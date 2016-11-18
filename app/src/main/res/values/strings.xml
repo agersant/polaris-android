@@ -14,4 +14,9 @@
     <string name="pref_server_url">Server address</string>
     <string name="pref_username">Username</string>
     <string name="pref_password">Password</string>
+
+    <string name="pref_key_server_url">server</string>
+    <string name="pref_key_username">username</string>
+    <string name="pref_key_password">password</string>
+
 </resources>
