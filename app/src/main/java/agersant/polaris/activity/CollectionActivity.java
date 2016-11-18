@@ -1,4 +1,4 @@
-package agersant.polaris;
+package agersant.polaris.activity;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Button;
+
+import agersant.polaris.R;
 
 public class CollectionActivity extends AppCompatActivity {
 
