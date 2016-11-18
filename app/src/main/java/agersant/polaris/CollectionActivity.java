@@ -7,16 +7,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+public class CollectionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_collection);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.collection);
+        setSupportActionBar(toolbar );
+
+        // Disable unimplemented features
+        {
+            Button button;
+            button = (Button) findViewById(R.id.random);
+            button.setEnabled(false);
+            button = (Button) findViewById(R.id.recently_added);
+            button.setEnabled(false);
+            button = (Button) findViewById(R.id.playlists);
+            button.setEnabled(false);
+        }
     }
 
     @Override

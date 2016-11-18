@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="agersant.polaris.CollectionActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+
+        <Button
+            android:id="@+id/browse_directories"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_height="48dp"
+            android:drawablePadding="8dp"
+            android:text="@string/collection_browse_directories"
+            android:drawableLeft="@drawable/ic_folder_black_24dp"
+            android:drawableStart="@drawable/ic_folder_black_24dp" />
+
+        <Button
+            android:id="@+id/random"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_height="48dp"
+            android:drawablePadding="8dp"
+            android:text="@string/collection_random_albums"
+            android:drawableLeft="@drawable/ic_shuffle_black_24dp"
+            android:drawableStart="@drawable/ic_shuffle_black_24dp" />
+
+        <Button
+            android:id="@+id/recently_added"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_height="48dp"
+            android:drawablePadding="8dp"
+            android:text="@string/collection_recently_added"
+            android:drawableLeft="@drawable/ic_new_releases_black_24dp"
+            android:drawableStart="@drawable/ic_new_releases_black_24dp" />
+
+        <Button
+            android:id="@+id/playlists"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_height="48dp"
+            android:drawablePadding="8dp"
+            android:text="@string/collection_playlists"
+            android:drawableLeft="@drawable/ic_queue_music_black_24dp"
+            android:drawableStart="@drawable/ic_queue_music_black_24dp" />
+    </LinearLayout>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/menu_navigation" />
+
+</RelativeLayout>

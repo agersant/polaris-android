@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">Polaris</string>
 
+    <string name="collection">Collection</string>
+    <string name="collection_browse_directories">Browse Directories</string>
+    <string name="collection_random_albums">Random Albums</string>
+    <string name="collection_recently_added">Recently Added</string>
+    <string name="collection_playlists">Playlists</string>
+
+    <string name="queue">Queue</string>
+
+    <string name="now_playing">Now Playing</string>
+
     <string name="pref_server_url">Server address</string>
     <string name="pref_username">Username</string>
     <string name="pref_password">Password</string>

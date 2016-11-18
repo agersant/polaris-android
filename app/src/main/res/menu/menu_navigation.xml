@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_search"
+        android:title="@string/collection"
+        android:icon="@drawable/ic_library_music_black_24dp" />
+    <item android:id="@+id/action_settings"
+        android:title="@string/queue"
+        android:icon="@drawable/ic_playlist_play_black_24dp" />
+    <item android:id="@+id/action_navigation"
+        android:title="@string/now_playing"
+        android:icon="@drawable/ic_play_circle_outline_black_24dp" />
+</menu>
