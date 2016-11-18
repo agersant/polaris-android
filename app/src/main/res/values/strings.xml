@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Polaris</string>
+
+    <string name="pref_server_url">Server address</string>
+    <string name="pref_username">Username</string>
+    <string name="pref_password">Password</string>
 </resources>
