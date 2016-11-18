@@ -13,19 +13,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public SettingsFragment() {
     }
 
+    private SharedPreferences getSharedPreferences() {
+        return getPreferenceManager().getSharedPreferences();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        for (int i = 0; i < getPreferenceScreen().getPreferenceCount(); ++i) {
-            Preference preference = getPreferenceScreen().getPreference(i);
-            updatePreferenceSummary(preference, preference.getKey());
+        for (String key : getSharedPreferences().getAll().keySet()) {
+            Preference preference = this.findPreference(key);
+            updatePreferenceSummary(preference, key);
         }
     }
 
@@ -38,7 +42,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (preference == null) {
             return;
         }
-        SharedPreferences sharedPrefs = getPreferenceManager().getSharedPreferences();
-        preference.setSummary(sharedPrefs.getString(key, ""));
+        preference.setSummary(getSharedPreferences().getString(key, ""));
     }
 }
