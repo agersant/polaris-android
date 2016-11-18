@@ -23,45 +23,58 @@
             android:id="@+id/browse_directories"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            style="?android:attr/borderlessButtonStyle"
+            style="?android:attr/actionButtonStyle"
             android:layout_height="48dp"
+            android:textSize="18sp"
             android:drawablePadding="8dp"
             android:text="@string/collection_browse_directories"
             android:drawableLeft="@drawable/ic_folder_black_24dp"
             android:drawableStart="@drawable/ic_folder_black_24dp" />
 
+        <View style="@style/Divider"/>
+
         <Button
             android:id="@+id/random"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            style="?android:attr/borderlessButtonStyle"
+            style="?android:attr/actionButtonStyle"
             android:layout_height="48dp"
+            android:textSize="18sp"
             android:drawablePadding="8dp"
             android:text="@string/collection_random_albums"
             android:drawableLeft="@drawable/ic_shuffle_black_24dp"
             android:drawableStart="@drawable/ic_shuffle_black_24dp" />
 
+        <View style="@style/Divider"/>
+
         <Button
             android:id="@+id/recently_added"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            style="?android:attr/borderlessButtonStyle"
+            style="?android:attr/actionButtonStyle"
             android:layout_height="48dp"
+            android:textSize="18sp"
             android:drawablePadding="8dp"
             android:text="@string/collection_recently_added"
             android:drawableLeft="@drawable/ic_new_releases_black_24dp"
             android:drawableStart="@drawable/ic_new_releases_black_24dp" />
 
+        <View style="@style/Divider"/>
+
         <Button
             android:id="@+id/playlists"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            style="?android:attr/borderlessButtonStyle"
+            style="?android:attr/actionButtonStyle"
             android:layout_height="48dp"
+            android:textSize="18sp"
             android:drawablePadding="8dp"
             android:text="@string/collection_playlists"
             android:drawableLeft="@drawable/ic_queue_music_black_24dp"
             android:drawableStart="@drawable/ic_queue_music_black_24dp" />
+
+        <View style="@style/Divider"/>
+
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
