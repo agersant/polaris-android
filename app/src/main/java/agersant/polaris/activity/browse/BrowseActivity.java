@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
@@ -70,18 +71,16 @@ public class BrowseActivity extends PolarisActivity {
     private void setContent(JSONArray content) {
         progressBar.setVisibility(View.GONE);
 
-        ArrayList<ExplorerItem> newItems = new ArrayList<>();
+        ArrayList<CollectionItem> newItems = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
+            JSONObject item = null;
             try {
-                JSONObject item = content.getJSONObject(i);
-                boolean isDirectory = item.getString("variant").equals("Directory");
-                JSONObject fields = item.getJSONArray("fields").getJSONObject(0);
-                String name = fields.getString("path");
-                ExplorerItem explorerItem = new ExplorerItem(name, isDirectory);
-                newItems.add(explorerItem);
+                item = content.getJSONObject(i);
             } catch (Exception e) {
-                System.err.println("Unexpected response structure");
             }
+            assert item != null;
+            CollectionItem browseItem = new CollectionItem(item);
+            newItems.add(browseItem);
         }
         adapter.setItems(newItems);
     }
