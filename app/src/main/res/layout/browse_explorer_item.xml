@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <Button
         android:id="@+id/browse_explorer_button"
@@ -11,5 +14,7 @@
         android:textSize="18sp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:drawablePadding="12dp" />
+        android:drawablePadding="12dp"
+        tools:text="Dead Can Dance"
+        tools:drawableLeft="@drawable/ic_folder_open_black_24dp"/>
 </LinearLayout>

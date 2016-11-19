@@ -21,7 +21,8 @@
         android:layout_height="match_parent"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        tools:listitem="@layout/queue_item" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
