@@ -36,11 +36,11 @@ public class BrowseActivity extends PolarisActivity {
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
         adapter = new ExplorerAdapter();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         Intent intent = getIntent();
