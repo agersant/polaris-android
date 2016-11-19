@@ -1,4 +1,4 @@
-package agersant.polaris.layout;
+package agersant.polaris.fragment;
 
 
 import android.content.SharedPreferences;
