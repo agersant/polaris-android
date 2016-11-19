@@ -3,8 +3,6 @@ package agersant.polaris.activity.browse;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuInflater;
 
 import com.android.volley.Response;
 
