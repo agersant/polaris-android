@@ -52,9 +52,10 @@ public class BrowseActivity extends AppCompatActivity {
         for (int i = 0; i < content.length(); i++) {
             try {
                 JSONObject item = content.getJSONObject(i);
+                boolean isDirectory = item.getString("variant").equals("Directory");
                 JSONObject fields = item.getJSONArray("fields").getJSONObject(0);
                 String name = fields.getString("path");
-                ExplorerItem explorerItem = new ExplorerItem(name);
+                ExplorerItem explorerItem = new ExplorerItem(name, isDirectory);
                 newItems.add(explorerItem);
             } catch (Exception e) {
                 System.err.println("Unexpected response structure");

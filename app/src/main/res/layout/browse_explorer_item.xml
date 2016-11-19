@@ -9,7 +9,5 @@
         style="?android:attr/actionButtonStyle"
         android:layout_height="48dp"
         android:textSize="18sp"
-        android:drawablePadding="12dp"
-        android:drawableLeft="@drawable/ic_folder_open_black_24dp"
-        android:drawableStart="@drawable/ic_folder_open_black_24dp" />
+        android:drawablePadding="12dp" />
 </LinearLayout>

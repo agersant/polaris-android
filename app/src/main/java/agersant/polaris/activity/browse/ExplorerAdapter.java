@@ -1,5 +1,7 @@
 package agersant.polaris.activity.browse;
 
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,8 +59,20 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
         }
 
         void bindItem(ExplorerItem item) {
-            button.setText(item.getName());
             path = item.getPath();
+            button.setText(item.getName());
+
+            int icon;
+            if (item.isDirectory()) {
+               icon = R.drawable.ic_folder_open_black_24dp;
+            } else {
+               icon = R.drawable.ic_audiotrack_black_24dp;
+            }
+
+            button.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
+            }
         }
 
         @Override

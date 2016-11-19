@@ -4,17 +4,23 @@ class ExplorerItem {
 
     private String name;
     private String path;
+    private boolean isDirectory;
 
-    ExplorerItem(String path) {
+    ExplorerItem(String path, boolean isDirectory) {
+        this.isDirectory = isDirectory;
         this.name = path;
         this.path = path;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public String getPath() {
+    String getPath() {
         return path;
+    }
+
+    boolean isDirectory() {
+        return isDirectory;
     }
 }
