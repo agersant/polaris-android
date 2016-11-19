@@ -9,5 +9,7 @@
         style="?android:attr/actionButtonStyle"
         android:layout_height="48dp"
         android:textSize="18sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:drawablePadding="12dp" />
 </LinearLayout>
