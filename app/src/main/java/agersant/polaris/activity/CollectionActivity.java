@@ -3,27 +3,22 @@ package agersant.polaris.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.R;
 import agersant.polaris.activity.browse.BrowseActivity;
 
-public class CollectionActivity extends AppCompatActivity {
+public class CollectionActivity extends PolarisActivity {
+
+    CollectionActivity() {
+        super(R.string.collection);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collection);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.collection);
-        setSupportActionBar(toolbar);
+        super.onCreate(savedInstanceState);
 
         // Disable unimplemented features
         {
@@ -37,27 +32,10 @@ public class CollectionActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     public void browseDirectories(View view) {
         Context context = view.getContext();
         Intent showBrowser = new Intent(context, BrowseActivity.class);
+        showBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         context.startActivity(showBrowser);
     }
 }

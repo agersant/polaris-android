@@ -1,9 +1,10 @@
 package agersant.polaris.activity.browse;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
 
 import com.android.volley.Response;
 
@@ -14,17 +15,22 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import agersant.polaris.R;
+import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
 
-public class BrowseActivity extends AppCompatActivity {
+public class BrowseActivity extends PolarisActivity {
 
     private ExplorerAdapter adapter;
     private Stack<JSONArray> history;
 
+    BrowseActivity() {
+        super(R.string.collection);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse);
+        super.onCreate(savedInstanceState);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -41,6 +47,7 @@ public class BrowseActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (history.size() < 2) {
             super.onBackPressed();
+            overridePendingTransition(0, 0);
         } else {
             history.pop();
             setContent(history.peek());
