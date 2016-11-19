@@ -11,18 +11,20 @@ import android.widget.Button;
 
 import java.util.ArrayList;
 
+import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 
 
 class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
 
-    private ArrayList<ExplorerItem> items;
+    private ArrayList<CollectionItem> items;
 
     ExplorerAdapter() {
-        setItems(new ArrayList<ExplorerItem>());
+        setItems(new ArrayList<CollectionItem>());
     }
 
-    void setItems(ArrayList<ExplorerItem> items) {
+    void setItems(ArrayList<CollectionItem> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -47,7 +49,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
     static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Button button;
-        private ExplorerItem item;
+        private CollectionItem item;
 
         BrowseItemHolder(View view) {
             super(view);
@@ -55,7 +57,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
             button.setOnClickListener(this);
         }
 
-        void bindItem(ExplorerItem item) {
+        void bindItem(CollectionItem item) {
             this.item = item;
             button.setText(item.getName());
 
@@ -80,6 +82,8 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
                 intent.putExtra(BrowseActivity.PATH, item.getPath());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 context.startActivity(intent);
+            } else {
+                PlaybackQueue.getInstance().add(item);
             }
         }
     }

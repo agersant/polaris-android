@@ -51,7 +51,7 @@ public class PolarisActivity extends AppCompatActivity {
 
     private void highlightNavigationTab() {
         Menu menu = navigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++ ) {
+        for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setChecked(false);
         }
         menu.findItem(navigationItem).setChecked(true);
