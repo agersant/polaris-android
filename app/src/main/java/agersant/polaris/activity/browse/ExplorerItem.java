@@ -8,8 +8,9 @@ class ExplorerItem {
 
     ExplorerItem(String path, boolean isDirectory) {
         this.isDirectory = isDirectory;
-        this.name = path;
         this.path = path;
+        String[] chunks = path.split("/|\\\\");
+        this.name = chunks[chunks.length-1];
     }
 
     String getName() {
