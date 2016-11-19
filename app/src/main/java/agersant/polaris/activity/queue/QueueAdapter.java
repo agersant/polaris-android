@@ -9,9 +9,12 @@ import android.widget.TextView;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.ui.DragAndSwipeItemTouchHelperAdapter;
 
 
-class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
+class QueueAdapter
+        extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder>
+        implements DragAndSwipeItemTouchHelperAdapter {
 
     private PlaybackQueue queue;
 
@@ -35,6 +38,18 @@ class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
     @Override
     public int getItemCount() {
         return queue.size();
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        queue.swap(fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        queue.remove(position);
+        notifyItemRemoved(position);
     }
 
     static class QueueItemHolder extends RecyclerView.ViewHolder {

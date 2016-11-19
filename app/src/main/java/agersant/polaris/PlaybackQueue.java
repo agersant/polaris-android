@@ -1,6 +1,7 @@
 package agersant.polaris;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class PlaybackQueue {
 
@@ -25,6 +26,14 @@ public class PlaybackQueue {
         } catch (Exception e) {
             System.err.println("Error while queuing item: " + e.toString());
         }
+    }
+
+    public void remove(int position) {
+        content.remove(position);
+    }
+
+    public void swap(int fromPosition, int toPosition) {
+        Collections.swap(content, fromPosition, toPosition);
     }
 
     public int size() {
