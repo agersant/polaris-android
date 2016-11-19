@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
@@ -18,6 +19,7 @@ import agersant.polaris.api.ServerAPI;
 public class BrowseActivity extends AppCompatActivity {
 
     private ExplorerAdapter adapter;
+    private Stack<JSONArray> history;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,15 +33,26 @@ public class BrowseActivity extends AppCompatActivity {
         adapter = new ExplorerAdapter(this);
         recyclerView.setAdapter(adapter);
 
+        history = new Stack<>();
         browseTo("");
     }
 
+    @Override
+    public void onBackPressed() {
+        if (history.size() < 2) {
+            super.onBackPressed();
+        } else {
+            history.pop();
+            setContent(history.peek());
+        }
+    }
+
     void browseTo(String path) {
-        final BrowseActivity that = this;
         Response.Listener<JSONArray> success = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                that.onReceiveContent(response);
+                history.push(response);
+                setContent(response);
             }
         };
 
@@ -47,7 +60,7 @@ public class BrowseActivity extends AppCompatActivity {
         server.browse(path, success);
     }
 
-    private void onReceiveContent(JSONArray content) {
+    private void setContent(JSONArray content) {
         ArrayList<ExplorerItem> newItems = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
             try {
