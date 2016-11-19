@@ -25,7 +25,7 @@ public class BrowseActivity extends PolarisActivity {
     private ProgressBar progressBar;
 
     public BrowseActivity() {
-        super(R.string.collection);
+        super(R.string.collection, R.id.nav_collection);
     }
 
     @Override

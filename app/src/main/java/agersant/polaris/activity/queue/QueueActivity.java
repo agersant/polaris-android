@@ -8,7 +8,7 @@ import agersant.polaris.activity.PolarisActivity;
 public class QueueActivity extends PolarisActivity {
 
     public QueueActivity() {
-        super(R.string.queue);
+        super(R.string.queue, R.id.nav_queue);
     }
 
     @Override

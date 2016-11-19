@@ -17,9 +17,12 @@ import agersant.polaris.activity.queue.QueueActivity;
 public class PolarisActivity extends AppCompatActivity {
 
     private int title;
+    private int navigationItem;
+    private BottomNavigationView navigationView;
 
-    public PolarisActivity(int title) {
+    public PolarisActivity(int title, int navigationItem) {
         this.title = title;
+        this.navigationItem = navigationItem;
     }
 
     @Override
@@ -31,13 +34,27 @@ public class PolarisActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final PolarisActivity that = this;
-        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        navigationView = (BottomNavigationView) findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(final @NonNull MenuItem menuItem) {
                 return that.onNavigationItemSelected(menuItem);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        highlightNavigationTab();
+    }
+
+    private void highlightNavigationTab() {
+        Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++ ) {
+            menu.getItem(i).setChecked(false);
+        }
+        menu.findItem(navigationItem).setChecked(true);
     }
 
     @Override

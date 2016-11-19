@@ -12,7 +12,7 @@ import agersant.polaris.activity.browse.BrowseActivity;
 public class CollectionActivity extends PolarisActivity {
 
     public CollectionActivity() {
-        super(R.string.collection);
+        super(R.string.collection, R.id.nav_collection);
     }
 
     @Override
