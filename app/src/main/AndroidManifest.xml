@@ -20,7 +20,8 @@
         </activity>
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".activity.browse.BrowseActivity" />
-        <activity android:name=".activity.queue.QueueActivity"></activity>
+        <activity android:name=".activity.queue.QueueActivity" />
+        <activity android:name=".activity.player.PlayerActivity"></activity>
     </application>
 
 </manifest>

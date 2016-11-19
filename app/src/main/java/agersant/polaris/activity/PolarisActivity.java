@@ -12,10 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import agersant.polaris.R;
+import agersant.polaris.activity.player.PlayerActivity;
 import agersant.polaris.activity.queue.QueueActivity;
 
 public class PolarisActivity extends AppCompatActivity {
 
+    protected Toolbar toolbar;
     private int title;
     private int navigationItem;
     private BottomNavigationView navigationView;
@@ -29,7 +31,7 @@ public class PolarisActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
@@ -77,6 +79,9 @@ public class PolarisActivity extends AppCompatActivity {
             case R.id.nav_queue:
                 openQueue();
                 return true;
+            case R.id.nav_now_playing:
+                openPlayer();
+                return true;
         }
         return false;
     }
@@ -89,6 +94,12 @@ public class PolarisActivity extends AppCompatActivity {
 
     private void openQueue() {
         Intent intent = new Intent(this, QueueActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void openPlayer() {
+        Intent intent = new Intent(this, PlayerActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

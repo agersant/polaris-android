@@ -8,6 +8,7 @@ public class PlaybackQueue {
     private static PlaybackQueue instance;
 
     private ArrayList<CollectionItem> content;
+    private CollectionItem currentItem;
 
     private PlaybackQueue() {
         content = new ArrayList<>();
@@ -44,4 +45,7 @@ public class PlaybackQueue {
         return content.get(position);
     }
 
+    public CollectionItem getCurrentItem() {
+        return currentItem;
+    }
 }
