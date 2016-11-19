@@ -7,7 +7,7 @@ import agersant.polaris.activity.PolarisActivity;
 
 public class QueueActivity extends PolarisActivity {
 
-    QueueActivity() {
+    public QueueActivity() {
         super(R.string.queue);
     }
 

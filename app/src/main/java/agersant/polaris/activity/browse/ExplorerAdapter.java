@@ -1,5 +1,7 @@
 package agersant.polaris.activity.browse;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,10 +17,8 @@ import agersant.polaris.R;
 class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
 
     private ArrayList<ExplorerItem> items;
-    private BrowseActivity browseActivity;
 
-    ExplorerAdapter(BrowseActivity browseActivity) {
-        this.browseActivity = browseActivity;
+    ExplorerAdapter() {
         setItems(new ArrayList<ExplorerItem>());
     }
 
@@ -31,7 +31,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
     public ExplorerAdapter.BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.browse_explorer_item, parent, false);
-        return new BrowseItemHolder(inflatedView, browseActivity);
+        return new BrowseItemHolder(inflatedView);
     }
 
     @Override
@@ -48,11 +48,9 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
 
         private Button button;
         private ExplorerItem item;
-        private BrowseActivity browseActivity;
 
-        BrowseItemHolder(View view, BrowseActivity browseActivity) {
+        BrowseItemHolder(View view) {
             super(view);
-            this.browseActivity = browseActivity;
             button = (Button) view.findViewById(R.id.browse_explorer_button);
             button.setOnClickListener(this);
         }
@@ -77,7 +75,11 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
         @Override
         public void onClick(View view) {
             if (item.isDirectory()) {
-                browseActivity.browseTo(item.getPath());
+                Context context = view.getContext();
+                Intent intent = new Intent(context, BrowseActivity.class);
+                intent.putExtra(BrowseActivity.PATH, item.getPath());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                context.startActivity(intent);
             }
         }
     }

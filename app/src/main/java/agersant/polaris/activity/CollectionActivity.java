@@ -11,7 +11,7 @@ import agersant.polaris.activity.browse.BrowseActivity;
 
 public class CollectionActivity extends PolarisActivity {
 
-    CollectionActivity() {
+    public CollectionActivity() {
         super(R.string.collection);
     }
 

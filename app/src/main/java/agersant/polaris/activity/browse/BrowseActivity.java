@@ -1,8 +1,11 @@
 package agersant.polaris.activity.browse;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.android.volley.Response;
 
@@ -10,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
@@ -18,10 +20,11 @@ import agersant.polaris.api.ServerAPI;
 
 public class BrowseActivity extends PolarisActivity {
 
+    public static final String PATH = "PATH";
     private ExplorerAdapter adapter;
-    private Stack<JSONArray> history;
+    private ProgressBar progressBar;
 
-    BrowseActivity() {
+    public BrowseActivity() {
         super(R.string.collection);
     }
 
@@ -30,42 +33,43 @@ public class BrowseActivity extends PolarisActivity {
         setContentView(R.layout.activity_browse);
         super.onCreate(savedInstanceState);
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        adapter = new ExplorerAdapter(this);
+        adapter = new ExplorerAdapter();
         recyclerView.setAdapter(adapter);
 
-        history = new Stack<>();
-        browseTo("");
+        Intent intent = getIntent();
+        String path = intent.getStringExtra(BrowseActivity.PATH);
+        if (path == null) {
+            path = "";
+        }
+        loadPath(path);
     }
 
     @Override
-    public void onBackPressed() {
-        if (history.size() < 2) {
-            super.onBackPressed();
-            overridePendingTransition(0, 0);
-        } else {
-            history.pop();
-            setContent(history.peek());
-        }
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
     }
 
-    void browseTo(String path) {
+    private void loadPath(String path) {
         Response.Listener<JSONArray> success = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                history.push(response);
                 setContent(response);
             }
         };
-
         ServerAPI server = ServerAPI.getInstance(getApplicationContext());
         server.browse(path, success);
     }
 
     private void setContent(JSONArray content) {
+        progressBar.setVisibility(View.GONE);
+
         ArrayList<ExplorerItem> newItems = new ArrayList<>();
         for (int i = 0; i < content.length(); i++) {
             try {

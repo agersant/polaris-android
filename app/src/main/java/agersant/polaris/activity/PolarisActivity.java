@@ -40,6 +40,18 @@ public class PolarisActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
+    }
+
     private boolean onNavigationItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_collection:
@@ -54,13 +66,13 @@ public class PolarisActivity extends AppCompatActivity {
 
     private void openCollection() {
         Intent intent = new Intent(this, CollectionActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
     private void openQueue() {
         Intent intent = new Intent(this, QueueActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }
 
