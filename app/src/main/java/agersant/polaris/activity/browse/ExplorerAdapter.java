@@ -48,7 +48,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
     static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Button button;
-        private String path;
+        private ExplorerItem item;
         private BrowseActivity browseActivity;
 
         BrowseItemHolder(View view, BrowseActivity browseActivity) {
@@ -59,7 +59,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
         }
 
         void bindItem(ExplorerItem item) {
-            path = item.getPath();
+            this.item = item;
             button.setText(item.getName());
 
             int icon;
@@ -77,7 +77,9 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
 
         @Override
         public void onClick(View view) {
-            browseActivity.browseTo(path);
+            if (item.isDirectory()) {
+                browseActivity.browseTo(item.getPath());
+            }
         }
     }
 }
