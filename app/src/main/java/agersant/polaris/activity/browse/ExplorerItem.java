@@ -10,7 +10,7 @@ class ExplorerItem {
         this.isDirectory = isDirectory;
         this.path = path;
         String[] chunks = path.split("/|\\\\");
-        this.name = chunks[chunks.length-1];
+        this.name = chunks[chunks.length - 1];
     }
 
     String getName() {
