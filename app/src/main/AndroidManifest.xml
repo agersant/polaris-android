@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.browse.BrowseActivity"></activity>
     </application>
 
 </manifest>

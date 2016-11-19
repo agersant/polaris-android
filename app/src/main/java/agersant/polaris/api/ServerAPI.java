@@ -58,17 +58,10 @@ public class ServerAPI {
         return this.requestQueue;
     }
 
-    public void browse(String path) {
+    public void browse(String path, Response.Listener<JSONArray> success) {
 
         String serverAddress = this.getURL();
         String requestURL = serverAddress + "/browse/" + path;
-
-        Response.Listener<JSONArray> success = new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                System.out.println("Something came through " + response.toString());
-            }
-        };
 
         Response.ErrorListener failure = new Response.ErrorListener() {
             @Override

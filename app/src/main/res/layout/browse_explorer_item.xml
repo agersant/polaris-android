@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/browse_explorer_button"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        style="?android:attr/actionButtonStyle"
+        android:layout_height="48dp"
+        android:textSize="18sp"
+        android:drawablePadding="12dp"
+        android:drawableLeft="@drawable/ic_folder_black_24dp"
+        android:drawableStart="@drawable/ic_folder_black_24dp" />
+</LinearLayout>
