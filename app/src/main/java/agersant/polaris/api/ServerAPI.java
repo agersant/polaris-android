@@ -40,7 +40,7 @@ public class ServerAPI {
         return instance;
     }
 
-    String getURL() {
+    public String getURL() {
         String address = this.preferences.getString(serverAddressKey, "");
         address = address.replaceAll("/$", "");
         return address + "/api";
@@ -56,6 +56,10 @@ public class ServerAPI {
 
     RequestQueue getRequestQueue() {
         return this.requestQueue;
+    }
+
+    public String getAuthCookie() {
+        return auth.getCookie();
     }
 
     public void browse(String path, Response.Listener<JSONArray> success) {

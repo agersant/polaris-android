@@ -21,7 +21,7 @@ public class QueueActivity extends PolarisActivity {
         setContentView(R.layout.activity_queue);
         super.onCreate(savedInstanceState);
 
-        QueueAdapter adapter = new QueueAdapter(PlaybackQueue.getInstance());
+        QueueAdapter adapter = new QueueAdapter(PlaybackQueue.getInstance(this));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
         recyclerView.setHasFixedSize(true);

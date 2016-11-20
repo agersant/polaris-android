@@ -1,5 +1,7 @@
 package agersant.polaris;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -8,25 +10,33 @@ public class PlaybackQueue {
     private static PlaybackQueue instance;
 
     private ArrayList<CollectionItem> content;
-    private CollectionItem currentItem;
+    private Player player;
 
-    private PlaybackQueue() {
+    private PlaybackQueue(Context context) {
+        player = Player.getInstance(context);
         content = new ArrayList<>();
     }
 
-    public static PlaybackQueue getInstance() {
+    public static PlaybackQueue getInstance(Context context) {
         if (instance == null) {
-            instance = new PlaybackQueue();
+            instance = new PlaybackQueue(context);
         }
         return instance;
     }
 
     public void add(CollectionItem item) {
+        CollectionItem newItem;
         try {
-            content.add(item.clone());
+            newItem = item.clone();
         } catch (Exception e) {
-            System.err.println("Error while queuing item: " + e.toString());
+            System.err.println("Error while cloning CollectionItem: " + e.toString());
+            return;
         }
+
+        content.add(newItem);
+        // if (player.isIdle()) {
+        player.play(newItem);
+        // }
     }
 
     public void remove(int position) {
@@ -43,9 +53,5 @@ public class PlaybackQueue {
 
     public CollectionItem getItem(int position) {
         return content.get(position);
-    }
-
-    public CollectionItem getCurrentItem() {
-        return currentItem;
     }
 }

@@ -76,14 +76,14 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
 
         @Override
         public void onClick(View view) {
+            Context context = view.getContext();
             if (item.isDirectory()) {
-                Context context = view.getContext();
                 Intent intent = new Intent(context, BrowseActivity.class);
                 intent.putExtra(BrowseActivity.PATH, item.getPath());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 context.startActivity(intent);
             } else {
-                PlaybackQueue.getInstance().add(item);
+                PlaybackQueue.getInstance(context).add(item);
             }
         }
     }

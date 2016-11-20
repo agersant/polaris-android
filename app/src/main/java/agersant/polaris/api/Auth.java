@@ -94,4 +94,7 @@ class Auth {
         this.serverAPI.getRequestQueue().addRequest(request);
     }
 
+    String getCookie() {
+        return cookie;
+    }
 }

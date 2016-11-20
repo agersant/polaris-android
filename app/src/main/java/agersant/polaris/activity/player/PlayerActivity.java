@@ -4,16 +4,19 @@ import android.os.Bundle;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
+import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
 
 public class PlayerActivity extends PolarisActivity {
 
     PlaybackQueue queue;
+    Player player;
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
-        this.queue = PlaybackQueue.getInstance();
+        queue = PlaybackQueue.getInstance(this);
+        player = Player.getInstance(this);
     }
 
     @Override
@@ -23,7 +26,7 @@ public class PlayerActivity extends PolarisActivity {
     }
 
     private void updateContent() {
-        CollectionItem currentItem = queue.getCurrentItem();
+        CollectionItem currentItem = player.getCurrentItem();
         if (currentItem == null) {
             populateWithBlank();
         } else {
