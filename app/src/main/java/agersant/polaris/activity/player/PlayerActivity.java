@@ -24,14 +24,14 @@ public class PlayerActivity extends PolarisActivity {
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
-        queue = PlaybackQueue.getInstance(this);
-        player = Player.getInstance(this);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_player);
         super.onCreate(savedInstanceState);
+        queue = PlaybackQueue.getInstance(this);
+        player = Player.getInstance(this);
         artwork = (ImageView) findViewById(R.id.artwork);
         subscribeToEvents();
     }

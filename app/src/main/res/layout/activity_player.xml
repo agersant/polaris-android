@@ -16,45 +16,54 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
 
-    <ImageView
-        android:id="@+id/artwork"
-        tools:src="@drawable/artwork"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true" />
-
-    <LinearLayout
+    <agersant.polaris.ui.SquareLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal">
-
+        android:id="@+id/viewGroup">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_skip_previous_black_24dp"/>
+            android:id="@+id/artwork"
+            tools:src="@drawable/artwork"
+            android:contentDescription="@string/player_artwork"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true" />
+    </agersant.polaris.ui.SquareLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_play_arrow_black_24dp"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_skip_next_black_24dp"/>
-
-    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+       <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/player_previous_track"
+                android:src="@drawable/ic_skip_previous_black_24dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/player_play_pause"
+                android:src="@drawable/ic_play_arrow_black_24dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/player_next_track"
+                android:src="@drawable/ic_skip_next_black_24dp"/>
+        </LinearLayout>
+    </FrameLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_alignParentBottom="true"
         app:menu="@menu/menu_navigation" />
 
 </LinearLayout>
