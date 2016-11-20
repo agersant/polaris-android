@@ -1,6 +1,11 @@
 package agersant.polaris.activity.player;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -10,8 +15,10 @@ import agersant.polaris.activity.PolarisActivity;
 
 public class PlayerActivity extends PolarisActivity {
 
-    PlaybackQueue queue;
-    Player player;
+    private BroadcastReceiver receiver;
+    private PlaybackQueue queue;
+    private Player player;
+    private ImageView artwork;
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
@@ -23,6 +30,31 @@ public class PlayerActivity extends PolarisActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_player);
         super.onCreate(savedInstanceState);
+        artwork = (ImageView) findViewById(R.id.artwork);
+        subscribeToEvents();
+    }
+
+    private void subscribeToEvents() {
+        final PlayerActivity that = this;
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Player.PLAYING_TRACK);
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case Player.PLAYING_TRACK:
+                        that.updateContent();
+                        break;
+                }
+            }
+        };
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     private void updateContent() {
@@ -49,6 +81,10 @@ public class PlayerActivity extends PolarisActivity {
         String artist = item.getArtist();
         if (artist != null) {
             toolbar.setSubtitle(artist);
+        }
+
+        String artworkPath = item.getArtwork();
+        if (artworkPath != null) {
         }
     }
 

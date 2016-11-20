@@ -1,11 +1,13 @@
 package agersant.polaris;
 
 import android.content.Context;
+import android.content.Intent;
 
 import agersant.polaris.api.ServerAPI;
 
 public class Player {
 
+    public static final String PLAYING_TRACK = "PLAYING_TRACK";
     private static Player instance;
 
     private CollectionItem currentItem;
@@ -23,9 +25,15 @@ public class Player {
     }
 
     public void play(CollectionItem item) {
+        PolarisApplication application = PolarisApplication.getInstance();
+
         currentItem = item;
         String url = serverAPI.getURL() + "/serve/" + item.getPath();
-        PolarisApplication.getInstance().getMediaPlayerService().play(url);
+        application.getMediaPlayerService().play(url);
+
+        Intent intent = new Intent();
+        intent.setAction(Player.PLAYING_TRACK);
+        application.sendBroadcast(intent);
     }
 
     public boolean isIdle() {

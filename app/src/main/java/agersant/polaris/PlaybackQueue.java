@@ -34,9 +34,9 @@ public class PlaybackQueue {
         }
 
         content.add(newItem);
-        // if (player.isIdle()) {
-        player.play(newItem);
-        // }
+        if (player.isIdle()) {
+            player.play(newItem);
+        }
     }
 
     public void remove(int position) {

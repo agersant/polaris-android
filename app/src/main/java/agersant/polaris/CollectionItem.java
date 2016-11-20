@@ -8,6 +8,7 @@ public class CollectionItem implements Cloneable {
     private String path;
     private String artist;
     private String title;
+    private String artwork;
     private boolean isDirectory;
 
     public CollectionItem(JSONObject source) {
@@ -17,6 +18,7 @@ public class CollectionItem implements Cloneable {
             path = fields.getString("path");
             artist = fields.optString("artist", null);
             title = fields.optString("title", null);
+            artwork = fields.optString("artwork", null);
         } catch (Exception e) {
             System.err.println("Unexpected CollectionItem structure: " + e.toString());
         }
@@ -44,6 +46,10 @@ public class CollectionItem implements Cloneable {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getArtwork() {
+        return artwork;
     }
 
     public boolean isDirectory() {
