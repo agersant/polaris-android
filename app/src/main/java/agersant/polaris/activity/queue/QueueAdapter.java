@@ -1,5 +1,6 @@
 package agersant.polaris.activity.queue;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
+import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.ui.DragAndSwipeItemTouchHelperAdapter;
 
@@ -52,7 +54,7 @@ class QueueAdapter
         notifyItemRemoved(position);
     }
 
-    static class QueueItemHolder extends RecyclerView.ViewHolder {
+    static class QueueItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private CollectionItem item;
         private TextView primaryText;
@@ -62,6 +64,7 @@ class QueueAdapter
             super(view);
             primaryText = (TextView) view.findViewById(R.id.primary_text);
             secondaryText = (TextView) view.findViewById(R.id.secondary_text);
+            view.setOnClickListener(this);
         }
 
         void bindItem(CollectionItem item) {
@@ -70,5 +73,10 @@ class QueueAdapter
             secondaryText.setText(item.getArtist());
         }
 
+        @Override
+        public void onClick(View view) {
+            Context context = view.getContext();
+            Player.getInstance(context).play(item);
+        }
     }
 }
