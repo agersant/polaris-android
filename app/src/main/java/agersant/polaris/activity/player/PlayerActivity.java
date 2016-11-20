@@ -12,6 +12,8 @@ import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
+import agersant.polaris.api.ServerAPI;
+import agersant.polaris.ui.NetworkImage;
 
 public class PlayerActivity extends PolarisActivity {
 
@@ -32,6 +34,12 @@ public class PlayerActivity extends PolarisActivity {
         super.onCreate(savedInstanceState);
         artwork = (ImageView) findViewById(R.id.artwork);
         subscribeToEvents();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateContent();
     }
 
     private void subscribeToEvents() {
@@ -85,6 +93,9 @@ public class PlayerActivity extends PolarisActivity {
 
         String artworkPath = item.getArtwork();
         if (artworkPath != null) {
+            ServerAPI serverAPI = ServerAPI.getInstance(this);
+            String url = serverAPI.getMediaURL(artworkPath);
+            NetworkImage.load(url, artwork);
         }
     }
 
