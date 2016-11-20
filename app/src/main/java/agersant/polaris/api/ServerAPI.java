@@ -62,6 +62,11 @@ public class ServerAPI {
         return auth.getCookie();
     }
 
+    public String getMediaURL(String path) {
+        String serverAddress = this.getURL();
+        return serverAddress + "/serve/" + path;
+    }
+
     public void browse(String path, Response.Listener<JSONArray> success) {
 
         String serverAddress = this.getURL();

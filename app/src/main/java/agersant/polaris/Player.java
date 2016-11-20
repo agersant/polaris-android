@@ -28,7 +28,7 @@ public class Player {
         PolarisApplication application = PolarisApplication.getInstance();
 
         currentItem = item;
-        String url = serverAPI.getURL() + "/serve/" + item.getPath();
+        String url = serverAPI.getMediaURL(item.getPath());
         application.getMediaPlayerService().play(url);
 
         Intent intent = new Intent();
