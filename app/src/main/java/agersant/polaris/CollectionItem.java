@@ -15,8 +15,8 @@ public class CollectionItem implements Cloneable {
             isDirectory = source.getString("variant").equals("Directory");
             JSONObject fields = source.getJSONArray("fields").getJSONObject(0);
             path = fields.getString("path");
-            artist = fields.getString("artist");
-            title = fields.getString("title");
+            artist = fields.optString("artist", null);
+            title = fields.optString("title", null);
         } catch (Exception e) {
             System.err.println("Unexpected CollectionItem structure: " + e.toString());
         }
