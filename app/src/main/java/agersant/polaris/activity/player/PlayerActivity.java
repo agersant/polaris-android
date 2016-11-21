@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 
 import agersant.polaris.CollectionItem;
@@ -65,6 +66,14 @@ public class PlayerActivity extends PolarisActivity {
         unregisterReceiver(receiver);
     }
 
+    public void skipPrevious(View view) {
+        queue.skipPrevious();
+    }
+
+    public void skipNext(View view) {
+        queue.skipNext();
+    }
+
     private void updateContent() {
         CollectionItem currentItem = player.getCurrentItem();
         if (currentItem == null) {
@@ -75,7 +84,6 @@ public class PlayerActivity extends PolarisActivity {
     }
 
     private void populateWithBlank() {
-
     }
 
     private void populateWithTrack(CollectionItem item) {

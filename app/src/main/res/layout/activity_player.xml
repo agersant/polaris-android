@@ -44,6 +44,7 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/player_previous_track"
+                android:onClick="skipPrevious"
                 android:src="@drawable/ic_skip_previous_black_24dp"/>
             <ImageView
                 android:layout_width="wrap_content"
@@ -58,6 +59,7 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/player_next_track"
+                android:onClick="skipNext"
                 android:src="@drawable/ic_skip_next_black_24dp"/>
         </LinearLayout>
     </FrameLayout>
