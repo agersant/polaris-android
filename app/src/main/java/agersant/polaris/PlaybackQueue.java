@@ -55,6 +55,10 @@ public class PlaybackQueue {
         content.remove(position);
     }
 
+    public void clear() {
+        content.clear();
+    }
+
     public void swap(int fromPosition, int toPosition) {
         Collections.swap(content, fromPosition, toPosition);
     }

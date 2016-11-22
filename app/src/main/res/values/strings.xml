@@ -22,4 +22,7 @@
     <string name="pref_key_server_url">server</string>
     <string name="pref_key_username">username</string>
     <string name="pref_key_password">password</string>
+    <string name="settings">Settings</string>
+    <string name="clear">Clear</string>
+
 </resources>
