@@ -63,6 +63,16 @@ public class PlaybackQueue {
         Collections.swap(content, fromPosition, toPosition);
     }
 
+    public void move(int fromPosition, int toPosition) {
+        if (fromPosition == toPosition) {
+            return;
+        }
+        int low = Math.min(fromPosition, toPosition);
+        int high = Math.max(fromPosition, toPosition);
+        int distance = fromPosition < toPosition ? -1 : 1;
+        Collections.rotate(content.subList(low, high + 1), distance);
+    }
+
     public int size() {
         return content.size();
     }

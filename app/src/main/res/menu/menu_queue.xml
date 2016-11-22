@@ -3,10 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:id="@+id/action_clear"
         android:title="@string/clear"
         android:icon="@drawable/ic_delete_black_24dp"/>
+    <item
+        app:showAsAction="ifRoom"
+        android:id="@+id/action_shuffle"
+        android:title="@string/shuffle"
+        android:icon="@drawable/ic_swap_vert_black_24dp"/>
     <item
         app:showAsAction="ifRoom"
         android:id="@+id/action_settings"

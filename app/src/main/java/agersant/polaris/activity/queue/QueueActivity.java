@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.Random;
+
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
@@ -53,6 +55,9 @@ public class QueueActivity extends PolarisActivity {
             case R.id.action_clear:
                 clear();
                 return true;
+            case R.id.action_shuffle:
+                shuffle();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -63,5 +68,16 @@ public class QueueActivity extends PolarisActivity {
         int oldCount = adapter.getItemCount();
         queue.clear();
         adapter.notifyItemRangeRemoved(0, oldCount);
+    }
+
+    private void shuffle() {
+        Random rng = new Random();
+        PlaybackQueue queue = PlaybackQueue.getInstance(this);
+        int count = adapter.getItemCount();
+        for (int i = 0; i <= count - 2; i++) {
+            int j = i + rng.nextInt(count - i);
+            queue.move(i, j);
+            adapter.notifyItemMoved(i, j);
+        }
     }
 }
