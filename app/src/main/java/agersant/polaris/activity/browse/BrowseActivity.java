@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
 
 import com.android.volley.Response;
 
+import java.util.ArrayList;
+
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
@@ -59,9 +61,9 @@ public class BrowseActivity extends PolarisActivity {
     }
 
     private void loadPath(String path) {
-        Response.Listener<Iterable<CollectionItem>> success = new Response.Listener<Iterable<CollectionItem>>() {
+        Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
             @Override
-            public void onResponse(Iterable<CollectionItem> response) {
+            public void onResponse(ArrayList<CollectionItem> response) {
                 progressBar.setVisibility(View.GONE);
                 adapter.setItems(response);
             }

@@ -71,7 +71,7 @@ public class ServerAPI {
         return serverAddress + "/serve/" + path;
     }
 
-    public void browse(String path, final Response.Listener<Iterable<CollectionItem>> success) {
+    public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success) {
         String serverAddress = this.getURL();
         String requestURL = serverAddress + "/browse/" + path;
         Response.ErrorListener failure = new Response.ErrorListener() {
@@ -85,7 +85,7 @@ public class ServerAPI {
         Response.Listener successWrapper = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                ArrayList<CollectionItem> items = new ArrayList<>();
+                ArrayList<CollectionItem> items = new ArrayList<>(response.length());
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject item = response.getJSONObject(i);
@@ -101,7 +101,7 @@ public class ServerAPI {
         this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
     }
 
-    public void flatten(String path, final Response.Listener<Iterable<CollectionItem>> success) {
+    public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success) {
         String serverAddress = this.getURL();
         String requestURL = serverAddress + "/flatten/" + path;
 
@@ -116,7 +116,7 @@ public class ServerAPI {
         Response.Listener successWrapper = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
-                ArrayList<CollectionItem> items = new ArrayList<>();
+                ArrayList<CollectionItem> items = new ArrayList<>(response.length());
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject item = response.getJSONObject(i);

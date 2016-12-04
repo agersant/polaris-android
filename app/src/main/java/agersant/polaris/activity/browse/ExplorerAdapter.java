@@ -30,11 +30,8 @@ class ExplorerAdapter
         setItems(new ArrayList<CollectionItem>());
     }
 
-    void setItems(Iterable<CollectionItem> items) {
-        this.items = new ArrayList<>();
-        for (CollectionItem item : items) {
-            this.items.add(item);
-        }
+    void setItems(ArrayList<CollectionItem> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
@@ -67,9 +64,9 @@ class ExplorerAdapter
             return;
         }
 
-        Response.Listener<Iterable<CollectionItem>> success = new Response.Listener<Iterable<CollectionItem>>() {
+        Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
             @Override
-            public void onResponse(Iterable<CollectionItem> response) {
+            public void onResponse(ArrayList<CollectionItem> response) {
                 PlaybackQueue.getInstance(context).addItems(response);
             }
         };
