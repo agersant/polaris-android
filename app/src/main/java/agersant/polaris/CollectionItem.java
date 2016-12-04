@@ -1,5 +1,6 @@
 package agersant.polaris;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CollectionItem implements Cloneable {
@@ -11,17 +12,29 @@ public class CollectionItem implements Cloneable {
     private String artwork;
     private boolean isDirectory;
 
-    public CollectionItem(JSONObject source) {
-        try {
-            isDirectory = source.getString("variant").equals("Directory");
-            JSONObject fields = source.getJSONArray("fields").getJSONObject(0);
-            path = fields.getString("path");
-            artist = fields.optString("artist", null);
-            title = fields.optString("title", null);
-            artwork = fields.optString("artwork", null);
-        } catch (Exception e) {
-            System.err.println("Unexpected CollectionItem structure: " + e.toString());
-        }
+    private CollectionItem() {
+    }
+
+    public static CollectionItem parse(JSONObject source) throws JSONException {
+        CollectionItem item = new CollectionItem();
+        item.isDirectory = source.optString("variant", "").equals("Directory");
+        JSONObject fields = source.getJSONArray("fields").getJSONObject(0);
+        item.parseFields(fields);
+        return item;
+    }
+
+    public static CollectionItem parseSong(JSONObject fields) throws JSONException {
+        CollectionItem item = new CollectionItem();
+        item.isDirectory = false;
+        item.parseFields(fields);
+        return item;
+    }
+
+    protected void parseFields(JSONObject fields) throws JSONException {
+        path = fields.getString("path");
+        artist = fields.optString("artist", null);
+        title = fields.optString("title", null);
+        artwork = fields.optString("artwork", null);
 
         String[] chunks = path.split("/|\\\\");
         name = chunks[chunks.length - 1];

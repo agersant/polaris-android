@@ -9,7 +9,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
 public class ServerAPI {
@@ -67,20 +71,65 @@ public class ServerAPI {
         return serverAddress + "/serve/" + path;
     }
 
-    public void browse(String path, Response.Listener<JSONArray> success) {
-
+    public void browse(String path, final Response.Listener<Iterable<CollectionItem>> success) {
         String serverAddress = this.getURL();
         String requestURL = serverAddress + "/browse/" + path;
+        Response.ErrorListener failure = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Handle
+                System.out.println("browse sadness here " + error);
+            }
+        };
+
+        Response.Listener successWrapper = new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ArrayList<CollectionItem> items = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject item = response.getJSONObject(i);
+                        CollectionItem browseItem = CollectionItem.parse(item);
+                        items.add(browseItem);
+                    } catch (Exception e) {
+                    }
+                }
+                success.onResponse(items);
+            }
+        };
+
+        this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
+    }
+
+    public void flatten(String path, final Response.Listener<Iterable<CollectionItem>> success) {
+        String serverAddress = this.getURL();
+        String requestURL = serverAddress + "/flatten/" + path;
 
         Response.ErrorListener failure = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // TODO Handle
-                System.out.println("sadness here " + error);
+                System.out.println("flatten sadness here " + error);
             }
         };
 
-        this.auth.doJsonArrayRequest(requestURL, success, failure);
+        Response.Listener successWrapper = new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ArrayList<CollectionItem> items = new ArrayList<>();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject item = response.getJSONObject(i);
+                        CollectionItem browseItem = CollectionItem.parseSong(item);
+                        items.add(browseItem);
+                    } catch (Exception e) {
+                    }
+                }
+                success.onResponse(items);
+            }
+        };
+
+        this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
     }
 }
 

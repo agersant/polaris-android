@@ -9,14 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.android.volley.Response;
+
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.ServerAPI;
+import agersant.polaris.ui.SwipeItemTouchHelperAdapter;
 
 
-class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
+class ExplorerAdapter
+        extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder>
+        implements SwipeItemTouchHelperAdapter {
 
     private ArrayList<CollectionItem> items;
 
@@ -24,8 +30,11 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
         setItems(new ArrayList<CollectionItem>());
     }
 
-    void setItems(ArrayList<CollectionItem> items) {
-        this.items = items;
+    void setItems(Iterable<CollectionItem> items) {
+        this.items = new ArrayList<>();
+        for (CollectionItem item : items) {
+            this.items.add(item);
+        }
         notifyDataSetChanged();
     }
 
@@ -44,6 +53,28 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public void onItemDismiss(RecyclerView.ViewHolder viewHolder) {
+        int position = viewHolder.getAdapterPosition();
+        notifyItemChanged(position);
+        final CollectionItem item = items.get(position);
+
+        final Context context = viewHolder.itemView.getContext();
+        if (!item.isDirectory()) {
+            PlaybackQueue.getInstance(context).addItem(item);
+            return;
+        }
+
+        Response.Listener<Iterable<CollectionItem>> success = new Response.Listener<Iterable<CollectionItem>>() {
+            @Override
+            public void onResponse(Iterable<CollectionItem> response) {
+                PlaybackQueue.getInstance(context).addItems(response);
+            }
+        };
+        ServerAPI server = ServerAPI.getInstance(context);
+        server.flatten(item.getPath(), success);
     }
 
     static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -83,7 +114,7 @@ class ExplorerAdapter extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHol
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 context.startActivity(intent);
             } else {
-                PlaybackQueue.getInstance(context).add(item);
+                PlaybackQueue.getInstance(context).addItem(item);
             }
         }
     }

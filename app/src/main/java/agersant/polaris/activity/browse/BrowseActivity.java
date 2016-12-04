@@ -4,20 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.android.volley.Response;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
+import agersant.polaris.ui.SwipeTouchHelperCallback;
 
 public class BrowseActivity extends PolarisActivity {
 
@@ -43,6 +40,10 @@ public class BrowseActivity extends PolarisActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
+        ItemTouchHelper.Callback callback = new SwipeTouchHelperCallback(adapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
         Intent intent = getIntent();
         String path = intent.getStringExtra(BrowseActivity.PATH);
         if (path == null) {
@@ -58,30 +59,14 @@ public class BrowseActivity extends PolarisActivity {
     }
 
     private void loadPath(String path) {
-        Response.Listener<JSONArray> success = new Response.Listener<JSONArray>() {
+        Response.Listener<Iterable<CollectionItem>> success = new Response.Listener<Iterable<CollectionItem>>() {
             @Override
-            public void onResponse(JSONArray response) {
-                setContent(response);
+            public void onResponse(Iterable<CollectionItem> response) {
+                progressBar.setVisibility(View.GONE);
+                adapter.setItems(response);
             }
         };
         ServerAPI server = ServerAPI.getInstance(getApplicationContext());
         server.browse(path, success);
-    }
-
-    private void setContent(JSONArray content) {
-        progressBar.setVisibility(View.GONE);
-
-        ArrayList<CollectionItem> newItems = new ArrayList<>();
-        for (int i = 0; i < content.length(); i++) {
-            JSONObject item = null;
-            try {
-                item = content.getJSONObject(i);
-            } catch (Exception e) {
-            }
-            assert item != null;
-            CollectionItem browseItem = new CollectionItem(item);
-            newItems.add(browseItem);
-        }
-        adapter.setItems(newItems);
     }
 }

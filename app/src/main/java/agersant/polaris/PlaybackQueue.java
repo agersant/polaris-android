@@ -13,6 +13,7 @@ public class PlaybackQueue {
     private ArrayList<CollectionItem> content;
     private Player player;
     private Ordering ordering;
+
     private PlaybackQueue(Context context) {
         rng = new Random();
         player = Player.getInstance(context);
@@ -27,7 +28,13 @@ public class PlaybackQueue {
         return instance;
     }
 
-    public void add(CollectionItem item) {
+    public void addItems(Iterable<CollectionItem> items) {
+        for (CollectionItem item : items) {
+            addItem(item);
+        }
+    }
+
+    public void addItem(CollectionItem item) {
         CollectionItem newItem;
         try {
             newItem = item.clone();
