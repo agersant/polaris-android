@@ -29,18 +29,8 @@ public class PlaybackQueue {
     }
 
     public void addItems(ArrayList<CollectionItem> items) {
-        content = new ArrayList<>(items.size());
-        try {
-            for (CollectionItem item : items) {
-                content.add(item.clone());
-            }
-        } catch (Exception e) {
-            System.err.println("Error while cloning CollectionItem: " + e.toString());
-            return;
-        }
-
-        if (player.isIdle() && content.size() > 0) {
-            player.play(content.get(0));
+        for (CollectionItem item : items) {
+            addItem(item);
         }
     }
 
