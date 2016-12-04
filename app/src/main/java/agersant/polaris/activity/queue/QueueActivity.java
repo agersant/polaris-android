@@ -1,6 +1,5 @@
 package agersant.polaris.activity.queue;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +13,6 @@ import java.util.Random;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
-import agersant.polaris.activity.SettingsActivity;
 import agersant.polaris.ui.DragAndSwipeTouchHelperCallback;
 
 public class QueueActivity extends PolarisActivity {

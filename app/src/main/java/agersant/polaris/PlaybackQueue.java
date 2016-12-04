@@ -8,20 +8,11 @@ import java.util.Random;
 
 public class PlaybackQueue {
 
-    public enum Ordering {
-        SEQUENCE,
-        RANDOM,
-        REPEAT_ONE,
-        REPEAT_ALL,
-    }
-
     private static PlaybackQueue instance;
-
     private Random rng;
     private ArrayList<CollectionItem> content;
     private Player player;
     private Ordering ordering;
-
     private PlaybackQueue(Context context) {
         rng = new Random();
         player = Player.getInstance(context);
@@ -112,12 +103,12 @@ public class PlaybackQueue {
         }
     }
 
-    public void setOrdering(Ordering ordering) {
-        this.ordering = ordering;
-    }
-
     public Ordering getOrdering() {
         return ordering;
+    }
+
+    public void setOrdering(Ordering ordering) {
+        this.ordering = ordering;
     }
 
     private void advance(int delta) {
@@ -134,5 +125,12 @@ public class PlaybackQueue {
 
     public void skipNext() {
         advance(1);
+    }
+
+    public enum Ordering {
+        SEQUENCE,
+        RANDOM,
+        REPEAT_ONE,
+        REPEAT_ALL,
     }
 }
