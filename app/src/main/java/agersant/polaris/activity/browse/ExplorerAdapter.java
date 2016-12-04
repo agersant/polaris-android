@@ -2,8 +2,16 @@ package agersant.polaris.activity.browse;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +25,10 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
-import agersant.polaris.ui.SwipeItemTouchHelperAdapter;
 
 
 class ExplorerAdapter
-        extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder>
-        implements SwipeItemTouchHelperAdapter {
+        extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
 
     private ArrayList<CollectionItem> items;
 
@@ -52,29 +58,7 @@ class ExplorerAdapter
         return items.size();
     }
 
-    @Override
-    public void onItemDismiss(RecyclerView.ViewHolder viewHolder) {
-        int position = viewHolder.getAdapterPosition();
-        notifyItemChanged(position);
-        final CollectionItem item = items.get(position);
-
-        final Context context = viewHolder.itemView.getContext();
-        if (!item.isDirectory()) {
-            PlaybackQueue.getInstance(context).addItem(item);
-            return;
-        }
-
-        Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
-            @Override
-            public void onResponse(ArrayList<CollectionItem> response) {
-                PlaybackQueue.getInstance(context).addItems(response);
-            }
-        };
-        ServerAPI server = ServerAPI.getInstance(context);
-        server.flatten(item.getPath(), success);
-    }
-
-    static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Button button;
         private CollectionItem item;
@@ -110,9 +94,50 @@ class ExplorerAdapter
                 intent.putExtra(BrowseActivity.PATH, item.getPath());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 context.startActivity(intent);
+            }
+        }
+
+        void onSwiped(View view) {
+            final Context context = view.getContext();
+            if (item.isDirectory()) {
+                Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
+                    @Override
+                    public void onResponse(ArrayList<CollectionItem> response) {
+                        PlaybackQueue.getInstance(context).addItems(response);
+                    }
+                };
+                ServerAPI server = ServerAPI.getInstance(context);
+                server.flatten(item.getPath(), success);
             } else {
                 PlaybackQueue.getInstance(context).addItem(item);
             }
         }
+
+        void onChildDraw(Canvas c, float dX, int actionState) {
+            Paint paint = new Paint();
+
+            if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                float left = itemView.getLeft() + itemView.getPaddingLeft();
+                float top = itemView.getTop() + itemView.getPaddingTop();
+                float bottom = itemView.getBottom() - itemView.getPaddingBottom();
+
+                float height = bottom - top;
+                float iconPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, itemView.getResources().getDisplayMetrics());
+                float iconSize = height - 2 * iconPadding;
+                float iconLeft = left + iconPadding;
+                float iconTop = top + (height - iconSize) / 2;
+
+                if (dX > 0) {
+                    paint.setColor(Color.parseColor("#388E3C"));
+                    RectF background = new RectF(left, top, left + dX, bottom);
+                    c.drawRect(background, paint);
+
+                    Bitmap icon = BitmapFactory.decodeResource(itemView.getResources(), R.drawable.ic_folder_black_24dp);
+                    RectF icon_dest = new RectF(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize);
+                    c.drawBitmap(icon, null, icon_dest, paint);
+                }
+            }
+        }
+
     }
 }

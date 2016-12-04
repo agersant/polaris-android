@@ -16,7 +16,6 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
-import agersant.polaris.ui.SwipeTouchHelperCallback;
 
 public class BrowseActivity extends PolarisActivity {
 
@@ -42,7 +41,7 @@ public class BrowseActivity extends PolarisActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new SwipeTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new ExplorerTouchCallback(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
