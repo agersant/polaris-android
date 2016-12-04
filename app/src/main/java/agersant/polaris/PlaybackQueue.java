@@ -116,6 +116,10 @@ public class PlaybackQueue {
         this.ordering = ordering;
     }
 
+    public Ordering getOrdering() {
+        return ordering;
+    }
+
     private void advance(int delta) {
         CollectionItem currentItem = player.getCurrentItem();
         CollectionItem newTrack = getNextTrack(currentItem, delta);
