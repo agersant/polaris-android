@@ -2,20 +2,16 @@ package agersant.polaris.activity.browse;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 
@@ -43,9 +39,9 @@ class ExplorerAdapter
 
     @Override
     public ExplorerAdapter.BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.browse_explorer_item, parent, false);
-        return new BrowseItemHolder(inflatedView);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item, parent, false);
+        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item_queued, parent, false);
+        return new BrowseItemHolder(itemView, itemQueueStatusView);
     }
 
     @Override
@@ -58,15 +54,21 @@ class ExplorerAdapter
         return items.size();
     }
 
-    public static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Button button;
         private CollectionItem item;
+        private View queueStatusView;
+        private TextView queueStatusText;
+        private ImageView queueStatusIcon;
 
-        BrowseItemHolder(View view) {
-            super(view);
-            button = (Button) view.findViewById(R.id.browse_explorer_button);
+        BrowseItemHolder(View itemView, View itemQueueStatusView) {
+            super(itemView);
+            button = (Button) itemView.findViewById(R.id.browse_explorer_button);
             button.setOnClickListener(this);
+            queueStatusView = itemQueueStatusView;
+            queueStatusText = (TextView) queueStatusView.findViewById(R.id.status_text);
+            queueStatusIcon = (ImageView) queueStatusView.findViewById(R.id.status_icon);
         }
 
         void bindItem(CollectionItem item) {
@@ -84,6 +86,8 @@ class ExplorerAdapter
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
             }
+
+            setStatusToQueueable();
         }
 
         @Override
@@ -97,45 +101,56 @@ class ExplorerAdapter
             }
         }
 
-        void onSwiped(View view) {
+        void onSwiped(final View view) {
             final Context context = view.getContext();
             if (item.isDirectory()) {
                 Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
                     @Override
                     public void onResponse(ArrayList<CollectionItem> response) {
                         PlaybackQueue.getInstance(context).addItems(response);
+                        setStatusToQueued();
                     }
+                    // TODO: Error handling
                 };
                 ServerAPI server = ServerAPI.getInstance(context);
                 server.flatten(item.getPath(), success);
+                setStatusToFetching();
             } else {
                 PlaybackQueue.getInstance(context).addItem(item);
+                setStatusToQueued();
             }
         }
 
-        void onChildDraw(Canvas c, float dX, int actionState) {
-            Paint paint = new Paint();
+        private void setStatusToQueueable() {
+            queueStatusText.setText(R.string.add_to_queue);
+            queueStatusIcon.setImageResource(R.drawable.ic_playlist_play_black_24dp);
+            itemView.requestLayout();
+        }
 
+        private void setStatusToFetching() {
+            queueStatusText.setText(R.string.queuing);
+            queueStatusIcon.setImageResource(R.drawable.ic_hourglass_empty_black_24dp);
+            itemView.requestLayout();
+        }
+
+        private void setStatusToQueued() {
+            queueStatusText.setText(R.string.queued);
+            queueStatusIcon.setImageResource(R.drawable.ic_check_black_24dp);
+            itemView.requestLayout();
+        }
+
+        void onChildDraw(Canvas canvas, float dX, int actionState) {
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                float left = itemView.getLeft() + itemView.getPaddingLeft();
-                float top = itemView.getTop() + itemView.getPaddingTop();
-                float bottom = itemView.getBottom() - itemView.getPaddingBottom();
+                int widthSpec = View.MeasureSpec.makeMeasureSpec(itemView.getWidth(), View.MeasureSpec.EXACTLY);
+                int heightSpec = View.MeasureSpec.makeMeasureSpec(itemView.getHeight(), View.MeasureSpec.EXACTLY);
+                queueStatusView.measure(widthSpec, heightSpec);
+                queueStatusView.layout(0, 0, queueStatusView.getMeasuredWidth(), queueStatusView.getMeasuredHeight());
 
-                float height = bottom - top;
-                float iconPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, itemView.getResources().getDisplayMetrics());
-                float iconSize = height - 2 * iconPadding;
-                float iconLeft = left + iconPadding;
-                float iconTop = top + (height - iconSize) / 2;
-
-                if (dX > 0) {
-                    paint.setColor(Color.parseColor("#388E3C"));
-                    RectF background = new RectF(left, top, left + dX, bottom);
-                    c.drawRect(background, paint);
-
-                    Bitmap icon = BitmapFactory.decodeResource(itemView.getResources(), R.drawable.ic_folder_black_24dp);
-                    RectF icon_dest = new RectF(iconLeft, iconTop, iconLeft + iconSize, iconTop + iconSize);
-                    c.drawBitmap(icon, null, icon_dest, paint);
-                }
+                canvas.save();
+                canvas.translate(itemView.getLeft(), itemView.getTop());
+                canvas.clipRect(0, 0, (int) dX, queueStatusView.getMeasuredHeight());
+                queueStatusView.draw(canvas);
+                canvas.restore();
             }
         }
 
