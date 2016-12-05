@@ -101,19 +101,11 @@ public class ServerAPI {
         this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
     }
 
-    public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success) {
+    public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
         String serverAddress = this.getURL();
         String requestURL = serverAddress + "/flatten/" + path;
 
-        Response.ErrorListener failure = new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO Handle
-                System.out.println("flatten sadness here " + error);
-            }
-        };
-
-        Response.Listener successWrapper = new Response.Listener<JSONArray>() {
+        Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 ArrayList<CollectionItem> items = new ArrayList<>(response.length());

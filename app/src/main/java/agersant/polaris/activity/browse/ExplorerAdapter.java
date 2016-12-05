@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import java.util.ArrayList;
 
@@ -104,16 +105,29 @@ class ExplorerAdapter
         void onSwiped(final View view) {
             final Context context = view.getContext();
             if (item.isDirectory()) {
+                final CollectionItem fetchingItem = item;
+
                 Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
                     @Override
                     public void onResponse(ArrayList<CollectionItem> response) {
                         PlaybackQueue.getInstance(context).addItems(response);
-                        setStatusToQueued();
+                        if (item == fetchingItem) {
+                            setStatusToQueued();
+                        }
                     }
-                    // TODO: Error handling
                 };
+
+                Response.ErrorListener failure = new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if (item == fetchingItem) {
+                            setStatusToQueueError();
+                        }
+                    }
+                };
+
                 ServerAPI server = ServerAPI.getInstance(context);
-                server.flatten(item.getPath(), success);
+                server.flatten(item.getPath(), success, failure);
                 setStatusToFetching();
             } else {
                 PlaybackQueue.getInstance(context).addItem(item);
@@ -136,6 +150,12 @@ class ExplorerAdapter
         private void setStatusToQueued() {
             queueStatusText.setText(R.string.queued);
             queueStatusIcon.setImageResource(R.drawable.ic_check_black_24dp);
+            itemView.requestLayout();
+        }
+
+        private void setStatusToQueueError() {
+            queueStatusText.setText(R.string.queuing_error);
+            queueStatusIcon.setImageResource(R.drawable.ic_error_black_24dp);
             itemView.requestLayout();
         }
 

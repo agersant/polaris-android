@@ -22,7 +22,7 @@
     <string name="pref_key_server_url">server</string>
     <string name="pref_key_username">username</string>
     <string name="pref_key_password">password</string>
-    
+
     <string name="settings">Settings</string>
     <string name="clear">Clear</string>
     <string name="shuffle">Shuffle</string>
@@ -36,5 +36,6 @@
     <string name="add_to_queue">Queue</string>
     <string name="queued">Added to queue</string>
     <string name="queuing">Fetching…</string>
+    <string name="queuing_error">Something went wrong</string>
 
 </resources>
