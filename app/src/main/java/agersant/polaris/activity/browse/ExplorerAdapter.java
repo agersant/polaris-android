@@ -103,36 +103,41 @@ class ExplorerAdapter
         }
 
         void onSwiped(final View view) {
-            final Context context = view.getContext();
             if (item.isDirectory()) {
-                final CollectionItem fetchingItem = item;
-
-                Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
-                    @Override
-                    public void onResponse(ArrayList<CollectionItem> response) {
-                        PlaybackQueue.getInstance(context).addItems(response);
-                        if (item == fetchingItem) {
-                            setStatusToQueued();
-                        }
-                    }
-                };
-
-                Response.ErrorListener failure = new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (item == fetchingItem) {
-                            setStatusToQueueError();
-                        }
-                    }
-                };
-
-                ServerAPI server = ServerAPI.getInstance(context);
-                server.flatten(item.getPath(), success, failure);
+                queueDirectory();
                 setStatusToFetching();
             } else {
+                Context context = view.getContext();
                 PlaybackQueue.getInstance(context).addItem(item);
                 setStatusToQueued();
             }
+        }
+
+        private void queueDirectory() {
+            final Context context = itemView.getContext();
+            final CollectionItem fetchingItem = item;
+
+            Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
+                @Override
+                public void onResponse(ArrayList<CollectionItem> response) {
+                    PlaybackQueue.getInstance(context).addItems(response);
+                    if (item == fetchingItem) {
+                        setStatusToQueued();
+                    }
+                }
+            };
+
+            Response.ErrorListener failure = new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (item == fetchingItem) {
+                        setStatusToQueueError();
+                    }
+                }
+            };
+
+            ServerAPI server = ServerAPI.getInstance(context);
+            server.flatten(item.getPath(), success, failure);
         }
 
         private void setStatusToQueueable() {
