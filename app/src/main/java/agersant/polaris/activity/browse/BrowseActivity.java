@@ -41,7 +41,7 @@ public class BrowseActivity extends PolarisActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new ExplorerTouchCallback(adapter);
+        ItemTouchHelper.Callback callback = new ExplorerTouchCallback();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 

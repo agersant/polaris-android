@@ -1,7 +1,6 @@
 package agersant.polaris.activity.browse;
 
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -9,15 +8,10 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Created by agersant on 12/4/2016.
  */
 
-public class ExplorerTouchCallback extends ItemTouchHelper.SimpleCallback {
+class ExplorerTouchCallback extends ItemTouchHelper.SimpleCallback {
 
-    private final ExplorerAdapter adapter;
-    private Paint paint;
-
-    public ExplorerTouchCallback(ExplorerAdapter adapter) {
+    ExplorerTouchCallback() {
         super(0, ItemTouchHelper.RIGHT);
-        this.adapter = adapter;
-        this.paint = new Paint();
     }
 
     @Override
