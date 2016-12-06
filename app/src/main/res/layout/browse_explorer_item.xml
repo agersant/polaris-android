@@ -7,6 +7,7 @@
     android:layout_height="wrap_content">
     <Button
         android:id="@+id/browse_explorer_button"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:gravity="center_vertical"
         style="?android:attr/actionButtonStyle"

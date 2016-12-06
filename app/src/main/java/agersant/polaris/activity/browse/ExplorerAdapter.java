@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -42,7 +43,7 @@ class ExplorerAdapter
     public ExplorerAdapter.BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item, parent, false);
         View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item_queued, parent, false);
-        return new BrowseItemHolder(itemView, itemQueueStatusView);
+        return new BrowseItemHolder(this, itemView, itemQueueStatusView);
     }
 
     @Override
@@ -57,14 +58,16 @@ class ExplorerAdapter
 
     static class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private ExplorerAdapter adapter;
         private Button button;
         private CollectionItem item;
         private View queueStatusView;
         private TextView queueStatusText;
         private ImageView queueStatusIcon;
 
-        BrowseItemHolder(View itemView, View itemQueueStatusView) {
+        BrowseItemHolder(ExplorerAdapter adapter, View itemView, View itemQueueStatusView) {
             super(itemView);
+            this.adapter = adapter;
             button = (Button) itemView.findViewById(R.id.browse_explorer_button);
             button.setOnClickListener(this);
             queueStatusView = itemQueueStatusView;
@@ -156,12 +159,28 @@ class ExplorerAdapter
             queueStatusText.setText(R.string.queued);
             queueStatusIcon.setImageResource(R.drawable.ic_check_black_24dp);
             itemView.requestLayout();
+            waitAndUnswipe();
         }
 
         private void setStatusToQueueError() {
             queueStatusText.setText(R.string.queuing_error);
             queueStatusIcon.setImageResource(R.drawable.ic_error_black_24dp);
             itemView.requestLayout();
+            waitAndUnswipe();
+        }
+
+        private void waitAndUnswipe() {
+            final CollectionItem oldItem = item;
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (item == oldItem) {
+                        int position = getAdapterPosition();
+                        adapter.notifyItemChanged(position);
+                    }
+                }
+            }, 1000);
         }
 
         void onChildDraw(Canvas canvas, float dX, int actionState) {
