@@ -55,23 +55,15 @@ public class PlayerActivity extends PolarisActivity {
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                boolean refreshTrack = false;
-                boolean refreshControls = false;
                 switch (intent.getAction()) {
                     case Player.PLAYING_TRACK:
-                        refreshTrack = true;
-                        refreshControls = true;
+                        that.updateContent();
+                        that.updateControls();
                         break;
                     case Player.PAUSED_TRACK:
                     case Player.RESUMED_TRACK:
-                        refreshControls = true;
+                        that.updateControls();
                         break;
-                }
-                if (refreshTrack) {
-                    that.updateContent();
-                }
-                if (refreshControls) {
-                    that.updateControls();
                 }
             }
         };
