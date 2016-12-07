@@ -15,7 +15,7 @@ public class MediaPlayerService
         extends Service {
 
     private final IBinder binder = new MediaPlayerBinder();
-    private PMediaPlayer player;
+    private PolarisMediaPlayer player;
 
     public MediaPlayerService() {
     }
@@ -60,7 +60,7 @@ public class MediaPlayerService
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new PMediaPlayer();
+        player = new PolarisMediaPlayer();
     }
 
     @Override

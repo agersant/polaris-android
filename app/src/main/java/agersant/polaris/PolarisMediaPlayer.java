@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by agersant on 12/6/2016.
  */
 
-public class PMediaPlayer
+public class PolarisMediaPlayer
         implements
         MediaPlayer.OnPreparedListener,
         MediaPlayer.OnErrorListener,
@@ -22,7 +22,7 @@ public class PMediaPlayer
     private State state;
     private boolean pause;
 
-    PMediaPlayer() {
+    PolarisMediaPlayer() {
         pause = false;
         state = State.IDLE;
         player = new MediaPlayer();
