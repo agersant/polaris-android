@@ -1,12 +1,15 @@
 package agersant.polaris;
 
 import android.content.Context;
+import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
 public class PlaybackQueue {
+
+    public static final String QUEUED_ITEMS = "QUEUED_ITEMS";
 
     private static PlaybackQueue instance;
     private Random rng;
@@ -32,6 +35,11 @@ public class PlaybackQueue {
         for (CollectionItem item : items) {
             addItem(item);
         }
+
+        PolarisApplication application = PolarisApplication.getInstance();
+        Intent intent = new Intent();
+        intent.setAction(QUEUED_ITEMS);
+        application.sendBroadcast(intent);
     }
 
     public void addItem(CollectionItem item) {

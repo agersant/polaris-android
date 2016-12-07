@@ -1,5 +1,9 @@
 package agersant.polaris.activity.queue;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +22,7 @@ import agersant.polaris.ui.DragAndSwipeTouchHelperCallback;
 public class QueueActivity extends PolarisActivity {
 
     private QueueAdapter adapter;
+    private BroadcastReceiver receiver;
 
     public QueueActivity() {
         super(R.string.queue, R.id.nav_queue);
@@ -38,6 +43,24 @@ public class QueueActivity extends PolarisActivity {
         ItemTouchHelper.Callback callback = new DragAndSwipeTouchHelperCallback(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        subscribeToEvents();
+    }
+
+    private void subscribeToEvents() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PlaybackQueue.QUEUED_ITEMS);
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case PlaybackQueue.QUEUED_ITEMS:
+                        adapter.notifyDataSetChanged();
+                        break;
+                }
+            }
+        };
+        registerReceiver(receiver, filter);
     }
 
     @Override
