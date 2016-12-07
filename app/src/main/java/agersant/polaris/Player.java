@@ -1,13 +1,14 @@
 package agersant.polaris;
 
 import android.content.Context;
-import android.content.Intent;
 
 import agersant.polaris.api.ServerAPI;
 
 public class Player {
 
     public static final String PLAYING_TRACK = "PLAYING_TRACK";
+    public static final String PAUSED_TRACK = "PAUSED_TRACK";
+    public static final String RESUMED_TRACK = "RESUMED_TRACK";
     private static Player instance;
 
     private CollectionItem currentItem;
@@ -26,14 +27,24 @@ public class Player {
 
     public void play(CollectionItem item) {
         PolarisApplication application = PolarisApplication.getInstance();
-
-        currentItem = item;
         String url = serverAPI.getMediaURL(item.getPath());
         application.getMediaPlayerService().play(url);
+        currentItem = item;
+    }
 
-        Intent intent = new Intent();
-        intent.setAction(Player.PLAYING_TRACK);
-        application.sendBroadcast(intent);
+    public void pause() {
+        PolarisApplication application = PolarisApplication.getInstance();
+        application.getMediaPlayerService().pause();
+    }
+
+    public void resume() {
+        PolarisApplication application = PolarisApplication.getInstance();
+        application.getMediaPlayerService().resume();
+    }
+
+    public boolean isPlaying() {
+        PolarisApplication application = PolarisApplication.getInstance();
+        return application.getMediaPlayerService().isPlaying();
     }
 
     public boolean isIdle() {

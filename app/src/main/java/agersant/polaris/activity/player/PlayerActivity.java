@@ -22,6 +22,7 @@ public class PlayerActivity extends PolarisActivity {
     private PlaybackQueue queue;
     private Player player;
     private ImageView artwork;
+    private ImageView pauseToggle;
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
@@ -34,6 +35,7 @@ public class PlayerActivity extends PolarisActivity {
         queue = PlaybackQueue.getInstance(this);
         player = Player.getInstance(this);
         artwork = (ImageView) findViewById(R.id.artwork);
+        pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
         subscribeToEvents();
     }
 
@@ -41,19 +43,35 @@ public class PlayerActivity extends PolarisActivity {
     public void onResume() {
         super.onResume();
         updateContent();
+        updateControls();
     }
 
     private void subscribeToEvents() {
         final PlayerActivity that = this;
         IntentFilter filter = new IntentFilter();
         filter.addAction(Player.PLAYING_TRACK);
+        filter.addAction(Player.PAUSED_TRACK);
+        filter.addAction(Player.RESUMED_TRACK);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                boolean refreshTrack = false;
+                boolean refreshControls = false;
                 switch (intent.getAction()) {
                     case Player.PLAYING_TRACK:
-                        that.updateContent();
+                        refreshTrack = true;
+                        refreshControls = true;
                         break;
+                    case Player.PAUSED_TRACK:
+                    case Player.RESUMED_TRACK:
+                        refreshControls = true;
+                        break;
+                }
+                if (refreshTrack) {
+                    that.updateContent();
+                }
+                if (refreshControls) {
+                    that.updateControls();
                 }
             }
         };
@@ -83,7 +101,13 @@ public class PlayerActivity extends PolarisActivity {
         }
     }
 
+    private void updateControls() {
+        int playPauseIcon = player.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
+        pauseToggle.setImageResource(playPauseIcon);
+    }
+
     private void populateWithBlank() {
+        // TODO?
     }
 
     private void populateWithTrack(CollectionItem item) {
@@ -104,6 +128,14 @@ public class PlayerActivity extends PolarisActivity {
             ServerAPI serverAPI = ServerAPI.getInstance(this);
             String url = serverAPI.getMediaURL(artworkPath);
             NetworkImage.load(url, artwork);
+        }
+    }
+
+    public void togglePause(View view) {
+        if (player.isPlaying()) {
+            player.pause();
+        } else {
+            player.resume();
         }
     }
 

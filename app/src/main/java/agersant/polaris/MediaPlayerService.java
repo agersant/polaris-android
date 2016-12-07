@@ -2,8 +2,6 @@ package agersant.polaris;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -14,14 +12,10 @@ import java.util.Map;
 import agersant.polaris.api.ServerAPI;
 
 public class MediaPlayerService
-        extends Service
-        implements
-        MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener {
+        extends Service {
 
     private final IBinder binder = new MediaPlayerBinder();
-    private MediaPlayer player;
+    private PMediaPlayer player;
 
     public MediaPlayerService() {
     }
@@ -36,35 +30,37 @@ public class MediaPlayerService
             player.setDataSource(this, uri, headers);
             player.prepareAsync();
         } catch (Exception e) {
+            // TODO Handle
             System.out.println("Error while beginning media playback: " + e);
+            return;
         }
+        broadcast(Player.PLAYING_TRACK);
+    }
+
+    public void resume() {
+        player.resume();
+        broadcast(Player.RESUMED_TRACK);
+    }
+
+    public void pause() {
+        player.pause();
+        broadcast(Player.PAUSED_TRACK);
+    }
+
+    public boolean isPlaying() {
+        return player.isPlaying();
+    }
+
+    private void broadcast(String event) {
+        Intent intent = new Intent();
+        intent.setAction(event);
+        sendBroadcast(intent);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new MediaPlayer();
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        player.setOnPreparedListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-        System.out.println("Mediaplayer error");
-        return false;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        assert player == mediaPlayer;
-        mediaPlayer.start();
+        player = new PMediaPlayer();
     }
 
     @Override
