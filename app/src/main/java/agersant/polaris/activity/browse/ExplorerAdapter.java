@@ -25,16 +25,16 @@ import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
 
 
-class ExplorerAdapter
+public class ExplorerAdapter
         extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
 
     private ArrayList<CollectionItem> items;
 
-    ExplorerAdapter() {
+    public ExplorerAdapter() {
         setItems(new ArrayList<CollectionItem>());
     }
 
-    void setItems(ArrayList<CollectionItem> items) {
+    public void setItems(ArrayList<CollectionItem> items) {
         this.items = items;
         notifyDataSetChanged();
     }

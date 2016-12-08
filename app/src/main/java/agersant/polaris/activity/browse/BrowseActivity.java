@@ -1,10 +1,9 @@
 package agersant.polaris.activity.browse;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -16,11 +15,11 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
+import agersant.polaris.fragment.BrowseExplorerFragment;
 
 public class BrowseActivity extends PolarisActivity {
 
     public static final String PATH = "PATH";
-    private ExplorerAdapter adapter;
     private ProgressBar progressBar;
 
     public BrowseActivity() {
@@ -33,17 +32,6 @@ public class BrowseActivity extends PolarisActivity {
         super.onCreate(savedInstanceState);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
-        adapter = new ExplorerAdapter();
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        ItemTouchHelper.Callback callback = new ExplorerTouchCallback();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         Intent intent = getIntent();
         String path = intent.getStringExtra(BrowseActivity.PATH);
@@ -64,10 +52,19 @@ public class BrowseActivity extends PolarisActivity {
             @Override
             public void onResponse(ArrayList<CollectionItem> response) {
                 progressBar.setVisibility(View.GONE);
-                adapter.setItems(response);
+                displayContent(response);
             }
         };
         ServerAPI server = ServerAPI.getInstance(getApplicationContext());
         server.browse(path, success);
+    }
+
+    private void displayContent(ArrayList<CollectionItem> items) {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        BrowseExplorerFragment fragment = new BrowseExplorerFragment();
+        fragmentTransaction.add(R.id.browse_content_holder, fragment);
+        fragment.setItems(items);
+        fragmentTransaction.commit();
     }
 }

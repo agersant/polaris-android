@@ -20,15 +20,12 @@
         android:layout_width="match_parent"
         android:layout_height="48dp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/browse_recycler_view"
-        android:layout_below="@id/toolbar"
+    <FrameLayout
+        android:id="@+id/browse_content_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/browse_explorer_item" />
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/navigation"/>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
