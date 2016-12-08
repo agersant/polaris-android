@@ -40,7 +40,6 @@ public class PlayerActivity extends PolarisActivity {
         pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
         skipNext = (ImageView) findViewById(R.id.skip_next);
         skipPrevious = (ImageView) findViewById(R.id.skip_previous);
-        subscribeToEvents();
     }
 
     @Override
@@ -87,9 +86,16 @@ public class PlayerActivity extends PolarisActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onStart() {
+        subscribeToEvents();
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
         unregisterReceiver(receiver);
+        receiver = null;
+        super.onPause();
     }
 
     public void skipPrevious(View view) {

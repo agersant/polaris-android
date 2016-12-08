@@ -43,8 +43,6 @@ public class QueueActivity extends PolarisActivity {
         ItemTouchHelper.Callback callback = new DragAndSwipeTouchHelperCallback(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-        subscribeToEvents();
     }
 
     private void subscribeToEvents() {
@@ -61,6 +59,19 @@ public class QueueActivity extends PolarisActivity {
             }
         };
         registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onStart() {
+        subscribeToEvents();
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        unregisterReceiver(receiver);
+        receiver = null;
+        super.onPause();
     }
 
     @Override
