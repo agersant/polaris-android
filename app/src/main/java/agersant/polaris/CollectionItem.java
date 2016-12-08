@@ -10,6 +10,7 @@ public class CollectionItem implements Cloneable {
     private String artist;
     private String title;
     private String artwork;
+    private String album;
     private boolean isDirectory;
 
     private CollectionItem() {
@@ -30,11 +31,12 @@ public class CollectionItem implements Cloneable {
         return item;
     }
 
-    protected void parseFields(JSONObject fields) throws JSONException {
+    private void parseFields(JSONObject fields) throws JSONException {
         path = fields.getString("path");
         artist = fields.optString("artist", null);
         title = fields.optString("title", null);
         artwork = fields.optString("artwork", null);
+        album = fields.optString("album", null);
 
         String[] chunks = path.split("/|\\\\");
         name = chunks[chunks.length - 1];
@@ -67,5 +69,9 @@ public class CollectionItem implements Cloneable {
 
     public boolean isDirectory() {
         return isDirectory;
+    }
+
+    public String getAlbum() {
+        return album;
     }
 }
