@@ -9,7 +9,12 @@ import java.util.Random;
 
 public class PlaybackQueue {
 
+    public static final String CHANGED_ORDERING = "CHANGED_ORDERING";
+    public static final String QUEUED_ITEM = "QUEUED_ITEM";
     public static final String QUEUED_ITEMS = "QUEUED_ITEMS";
+    public static final String REMOVED_ITEM = "REMOVED_ITEM";
+    public static final String REMOVED_ITEMS = "REMOVED_ITEMS";
+    public static final String REORDERED_ITEMS = "REORDERED_ITEMS";
 
     private static PlaybackQueue instance;
     private Random rng;
@@ -33,16 +38,17 @@ public class PlaybackQueue {
 
     public void addItems(ArrayList<CollectionItem> items) {
         for (CollectionItem item : items) {
-            addItem(item);
+            addItemInternal(item);
         }
-
-        PolarisApplication application = PolarisApplication.getInstance();
-        Intent intent = new Intent();
-        intent.setAction(QUEUED_ITEMS);
-        application.sendBroadcast(intent);
+        broadcast(QUEUED_ITEMS);
     }
 
     public void addItem(CollectionItem item) {
+        addItemInternal(item);
+        broadcast(QUEUED_ITEM);
+    }
+
+    private void addItemInternal(CollectionItem item) {
         CollectionItem newItem;
         try {
             newItem = item.clone();
@@ -50,7 +56,6 @@ public class PlaybackQueue {
             System.err.println("Error while cloning CollectionItem: " + e.toString());
             return;
         }
-
         content.add(newItem);
         if (player.isIdle()) {
             player.play(newItem);
@@ -59,14 +64,17 @@ public class PlaybackQueue {
 
     public void remove(int position) {
         content.remove(position);
+        broadcast(REMOVED_ITEM);
     }
 
     public void clear() {
         content.clear();
+        broadcast(REMOVED_ITEMS);
     }
 
     public void swap(int fromPosition, int toPosition) {
         Collections.swap(content, fromPosition, toPosition);
+        broadcast(REORDERED_ITEMS);
     }
 
     public void move(int fromPosition, int toPosition) {
@@ -77,6 +85,7 @@ public class PlaybackQueue {
         int high = Math.max(fromPosition, toPosition);
         int distance = fromPosition < toPosition ? -1 : 1;
         Collections.rotate(content.subList(low, high + 1), distance);
+        broadcast(REORDERED_ITEMS);
     }
 
     public int size() {
@@ -124,6 +133,7 @@ public class PlaybackQueue {
 
     public void setOrdering(Ordering ordering) {
         this.ordering = ordering;
+        broadcast(CHANGED_ORDERING);
     }
 
     private void advance(int delta) {
@@ -140,6 +150,23 @@ public class PlaybackQueue {
 
     public void skipNext() {
         advance(1);
+    }
+
+    public boolean hasNextTrack() {
+        CollectionItem currentItem = player.getCurrentItem();
+        return getNextTrack(currentItem, 1) != null;
+    }
+
+    public boolean hasPreviousTrack() {
+        CollectionItem currentItem = player.getCurrentItem();
+        return getNextTrack(currentItem, -1) != null;
+    }
+
+    private void broadcast(String event) {
+        PolarisApplication application = PolarisApplication.getInstance();
+        Intent intent = new Intent();
+        intent.setAction(event);
+        application.sendBroadcast(intent);
     }
 
     public enum Ordering {

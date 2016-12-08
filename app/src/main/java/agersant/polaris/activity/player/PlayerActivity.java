@@ -23,6 +23,8 @@ public class PlayerActivity extends PolarisActivity {
     private Player player;
     private ImageView artwork;
     private ImageView pauseToggle;
+    private ImageView skipNext;
+    private ImageView skipPrevious;
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
@@ -36,6 +38,8 @@ public class PlayerActivity extends PolarisActivity {
         player = Player.getInstance(this);
         artwork = (ImageView) findViewById(R.id.artwork);
         pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
+        skipNext = (ImageView) findViewById(R.id.skip_next);
+        skipPrevious = (ImageView) findViewById(R.id.skip_previous);
         subscribeToEvents();
     }
 
@@ -52,6 +56,12 @@ public class PlayerActivity extends PolarisActivity {
         filter.addAction(Player.PLAYING_TRACK);
         filter.addAction(Player.PAUSED_TRACK);
         filter.addAction(Player.RESUMED_TRACK);
+        filter.addAction(PlaybackQueue.CHANGED_ORDERING);
+        filter.addAction(PlaybackQueue.QUEUED_ITEM);
+        filter.addAction(PlaybackQueue.QUEUED_ITEMS);
+        filter.addAction(PlaybackQueue.REMOVED_ITEM);
+        filter.addAction(PlaybackQueue.REMOVED_ITEMS);
+        filter.addAction(PlaybackQueue.REORDERED_ITEMS);
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -62,6 +72,12 @@ public class PlayerActivity extends PolarisActivity {
                         break;
                     case Player.PAUSED_TRACK:
                     case Player.RESUMED_TRACK:
+                    case PlaybackQueue.CHANGED_ORDERING:
+                    case PlaybackQueue.REMOVED_ITEM:
+                    case PlaybackQueue.REMOVED_ITEMS:
+                    case PlaybackQueue.REORDERED_ITEMS:
+                    case PlaybackQueue.QUEUED_ITEM:
+                    case PlaybackQueue.QUEUED_ITEMS:
                         that.updateControls();
                         break;
                 }
@@ -86,16 +102,34 @@ public class PlayerActivity extends PolarisActivity {
 
     private void updateContent() {
         CollectionItem currentItem = player.getCurrentItem();
-        if (currentItem == null) {
-            populateWithBlank();
-        } else {
+        if (currentItem != null) {
             populateWithTrack(currentItem);
         }
     }
 
     private void updateControls() {
+        final float disabledAlpha = 0.2f;
+
         int playPauseIcon = player.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
         pauseToggle.setImageResource(playPauseIcon);
+        pauseToggle.setAlpha(player.isIdle() ? disabledAlpha : 1.f);
+
+
+        if (queue.hasNextTrack()) {
+            skipNext.setClickable(true);
+            skipNext.setAlpha(1.0f);
+        } else {
+            skipNext.setClickable(false);
+            skipNext.setAlpha(disabledAlpha);
+        }
+
+        if (queue.hasPreviousTrack()) {
+            skipPrevious.setClickable(true);
+            skipPrevious.setAlpha(1.0f);
+        } else {
+            skipPrevious.setClickable(false);
+            skipPrevious.setAlpha(disabledAlpha);
+        }
     }
 
     private void populateWithBlank() {
