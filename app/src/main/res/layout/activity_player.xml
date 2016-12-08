@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="agersant.polaris.activity.player.PlayerActivity">
+    tools:context="agersant.polaris.features.player.PlayerActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

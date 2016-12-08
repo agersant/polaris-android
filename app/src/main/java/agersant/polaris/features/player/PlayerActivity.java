@@ -1,4 +1,4 @@
-package agersant.polaris.activity.player;
+package agersant.polaris.features.player;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,8 +12,8 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
-import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
+import agersant.polaris.features.PolarisActivity;
 import agersant.polaris.ui.NetworkImage;
 
 public class PlayerActivity extends PolarisActivity {

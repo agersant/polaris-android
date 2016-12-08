@@ -1,9 +1,7 @@
-package agersant.polaris.activity;
+package agersant.polaris.features.settings;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
-import agersant.polaris.fragment.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity {
     @Override

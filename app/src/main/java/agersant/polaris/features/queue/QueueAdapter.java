@@ -1,4 +1,4 @@
-package agersant.polaris.activity.queue;
+package agersant.polaris.features.queue;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -28,7 +28,7 @@ class QueueAdapter
     @Override
     public QueueAdapter.QueueItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View inflatedView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.queue_item, parent, false);
+                .inflate(R.layout.view_queue_item, parent, false);
         return new QueueAdapter.QueueItemHolder(inflatedView);
     }
 

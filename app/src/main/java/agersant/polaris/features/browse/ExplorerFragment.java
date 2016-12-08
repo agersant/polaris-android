@@ -1,4 +1,4 @@
-package agersant.polaris.fragment;
+package agersant.polaris.features.browse;
 
 
 import android.app.Fragment;
@@ -14,16 +14,14 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.activity.browse.ExplorerAdapter;
-import agersant.polaris.activity.browse.ExplorerTouchCallback;
 
 
-public class BrowseExplorerFragment extends Fragment {
+public class ExplorerFragment extends Fragment {
 
     private ExplorerAdapter adapter;
     private ArrayList<CollectionItem> items;
 
-    public BrowseExplorerFragment() {
+    public ExplorerFragment() {
     }
 
     @Override

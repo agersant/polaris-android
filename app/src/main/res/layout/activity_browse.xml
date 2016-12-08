@@ -5,7 +5,7 @@
     android:id="@+id/activity_browse"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="agersant.polaris.activity.browse.BrowseActivity">
+    tools:context="agersant.polaris.features.browse.BrowseActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

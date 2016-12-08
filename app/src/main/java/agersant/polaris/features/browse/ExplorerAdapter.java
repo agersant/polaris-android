@@ -1,4 +1,4 @@
-package agersant.polaris.activity.browse;
+package agersant.polaris.features.browse;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,24 +25,24 @@ import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
 
 
-public class ExplorerAdapter
+class ExplorerAdapter
         extends RecyclerView.Adapter<ExplorerAdapter.BrowseItemHolder> {
 
     private ArrayList<CollectionItem> items;
 
-    public ExplorerAdapter() {
+    ExplorerAdapter() {
         setItems(new ArrayList<CollectionItem>());
     }
 
-    public void setItems(ArrayList<CollectionItem> items) {
+    void setItems(ArrayList<CollectionItem> items) {
         this.items = items;
         notifyDataSetChanged();
     }
 
     @Override
     public ExplorerAdapter.BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item, parent, false);
-        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.browse_explorer_item_queued, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item, parent, false);
+        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item_queued, parent, false);
         return new BrowseItemHolder(this, itemView, itemQueueStatusView);
     }
 

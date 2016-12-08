@@ -1,4 +1,4 @@
-package agersant.polaris.activity;
+package agersant.polaris.features;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.R;
-import agersant.polaris.activity.browse.BrowseActivity;
+import agersant.polaris.features.browse.BrowseActivity;
 
 public class CollectionActivity extends PolarisActivity {
 

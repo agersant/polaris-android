@@ -1,4 +1,4 @@
-package agersant.polaris.activity.browse;
+package agersant.polaris.features.browse;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -13,9 +13,8 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.activity.PolarisActivity;
 import agersant.polaris.api.ServerAPI;
-import agersant.polaris.fragment.BrowseExplorerFragment;
+import agersant.polaris.features.PolarisActivity;
 
 public class BrowseActivity extends PolarisActivity {
 
@@ -62,7 +61,7 @@ public class BrowseActivity extends PolarisActivity {
     private void displayContent(ArrayList<CollectionItem> items) {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        BrowseExplorerFragment fragment = new BrowseExplorerFragment();
+        ExplorerFragment fragment = new ExplorerFragment();
         fragmentTransaction.add(R.id.browse_content_holder, fragment);
         fragment.setItems(items);
         fragmentTransaction.commit();

@@ -1,4 +1,4 @@
-package agersant.polaris.activity.queue;
+package agersant.polaris.features.queue;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,7 +16,7 @@ import java.util.Random;
 
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
-import agersant.polaris.activity.PolarisActivity;
+import agersant.polaris.features.PolarisActivity;
 import agersant.polaris.ui.DragAndSwipeTouchHelperCallback;
 
 public class QueueActivity extends PolarisActivity {

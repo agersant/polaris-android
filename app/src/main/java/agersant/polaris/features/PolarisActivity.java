@@ -1,4 +1,4 @@
-package agersant.polaris.activity;
+package agersant.polaris.features;
 
 
 import android.content.Intent;
@@ -12,8 +12,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import agersant.polaris.R;
-import agersant.polaris.activity.player.PlayerActivity;
-import agersant.polaris.activity.queue.QueueActivity;
+import agersant.polaris.features.player.PlayerActivity;
+import agersant.polaris.features.queue.QueueActivity;
+import agersant.polaris.features.settings.SettingsActivity;
 
 public class PolarisActivity extends AppCompatActivity {
 
