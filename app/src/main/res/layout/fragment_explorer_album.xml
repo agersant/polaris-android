@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="agersant.polaris.features.browse.ExplorerFolderFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@color/colorAccent"
+        >
+        <ImageView
+            android:id="@+id/album_artwork"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:contentDescription="@string/album_artwork"
+            tools:src="@drawable/artwork"
+            />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:padding="8dp"
+            >
+            <TextView
+                android:id="@+id/album_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Calcium Engine"/>
+            <TextView
+                android:id="@+id/album_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/album_title"
+                tools:text="Botanical"/>
+        </RelativeLayout>
+    </LinearLayout>
+    
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/browse_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/view_browse_explorer_item" />
+
+</LinearLayout>

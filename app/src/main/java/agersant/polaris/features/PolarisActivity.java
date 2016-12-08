@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import agersant.polaris.R;
+import agersant.polaris.features.browse.CollectionActivity;
 import agersant.polaris.features.player.PlayerActivity;
 import agersant.polaris.features.queue.QueueActivity;
 import agersant.polaris.features.settings.SettingsActivity;

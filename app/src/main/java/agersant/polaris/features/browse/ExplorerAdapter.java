@@ -98,8 +98,8 @@ class ExplorerAdapter
         public void onClick(View view) {
             Context context = view.getContext();
             if (item.isDirectory()) {
-                Intent intent = new Intent(context, BrowseActivity.class);
-                intent.putExtra(BrowseActivity.PATH, item.getPath());
+                Intent intent = new Intent(context, ExplorerActivity.class);
+                intent.putExtra(ExplorerActivity.PATH, item.getPath());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 context.startActivity(intent);
             }

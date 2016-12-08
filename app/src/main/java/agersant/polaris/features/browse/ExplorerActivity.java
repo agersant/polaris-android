@@ -16,12 +16,12 @@ import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
-public class BrowseActivity extends PolarisActivity {
+public class ExplorerActivity extends PolarisActivity {
 
     public static final String PATH = "PATH";
     private ProgressBar progressBar;
 
-    public BrowseActivity() {
+    public ExplorerActivity() {
         super(R.string.collection, R.id.nav_collection);
     }
 
@@ -33,7 +33,7 @@ public class BrowseActivity extends PolarisActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         Intent intent = getIntent();
-        String path = intent.getStringExtra(BrowseActivity.PATH);
+        String path = intent.getStringExtra(ExplorerActivity.PATH);
         if (path == null) {
             path = "";
         }
@@ -59,11 +59,47 @@ public class BrowseActivity extends PolarisActivity {
     }
 
     private void displayContent(ArrayList<CollectionItem> items) {
+        ExplorerFragment fragment = null;
+
+        switch (getDisplayModeForItems(items)) {
+            case FOLDER:
+                fragment = new ExplorerFolderFragment();
+                break;
+            case ALBUM:
+                fragment = new ExplorerAlbumFragment();
+                break;
+        }
+
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        ExplorerFragment fragment = new ExplorerFragment();
         fragmentTransaction.add(R.id.browse_content_holder, fragment);
         fragment.setItems(items);
         fragmentTransaction.commit();
+    }
+
+    private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {
+        if (items.isEmpty()) {
+            return DisplayMode.FOLDER;
+        }
+
+        String album = items.get(0).getAlbum();
+        boolean allSongs = true;
+        boolean allSameAlbum = true;
+        for (CollectionItem item : items) {
+            allSongs &= !item.isDirectory();
+            allSameAlbum &= album.equals(item.getAlbum());
+        }
+
+        if (album != null && allSongs && allSameAlbum) {
+            return DisplayMode.ALBUM;
+        }
+
+        return DisplayMode.FOLDER;
+    }
+
+    private enum DisplayMode {
+        FOLDER,
+        DISCOGRAPHY,
+        ALBUM,
     }
 }

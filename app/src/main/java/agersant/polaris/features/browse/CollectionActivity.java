@@ -1,4 +1,4 @@
-package agersant.polaris.features;
+package agersant.polaris.features.browse;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.R;
-import agersant.polaris.features.browse.BrowseActivity;
+import agersant.polaris.features.PolarisActivity;
 
 public class CollectionActivity extends PolarisActivity {
 
@@ -34,7 +34,7 @@ public class CollectionActivity extends PolarisActivity {
 
     public void browseDirectories(View view) {
         Context context = view.getContext();
-        Intent showBrowser = new Intent(context, BrowseActivity.class);
+        Intent showBrowser = new Intent(context, ExplorerActivity.class);
         showBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         context.startActivity(showBrowser);
     }

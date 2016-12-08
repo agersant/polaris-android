@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".features.CollectionActivity">
+        <activity android:name=".features.browse.CollectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".features.settings.SettingsActivity" />
-        <activity android:name=".features.browse.BrowseActivity" />
+        <activity android:name=".features.browse.ExplorerActivity" />
         <activity android:name=".features.queue.QueueActivity" />
         <activity android:name=".features.player.PlayerActivity" />
 
