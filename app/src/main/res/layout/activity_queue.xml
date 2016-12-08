@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/queue_recycler_view"
-        android:layout_below="@id/toolbar"
-        android:layout_above="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/navigation"
+        android:layout_below="@id/toolbar"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:scrollbars="vertical"
