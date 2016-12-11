@@ -13,11 +13,11 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
 
-public class BrowseExplorerView extends BrowseContentView {
+public class BrowseViewExplorer extends BrowseViewContent {
 
     private BrowseAdapter adapter;
 
-    public BrowseExplorerView(Context context) {
+    public BrowseViewExplorer(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

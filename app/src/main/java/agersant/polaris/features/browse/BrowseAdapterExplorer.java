@@ -20,7 +20,7 @@ class BrowseAdapterExplorer extends BrowseAdapter {
     public BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item, parent, false);
-        return new BrowseExplorerItemHolder(this, itemView, itemQueueStatusView);
+        return new BrowseItemHolderExplorer(this, itemView, itemQueueStatusView);
     }
 
 }

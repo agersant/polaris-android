@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
-class BrowseDiscographyView extends BrowseContentView {
+class BrowseViewDiscography extends BrowseViewContent {
 
     private BrowseAdapter adapter;
 
-    public BrowseDiscographyView(Context context) {
+    public BrowseViewDiscography(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

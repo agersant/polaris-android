@@ -17,14 +17,14 @@ import agersant.polaris.api.ServerAPI;
 import agersant.polaris.ui.NetworkImage;
 
 
-public class BrowseAlbumView extends BrowseContentView {
+public class BrowseViewAlbum extends BrowseViewContent {
 
     private BrowseAdapter adapter;
     private ImageView artwork;
     private TextView artist;
     private TextView title;
 
-    public BrowseAlbumView(Context context) {
+    public BrowseViewAlbum(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

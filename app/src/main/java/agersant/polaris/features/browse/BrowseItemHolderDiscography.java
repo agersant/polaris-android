@@ -13,13 +13,13 @@ import agersant.polaris.ui.NetworkImage;
  * Created by agersant on 12/11/2016.
  */
 
-public class BrowseDiscographyItemHolder extends BrowseItemHolder {
+public class BrowseItemHolderDiscography extends BrowseItemHolder {
 
     private ImageView artwork;
     private TextView artist;
     private TextView album;
 
-    BrowseDiscographyItemHolder(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+    BrowseItemHolderDiscography(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
         super(adapter, itemView, itemQueueStatusView);
         artwork = (ImageView) itemView.findViewById(R.id.artwork);
         artist = (TextView) itemView.findViewById(R.id.artist);

@@ -60,16 +60,16 @@ public class BrowseActivity extends PolarisActivity {
     }
 
     private void displayContent(ArrayList<CollectionItem> items) {
-        BrowseContentView contentView = null;
+        BrowseViewContent contentView = null;
         switch (getDisplayModeForItems(items)) {
             case EXPLORER:
-                contentView = new BrowseExplorerView(this);
+                contentView = new BrowseViewExplorer(this);
                 break;
             case ALBUM:
-                contentView = new BrowseAlbumView(this);
+                contentView = new BrowseViewAlbum(this);
                 break;
             case DISCOGRAPHY:
-                contentView = new BrowseDiscographyView(this);
+                contentView = new BrowseViewDiscography(this);
                 break;
         }
         contentView.setItems(items);

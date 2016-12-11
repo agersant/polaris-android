@@ -10,11 +10,11 @@ import agersant.polaris.R;
  * Created by agersant on 12/11/2016.
  */
 
-public class BrowseAlbumItemHolder extends BrowseItemHolder {
+public class BrowseItemHolderAlbum extends BrowseItemHolder {
 
     private Button button;
 
-    BrowseAlbumItemHolder(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+    BrowseItemHolderAlbum(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
         super(adapter, itemView, itemQueueStatusView);
         button = (Button) itemView.findViewById(R.id.button);
         button.setOnClickListener(this);
