@@ -62,7 +62,7 @@ public class BrowseActivity extends PolarisActivity {
     private void displayContent(ArrayList<CollectionItem> items) {
         BrowseContentView contentView = null;
         switch (getDisplayModeForItems(items)) {
-            case FOLDER:
+            case EXPLORER:
                 contentView = new BrowseExplorerView(this);
                 break;
             case ALBUM:
@@ -78,7 +78,7 @@ public class BrowseActivity extends PolarisActivity {
 
     private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {
         if (items.isEmpty()) {
-            return DisplayMode.FOLDER;
+            return DisplayMode.EXPLORER;
         }
 
         String album = items.get(0).getAlbum();
@@ -103,11 +103,11 @@ public class BrowseActivity extends PolarisActivity {
             return DisplayMode.ALBUM;
         }
 
-        return DisplayMode.FOLDER;
+        return DisplayMode.EXPLORER;
     }
 
     private enum DisplayMode {
-        FOLDER,
+        EXPLORER,
         DISCOGRAPHY,
         ALBUM,
     }
