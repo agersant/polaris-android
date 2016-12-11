@@ -33,13 +33,21 @@ public class CollectionItem implements Cloneable {
 
     private void parseFields(JSONObject fields) throws JSONException {
         path = fields.getString("path");
-        artist = fields.optString("artist", null);
-        title = fields.optString("title", null);
-        artwork = fields.optString("artwork", null);
-        album = fields.optString("album", null);
+        artist = readField(fields, "artist");
+        title = readField(fields, "title");
+        artwork = readField(fields, "artwork");
+        album = readField(fields, "album");
 
         String[] chunks = path.split("/|\\\\");
         name = chunks[chunks.length - 1];
+    }
+
+    private String readField(JSONObject fields, String name) {
+        String value = fields.optString(name);
+        if (value != null && value.equals("null")) {
+            return null;
+        }
+        return value;
     }
 
     @Override

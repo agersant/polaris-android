@@ -42,7 +42,7 @@ public class ExplorerAlbumView extends ExplorerContentView {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new ExplorerAdapter();
+        adapter = new ExplorerAdapter(DisplayMode.ALBUM);
         recyclerView.setAdapter(adapter);
     }
 

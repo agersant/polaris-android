@@ -1,5 +1,8 @@
 package agersant.polaris.features.browse;
 
+/**
+ * Created by agersant on 12/11/2016.
+ */
 
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,16 +15,15 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
-
-public class ExplorerFolderView extends ExplorerContentView {
+class ExplorerDiscographyView extends ExplorerContentView {
 
     private ExplorerAdapter adapter;
 
-    public ExplorerFolderView(Context context) {
+    public ExplorerDiscographyView(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_explorer_folder, this, true);
+        inflater.inflate(R.layout.view_explorer_discography, this, true);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -31,7 +33,7 @@ public class ExplorerFolderView extends ExplorerContentView {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new ExplorerAdapter(DisplayMode.FOLDER);
+        adapter = new ExplorerAdapter(DisplayMode.DISCOGRAPHY);
         recyclerView.setAdapter(adapter);
     }
 

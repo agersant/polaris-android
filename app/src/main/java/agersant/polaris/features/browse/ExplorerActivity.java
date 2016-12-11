@@ -68,6 +68,9 @@ public class ExplorerActivity extends PolarisActivity {
             case ALBUM:
                 contentView = new ExplorerAlbumView(this);
                 break;
+            case DISCOGRAPHY:
+                contentView = new ExplorerDiscographyView(this);
+                break;
         }
         contentView.setItems(items);
         contentHolder.addView(contentView);
@@ -80,10 +83,20 @@ public class ExplorerActivity extends PolarisActivity {
 
         String album = items.get(0).getAlbum();
         boolean allSongs = true;
+        boolean allDirectories = true;
+        boolean allHaveArtwork = true;
+        boolean allHaveAlbum = album != null;
         boolean allSameAlbum = true;
         for (CollectionItem item : items) {
             allSongs &= !item.isDirectory();
-            allSameAlbum &= album.equals(item.getAlbum());
+            allDirectories &= item.isDirectory();
+            allHaveArtwork &= item.getArtwork() != null;
+            allHaveAlbum &= item.getAlbum() != null;
+            allSameAlbum &= album != null && album.equals(item.getAlbum());
+        }
+
+        if (allDirectories && allHaveArtwork && allHaveAlbum) {
+            return DisplayMode.DISCOGRAPHY;
         }
 
         if (album != null && allSongs && allSameAlbum) {
@@ -91,11 +104,5 @@ public class ExplorerActivity extends PolarisActivity {
         }
 
         return DisplayMode.FOLDER;
-    }
-
-    private enum DisplayMode {
-        FOLDER,
-        DISCOGRAPHY,
-        ALBUM,
     }
 }

@@ -21,13 +21,13 @@ class ExplorerTouchCallback extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        ExplorerAdapter.BrowseItemHolder itemHolder = (ExplorerAdapter.BrowseItemHolder) viewHolder;
+        BrowseItemHolder itemHolder = (BrowseItemHolder) viewHolder;
         itemHolder.onSwiped(itemHolder.itemView);
     }
 
     @Override
     public void onChildDraw(Canvas canvas, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        ExplorerAdapter.BrowseItemHolder itemHolder = (ExplorerAdapter.BrowseItemHolder) viewHolder;
+        BrowseItemHolder itemHolder = (BrowseItemHolder) viewHolder;
         itemHolder.onChildDraw(canvas, dX, actionState);
         super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
