@@ -8,9 +8,9 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Created by agersant on 12/4/2016.
  */
 
-class ExplorerTouchCallback extends ItemTouchHelper.SimpleCallback {
+class BrowseTouchCallback extends ItemTouchHelper.SimpleCallback {
 
-    ExplorerTouchCallback() {
+    BrowseTouchCallback() {
         super(0, ItemTouchHelper.RIGHT);
     }
 

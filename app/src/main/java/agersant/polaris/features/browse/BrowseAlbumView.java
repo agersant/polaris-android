@@ -17,18 +17,18 @@ import agersant.polaris.api.ServerAPI;
 import agersant.polaris.ui.NetworkImage;
 
 
-public class ExplorerAlbumView extends ExplorerContentView {
+public class BrowseAlbumView extends BrowseContentView {
 
-    private ExplorerAdapter adapter;
+    private BrowseAdapter adapter;
     private ImageView artwork;
     private TextView artist;
     private TextView title;
 
-    public ExplorerAlbumView(Context context) {
+    public BrowseAlbumView(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_explorer_album, this, true);
+        inflater.inflate(R.layout.view_browse_album, this, true);
 
         artwork = (ImageView) findViewById(R.id.album_artwork);
         artist = (TextView) findViewById(R.id.album_artist);
@@ -38,11 +38,11 @@ public class ExplorerAlbumView extends ExplorerContentView {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        ItemTouchHelper.Callback callback = new ExplorerTouchCallback();
+        ItemTouchHelper.Callback callback = new BrowseTouchCallback();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new ExplorerAdapter(DisplayMode.ALBUM);
+        adapter = new BrowseAdapter(DisplayMode.ALBUM);
         recyclerView.setAdapter(adapter);
     }
 

@@ -13,25 +13,25 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
 
-public class ExplorerFolderView extends ExplorerContentView {
+public class BrowseExplorerView extends BrowseContentView {
 
-    private ExplorerAdapter adapter;
+    private BrowseAdapter adapter;
 
-    public ExplorerFolderView(Context context) {
+    public BrowseExplorerView(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_explorer_folder, this, true);
+        inflater.inflate(R.layout.view_browse_explorer, this, true);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        ItemTouchHelper.Callback callback = new ExplorerTouchCallback();
+        ItemTouchHelper.Callback callback = new BrowseTouchCallback();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new ExplorerAdapter(DisplayMode.FOLDER);
+        adapter = new BrowseAdapter(DisplayMode.FOLDER);
         recyclerView.setAdapter(adapter);
     }
 

@@ -15,13 +15,13 @@ import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
-public class ExplorerActivity extends PolarisActivity {
+public class BrowseActivity extends PolarisActivity {
 
     public static final String PATH = "PATH";
     private ProgressBar progressBar;
     private ViewGroup contentHolder;
 
-    public ExplorerActivity() {
+    public BrowseActivity() {
         super(R.string.collection, R.id.nav_collection);
     }
 
@@ -34,7 +34,7 @@ public class ExplorerActivity extends PolarisActivity {
         contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
         Intent intent = getIntent();
-        String path = intent.getStringExtra(ExplorerActivity.PATH);
+        String path = intent.getStringExtra(BrowseActivity.PATH);
         if (path == null) {
             path = "";
         }
@@ -60,16 +60,16 @@ public class ExplorerActivity extends PolarisActivity {
     }
 
     private void displayContent(ArrayList<CollectionItem> items) {
-        ExplorerContentView contentView = null;
+        BrowseContentView contentView = null;
         switch (getDisplayModeForItems(items)) {
             case FOLDER:
-                contentView = new ExplorerFolderView(this);
+                contentView = new BrowseExplorerView(this);
                 break;
             case ALBUM:
-                contentView = new ExplorerAlbumView(this);
+                contentView = new BrowseAlbumView(this);
                 break;
             case DISCOGRAPHY:
-                contentView = new ExplorerDiscographyView(this);
+                contentView = new BrowseDiscographyView(this);
                 break;
         }
         contentView.setItems(items);

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="agersant.polaris.features.browse.ExplorerFolderView">
+    tools:context="agersant.polaris.features.browse.BrowseExplorerView">
 
     <LinearLayout
         android:layout_width="match_parent"

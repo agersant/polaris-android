@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".features.settings.SettingsActivity" />
-        <activity android:name=".features.browse.ExplorerActivity" />
+        <activity android:name=".features.browse.BrowseActivity" />
         <activity android:name=".features.queue.QueueActivity" />
         <activity android:name=".features.player.PlayerActivity" />
 

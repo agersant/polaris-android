@@ -15,25 +15,25 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
-class ExplorerDiscographyView extends ExplorerContentView {
+class BrowseDiscographyView extends BrowseContentView {
 
-    private ExplorerAdapter adapter;
+    private BrowseAdapter adapter;
 
-    public ExplorerDiscographyView(Context context) {
+    public BrowseDiscographyView(Context context) {
         super(context);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_explorer_discography, this, true);
+        inflater.inflate(R.layout.view_browse_discography, this, true);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        ItemTouchHelper.Callback callback = new ExplorerTouchCallback();
+        ItemTouchHelper.Callback callback = new BrowseTouchCallback();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new ExplorerAdapter(DisplayMode.DISCOGRAPHY);
+        adapter = new BrowseAdapter(DisplayMode.DISCOGRAPHY);
         recyclerView.setAdapter(adapter);
     }
 

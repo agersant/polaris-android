@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="agersant.polaris.features.browse.ExplorerFolderView">
+    tools:context="agersant.polaris.features.browse.BrowseExplorerView">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/browse_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical"
-        tools:listitem="@layout/view_browse_discography_item" />
+        tools:listitem="@layout/view_browse_explorer_item" />
 
 </RelativeLayout>

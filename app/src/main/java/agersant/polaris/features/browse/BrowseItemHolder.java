@@ -26,13 +26,13 @@ import agersant.polaris.api.ServerAPI;
 
 class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    private ExplorerAdapter adapter;
+    private BrowseAdapter adapter;
     private CollectionItem item;
     private View queueStatusView;
     private TextView queueStatusText;
     private ImageView queueStatusIcon;
 
-    BrowseItemHolder(ExplorerAdapter adapter, View itemView, View itemQueueStatusView) {
+    BrowseItemHolder(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
         super(itemView);
         this.adapter = adapter;
         queueStatusView = itemQueueStatusView;
@@ -49,8 +49,8 @@ class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickLi
     public void onClick(View view) {
         Context context = view.getContext();
         if (item.isDirectory()) {
-            Intent intent = new Intent(context, ExplorerActivity.class);
-            intent.putExtra(ExplorerActivity.PATH, item.getPath());
+            Intent intent = new Intent(context, BrowseActivity.class);
+            intent.putExtra(BrowseActivity.PATH, item.getPath());
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             context.startActivity(intent);
         }

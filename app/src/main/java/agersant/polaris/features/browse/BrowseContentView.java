@@ -11,9 +11,9 @@ import agersant.polaris.CollectionItem;
  * Created by agersant on 12/7/2016.
  */
 
-abstract class ExplorerContentView extends FrameLayout {
+abstract class BrowseContentView extends FrameLayout {
 
-    public ExplorerContentView(Context context) {
+    public BrowseContentView(Context context) {
         super(context);
     }
 

@@ -34,7 +34,7 @@ public class CollectionActivity extends PolarisActivity {
 
     public void browseDirectories(View view) {
         Context context = view.getContext();
-        Intent showBrowser = new Intent(context, ExplorerActivity.class);
+        Intent showBrowser = new Intent(context, BrowseActivity.class);
         showBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         context.startActivity(showBrowser);
     }

@@ -11,13 +11,13 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 
 
-class ExplorerAdapter
+class BrowseAdapter
         extends RecyclerView.Adapter<BrowseItemHolder> {
 
     private ArrayList<CollectionItem> items;
     private DisplayMode mode;
 
-    ExplorerAdapter(DisplayMode mode) {
+    BrowseAdapter(DisplayMode mode) {
         super();
         this.mode = mode;
         setItems(new ArrayList<CollectionItem>());
@@ -30,17 +30,17 @@ class ExplorerAdapter
 
     @Override
     public BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item_queued, parent, false);
-        View itemView = null;
+        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
+        View itemView;
         BrowseItemHolder itemHolder = null;
         switch (mode) {
             case FOLDER:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item, parent, false);
-                itemHolder = new BrowseFolderItemHolder(this, itemView, itemQueueStatusView);
+                itemHolder = new BrowseExplorerItemHolder(this, itemView, itemQueueStatusView);
                 break;
             case ALBUM:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item, parent, false);
-                itemHolder = new BrowseFolderItemHolder(this, itemView, itemQueueStatusView);
+                itemHolder = new BrowseExplorerItemHolder(this, itemView, itemQueueStatusView);
                 break;
             case DISCOGRAPHY: {
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_discography_item, parent, false);

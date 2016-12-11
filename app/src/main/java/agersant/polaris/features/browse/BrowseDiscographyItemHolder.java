@@ -19,7 +19,7 @@ public class BrowseDiscographyItemHolder extends BrowseItemHolder {
     private TextView artist;
     private TextView album;
 
-    BrowseDiscographyItemHolder(ExplorerAdapter adapter, View itemView, View itemQueueStatusView) {
+    BrowseDiscographyItemHolder(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
         super(adapter, itemView, itemQueueStatusView);
         artwork = (ImageView) itemView.findViewById(R.id.artwork);
         artist = (TextView) itemView.findViewById(R.id.artist);
