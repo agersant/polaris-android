@@ -105,4 +105,10 @@ public class BrowseActivity extends PolarisActivity {
 
         return DisplayMode.FOLDER;
     }
+
+    private enum DisplayMode {
+        FOLDER,
+        DISCOGRAPHY,
+        ALBUM,
+    }
 }

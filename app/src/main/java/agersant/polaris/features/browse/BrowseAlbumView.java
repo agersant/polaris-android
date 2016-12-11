@@ -42,7 +42,7 @@ public class BrowseAlbumView extends BrowseContentView {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new BrowseAdapter(DisplayMode.ALBUM);
+        adapter = new BrowseAdapterAlbum();
         recyclerView.setAdapter(adapter);
     }
 

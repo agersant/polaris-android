@@ -24,7 +24,7 @@ import agersant.polaris.api.ServerAPI;
  * Created by agersant on 12/11/2016.
  */
 
-class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private BrowseAdapter adapter;
     private CollectionItem item;

@@ -31,7 +31,7 @@ public class BrowseExplorerView extends BrowseContentView {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new BrowseAdapter(DisplayMode.FOLDER);
+        adapter = new BrowseAdapterExplorer();
         recyclerView.setAdapter(adapter);
     }
 

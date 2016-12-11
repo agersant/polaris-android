@@ -33,7 +33,7 @@ class BrowseDiscographyView extends BrowseContentView {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new BrowseAdapter(DisplayMode.DISCOGRAPHY);
+        adapter = new BrowseAdapterDiscography();
         recyclerView.setAdapter(adapter);
     }
 
