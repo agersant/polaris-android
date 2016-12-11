@@ -17,7 +17,6 @@ import java.util.Random;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 import agersant.polaris.features.PolarisActivity;
-import agersant.polaris.ui.DragAndSwipeTouchHelperCallback;
 
 public class QueueActivity extends PolarisActivity {
 
@@ -40,7 +39,7 @@ public class QueueActivity extends PolarisActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.Callback callback = new DragAndSwipeTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }

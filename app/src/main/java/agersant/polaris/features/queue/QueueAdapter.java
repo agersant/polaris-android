@@ -11,12 +11,10 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
-import agersant.polaris.ui.DragAndSwipeItemTouchHelperAdapter;
 
 
 class QueueAdapter
-        extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder>
-        implements DragAndSwipeItemTouchHelperAdapter {
+        extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
 
     private PlaybackQueue queue;
 
@@ -42,14 +40,12 @@ class QueueAdapter
         return queue.size();
     }
 
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
+    void onItemMove(int fromPosition, int toPosition) {
         queue.swap(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
-    @Override
-    public void onItemDismiss(int position) {
+    void onItemDismiss(int position) {
         queue.remove(position);
         notifyItemRemoved(position);
     }

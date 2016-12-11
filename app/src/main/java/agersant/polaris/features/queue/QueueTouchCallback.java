@@ -1,13 +1,13 @@
-package agersant.polaris.ui;
+package agersant.polaris.features.queue;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-public class DragAndSwipeTouchHelperCallback extends ItemTouchHelper.Callback {
+public class QueueTouchCallback extends ItemTouchHelper.Callback {
 
-    private final DragAndSwipeItemTouchHelperAdapter adapter;
+    private final QueueAdapter adapter;
 
-    public DragAndSwipeTouchHelperCallback(DragAndSwipeItemTouchHelperAdapter adapter) {
+    public QueueTouchCallback(QueueAdapter adapter) {
         this.adapter = adapter;
     }
 
