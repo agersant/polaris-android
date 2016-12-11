@@ -39,8 +39,8 @@ class BrowseAdapter
                 itemHolder = new BrowseExplorerItemHolder(this, itemView, itemQueueStatusView);
                 break;
             case ALBUM:
-                itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_explorer_item, parent, false);
-                itemHolder = new BrowseExplorerItemHolder(this, itemView, itemQueueStatusView);
+                itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_album_item, parent, false);
+                itemHolder = new BrowseAlbumItemHolder(this, itemView, itemQueueStatusView);
                 break;
             case DISCOGRAPHY: {
                 itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_discography_item, parent, false);
