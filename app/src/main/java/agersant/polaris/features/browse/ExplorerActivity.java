@@ -1,10 +1,9 @@
 package agersant.polaris.features.browse;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.android.volley.Response;
@@ -20,6 +19,7 @@ public class ExplorerActivity extends PolarisActivity {
 
     public static final String PATH = "PATH";
     private ProgressBar progressBar;
+    private ViewGroup contentHolder;
 
     public ExplorerActivity() {
         super(R.string.collection, R.id.nav_collection);
@@ -31,6 +31,7 @@ public class ExplorerActivity extends PolarisActivity {
         super.onCreate(savedInstanceState);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
         Intent intent = getIntent();
         String path = intent.getStringExtra(ExplorerActivity.PATH);
@@ -59,22 +60,17 @@ public class ExplorerActivity extends PolarisActivity {
     }
 
     private void displayContent(ArrayList<CollectionItem> items) {
-        ExplorerFragment fragment = null;
-
+        ExplorerContentView contentView = null;
         switch (getDisplayModeForItems(items)) {
             case FOLDER:
-                fragment = new ExplorerFolderFragment();
+                contentView = new ExplorerFolderView(this);
                 break;
             case ALBUM:
-                fragment = new ExplorerAlbumFragment();
+                contentView = new ExplorerAlbumView(this);
                 break;
         }
-
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.browse_content_holder, fragment);
-        fragment.setItems(items);
-        fragmentTransaction.commit();
+        contentView.setItems(items);
+        contentHolder.addView(contentView);
     }
 
     private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {

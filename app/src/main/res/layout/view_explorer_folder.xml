@@ -1,8 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="agersant.polaris.features.browse.ExplorerFolderFragment">
+    tools:context="agersant.polaris.features.browse.ExplorerFolderView">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/browse_recycler_view"
@@ -11,4 +11,4 @@
         android:scrollbars="vertical"
         tools:listitem="@layout/view_browse_explorer_item" />
 
-</FrameLayout>
+</RelativeLayout>
