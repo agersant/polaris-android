@@ -1,7 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/lightBlue</item> <!--Navigation bar highlight-->
+        <item name="colorPrimaryDark">@color/veryDarkBlue</item> <!--Status bar background-->
+
+        <item name="swipeBackgroundColor">@color/lightBlue</item>
+        <item name="swipeTextColor">@color/white</item>
+        <item name="swipeFontFamily">sans-serif </item>
+
+        <item name="albumDetailsBackgroundColor">@color/blueGray</item>
+        <item name="albumDetailsTitleColor">@color/white</item>
+        <item name="albumDetailsArtistColor">@color/gray</item>
+
+        <item name="discographyAlbumColor">@color/darkGray</item>
+        <item name="discographyArtistColor">@color/gray</item>
     </style>
 
     <style name="Divider">
@@ -10,6 +24,28 @@
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:background">@android:drawable/divider_horizontal_bright</item>
+    </style>
+
+    <style name="PolarisToolbar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+    </style>
+
+    <style name="PolarisButton">
+        <item name="android:background">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/darkGray</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="ExplorerButton" parent="@style/PolarisButton">
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+    </style>
+
+    <style name="AlbumButton" parent="@style/PolarisButton">
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
     </style>
 
 </resources>

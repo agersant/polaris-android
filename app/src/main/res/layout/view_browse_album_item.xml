@@ -10,7 +10,7 @@
         android:background="@color/white"
         android:layout_width="match_parent"
         android:gravity="center_vertical"
-        style="?android:attr/actionButtonStyle"
+        style="@style/AlbumButton"
         android:layout_height="48dp"
         android:textSize="18sp"
         android:ellipsize="end"

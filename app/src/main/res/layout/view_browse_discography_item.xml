@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/artwork"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         tools:background="@drawable/artwork"/>
 
     <RelativeLayout
@@ -23,6 +23,7 @@
             android:id="@+id/album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?discographyAlbumColor"
             android:maxLines="1"
             android:textSize="18sp"
             tools:text="Into the Labyrinth"/>
@@ -32,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/album"
+            android:textColor="?discographyArtistColor"
             android:maxLines="1"
             android:textSize="14sp"
             tools:text="Dead Can Dance"/>

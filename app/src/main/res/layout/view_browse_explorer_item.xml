@@ -7,12 +7,9 @@
     android:layout_height="wrap_content">
     <Button
         android:id="@+id/browse_explorer_button"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:gravity="center_vertical"
-        style="?android:attr/actionButtonStyle"
-        android:layout_height="48dp"
-        android:textSize="18sp"
+        style="@style/ExplorerButton"
         android:ellipsize="end"
         android:maxLines="1"
         android:drawablePadding="12dp"

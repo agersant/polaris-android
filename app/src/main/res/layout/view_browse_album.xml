@@ -7,13 +7,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@color/colorAccent"
+        android:layout_height="100dp"
+        android:background="?albumDetailsBackgroundColor"
         >
         <ImageView
             android:id="@+id/album_artwork"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:contentDescription="@string/album_artwork"
             tools:src="@drawable/artwork"
             />
@@ -22,19 +22,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center_vertical"
-            android:padding="8dp"
+            android:padding="10dp"
             >
             <TextView
                 android:id="@+id/album_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
+                android:textSize="20sp"
+                android:textColor="?albumDetailsTitleColor"
                 tools:text="Calcium Engine"/>
             <TextView
                 android:id="@+id/album_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/album_title"
+                android:textSize="16sp"
+                android:textColor="?albumDetailsArtistColor"
                 tools:text="Botanical"/>
         </RelativeLayout>
     </LinearLayout>
