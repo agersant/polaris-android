@@ -60,7 +60,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
             NetworkImage.load(url, artwork);
         }
 
-        String titleString = item.getTitle();
+        String titleString = item.getAlbum();
         if (title != null) {
             title.setText(titleString);
         }
