@@ -82,6 +82,9 @@
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        app:itemBackground="@color/blueGray"
+        app:itemIconTint="@drawable/bottom_navigation_item"
+        app:itemTextColor="@drawable/bottom_navigation_item"
         android:layout_alignParentBottom="true"
         app:menu="@menu/menu_navigation" />
 
