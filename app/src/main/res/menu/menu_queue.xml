@@ -6,7 +6,7 @@
         app:showAsAction="ifRoom"
         android:id="@+id/action_ordering"
         android:title="@string/ordering"
-        android:icon="@drawable/ic_reorder_black_24dp">
+        android:icon="@drawable/ic_reorder_white_24dp">
         <menu>
             <item
                 app:showAsAction="never|withText"
@@ -34,10 +34,10 @@
         app:showAsAction="ifRoom"
         android:id="@+id/action_shuffle"
         android:title="@string/shuffle"
-        android:icon="@drawable/ic_swap_vert_black_24dp"/>
+        android:icon="@drawable/ic_swap_vert_white_24dp"/>
     <item
         app:showAsAction="ifRoom"
         android:id="@+id/action_clear"
         android:title="@string/clear"
-        android:icon="@drawable/ic_delete_black_24dp"/>
+        android:icon="@drawable/ic_delete_white_24dp"/>
 </menu>

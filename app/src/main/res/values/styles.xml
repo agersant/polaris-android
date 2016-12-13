@@ -26,7 +26,12 @@
         <item name="android:background">@android:drawable/divider_horizontal_bright</item>
     </style>
 
-    <style name="PolarisToolbar" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+    <style name="PolarisToolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">@color/darkBlue</item>
+    </style>
+
+    <style name="PolarisToolbarMenu" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@color/white</item>
     </style>
 
     <style name="PolarisButton">

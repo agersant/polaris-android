@@ -147,14 +147,14 @@ public class QueueActivity extends PolarisActivity {
     private int getIconForOrdering(PlaybackQueue.Ordering ordering) {
         switch (ordering) {
             case REPEAT_ONE:
-                return R.drawable.ic_repeat_one_black_24dp;
+                return R.drawable.ic_repeat_one_white_24dp;
             case REPEAT_ALL:
-                return R.drawable.ic_repeat_black_24dp;
+                return R.drawable.ic_repeat_white_24dp;
             case RANDOM:
-                return R.drawable.ic_shuffle_black_24dp;
+                return R.drawable.ic_shuffle_white_24dp;
             case SEQUENCE:
             default:
-                return R.drawable.ic_reorder_black_24dp;
+                return R.drawable.ic_reorder_white_24dp;
         }
     }
 }
