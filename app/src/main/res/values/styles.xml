@@ -3,7 +3,7 @@
 
     <!-- Base application theme. -->
     <style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/lightBlue</item> <!--Navigation bar highlight-->
+        <item name="colorPrimary">@color/darkBlue</item> <!--Task manager toolbar-->
         <item name="colorPrimaryDark">@color/veryDarkBlue</item> <!--Status bar background-->
 
         <item name="swipeBackgroundColor">@color/lightBlue</item>
