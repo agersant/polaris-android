@@ -16,7 +16,7 @@
         android:textSize="16sp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textColor="@color/darkGray"
+        android:textColor="@color/blueGrey700"
         tools:text="The Dreams of Swedenborg" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:textSize="12sp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textColor="@color/gray"
+        android:textColor="@color/blueGrey400"
         android:layout_below="@+id/title"
         tools:text="Therion" />
 

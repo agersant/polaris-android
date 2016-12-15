@@ -21,7 +21,7 @@
         android:layout_centerVertical="true"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:indeterminateTint="@color/lightBlue"
+        android:indeterminateTint="@color/lightBlue600"
         tools:visibility="gone"/>
 
     <FrameLayout
@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        app:itemBackground="@color/veryDarkGray"
+        app:itemBackground="@color/blueGrey900"
         app:itemIconTint="@drawable/bottom_navigation_item"
         app:itemTextColor="@drawable/bottom_navigation_item"
         app:menu="@menu/menu_navigation" />

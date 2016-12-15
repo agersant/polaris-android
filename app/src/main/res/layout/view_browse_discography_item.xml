@@ -32,7 +32,7 @@
                 android:id="@+id/album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/darkGray"
+                android:textColor="@color/blueGrey700"
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:textSize="20sp"
@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/album"
-                android:textColor="@color/gray"
+                android:textColor="@color/blueGrey400"
                 android:maxLines="1"
                 android:textSize="16sp"
                 tools:text="Dead Can Dance"/>

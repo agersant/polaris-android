@@ -3,8 +3,8 @@
 
     <!-- Base application theme. -->
     <style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/darkBlue</item> <!--Task manager toolbar-->
-        <item name="colorPrimaryDark">@color/veryDarkBlue</item> <!--Status bar background-->
+        <item name="colorPrimary">@color/lightBlue600</item> <!--Task manager toolbar-->
+        <item name="colorPrimaryDark">@color/lightBlue800</item> <!--Status bar background-->
     </style>
 
     <style name="Divider">
@@ -16,7 +16,7 @@
     </style>
 
     <style name="PolarisToolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/darkBlue</item>
+        <item name="android:background">@color/lightBlue600</item>
     </style>
 
     <style name="PolarisToolbarMenu" parent="@style/ThemeOverlay.AppCompat.Light">
@@ -26,7 +26,7 @@
     <style name="PolarisButton">
         <item name="android:background">@color/white</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/darkGray</item>
+        <item name="android:textColor">@color/blueGrey700</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textSize">18sp</item>
         <item name="android:fontFamily">sans-serif</item>

@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="paleBlue">#bbd6e7</color>
-    <color name="lightBlue">#44c8f1</color>
-    <color name="blue">#1454a6</color>
-    <color name="darkBlue">#07415b</color>
-    <color name="blueGray">#222723</color>
-    <color name="pink">#e67aaf</color>
-    <color name="purple">#694e94</color>
+    <color name="lightBlue600">#039be5</color>
+    <color name="lightBlue800">#0277bd</color>
 
-    <color name="veryDarkBlue">#02293b</color>
+    <color name="blueGrey400">#78909C</color>
+    <color name="blueGrey700">#455A64</color>
+    <color name="blueGrey900">#263238</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="gray">#888888</color>
-    <color name="darkGray">#3A3A3A</color>
-    <color name="veryDarkGray">#111111</color>
     <color name="black">#000000</color>
 </resources>

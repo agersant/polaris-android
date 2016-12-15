@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textAlignment="textEnd"
-            android:textColor="@color/gray"
+            android:textColor="@color/blueGrey400"
             tools:text="04." />
 
         <TextView
@@ -34,7 +34,7 @@
             android:maxLines="1"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="24dp"
-            android:textColor="@color/darkGray"
+            android:textColor="@color/blueGrey700"
             tools:text="March of the Swordmaster" />
 
     </LinearLayout>
