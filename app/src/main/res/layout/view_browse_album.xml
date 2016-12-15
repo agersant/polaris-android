@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center_vertical"
-            android:padding="10dp"
+            android:padding="15dp"
             >
             <TextView
                 android:id="@+id/album_title"

@@ -9,12 +9,12 @@
         android:id="@+id/button"
         android:background="@color/white"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center_vertical"
         style="@style/AlbumButton"
-        android:layout_height="48dp"
         android:textSize="18sp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:drawablePadding="12dp"
+        android:padding="12dp"
         tools:text="March of the Swordmaster" />
 </LinearLayout>
