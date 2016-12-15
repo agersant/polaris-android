@@ -13,7 +13,7 @@ import agersant.polaris.ui.NetworkImage;
  * Created by agersant on 12/11/2016.
  */
 
-public class BrowseItemHolderDiscography extends BrowseItemHolder {
+class BrowseItemHolderDiscography extends BrowseItemHolder {
 
     private ImageView artwork;
     private TextView artist;
