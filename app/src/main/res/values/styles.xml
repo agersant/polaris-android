@@ -10,7 +10,7 @@
         <item name="swipeTextColor">@color/white</item>
         <item name="swipeFontFamily">sans-serif </item>
 
-        <item name="albumDetailsBackgroundColor">@color/blueGray</item>
+        <item name="albumDetailsBackgroundColor">@color/veryDarkGray</item>
         <item name="albumDetailsTitleColor">@color/white</item>
         <item name="albumDetailsArtistColor">@color/gray</item>
 
