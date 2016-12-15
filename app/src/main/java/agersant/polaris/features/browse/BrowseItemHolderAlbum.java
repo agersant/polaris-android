@@ -2,6 +2,7 @@ package agersant.polaris.features.browse;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
@@ -10,14 +11,15 @@ import agersant.polaris.R;
  * Created by agersant on 12/11/2016.
  */
 
-public class BrowseItemHolderAlbum extends BrowseItemHolder {
+class BrowseItemHolderAlbum extends BrowseItemHolder {
 
-    private Button button;
+    private TextView trackNumberText;
+    private TextView titleText;
 
     BrowseItemHolderAlbum(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
         super(adapter, itemView, itemQueueStatusView);
-        button = (Button) itemView.findViewById(R.id.button);
-        button.setOnClickListener(this);
+        trackNumberText = (TextView) itemView.findViewById(R.id.track_number);
+        titleText = (TextView) itemView.findViewById(R.id.title);
     }
 
     @Override
@@ -25,12 +27,17 @@ public class BrowseItemHolderAlbum extends BrowseItemHolder {
         super.bindItem(item);
 
         String title = item.getTitle();
-        Integer trackNumber = item.getTrackNumber();
-
-        if (title != null && trackNumber != null) {
-            button.setText(String.format("%1$02d. %2$s", trackNumber, title));
+        if (title != null) {
+            titleText.setText(title);
         } else {
-            button.setText(item.getName());
+            titleText.setText(item.getName());
+        }
+
+        Integer trackNumber = item.getTrackNumber();
+        if (trackNumber != null) {
+            trackNumberText.setText(String.format("%1$02d.", trackNumber));
+        } else {
+            trackNumberText.setText("");
         }
     }
 

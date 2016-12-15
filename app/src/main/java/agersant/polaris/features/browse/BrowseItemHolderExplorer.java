@@ -11,7 +11,7 @@ import agersant.polaris.R;
  * Created by agersant on 12/11/2016.
  */
 
-public class BrowseItemHolderExplorer extends BrowseItemHolder {
+class BrowseItemHolderExplorer extends BrowseItemHolder {
 
     private Button button;
 
