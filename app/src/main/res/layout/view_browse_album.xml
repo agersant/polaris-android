@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="?albumDetailsBackgroundColor"
+        android:background="@color/veryDarkBlue"
         >
         <ImageView
             android:id="@+id/album_artwork"
@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="?albumDetailsTitleColor"
+                android:textColor="@color/white"
                 tools:text="Calcium Engine"/>
             <TextView
                 android:id="@+id/album_artist"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/album_title"
                 android:textSize="16sp"
-                android:textColor="?albumDetailsArtistColor"
+                android:textColor="@color/gray"
                 tools:text="Botanical"/>
         </RelativeLayout>
     </LinearLayout>

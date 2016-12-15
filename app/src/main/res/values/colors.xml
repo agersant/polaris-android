@@ -4,10 +4,11 @@
     <color name="lightBlue">#44c8f1</color>
     <color name="blue">#1454a6</color>
     <color name="darkBlue">#07415b</color>
-    <color name="veryDarkBlue">#02293b</color>
-
+    <color name="blueGray">#222723</color>
     <color name="pink">#e67aaf</color>
     <color name="purple">#694e94</color>
+
+    <color name="veryDarkBlue">#02293b</color>
 
     <color name="white">#FFFFFF</color>
     <color name="gray">#888888</color>

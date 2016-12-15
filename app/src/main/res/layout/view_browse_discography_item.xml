@@ -23,7 +23,7 @@
             android:id="@+id/album"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?discographyAlbumColor"
+            android:textColor="@color/darkGray"
             android:maxLines="1"
             android:textSize="18sp"
             tools:text="Into the Labyrinth"/>
@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/album"
-            android:textColor="?discographyArtistColor"
+            android:textColor="@color/gray"
             android:maxLines="1"
             android:textSize="14sp"
             tools:text="Dead Can Dance"/>

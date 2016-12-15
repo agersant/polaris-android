@@ -5,18 +5,6 @@
     <style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/darkBlue</item> <!--Task manager toolbar-->
         <item name="colorPrimaryDark">@color/veryDarkBlue</item> <!--Status bar background-->
-
-        <item name="swipeBackgroundColor">@color/lightBlue</item>
-        <item name="swipeTextColor">@color/white</item>
-        <item name="swipeIconColor">@color/white</item>
-        <item name="swipeFontFamily">sans-serif </item>
-
-        <item name="albumDetailsBackgroundColor">@color/veryDarkGray</item>
-        <item name="albumDetailsTitleColor">@color/white</item>
-        <item name="albumDetailsArtistColor">@color/gray</item>
-
-        <item name="discographyAlbumColor">@color/darkGray</item>
-        <item name="discographyArtistColor">@color/gray</item>
     </style>
 
     <style name="Divider">

@@ -10,7 +10,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?swipeBackgroundColor"/>
+        android:background="@color/lightBlue"/>
 
     <ImageView
         android:id="@+id/status_icon"
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:layout_centerVertical="true"
-        android:tint="?swipeIconColor"
+        android:tint="@color/white"
         tools:background="@drawable/ic_repeat_black_24dp"/>
 
     <TextView
@@ -27,8 +27,8 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:layout_centerVertical="true"
-        android:textColor="?swipeTextColor"
-        android:fontFamily="?swipeFontFamily"
+        android:textColor="@color/white"
+        android:fontFamily="sans-serif"
         android:layout_toRightOf="@+id/status_icon"
         tools:text="Add to queue"/>
 
