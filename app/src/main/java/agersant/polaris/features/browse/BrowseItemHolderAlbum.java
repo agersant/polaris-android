@@ -23,7 +23,15 @@ public class BrowseItemHolderAlbum extends BrowseItemHolder {
     @Override
     void bindItem(CollectionItem item) {
         super.bindItem(item);
-        button.setText(item.getName());
+
+        String title = item.getTitle();
+        Integer trackNumber = item.getTrackNumber();
+
+        if (title != null && trackNumber != null) {
+            button.setText(String.format("%1$02d. %2$s", trackNumber, title));
+        } else {
+            button.setText(item.getName());
+        }
     }
 
 }

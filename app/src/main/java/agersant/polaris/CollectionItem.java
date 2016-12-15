@@ -11,6 +11,7 @@ public class CollectionItem implements Cloneable {
     private String title;
     private String artwork;
     private String album;
+    private Integer trackNumber;
     private boolean isDirectory;
 
     private CollectionItem() {
@@ -33,21 +34,30 @@ public class CollectionItem implements Cloneable {
 
     private void parseFields(JSONObject fields) throws JSONException {
         path = fields.getString("path");
-        artist = readField(fields, "artist");
-        title = readField(fields, "title");
-        artwork = readField(fields, "artwork");
-        album = readField(fields, "album");
+        artist = readStringField(fields, "artist");
+        title = readStringField(fields, "title");
+        artwork = readStringField(fields, "artwork");
+        album = readStringField(fields, "album");
+        trackNumber = readIntField(fields, "track_number");
 
         String[] chunks = path.split("/|\\\\");
         name = chunks[chunks.length - 1];
     }
 
-    private String readField(JSONObject fields, String name) {
+    private String readStringField(JSONObject fields, String name) {
+
         String value = fields.optString(name);
         if (value != null && value.equals("null")) {
             return null;
         }
         return value;
+    }
+
+    private Integer readIntField(JSONObject fields, String name) throws JSONException {
+        if (fields.isNull(name)) {
+            return null;
+        }
+        return Integer.valueOf(fields.getInt(name));
     }
 
     @Override
@@ -81,5 +91,9 @@ public class CollectionItem implements Cloneable {
 
     public String getAlbum() {
         return album;
+    }
+
+    public Integer getTrackNumber() {
+        return trackNumber;
     }
 }
