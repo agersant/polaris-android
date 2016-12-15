@@ -8,6 +8,7 @@
 
         <item name="swipeBackgroundColor">@color/lightBlue</item>
         <item name="swipeTextColor">@color/white</item>
+        <item name="swipeIconColor">@color/white</item>
         <item name="swipeFontFamily">sans-serif </item>
 
         <item name="albumDetailsBackgroundColor">@color/veryDarkGray</item>

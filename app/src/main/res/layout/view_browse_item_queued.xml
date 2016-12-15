@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:layout_centerVertical="true"
+        android:tint="?swipeIconColor"
         tools:background="@drawable/ic_repeat_black_24dp"/>
 
     <TextView

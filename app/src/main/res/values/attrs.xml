@@ -3,6 +3,7 @@
     <attr name="swipeBackgroundColor" format="color" />
     <attr name="swipeFontFamily" format="string" />
     <attr name="swipeTextColor" format="color" />
+    <attr name="swipeIconColor" format="color" />
 
     <attr name="discographyAlbumColor" format="color" />
     <attr name="discographyArtistColor" format="color" />
