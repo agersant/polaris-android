@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:gravity="center_vertical"
     android:layout_height="48dp"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
     >
 
     <TextView

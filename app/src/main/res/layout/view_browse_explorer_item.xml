@@ -12,8 +12,8 @@
         style="@style/ExplorerButton"
         android:ellipsize="end"
         android:maxLines="1"
-        android:padding="12dp"
-        android:drawablePadding="8dp"
+        android:paddingStart="20dp"
+        android:drawablePadding="12dp"
         tools:text="Dead Can Dance"
         tools:drawableLeft="@drawable/ic_folder_open_black_24dp"/>
 </LinearLayout>

@@ -22,8 +22,6 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/navigation"
         android:layout_below="@id/toolbar"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:scrollbars="vertical"
         tools:listitem="@layout/view_queue_item" />
 
