@@ -53,20 +53,20 @@ class QueueAdapter
     static class QueueItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private CollectionItem item;
-        private TextView primaryText;
-        private TextView secondaryText;
+        private TextView titleText;
+        private TextView artistText;
 
         QueueItemHolder(View view) {
             super(view);
-            primaryText = (TextView) view.findViewById(R.id.primary_text);
-            secondaryText = (TextView) view.findViewById(R.id.secondary_text);
+            titleText = (TextView) view.findViewById(R.id.title);
+            artistText = (TextView) view.findViewById(R.id.artist);
             view.setOnClickListener(this);
         }
 
         void bindItem(CollectionItem item) {
             this.item = item;
-            primaryText.setText(item.getTitle());
-            secondaryText.setText(item.getArtist());
+            titleText.setText(item.getTitle());
+            artistText.setText(item.getArtist());
         }
 
         @Override

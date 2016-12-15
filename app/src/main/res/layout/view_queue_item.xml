@@ -3,25 +3,31 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="40dp">
+    android:gravity="center_vertical"
+    android:layout_height="48dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    >
 
     <TextView
-        android:id="@+id/primary_text"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:maxLines="1"
         android:ellipsize="end"
+        android:textColor="@color/darkGray"
         tools:text="The Dreams of Swedenborg" />
 
     <TextView
-        android:id="@+id/secondary_text"
+        android:id="@+id/artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:layout_alignParentBottom="true"
+        android:textColor="@color/gray"
+        android:layout_below="@+id/title"
         tools:text="Therion" />
 
 </RelativeLayout>
