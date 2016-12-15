@@ -25,14 +25,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="15dp">
+            android:padding="15dp"
+            >
 
             <TextView
                 android:id="@+id/album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/darkGray"
-                android:maxLines="1"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textSize="20sp"
                 tools:text="Into the Labyrinth"/>
 

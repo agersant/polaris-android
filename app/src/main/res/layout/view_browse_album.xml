@@ -29,6 +29,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textColor="@color/white"
                 tools:text="Calcium Engine"/>
             <TextView
