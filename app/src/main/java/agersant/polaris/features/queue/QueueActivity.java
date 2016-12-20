@@ -63,20 +63,21 @@ public class QueueActivity extends PolarisActivity {
 	@Override
 	public void onStart() {
 		subscribeToEvents();
-		super.onResume();
+		super.onStart();
 	}
 
 	@Override
 	public void onStop() {
 		unregisterReceiver(receiver);
 		receiver = null;
-		super.onPause();
+		super.onStop();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu_queue, menu);
+		updateOrderingIcon();
 		return true;
 	}
 
