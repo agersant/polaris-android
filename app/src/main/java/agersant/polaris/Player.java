@@ -9,6 +9,7 @@ public class Player {
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
 	public static final String PAUSED_TRACK = "PAUSED_TRACK";
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
+	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 	private static Player instance;
 
 	private CollectionItem currentItem;

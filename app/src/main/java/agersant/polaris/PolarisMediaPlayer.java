@@ -19,6 +19,7 @@ public class PolarisMediaPlayer
 		MediaPlayer.OnCompletionListener {
 
 	private MediaPlayer player;
+	private MediaPlayer.OnCompletionListener onCompletionListener;
 	private State state;
 	private boolean pause;
 
@@ -34,8 +35,14 @@ public class PolarisMediaPlayer
 
 	@Override
 	public void onCompletion(MediaPlayer mediaPlayer) {
-		// TODO Handle
 		state = State.PLAYBACK_COMPLETED;
+		if (onCompletionListener != null) {
+			onCompletionListener.onCompletion(mediaPlayer);
+		}
+	}
+
+	public void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
+		onCompletionListener = listener;
 	}
 
 	@Override

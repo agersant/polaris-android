@@ -2,6 +2,7 @@ package agersant.polaris;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -12,7 +13,8 @@ import java.util.Map;
 import agersant.polaris.api.ServerAPI;
 
 public class MediaPlayerService
-		extends Service {
+		extends Service
+		implements MediaPlayer.OnCompletionListener {
 
 	private final IBinder binder = new MediaPlayerBinder();
 	private PolarisMediaPlayer player;
@@ -69,11 +71,19 @@ public class MediaPlayerService
 	public void onCreate() {
 		super.onCreate();
 		player = new PolarisMediaPlayer();
+		player.setOnCompletionListener(this);
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
+	}
+
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		broadcast(Player.COMPLETED_TRACK);
+		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		queue.skipNext();
 	}
 
 	public class MediaPlayerBinder extends Binder {
