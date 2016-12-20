@@ -17,92 +17,92 @@ import agersant.polaris.api.ServerAPI;
 
 public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 
-    private final WeakReference<ImageView> imageViewReference;
+	private final WeakReference<ImageView> imageViewReference;
 
-    private String url;
-    private String authCookie;
+	private String url;
+	private String authCookie;
 
-    private NetworkImage(String url, ImageView imageView, String authCookie) {
-        this.url = url;
-        this.authCookie = authCookie;
-        imageViewReference = new WeakReference<>(imageView);
-    }
+	private NetworkImage(String url, ImageView imageView, String authCookie) {
+		this.url = url;
+		this.authCookie = authCookie;
+		imageViewReference = new WeakReference<>(imageView);
+	}
 
-    public static void load(String url, ImageView imageView) {
-        if (NetworkImage.cancelPotentialWork(url, imageView)) {
-            PolarisApplication polarisApplication = PolarisApplication.getInstance();
-            Resources resources = polarisApplication.getResources();
-            ServerAPI serverAPI = ServerAPI.getInstance(polarisApplication);
-            String authCookie = serverAPI.getAuthCookie();
+	public static void load(String url, ImageView imageView) {
+		if (NetworkImage.cancelPotentialWork(url, imageView)) {
+			PolarisApplication polarisApplication = PolarisApplication.getInstance();
+			Resources resources = polarisApplication.getResources();
+			ServerAPI serverAPI = ServerAPI.getInstance(polarisApplication);
+			String authCookie = serverAPI.getAuthCookie();
 
-            NetworkImage task = new NetworkImage(url, imageView, authCookie);
-            NetworkImage.AsyncDrawable asyncDrawable = new NetworkImage.AsyncDrawable(resources, null, task);
-            imageView.setImageDrawable(asyncDrawable);
-            task.execute();
-        }
-    }
+			NetworkImage task = new NetworkImage(url, imageView, authCookie);
+			NetworkImage.AsyncDrawable asyncDrawable = new NetworkImage.AsyncDrawable(resources, null, task);
+			imageView.setImageDrawable(asyncDrawable);
+			task.execute();
+		}
+	}
 
-    private static NetworkImage getTask(ImageView imageView) {
-        if (imageView != null) {
-            Drawable drawable = imageView.getDrawable();
-            if (drawable instanceof AsyncDrawable) {
-                final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
-                return asyncDrawable.getTask();
-            }
-        }
-        return null;
-    }
+	private static NetworkImage getTask(ImageView imageView) {
+		if (imageView != null) {
+			Drawable drawable = imageView.getDrawable();
+			if (drawable instanceof AsyncDrawable) {
+				final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
+				return asyncDrawable.getTask();
+			}
+		}
+		return null;
+	}
 
-    private static boolean cancelPotentialWork(String newURL, ImageView imageView) {
-        NetworkImage task = getTask(imageView);
-        if (task != null) {
-            if (!task.url.equals(newURL)) {
-                task.cancel(true);
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
+	private static boolean cancelPotentialWork(String newURL, ImageView imageView) {
+		NetworkImage task = getTask(imageView);
+		if (task != null) {
+			if (!task.url.equals(newURL)) {
+				task.cancel(true);
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
 
-    @Override
-    protected Bitmap doInBackground(Void... params) {
-        Bitmap bitmap = null;
-        try {
-            URLConnection connection = new java.net.URL(url).openConnection();
-            connection.setRequestProperty("Cookie", authCookie);
-            InputStream stream = connection.getInputStream();
-            bitmap = BitmapFactory.decodeStream(stream);
-        } catch (Exception e) {
-            System.out.println("Error while downloading image: " + e.toString());
-        }
-        return bitmap;
-    }
+	@Override
+	protected Bitmap doInBackground(Void... params) {
+		Bitmap bitmap = null;
+		try {
+			URLConnection connection = new java.net.URL(url).openConnection();
+			connection.setRequestProperty("Cookie", authCookie);
+			InputStream stream = connection.getInputStream();
+			bitmap = BitmapFactory.decodeStream(stream);
+		} catch (Exception e) {
+			System.out.println("Error while downloading image: " + e.toString());
+		}
+		return bitmap;
+	}
 
-    @Override
-    protected void onPostExecute(Bitmap bitmap) {
-        if (isCancelled()) {
-            bitmap = null;
-        }
-        if (bitmap != null) {
-            ImageView imageView = imageViewReference.get();
-            NetworkImage task = getTask(imageView);
-            if (imageView != null && task == this) {
-                imageView.setImageBitmap(bitmap);
-            }
-        }
-    }
+	@Override
+	protected void onPostExecute(Bitmap bitmap) {
+		if (isCancelled()) {
+			bitmap = null;
+		}
+		if (bitmap != null) {
+			ImageView imageView = imageViewReference.get();
+			NetworkImage task = getTask(imageView);
+			if (imageView != null && task == this) {
+				imageView.setImageBitmap(bitmap);
+			}
+		}
+	}
 
-    private static class AsyncDrawable extends BitmapDrawable {
-        private WeakReference<NetworkImage> task;
+	private static class AsyncDrawable extends BitmapDrawable {
+		private WeakReference<NetworkImage> task;
 
-        AsyncDrawable(Resources res, Bitmap bitmap, NetworkImage task) {
-            super(res, bitmap);
-            this.task = new WeakReference<>(task);
-        }
+		AsyncDrawable(Resources res, Bitmap bitmap, NetworkImage task) {
+			super(res, bitmap);
+			this.task = new WeakReference<>(task);
+		}
 
-        NetworkImage getTask() {
-            return task.get();
-        }
-    }
+		NetworkImage getTask() {
+			return task.get();
+		}
+	}
 }

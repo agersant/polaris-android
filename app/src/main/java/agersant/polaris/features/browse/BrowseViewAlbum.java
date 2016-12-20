@@ -19,56 +19,56 @@ import agersant.polaris.ui.NetworkImage;
 
 public class BrowseViewAlbum extends BrowseViewContent {
 
-    private BrowseAdapter adapter;
-    private ImageView artwork;
-    private TextView artist;
-    private TextView title;
+	private BrowseAdapter adapter;
+	private ImageView artwork;
+	private TextView artist;
+	private TextView title;
 
-    public BrowseViewAlbum(Context context) {
-        super(context);
+	public BrowseViewAlbum(Context context) {
+		super(context);
 
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_browse_album, this, true);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater.inflate(R.layout.view_browse_album, this, true);
 
-        artwork = (ImageView) findViewById(R.id.album_artwork);
-        artist = (TextView) findViewById(R.id.album_artist);
-        title = (TextView) findViewById(R.id.album_title);
+		artwork = (ImageView) findViewById(R.id.album_artwork);
+		artist = (TextView) findViewById(R.id.album_artist);
+		title = (TextView) findViewById(R.id.album_title);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        ItemTouchHelper.Callback callback = new BrowseTouchCallback();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+		ItemTouchHelper.Callback callback = new BrowseTouchCallback();
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new BrowseAdapterAlbum();
-        recyclerView.setAdapter(adapter);
-    }
+		adapter = new BrowseAdapterAlbum();
+		recyclerView.setAdapter(adapter);
+	}
 
-    @Override
-    void setItems(ArrayList<CollectionItem> items) {
-        assert !items.isEmpty();
+	@Override
+	void setItems(ArrayList<CollectionItem> items) {
+		assert !items.isEmpty();
 
-        adapter.setItems(items);
+		adapter.setItems(items);
 
-        CollectionItem item = items.get(0);
-        String artworkPath = item.getArtwork();
-        if (artworkPath != null) {
-            ServerAPI serverAPI = ServerAPI.getInstance(getContext());
-            String url = serverAPI.getMediaURL(artworkPath);
-            NetworkImage.load(url, artwork);
-        }
+		CollectionItem item = items.get(0);
+		String artworkPath = item.getArtwork();
+		if (artworkPath != null) {
+			ServerAPI serverAPI = ServerAPI.getInstance(getContext());
+			String url = serverAPI.getMediaURL(artworkPath);
+			NetworkImage.load(url, artwork);
+		}
 
-        String titleString = item.getAlbum();
-        if (title != null) {
-            title.setText(titleString);
-        }
+		String titleString = item.getAlbum();
+		if (title != null) {
+			title.setText(titleString);
+		}
 
-        String artistString = item.getArtist();
-        if (artist != null) {
-            artist.setText(artistString);
-        }
-    }
+		String artistString = item.getArtist();
+		if (artist != null) {
+			artist.setText(artistString);
+		}
+	}
 
 }

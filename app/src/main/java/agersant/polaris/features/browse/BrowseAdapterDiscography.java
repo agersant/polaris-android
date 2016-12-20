@@ -12,15 +12,15 @@ import agersant.polaris.R;
 
 class BrowseAdapterDiscography extends BrowseAdapter {
 
-    BrowseAdapterDiscography() {
-        super();
-    }
+	BrowseAdapterDiscography() {
+		super();
+	}
 
-    @Override
-    public BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_discography_item, parent, false);
-        return new BrowseItemHolderDiscography(this, itemView, itemQueueStatusView);
-    }
+	@Override
+	public BrowseItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
+		View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_discography_item, parent, false);
+		return new BrowseItemHolderDiscography(this, itemView, itemQueueStatusView);
+	}
 
 }

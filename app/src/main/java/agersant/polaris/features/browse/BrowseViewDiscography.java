@@ -17,29 +17,29 @@ import agersant.polaris.R;
 
 class BrowseViewDiscography extends BrowseViewContent {
 
-    private BrowseAdapter adapter;
+	private BrowseAdapter adapter;
 
-    public BrowseViewDiscography(Context context) {
-        super(context);
+	public BrowseViewDiscography(Context context) {
+		super(context);
 
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_browse_discography, this, true);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater.inflate(R.layout.view_browse_discography, this, true);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        ItemTouchHelper.Callback callback = new BrowseTouchCallback();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+		ItemTouchHelper.Callback callback = new BrowseTouchCallback();
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        adapter = new BrowseAdapterDiscography();
-        recyclerView.setAdapter(adapter);
-    }
+		adapter = new BrowseAdapterDiscography();
+		recyclerView.setAdapter(adapter);
+	}
 
-    @Override
-    void setItems(ArrayList<CollectionItem> items) {
-        adapter.setItems(items);
-    }
+	@Override
+	void setItems(ArrayList<CollectionItem> items) {
+		adapter.setItems(items);
+	}
 
 }

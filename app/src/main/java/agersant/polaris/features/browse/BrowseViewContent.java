@@ -13,10 +13,10 @@ import agersant.polaris.CollectionItem;
 
 abstract class BrowseViewContent extends FrameLayout {
 
-    public BrowseViewContent(Context context) {
-        super(context);
-    }
+	public BrowseViewContent(Context context) {
+		super(context);
+	}
 
-    void setItems(ArrayList<CollectionItem> items) {
-    }
+	void setItems(ArrayList<CollectionItem> items) {
+	}
 }

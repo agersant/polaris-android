@@ -11,31 +11,31 @@ import agersant.polaris.features.PolarisActivity;
 
 public class CollectionActivity extends PolarisActivity {
 
-    public CollectionActivity() {
-        super(R.string.collection, R.id.nav_collection);
-    }
+	public CollectionActivity() {
+		super(R.string.collection, R.id.nav_collection);
+	}
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_collection);
-        super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity_collection);
+		super.onCreate(savedInstanceState);
 
-        // Disable unimplemented features
-        {
-            Button button;
-            button = (Button) findViewById(R.id.random);
-            button.setEnabled(false);
-            button = (Button) findViewById(R.id.recently_added);
-            button.setEnabled(false);
-            button = (Button) findViewById(R.id.playlists);
-            button.setEnabled(false);
-        }
-    }
+		// Disable unimplemented features
+		{
+			Button button;
+			button = (Button) findViewById(R.id.random);
+			button.setEnabled(false);
+			button = (Button) findViewById(R.id.recently_added);
+			button.setEnabled(false);
+			button = (Button) findViewById(R.id.playlists);
+			button.setEnabled(false);
+		}
+	}
 
-    public void browseDirectories(View view) {
-        Context context = view.getContext();
-        Intent showBrowser = new Intent(context, BrowseActivity.class);
-        showBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        context.startActivity(showBrowser);
-    }
+	public void browseDirectories(View view) {
+		Context context = view.getContext();
+		Intent showBrowser = new Intent(context, BrowseActivity.class);
+		showBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		context.startActivity(showBrowser);
+	}
 }

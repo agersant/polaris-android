@@ -17,98 +17,98 @@ import agersant.polaris.features.PolarisActivity;
 
 public class BrowseActivity extends PolarisActivity {
 
-    public static final String PATH = "PATH";
-    private ProgressBar progressBar;
-    private ViewGroup contentHolder;
+	public static final String PATH = "PATH";
+	private ProgressBar progressBar;
+	private ViewGroup contentHolder;
 
-    public BrowseActivity() {
-        super(R.string.collection, R.id.nav_collection);
-    }
+	public BrowseActivity() {
+		super(R.string.collection, R.id.nav_collection);
+	}
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_browse);
-        super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity_browse);
+		super.onCreate(savedInstanceState);
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
+		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+		contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
-        Intent intent = getIntent();
-        String path = intent.getStringExtra(BrowseActivity.PATH);
-        if (path == null) {
-            path = "";
-        }
-        loadPath(path);
-    }
+		Intent intent = getIntent();
+		String path = intent.getStringExtra(BrowseActivity.PATH);
+		if (path == null) {
+			path = "";
+		}
+		loadPath(path);
+	}
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(0, 0);
-    }
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(0, 0);
+	}
 
-    private void loadPath(String path) {
-        Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
-            @Override
-            public void onResponse(ArrayList<CollectionItem> response) {
-                progressBar.setVisibility(View.GONE);
-                displayContent(response);
-            }
-        };
-        ServerAPI server = ServerAPI.getInstance(getApplicationContext());
-        server.browse(path, success);
-    }
+	private void loadPath(String path) {
+		Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
+			@Override
+			public void onResponse(ArrayList<CollectionItem> response) {
+				progressBar.setVisibility(View.GONE);
+				displayContent(response);
+			}
+		};
+		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
+		server.browse(path, success);
+	}
 
-    private void displayContent(ArrayList<CollectionItem> items) {
-        BrowseViewContent contentView = null;
-        switch (getDisplayModeForItems(items)) {
-            case EXPLORER:
-                contentView = new BrowseViewExplorer(this);
-                break;
-            case ALBUM:
-                contentView = new BrowseViewAlbum(this);
-                break;
-            case DISCOGRAPHY:
-                contentView = new BrowseViewDiscography(this);
-                break;
-        }
-        contentView.setItems(items);
-        contentHolder.addView(contentView);
-    }
+	private void displayContent(ArrayList<CollectionItem> items) {
+		BrowseViewContent contentView = null;
+		switch (getDisplayModeForItems(items)) {
+			case EXPLORER:
+				contentView = new BrowseViewExplorer(this);
+				break;
+			case ALBUM:
+				contentView = new BrowseViewAlbum(this);
+				break;
+			case DISCOGRAPHY:
+				contentView = new BrowseViewDiscography(this);
+				break;
+		}
+		contentView.setItems(items);
+		contentHolder.addView(contentView);
+	}
 
-    private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {
-        if (items.isEmpty()) {
-            return DisplayMode.EXPLORER;
-        }
+	private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {
+		if (items.isEmpty()) {
+			return DisplayMode.EXPLORER;
+		}
 
-        String album = items.get(0).getAlbum();
-        boolean allSongs = true;
-        boolean allDirectories = true;
-        boolean allHaveArtwork = true;
-        boolean allHaveAlbum = album != null;
-        boolean allSameAlbum = true;
-        for (CollectionItem item : items) {
-            allSongs &= !item.isDirectory();
-            allDirectories &= item.isDirectory();
-            allHaveArtwork &= item.getArtwork() != null;
-            allHaveAlbum &= item.getAlbum() != null;
-            allSameAlbum &= album != null && album.equals(item.getAlbum());
-        }
+		String album = items.get(0).getAlbum();
+		boolean allSongs = true;
+		boolean allDirectories = true;
+		boolean allHaveArtwork = true;
+		boolean allHaveAlbum = album != null;
+		boolean allSameAlbum = true;
+		for (CollectionItem item : items) {
+			allSongs &= !item.isDirectory();
+			allDirectories &= item.isDirectory();
+			allHaveArtwork &= item.getArtwork() != null;
+			allHaveAlbum &= item.getAlbum() != null;
+			allSameAlbum &= album != null && album.equals(item.getAlbum());
+		}
 
-        if (allDirectories && allHaveArtwork && allHaveAlbum) {
-            return DisplayMode.DISCOGRAPHY;
-        }
+		if (allDirectories && allHaveArtwork && allHaveAlbum) {
+			return DisplayMode.DISCOGRAPHY;
+		}
 
-        if (album != null && allSongs && allSameAlbum) {
-            return DisplayMode.ALBUM;
-        }
+		if (album != null && allSongs && allSameAlbum) {
+			return DisplayMode.ALBUM;
+		}
 
-        return DisplayMode.EXPLORER;
-    }
+		return DisplayMode.EXPLORER;
+	}
 
-    private enum DisplayMode {
-        EXPLORER,
-        DISCOGRAPHY,
-        ALBUM,
-    }
+	private enum DisplayMode {
+		EXPLORER,
+		DISCOGRAPHY,
+		ALBUM,
+	}
 }

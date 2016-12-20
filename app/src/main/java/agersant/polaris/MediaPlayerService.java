@@ -12,73 +12,73 @@ import java.util.Map;
 import agersant.polaris.api.ServerAPI;
 
 public class MediaPlayerService
-        extends Service {
+		extends Service {
 
-    private final IBinder binder = new MediaPlayerBinder();
-    private PolarisMediaPlayer player;
+	private final IBinder binder = new MediaPlayerBinder();
+	private PolarisMediaPlayer player;
 
-    public MediaPlayerService() {
-    }
+	public MediaPlayerService() {
+	}
 
-    public void play(String url) {
-        player.reset();
-        try {
-            Uri uri = Uri.parse(url);
-            Map<String, String> headers = new HashMap<>();
-            // TODO There is no strong guarantee that we have an auth cookie at this point
-            headers.put("Cookie", ServerAPI.getInstance(this).getAuthCookie());
-            player.setDataSource(this, uri, headers);
-            player.prepareAsync();
-        } catch (Exception e) {
-            // TODO Handle
-            System.out.println("Error while beginning media playback: " + e);
-            return;
-        }
-        broadcast(Player.PLAYING_TRACK);
-    }
+	public void play(String url) {
+		player.reset();
+		try {
+			Uri uri = Uri.parse(url);
+			Map<String, String> headers = new HashMap<>();
+			// TODO There is no strong guarantee that we have an auth cookie at this point
+			headers.put("Cookie", ServerAPI.getInstance(this).getAuthCookie());
+			player.setDataSource(this, uri, headers);
+			player.prepareAsync();
+		} catch (Exception e) {
+			// TODO Handle
+			System.out.println("Error while beginning media playback: " + e);
+			return;
+		}
+		broadcast(Player.PLAYING_TRACK);
+	}
 
-    public void resume() {
-        player.resume();
-        broadcast(Player.RESUMED_TRACK);
-    }
+	public void resume() {
+		player.resume();
+		broadcast(Player.RESUMED_TRACK);
+	}
 
-    public void pause() {
-        player.pause();
-        broadcast(Player.PAUSED_TRACK);
-    }
+	public void pause() {
+		player.pause();
+		broadcast(Player.PAUSED_TRACK);
+	}
 
-    public boolean isPlaying() {
-        return player.isPlaying();
-    }
+	public boolean isPlaying() {
+		return player.isPlaying();
+	}
 
-    public void seekTo(float progress) {
-	    player.seekTo(progress);
-    }
+	public void seekTo(float progress) {
+		player.seekTo(progress);
+	}
 
-    public float getProgress() {
-	    return player.getProgress();
-    }
+	public float getProgress() {
+		return player.getProgress();
+	}
 
-    private void broadcast(String event) {
-        Intent intent = new Intent();
-        intent.setAction(event);
-        sendBroadcast(intent);
-    }
+	private void broadcast(String event) {
+		Intent intent = new Intent();
+		intent.setAction(event);
+		sendBroadcast(intent);
+	}
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        player = new PolarisMediaPlayer();
-    }
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		player = new PolarisMediaPlayer();
+	}
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
+	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
 
-    public class MediaPlayerBinder extends Binder {
-        MediaPlayerService getService() {
-            return MediaPlayerService.this;
-        }
-    }
+	public class MediaPlayerBinder extends Binder {
+		MediaPlayerService getService() {
+			return MediaPlayerService.this;
+		}
+	}
 }
