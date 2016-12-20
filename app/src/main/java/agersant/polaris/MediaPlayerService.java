@@ -51,6 +51,14 @@ public class MediaPlayerService
         return player.isPlaying();
     }
 
+    public void seekTo(float progress) {
+	    player.seekTo(progress);
+    }
+
+    public float getProgress() {
+	    return player.getProgress();
+    }
+
     private void broadcast(String event) {
         Intent intent = new Intent();
         intent.setAction(event);

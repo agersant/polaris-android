@@ -31,15 +31,19 @@
             android:adjustViewBounds="true" />
     </agersant.polaris.ui.SquareLayout>
 
-    <FrameLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
-       <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        >
+
+        <LinearLayout
+            android:id="@+id/controls"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:orientation="horizontal"
-            android:layout_gravity="center_vertical"
             android:gravity="center_horizontal">
             <ImageView
                 android:id="@+id/skip_previous"
@@ -68,7 +72,17 @@
                 android:onClick="skipNext"
                 android:src="@drawable/ic_skip_next_black_24dp"/>
         </LinearLayout>
-    </FrameLayout>
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:max="100"
+            tools:progress="20"
+            tools:secondaryProgress="20"
+            />
+
+    </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
@@ -77,6 +91,7 @@
         app:itemBackground="@color/blueGrey900"
         app:itemIconTint="@drawable/bottom_navigation_item"
         app:itemTextColor="@drawable/bottom_navigation_item"
-        app:menu="@menu/menu_navigation" />
+        app:menu="@menu/menu_navigation"
+    />
 
 </LinearLayout>

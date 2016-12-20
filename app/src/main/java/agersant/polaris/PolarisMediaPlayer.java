@@ -103,7 +103,42 @@ public class PolarisMediaPlayer
         return false;
     }
 
-    enum State {
+    void seekTo(float progress) {
+        switch(state) {
+	        case IDLE:
+	        case INITIALIZED:
+	        case PREPARING:
+	        case END:
+	        case ERROR:
+		        return;
+	        default: {
+		        int duration = (int)(progress * player.getDuration());
+		        player.seekTo(duration);
+	        }
+        }
+    }
+
+	float getProgress() {
+		switch(state) {
+			case IDLE:
+			case INITIALIZED:
+			case PREPARING:
+			case PREPARED:
+			case STOPPED:
+			case ERROR:
+				return 0.f;
+			case END:
+			case PLAYBACK_COMPLETED:
+				return 1.f;
+			default: {
+				int duration = player.getDuration();
+				int position = player.getCurrentPosition();
+				return (float) position / duration;
+			}
+		}
+	}
+
+    private enum State {
         IDLE,
         INITIALIZED,
         PREPARING,

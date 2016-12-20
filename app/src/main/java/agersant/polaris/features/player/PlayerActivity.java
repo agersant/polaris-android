@@ -7,6 +7,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -18,13 +22,18 @@ import agersant.polaris.ui.NetworkImage;
 
 public class PlayerActivity extends PolarisActivity {
 
+    private Timer timer;
     private BroadcastReceiver receiver;
     private PlaybackQueue queue;
     private Player player;
+
     private ImageView artwork;
     private ImageView pauseToggle;
     private ImageView skipNext;
     private ImageView skipPrevious;
+    private SeekBar seekBar;
+
+	boolean seeking = false;
 
     public PlayerActivity() {
         super(R.string.now_playing, R.id.nav_now_playing);
@@ -40,6 +49,21 @@ public class PlayerActivity extends PolarisActivity {
         pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
         skipNext = (ImageView) findViewById(R.id.skip_next);
         skipPrevious = (ImageView) findViewById(R.id.skip_previous);
+        seekBar = (SeekBar) findViewById(R.id.seek_bar);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int newPosition = 0;
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+	            newPosition = progress;
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+	            seeking = true;
+            }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+	            player.seekTo(newPosition / 100.f);
+	            seeking = false;
+            }
+        });
     }
 
     @Override
@@ -85,17 +109,32 @@ public class PlayerActivity extends PolarisActivity {
         registerReceiver(receiver, filter);
     }
 
+    private void scheduleSeekBarUpdates() {
+	    timer = new Timer();
+	    timer.schedule(new TimerTask() {
+		    @Override
+		    public void run() {
+			    if (!seeking) {
+				    updateSeekBar();
+			    }
+		    }
+	    }, 0, 100); // in ms
+    }
+
     @Override
     public void onStart() {
         subscribeToEvents();
-        super.onResume();
+	    scheduleSeekBarUpdates();
+        super.onStart();
     }
 
     @Override
     public void onStop() {
         unregisterReceiver(receiver);
         receiver = null;
-        super.onPause();
+	    timer.cancel();
+	    timer = null;
+        super.onStop();
     }
 
     public void skipPrevious(View view) {
@@ -137,6 +176,11 @@ public class PlayerActivity extends PolarisActivity {
             skipPrevious.setAlpha(disabledAlpha);
         }
     }
+
+	private void updateSeekBar() {
+		int progress = (int) (seekBar.getMax() * player.getProgress());
+		seekBar.setProgress(progress);
+	}
 
     private void populateWithBlank() {
         // TODO?

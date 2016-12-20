@@ -51,6 +51,16 @@ public class Player {
         return currentItem == null;
     }
 
+    public void seekTo(float progress) {
+	    PolarisApplication application = PolarisApplication.getInstance();
+	    application.getMediaPlayerService().seekTo(progress);
+    }
+
+    public float getProgress() {
+        PolarisApplication application = PolarisApplication.getInstance();
+        return application.getMediaPlayerService().getProgress();
+    }
+
     public CollectionItem getCurrentItem() {
         return currentItem;
     }
