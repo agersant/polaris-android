@@ -50,6 +50,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		Context context = view.getContext();
 		if (item.isDirectory()) {
 			Intent intent = new Intent(context, BrowseActivity.class);
+			intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.PATH);
 			intent.putExtra(BrowseActivity.PATH, item.getPath());
 			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 			context.startActivity(intent);

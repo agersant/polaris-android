@@ -18,8 +18,10 @@ import agersant.polaris.features.PolarisActivity;
 public class BrowseActivity extends PolarisActivity {
 
 	public static final String PATH = "PATH";
+	public static final String NAVIGATION_MODE = "NAVIGATION_MODE";
 	private ProgressBar progressBar;
 	private ViewGroup contentHolder;
+	private Response.Listener<ArrayList<CollectionItem>> onLoad;
 
 	public BrowseActivity() {
 		super(R.string.collection, R.id.nav_collection);
@@ -33,12 +35,32 @@ public class BrowseActivity extends PolarisActivity {
 		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 		contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
+		onLoad = new Response.Listener<ArrayList<CollectionItem>>() {
+			@Override
+			public void onResponse(ArrayList<CollectionItem> response) {
+				progressBar.setVisibility(View.GONE);
+				displayContent(response);
+			}
+		};
+
 		Intent intent = getIntent();
-		String path = intent.getStringExtra(BrowseActivity.PATH);
-		if (path == null) {
-			path = "";
+		NavigationMode navigationMode = (NavigationMode) intent.getSerializableExtra(BrowseActivity.NAVIGATION_MODE);
+		switch (navigationMode) {
+			case PATH:
+			{
+				String path = intent.getStringExtra(BrowseActivity.PATH);
+				if (path == null) {
+					path = "";
+				}
+				loadPath(path);
+				break;
+			}
+			case RANDOM: {
+				loadRandom();
+				break;
+			}
 		}
-		loadPath(path);
+
 	}
 
 	@Override
@@ -48,15 +70,13 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadPath(String path) {
-		Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
-			@Override
-			public void onResponse(ArrayList<CollectionItem> response) {
-				progressBar.setVisibility(View.GONE);
-				displayContent(response);
-			}
-		};
 		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
-		server.browse(path, success);
+		server.browse(path, onLoad);
+	}
+
+	private void loadRandom() {
+		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
+		server.getRandomAlbums(onLoad);
 	}
 
 	private void displayContent(ArrayList<CollectionItem> items) {
@@ -111,4 +131,10 @@ public class BrowseActivity extends PolarisActivity {
 		DISCOGRAPHY,
 		ALBUM,
 	}
+
+	enum NavigationMode {
+		PATH,
+		RANDOM,
+	}
+
 }

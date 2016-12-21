@@ -1,91 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context="agersant.polaris.features.browse.CollectionActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/activity_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                tools:context="agersant.polaris.features.browse.CollectionActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/PolarisToolbar"
-        app:popupTheme="@style/PolarisToolbarMenu"
-        />
+	<android.support.v7.widget.Toolbar
+		android:id="@+id/toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		android:theme="@style/PolarisToolbar"
+		app:popupTheme="@style/PolarisToolbarMenu"
+		/>
 
-    <LinearLayout
-        android:layout_below="@id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:orientation="vertical">
+	<LinearLayout
+		android:layout_below="@id/toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:paddingLeft="8dp"
+		android:paddingRight="8dp"
+		android:orientation="vertical">
 
-        <Button
-            android:id="@+id/browse_directories"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            style="?android:attr/actionButtonStyle"
-            android:layout_height="48dp"
-            android:textColor="@color/blueGrey700"
-            android:textSize="18sp"
-            android:drawablePadding="12dp"
-            android:text="@string/collection_browse_directories"
-            android:onClick="browseDirectories"
-            android:drawableStart="@drawable/ic_folder_black_24dp" />
+		<Button
+			android:id="@+id/browse_directories"
+			android:layout_width="match_parent"
+			android:gravity="center_vertical"
+			style="?android:attr/actionButtonStyle"
+			android:layout_height="48dp"
+			android:textColor="@color/blueGrey700"
+			android:textSize="18sp"
+			android:drawablePadding="12dp"
+			android:text="@string/collection_browse_directories"
+			android:onClick="browseDirectories"
+			android:drawableStart="@drawable/ic_folder_black_24dp"/>
 
-        <View style="@style/Divider"/>
+		<View style="@style/Divider"/>
 
-        <Button
-            android:id="@+id/random"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            style="?android:attr/actionButtonStyle"
-            android:layout_height="48dp"
-            android:textSize="18sp"
-            android:drawablePadding="12dp"
-            android:text="@string/collection_random_albums"
-            android:drawableStart="@drawable/ic_shuffle_black_24dp" />
+		<Button
+			android:id="@+id/random"
+			android:layout_width="match_parent"
+			android:gravity="center_vertical"
+			style="?android:attr/actionButtonStyle"
+			android:layout_height="48dp"
+			android:textColor="@color/blueGrey700"
+			android:textSize="18sp"
+			android:drawablePadding="12dp"
+			android:text="@string/collection_random_albums"
+			android:onClick="browseRandom"
+			android:drawableStart="@drawable/ic_shuffle_black_24dp"/>
 
-        <View style="@style/Divider"/>
+		<View style="@style/Divider"/>
 
-        <Button
-            android:id="@+id/recently_added"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            style="?android:attr/actionButtonStyle"
-            android:layout_height="48dp"
-            android:textSize="18sp"
-            android:drawablePadding="12dp"
-            android:text="@string/collection_recently_added"
-            android:drawableStart="@drawable/ic_new_releases_black_24dp" />
+		<Button
+			android:id="@+id/recently_added"
+			android:layout_width="match_parent"
+			android:gravity="center_vertical"
+			style="?android:attr/actionButtonStyle"
+			android:layout_height="48dp"
+			android:textSize="18sp"
+			android:drawablePadding="12dp"
+			android:text="@string/collection_recently_added"
+			android:drawableStart="@drawable/ic_new_releases_black_24dp"/>
 
-        <View style="@style/Divider"/>
+		<View style="@style/Divider"/>
 
-        <Button
-            android:id="@+id/playlists"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            style="?android:attr/actionButtonStyle"
-            android:layout_height="48dp"
-            android:textSize="18sp"
-            android:drawablePadding="12dp"
-            android:text="@string/collection_playlists"
-            android:drawableStart="@drawable/ic_queue_music_black_24dp" />
+		<Button
+			android:id="@+id/playlists"
+			android:layout_width="match_parent"
+			android:gravity="center_vertical"
+			style="?android:attr/actionButtonStyle"
+			android:layout_height="48dp"
+			android:textSize="18sp"
+			android:drawablePadding="12dp"
+			android:text="@string/collection_playlists"
+			android:drawableStart="@drawable/ic_queue_music_black_24dp"/>
 
-    </LinearLayout>
+	</LinearLayout>
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:itemBackground="@color/blueGrey900"
-        app:itemIconTint="@drawable/bottom_navigation_item"
-        app:itemTextColor="@drawable/bottom_navigation_item"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/menu_navigation" />
+	<android.support.design.widget.BottomNavigationView
+		android:id="@+id/navigation"
+		android:layout_width="match_parent"
+		android:layout_height="56dp"
+		app:itemBackground="@color/blueGrey900"
+		app:itemIconTint="@drawable/bottom_navigation_item"
+		app:itemTextColor="@drawable/bottom_navigation_item"
+		android:layout_alignParentBottom="true"
+		app:menu="@menu/menu_navigation"/>
 
 </RelativeLayout>

@@ -32,6 +32,13 @@ public class CollectionItem implements Cloneable {
 		return item;
 	}
 
+	public static CollectionItem parseDirectory(JSONObject fields) throws JSONException {
+		CollectionItem item = new CollectionItem();
+		item.isDirectory = true;
+		item.parseFields(fields);
+		return item;
+	}
+
 	private void parseFields(JSONObject fields) throws JSONException {
 		path = fields.getString("path");
 		artist = readStringField(fields, "artist");
