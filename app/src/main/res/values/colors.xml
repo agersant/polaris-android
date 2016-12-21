@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="lightBlue600">#039be5</color>
-    <color name="lightBlue800">#0277bd</color>
+	<color name="lightBlue600">#039be5</color>
+	<color name="lightBlue800">#0277bd</color>
 
-    <color name="blueGrey400">#78909C</color>
-    <color name="blueGrey700">#455A64</color>
-    <color name="blueGrey900">#263238</color>
+	<color name="blueGrey400">#78909C</color>
+	<color name="blueGrey700">#455A64</color>
+	<color name="blueGrey900">#263238</color>
 
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
+	<color name="white">#FFFFFF</color>
+	<color name="black">#000000</color>
 </resources>

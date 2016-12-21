@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_queue"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context="agersant.polaris.features.queue.QueueActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/activity_queue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                tools:context="agersant.polaris.features.queue.QueueActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/PolarisToolbar"
-        app:popupTheme="@style/PolarisToolbarMenu"
-        />
+	<android.support.v7.widget.Toolbar
+		android:id="@+id/toolbar"
+		android:layout_width="match_parent"
+		android:layout_height="?attr/actionBarSize"
+		android:theme="@style/PolarisToolbar"
+		app:popupTheme="@style/PolarisToolbarMenu"
+		/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/queue_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/navigation"
-        android:layout_below="@id/toolbar"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/view_queue_item" />
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/queue_recycler_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@+id/navigation"
+		android:layout_below="@id/toolbar"
+		android:scrollbars="vertical"
+		tools:listitem="@layout/view_queue_item"/>
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_alignParentBottom="true"
-        app:itemBackground="@color/blueGrey900"
-        app:itemIconTint="@drawable/bottom_navigation_item"
-        app:itemTextColor="@drawable/bottom_navigation_item"
-        app:menu="@menu/menu_navigation" />
+	<android.support.design.widget.BottomNavigationView
+		android:id="@+id/navigation"
+		android:layout_width="match_parent"
+		android:layout_height="56dp"
+		android:layout_alignParentBottom="true"
+		app:itemBackground="@color/blueGrey900"
+		app:itemIconTint="@drawable/bottom_navigation_item"
+		app:itemTextColor="@drawable/bottom_navigation_item"
+		app:menu="@menu/menu_navigation"/>
 
 </RelativeLayout>
