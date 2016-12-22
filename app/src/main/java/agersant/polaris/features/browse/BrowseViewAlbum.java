@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
-import agersant.polaris.ui.NetworkImage;
+import agersant.polaris.ui.FetchImageTask;
 
 
 public class BrowseViewAlbum extends BrowseViewContent {
@@ -57,7 +57,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		if (artworkPath != null) {
 			ServerAPI serverAPI = ServerAPI.getInstance(getContext());
 			String url = serverAPI.getMediaURL(artworkPath);
-			NetworkImage.load(url, artwork);
+			FetchImageTask.load(url, artwork);
 		}
 
 		String titleString = item.getAlbum();

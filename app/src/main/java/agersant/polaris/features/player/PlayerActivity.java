@@ -18,7 +18,7 @@ import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
-import agersant.polaris.ui.NetworkImage;
+import agersant.polaris.ui.FetchImageTask;
 
 public class PlayerActivity extends PolarisActivity {
 
@@ -206,7 +206,7 @@ public class PlayerActivity extends PolarisActivity {
 		if (artworkPath != null) {
 			ServerAPI serverAPI = ServerAPI.getInstance(this);
 			String url = serverAPI.getMediaURL(artworkPath);
-			NetworkImage.load(url, artwork);
+			FetchImageTask.load(url, artwork);
 		}
 	}
 

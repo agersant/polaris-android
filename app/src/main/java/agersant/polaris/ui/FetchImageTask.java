@@ -16,25 +16,22 @@ import agersant.polaris.PolarisApplication;
 import agersant.polaris.api.ServerAPI;
 import agersant.polaris.cache.ImageCache;
 
-public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
+public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final WeakReference<ImageView> imageViewReference;
 
 	private String url;
 	private String authCookie;
 
-	private NetworkImage(String url, ImageView imageView, String authCookie) {
+	private FetchImageTask(String url, ImageView imageView, String authCookie) {
 		this.url = url;
 		this.authCookie = authCookie;
 		imageViewReference = new WeakReference<>(imageView);
 	}
 
 	public static void load(String url, ImageView imageView) {
-		if (NetworkImage.cancelPotentialWork(url, imageView)) {
-			ImageCache cache = ImageCache.getInstance();
-			Bitmap cacheEntry = cache.get(url);
-			if (cacheEntry != null) {
-				imageView.setImageBitmap(cacheEntry);
+		if (FetchImageTask.cancelPotentialWork(url, imageView)) {
+			if (FetchImageTask.loadFromCache(url, imageView)) {
 				return;
 			}
 
@@ -43,14 +40,14 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 			ServerAPI serverAPI = ServerAPI.getInstance(polarisApplication);
 			String authCookie = serverAPI.getAuthCookie();
 
-			NetworkImage task = new NetworkImage(url, imageView, authCookie);
-			NetworkImage.AsyncDrawable asyncDrawable = new NetworkImage.AsyncDrawable(resources, null, task);
+			FetchImageTask task = new FetchImageTask(url, imageView, authCookie);
+			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, null, task);
 			imageView.setImageDrawable(asyncDrawable);
 			task.execute();
 		}
 	}
 
-	private static NetworkImage getTask(ImageView imageView) {
+	private static FetchImageTask getTask(ImageView imageView) {
 		if (imageView != null) {
 			Drawable drawable = imageView.getDrawable();
 			if (drawable instanceof AsyncDrawable) {
@@ -62,7 +59,7 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 	}
 
 	private static boolean cancelPotentialWork(String newURL, ImageView imageView) {
-		NetworkImage task = getTask(imageView);
+		FetchImageTask task = getTask(imageView);
 		if (task != null) {
 			if (task.url.equals(newURL)) {
 				return false;
@@ -71,6 +68,16 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 			}
 		}
 		return true;
+	}
+
+	private static boolean loadFromCache(String url, ImageView imageView) {
+		ImageCache cache = ImageCache.getInstance();
+		Bitmap cacheEntry = cache.get(url);
+		if (cacheEntry != null) {
+			imageView.setImageBitmap(cacheEntry);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -97,7 +104,7 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 			cache.put(url, bitmap);
 
 			ImageView imageView = imageViewReference.get();
-			NetworkImage task = getTask(imageView);
+			FetchImageTask task = getTask(imageView);
 			if (imageView != null && task == this) {
 				imageView.setImageBitmap(bitmap);
 			}
@@ -105,14 +112,14 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 	}
 
 	private static class AsyncDrawable extends BitmapDrawable {
-		private WeakReference<NetworkImage> task;
+		private WeakReference<FetchImageTask> task;
 
-		AsyncDrawable(Resources res, Bitmap bitmap, NetworkImage task) {
+		AsyncDrawable(Resources res, Bitmap bitmap, FetchImageTask task) {
 			super(res, bitmap);
 			this.task = new WeakReference<>(task);
 		}
 
-		NetworkImage getTask() {
+		FetchImageTask getTask() {
 			return task.get();
 		}
 	}

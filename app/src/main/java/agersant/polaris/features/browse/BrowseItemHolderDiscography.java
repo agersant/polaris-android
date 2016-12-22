@@ -7,7 +7,7 @@ import android.widget.TextView;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.ServerAPI;
-import agersant.polaris.ui.NetworkImage;
+import agersant.polaris.ui.FetchImageTask;
 
 /**
  * Created by agersant on 12/11/2016.
@@ -50,7 +50,7 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 			if (artworkValue != null) {
 				ServerAPI serverAPI = ServerAPI.getInstance(itemView.getContext());
 				String url = serverAPI.getMediaURL(artworkValue);
-				NetworkImage.load(url, artwork);
+				FetchImageTask.load(url, artwork);
 			}
 		}
 	}
