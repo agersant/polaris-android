@@ -5,29 +5,49 @@
 	android:layout_width="match_parent"
 	android:gravity="center_vertical"
 	android:layout_height="48dp"
-	android:paddingStart="12dp"
-	android:paddingEnd="12dp"
+	android:duplicateParentState="true"
 	>
 
-	<TextView
-		android:id="@+id/title"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textSize="16sp"
-		android:maxLines="1"
-		android:ellipsize="end"
-		android:textColor="@color/blueGrey700"
-		tools:text="The Dreams of Swedenborg"/>
+	<ImageView
+		android:id="@+id/background"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:duplicateParentState="true"
+		android:background="@drawable/queue_item_background"/>
 
-	<TextView
-		android:id="@+id/artist"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:textSize="12sp"
-		android:maxLines="1"
-		android:ellipsize="end"
-		android:textColor="@color/blueGrey400"
-		android:layout_below="@+id/title"
-		tools:text="Therion"/>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:gravity="center_vertical"
+		android:paddingStart="12dp"
+		android:paddingEnd="12dp"
+		android:duplicateParentState="true">
+
+		<TextView
+			android:id="@+id/title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="16sp"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:duplicateParentState="true"
+			android:textColor="@color/queue_item_title"
+			tools:text="The Dreams of Swedenborg"/>
+
+		<TextView
+			android:id="@+id/artist"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="12sp"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:duplicateParentState="true"
+			android:textColor="@color/queue_item_artist"
+			tools:text="Therion"/>
+
+	</LinearLayout>
+
+
 
 </RelativeLayout>

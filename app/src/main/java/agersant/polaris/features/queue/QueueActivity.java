@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import java.util.Random;
 
 import agersant.polaris.PlaybackQueue;
+import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.features.PolarisActivity;
 
@@ -47,11 +48,13 @@ public class QueueActivity extends PolarisActivity {
 	private void subscribeToEvents() {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
+		filter.addAction(Player.PLAYING_TRACK);
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
 					case PlaybackQueue.QUEUED_ITEMS:
+					case Player.PLAYING_TRACK:
 						adapter.notifyDataSetChanged();
 						break;
 				}

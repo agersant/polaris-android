@@ -25,9 +25,8 @@ class QueueAdapter
 
 	@Override
 	public QueueAdapter.QueueItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		View inflatedView = LayoutInflater.from(parent.getContext())
-				.inflate(R.layout.view_queue_item, parent, false);
-		return new QueueAdapter.QueueItemHolder(inflatedView);
+		QueueItemView queueItemView = new QueueItemView(parent.getContext());
+		return new QueueAdapter.QueueItemHolder(queueItemView);
 	}
 
 	@Override
@@ -53,11 +52,15 @@ class QueueAdapter
 	static class QueueItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 		private CollectionItem item;
+		private QueueItemView queueItemView;
 		private TextView titleText;
 		private TextView artistText;
+		private Player player;
 
-		QueueItemHolder(View view) {
+		QueueItemHolder(QueueItemView view) {
 			super(view);
+			queueItemView = view;
+			player = Player.getInstance(view.getContext());
 			titleText = (TextView) view.findViewById(R.id.title);
 			artistText = (TextView) view.findViewById(R.id.artist);
 			view.setOnClickListener(this);
@@ -65,8 +68,10 @@ class QueueAdapter
 
 		void bindItem(CollectionItem item) {
 			this.item = item;
+			boolean isPlaying = player.getCurrentItem() == this.item;
 			titleText.setText(item.getTitle());
 			artistText.setText(item.getArtist());
+			queueItemView.setIsPlaying(isPlaying);
 		}
 
 		@Override

@@ -7,6 +7,9 @@
 	<color name="blueGrey700">#455A64</color>
 	<color name="blueGrey900">#263238</color>
 
+	<color name="pink100">#f8bbd0</color>
+	<color name="pink400">#ec407a</color>
+
 	<color name="white">#FFFFFF</color>
 	<color name="black">#000000</color>
 </resources>
