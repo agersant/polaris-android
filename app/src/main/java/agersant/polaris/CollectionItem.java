@@ -11,6 +11,7 @@ public class CollectionItem implements Cloneable {
 	private String title;
 	private String artwork;
 	private String album;
+	private String albumArtist;
 	private Integer trackNumber;
 	private boolean isDirectory;
 
@@ -46,6 +47,7 @@ public class CollectionItem implements Cloneable {
 		artwork = readStringField(fields, "artwork");
 		album = readStringField(fields, "album");
 		trackNumber = readIntField(fields, "track_number");
+		albumArtist = readStringField(fields, "album_artist");
 
 		String[] chunks = path.split("/|\\\\");
 		name = chunks[chunks.length - 1];
@@ -82,6 +84,10 @@ public class CollectionItem implements Cloneable {
 
 	public String getArtist() {
 		return artist;
+	}
+
+	public String getAlbumArtist() {
+		return albumArtist;
 	}
 
 	public String getTitle() {

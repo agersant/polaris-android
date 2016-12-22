@@ -65,7 +65,10 @@ public class BrowseViewAlbum extends BrowseViewContent {
 			title.setText(titleString);
 		}
 
-		String artistString = item.getArtist();
+		String artistString = item.getAlbumArtist();
+		if (artistString == null) {
+			artistString = item.getArtist();
+		}
 		if (artist != null) {
 			artist.setText(artistString);
 		}
