@@ -14,6 +14,7 @@ import java.net.URLConnection;
 
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.api.ServerAPI;
+import agersant.polaris.cache.ImageCache;
 
 public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 
@@ -30,6 +31,13 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 
 	public static void load(String url, ImageView imageView) {
 		if (NetworkImage.cancelPotentialWork(url, imageView)) {
+			ImageCache cache = ImageCache.getInstance();
+			Bitmap cacheEntry = cache.get(url);
+			if (cacheEntry != null) {
+				imageView.setImageBitmap(cacheEntry);
+				return;
+			}
+
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
 			ServerAPI serverAPI = ServerAPI.getInstance(polarisApplication);
@@ -56,10 +64,10 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 	private static boolean cancelPotentialWork(String newURL, ImageView imageView) {
 		NetworkImage task = getTask(imageView);
 		if (task != null) {
-			if (!task.url.equals(newURL)) {
-				task.cancel(true);
-			} else {
+			if (task.url.equals(newURL)) {
 				return false;
+			} else {
+				task.cancel(true);
 			}
 		}
 		return true;
@@ -85,6 +93,9 @@ public class NetworkImage extends AsyncTask<Void, Void, Bitmap> {
 			bitmap = null;
 		}
 		if (bitmap != null) {
+			ImageCache cache = ImageCache.getInstance();
+			cache.put(url, bitmap);
+
 			ImageView imageView = imageViewReference.get();
 			NetworkImage task = getTask(imageView);
 			if (imageView != null && task == this) {
