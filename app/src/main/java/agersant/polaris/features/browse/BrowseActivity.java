@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.android.volley.Response;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.ArrayList;
 
@@ -22,6 +24,8 @@ public class BrowseActivity extends PolarisActivity {
 	private ProgressBar progressBar;
 	private ViewGroup contentHolder;
 	private Response.Listener<ArrayList<CollectionItem>> onLoad;
+	private NavigationMode navigationMode;
+	private SwipyRefreshLayout.OnRefreshListener onRefresh;
 
 	public BrowseActivity() {
 		super(R.string.collection, R.id.nav_collection);
@@ -44,10 +48,24 @@ public class BrowseActivity extends PolarisActivity {
 		};
 
 		Intent intent = getIntent();
-		NavigationMode navigationMode = (NavigationMode) intent.getSerializableExtra(BrowseActivity.NAVIGATION_MODE);
+		navigationMode = (NavigationMode) intent.getSerializableExtra(BrowseActivity.NAVIGATION_MODE);
+
+		if (navigationMode == NavigationMode.RANDOM) {
+			onRefresh = new SwipyRefreshLayout.OnRefreshListener() {
+				@Override
+				public void onRefresh(SwipyRefreshLayoutDirection direction) {
+					loadContent();
+				}
+			};
+		}
+
+		loadContent();
+	}
+
+	private void loadContent() {
+		Intent intent = getIntent();
 		switch (navigationMode) {
-			case PATH:
-			{
+			case PATH: {
 				String path = intent.getStringExtra(BrowseActivity.PATH);
 				if (path == null) {
 					path = "";
@@ -60,7 +78,6 @@ public class BrowseActivity extends PolarisActivity {
 				break;
 			}
 		}
-
 	}
 
 	@Override
@@ -92,7 +109,9 @@ public class BrowseActivity extends PolarisActivity {
 				contentView = new BrowseViewDiscography(this);
 				break;
 		}
+
 		contentView.setItems(items);
+		contentView.setOnRefreshListener(onRefresh);
 		contentHolder.addView(contentView);
 	}
 

@@ -40,7 +40,7 @@ public class CollectionActivity extends PolarisActivity {
 
 	public void browseRandom(View view) {
 		Context context = view.getContext();
-		Intent intent= new Intent(context, BrowseActivity.class);
+		Intent intent = new Intent(context, BrowseActivity.class);
 		intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.RANDOM);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		context.startActivity(intent);

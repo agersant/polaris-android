@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
@@ -18,6 +20,7 @@ import agersant.polaris.R;
 class BrowseViewDiscography extends BrowseViewContent {
 
 	private BrowseAdapter adapter;
+	private SwipyRefreshLayout swipeRefresh;
 
 	public BrowseViewDiscography(Context context) {
 		super(context);
@@ -35,6 +38,8 @@ class BrowseViewDiscography extends BrowseViewContent {
 
 		adapter = new BrowseAdapterDiscography();
 		recyclerView.setAdapter(adapter);
+
+		swipeRefresh = (SwipyRefreshLayout) findViewById(R.id.swipe_refresh);
 	}
 
 	@Override
@@ -42,4 +47,10 @@ class BrowseViewDiscography extends BrowseViewContent {
 		adapter.setItems(items);
 	}
 
+
+	@Override
+	void setOnRefreshListener(SwipyRefreshLayout.OnRefreshListener listener) {
+		swipeRefresh.setEnabled(listener != null);
+		swipeRefresh.setOnRefreshListener(listener);
+	}
 }

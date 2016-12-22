@@ -3,6 +3,8 @@ package agersant.polaris.features.browse;
 import android.content.Context;
 import android.widget.FrameLayout;
 
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
@@ -18,5 +20,9 @@ abstract class BrowseViewContent extends FrameLayout {
 	}
 
 	void setItems(ArrayList<CollectionItem> items) {
+	}
+
+	void setOnRefreshListener(SwipyRefreshLayout.OnRefreshListener listener) {
+
 	}
 }
