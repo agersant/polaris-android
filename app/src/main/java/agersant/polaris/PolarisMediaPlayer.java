@@ -2,6 +2,7 @@ package agersant.polaris;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.net.Uri;
 
@@ -70,6 +71,11 @@ public class PolarisMediaPlayer
 	void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException {
 		state = State.INITIALIZED;
 		player.setDataSource(context, uri, headers);
+	}
+
+	void setDataSource(MediaDataSource media) {
+		state = State.INITIALIZED;
+		player.setDataSource(media);
 	}
 
 	void prepareAsync() {
