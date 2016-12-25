@@ -1,12 +1,15 @@
 package agersant.polaris.features.browse;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -24,6 +27,7 @@ public class BrowseActivity extends PolarisActivity {
 	private ProgressBar progressBar;
 	private ViewGroup contentHolder;
 	private Response.Listener<ArrayList<CollectionItem>> onLoad;
+	private Response.ErrorListener onFail;
 	private NavigationMode navigationMode;
 	private SwipyRefreshLayout.OnRefreshListener onRefresh;
 
@@ -44,6 +48,15 @@ public class BrowseActivity extends PolarisActivity {
 			public void onResponse(ArrayList<CollectionItem> response) {
 				progressBar.setVisibility(View.GONE);
 				displayContent(response);
+			}
+		};
+
+		final Context that = this;
+		onFail = new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Toast toast = Toast.makeText(that, R.string.browse_error, Toast.LENGTH_SHORT);
+				toast.show();
 			}
 		};
 
@@ -88,12 +101,12 @@ public class BrowseActivity extends PolarisActivity {
 
 	private void loadPath(String path) {
 		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
-		server.browse(path, onLoad);
+		server.browse(path, onLoad, onFail);
 	}
 
 	private void loadRandom() {
 		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
-		server.getRandomAlbums(onLoad);
+		server.getRandomAlbums(onLoad, onFail);
 	}
 
 	private void displayContent(ArrayList<CollectionItem> items) {

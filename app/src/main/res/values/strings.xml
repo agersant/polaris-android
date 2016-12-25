@@ -7,6 +7,8 @@
 	<string name="collection_recently_added">Recently Added</string>
 	<string name="collection_playlists">Playlists</string>
 
+	<string name="browse_error">An error occurred while listing content</string>
+
 	<string name="queue">Queue</string>
 
 	<string name="now_playing">Now Playing</string>

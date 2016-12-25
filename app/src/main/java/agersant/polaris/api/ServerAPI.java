@@ -71,18 +71,11 @@ public class ServerAPI {
 		return serverAddress + "/serve/" + path;
 	}
 
-	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success) {
+	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
 		String serverAddress = this.getURL();
 		String requestURL = serverAddress + "/browse/" + path;
-		Response.ErrorListener failure = new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO Handle
-				System.out.println("browse sadness here " + error);
-			}
-		};
 
-		Response.Listener successWrapper = new Response.Listener<JSONArray>() {
+		Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
 				ArrayList<CollectionItem> items = new ArrayList<>(response.length());
@@ -101,18 +94,11 @@ public class ServerAPI {
 		this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
 	}
 
-	public void getRandomAlbums(final Response.Listener<ArrayList<CollectionItem>> success) {
+	public void getRandomAlbums(final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
 		String serverAddress = this.getURL();
 		String requestURL = serverAddress + "/random/";
-		Response.ErrorListener failure = new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO Handle
-				System.out.println("random sadness here " + error);
-			}
-		};
 
-		Response.Listener successWrapper = new Response.Listener<JSONArray>() {
+		Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
 			@Override
 			public void onResponse(JSONArray response) {
 				ArrayList<CollectionItem> items = new ArrayList<>(response.length());
