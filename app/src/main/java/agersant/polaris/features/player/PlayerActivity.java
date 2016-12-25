@@ -22,18 +22,16 @@ import agersant.polaris.ui.FetchImageTask;
 
 public class PlayerActivity extends PolarisActivity {
 
+	boolean seeking = false;
 	private Timer timer;
 	private BroadcastReceiver receiver;
 	private PlaybackQueue queue;
 	private Player player;
-
 	private ImageView artwork;
 	private ImageView pauseToggle;
 	private ImageView skipNext;
 	private ImageView skipPrevious;
 	private SeekBar seekBar;
-
-	boolean seeking = false;
 
 	public PlayerActivity() {
 		super(R.string.now_playing, R.id.nav_now_playing);

@@ -1,7 +1,6 @@
 package agersant.polaris.features.browse;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;

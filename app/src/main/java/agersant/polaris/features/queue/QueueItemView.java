@@ -10,8 +10,8 @@ import agersant.polaris.R;
 
 public class QueueItemView extends FrameLayout {
 
-	private boolean isPlaying = false;
 	private static final int[] IS_PLAYING = {R.attr.state_is_playing};
+	private boolean isPlaying = false;
 
 	public QueueItemView(Context context) {
 		super(context);
