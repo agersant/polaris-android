@@ -44,7 +44,7 @@ public class ServerAPI {
 		return instance;
 	}
 
-	public String getURL() {
+	String getURL() {
 		String address = this.preferences.getString(serverAddressKey, "");
 		address = address.replaceAll("/$", "");
 		return address + "/api";
