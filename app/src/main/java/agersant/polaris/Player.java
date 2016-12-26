@@ -16,7 +16,7 @@ public class Player {
 	private ServerAPI serverAPI;
 
 	private Player(Context context) {
-		serverAPI = ServerAPI.getInstance(context);
+		serverAPI = ServerAPI.getInstance();
 	}
 
 	public static Player getInstance(Context context) {
@@ -28,8 +28,7 @@ public class Player {
 
 	public void play(CollectionItem item) {
 		PolarisApplication application = PolarisApplication.getInstance();
-		String url = serverAPI.getMediaURL(item.getPath());
-		application.getMediaPlayerService().play(url);
+		application.getMediaPlayerService().play(item.getPath());
 		currentItem = item;
 	}
 

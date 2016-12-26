@@ -48,7 +48,7 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 		{
 			String artworkValue = item.getArtwork();
 			if (artworkValue != null) {
-				ServerAPI serverAPI = ServerAPI.getInstance(itemView.getContext());
+				ServerAPI serverAPI = ServerAPI.getInstance();
 				String url = serverAPI.getMediaURL(artworkValue);
 				FetchImageTask.load(url, artwork);
 			}

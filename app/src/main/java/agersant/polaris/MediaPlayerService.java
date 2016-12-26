@@ -2,15 +2,10 @@ package agersant.polaris;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaDataSource;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import agersant.polaris.api.ServerAPI;
 
 public class MediaPlayerService
 		extends Service
@@ -22,14 +17,13 @@ public class MediaPlayerService
 	public MediaPlayerService() {
 	}
 
-	public void play(String url) {
+	public void play(String path) {
+		System.out.println("Beginning playback for: " + path);
 		player.reset();
 		try {
-			Uri uri = Uri.parse(url);
-			Map<String, String> headers = new HashMap<>();
-			// TODO There is no strong guarantee that we have an auth cookie at this point
-			headers.put("Cookie", ServerAPI.getInstance(this).getAuthCookie());
-			player.setDataSource(this, uri, headers);
+			API api = API.getInstance();
+			MediaDataSource media = api.getAudio(path);
+			player.setDataSource(media);
 			player.prepareAsync();
 		} catch (Exception e) {
 			// TODO Handle

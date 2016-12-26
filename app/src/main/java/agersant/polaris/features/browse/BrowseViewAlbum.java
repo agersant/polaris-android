@@ -55,7 +55,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		CollectionItem item = items.get(0);
 		String artworkPath = item.getArtwork();
 		if (artworkPath != null) {
-			ServerAPI serverAPI = ServerAPI.getInstance(getContext());
+			ServerAPI serverAPI = ServerAPI.getInstance();
 			String url = serverAPI.getMediaURL(artworkPath);
 			FetchImageTask.load(url, artwork);
 		}

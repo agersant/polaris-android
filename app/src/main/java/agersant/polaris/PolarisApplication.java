@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import agersant.polaris.api.DownloadQueue;
+import agersant.polaris.api.ServerAPI;
+import agersant.polaris.cache.LocalAPI;
+
 public class PolarisApplication extends Application {
 
 	private static PolarisApplication instance;
@@ -21,6 +25,11 @@ public class PolarisApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		ServerAPI.init(this);
+		LocalAPI.init();
+		API.init();
+
+		DownloadQueue.init(this, ServerAPI.getInstance());
 		initMediaPlayerService();
 		instance = this;
 	}

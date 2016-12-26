@@ -100,12 +100,12 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadPath(String path) {
-		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
+		ServerAPI server = ServerAPI.getInstance();
 		server.browse(path, onLoad, onFail);
 	}
 
 	private void loadRandom() {
-		ServerAPI server = ServerAPI.getInstance(getApplicationContext());
+		ServerAPI server = ServerAPI.getInstance();
 		server.getRandomAlbums(onLoad, onFail);
 	}
 

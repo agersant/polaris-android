@@ -3,20 +3,23 @@ package agersant.polaris.api;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.IPolarisAPI;
 import agersant.polaris.R;
 
-public class ServerAPI {
+public class ServerAPI
+		implements IPolarisAPI {
 
 	private static ServerAPI instance;
 	private RequestQueue requestQueue;
@@ -37,10 +40,11 @@ public class ServerAPI {
 		passwordKey = context.getString(R.string.pref_key_password);
 	}
 
-	public static synchronized ServerAPI getInstance(Context context) {
-		if (instance == null) {
-			instance = new ServerAPI(context);
-		}
+	public static void init(Context context) {
+		instance = new ServerAPI(context);
+	}
+
+	public static ServerAPI getInstance() {
 		return instance;
 	}
 
@@ -69,6 +73,12 @@ public class ServerAPI {
 	public String getMediaURL(String path) {
 		String serverAddress = this.getURL();
 		return serverAddress + "/serve/" + path;
+	}
+
+	@Override
+	public MediaDataSource getAudio(String path) throws IOException {
+		DownloadQueue downloadQueue = DownloadQueue.getInstance();
+		return downloadQueue.getAudio(path);
 	}
 
 	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

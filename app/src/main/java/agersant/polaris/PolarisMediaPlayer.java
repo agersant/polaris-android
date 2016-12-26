@@ -1,13 +1,8 @@
 package agersant.polaris;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaDataSource;
 import android.media.MediaPlayer;
-import android.net.Uri;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Created by agersant on 12/6/2016.
@@ -66,11 +61,6 @@ public class PolarisMediaPlayer
 		state = State.IDLE;
 		pause = false;
 		player.reset();
-	}
-
-	void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException {
-		state = State.INITIALIZED;
-		player.setDataSource(context, uri, headers);
 	}
 
 	void setDataSource(MediaDataSource media) {

@@ -202,7 +202,7 @@ public class PlayerActivity extends PolarisActivity {
 
 		String artworkPath = item.getArtwork();
 		if (artworkPath != null) {
-			ServerAPI serverAPI = ServerAPI.getInstance(this);
+			ServerAPI serverAPI = ServerAPI.getInstance();
 			String url = serverAPI.getMediaURL(artworkPath);
 			FetchImageTask.load(url, artwork);
 		}

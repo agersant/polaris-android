@@ -91,7 +91,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 			}
 		};
 
-		ServerAPI server = ServerAPI.getInstance(context);
+		ServerAPI server = ServerAPI.getInstance();
 		server.flatten(item.getPath(), success, failure);
 	}
 

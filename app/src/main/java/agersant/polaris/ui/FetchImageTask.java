@@ -37,7 +37,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
-			ServerAPI serverAPI = ServerAPI.getInstance(polarisApplication);
+			ServerAPI serverAPI = ServerAPI.getInstance();
 			String authCookie = serverAPI.getAuthCookie();
 
 			FetchImageTask task = new FetchImageTask(url, imageView, authCookie);
