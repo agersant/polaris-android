@@ -22,8 +22,8 @@ import agersant.polaris.CollectionItem;
 
 public class OfflineCache {
 
-	static final int VERSION = 1;
-	static final int BUFFER_SIZE = 1024 * 64;
+	private static final int VERSION = 1;
+	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
 	private File root;
 
@@ -57,8 +57,8 @@ public class OfflineCache {
 		}
 	}
 
-	private static void write(Bitmap image, OutputStream storage) {
-		// TODO
+	private static void write(Bitmap image, OutputStream storage) throws IOException {
+		storage.write(OfflineCache.VERSION);
 	}
 
 	public void put(CollectionItem item, FileInputStream audio, Bitmap image) {
