@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public interface IPolarisAPI {
 
-	MediaDataSource getAudio(String path) throws IOException;
+	MediaDataSource getAudio(CollectionItem item) throws IOException;
 
 	void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure);
 

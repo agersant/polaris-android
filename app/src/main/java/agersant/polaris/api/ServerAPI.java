@@ -76,9 +76,9 @@ public class ServerAPI
 	}
 
 	@Override
-	public MediaDataSource getAudio(String path) throws IOException {
+	public MediaDataSource getAudio(CollectionItem item) throws IOException {
 		DownloadQueue downloadQueue = DownloadQueue.getInstance();
-		return downloadQueue.getAudio(path);
+		return downloadQueue.getAudio(item);
 	}
 
 	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

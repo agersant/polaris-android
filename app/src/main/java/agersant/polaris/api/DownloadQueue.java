@@ -6,6 +6,8 @@ import android.media.MediaDataSource;
 import java.io.File;
 import java.io.IOException;
 
+import agersant.polaris.CollectionItem;
+
 /**
  * Created by agersant on 12/25/2016.
  */
@@ -32,12 +34,13 @@ public class DownloadQueue {
 		return instance;
 	}
 
-	MediaDataSource getAudio(String path) throws IOException {
-		beginDownload(path);
+	MediaDataSource getAudio(CollectionItem item) throws IOException {
+		beginDownload(item);
 		return mediaDataSource;
 	}
 
-	private void beginDownload(final String path) throws IOException {
+	private void beginDownload(CollectionItem item) throws IOException {
+		String path = item.getPath();
 		if (job != null) {
 			String currentJobPath = job.getPath();
 			if (currentJobPath.equals(path)) {
@@ -62,12 +65,7 @@ public class DownloadQueue {
 		}
 
 		mediaDataSource = new StreamingMediaDataSource(tempFile);
-		job = new DownloadTask(server, path, tempFile) {
-			@Override
-			protected void onPostExecute(Integer unused) {
-				mediaDataSource.markAsComplete();
-			}
-		};
+		job = new DownloadTask(server, item, tempFile, mediaDataSource);
 
 		job.execute();
 	}

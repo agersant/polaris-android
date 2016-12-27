@@ -61,6 +61,7 @@ class StreamingMediaDataSource extends MediaDataSource {
 			input.close();
 		}
 
+		// TODO can only get here from exception. should reach from file end
 		return -1;
 	}
 

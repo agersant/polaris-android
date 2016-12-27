@@ -28,7 +28,7 @@ public class Player {
 
 	public void play(CollectionItem item) {
 		PolarisApplication application = PolarisApplication.getInstance();
-		application.getMediaPlayerService().play(item.getPath());
+		application.getMediaPlayerService().play(item);
 		currentItem = item;
 	}
 

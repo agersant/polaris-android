@@ -3,7 +3,10 @@ package agersant.polaris;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CollectionItem implements Cloneable {
+import java.io.Serializable;
+
+public class CollectionItem
+		implements Cloneable, Serializable {
 
 	private String name;
 	private String path;

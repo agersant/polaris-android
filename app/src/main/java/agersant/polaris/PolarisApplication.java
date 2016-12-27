@@ -10,6 +10,7 @@ import android.os.IBinder;
 import agersant.polaris.api.DownloadQueue;
 import agersant.polaris.api.ServerAPI;
 import agersant.polaris.cache.LocalAPI;
+import agersant.polaris.cache.OfflineCache;
 
 public class PolarisApplication extends Application {
 
@@ -25,6 +26,7 @@ public class PolarisApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		OfflineCache.init(this);
 		ServerAPI.init(this);
 		LocalAPI.init();
 		API.init();

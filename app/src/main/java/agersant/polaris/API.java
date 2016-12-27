@@ -14,7 +14,7 @@ import agersant.polaris.cache.LocalAPI;
  * Created by agersant on 12/25/2016.
  */
 
-public class API {
+class API {
 
 	private static API instance;
 	private ServerAPI serverAPI;
@@ -25,7 +25,7 @@ public class API {
 		localAPI = LocalAPI.getInstance();
 	}
 
-	public static void init() {
+	static void init() {
 		instance = new API();
 	}
 
@@ -37,16 +37,12 @@ public class API {
 		return false;
 	}
 
-	public MediaDataSource getAudio(String path) throws IOException {
-		return getAPI().getAudio(path);
+	MediaDataSource getAudio(CollectionItem item) throws IOException {
+		return getAPI().getAudio(item);
 	}
 
 	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
-		if (isOffline()) {
-			localAPI.browse(path, success, failure);
-		} else {
-			serverAPI.browse(path, success, failure);
-		}
+		getAPI().browse(path, success, failure);
 	}
 
 	private IPolarisAPI getAPI() {

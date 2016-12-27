@@ -31,9 +31,10 @@ public class LocalAPI implements IPolarisAPI {
 	}
 
 	@Override
-	public MediaDataSource getAudio(String path) throws IOException {
-		// TODO
-		return null;
+	public MediaDataSource getAudio(CollectionItem item) throws IOException {
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		String path = item.getPath();
+		return offlineCache.getAudio(path);
 	}
 
 	public void browse(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

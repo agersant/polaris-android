@@ -17,12 +17,13 @@ public class MediaPlayerService
 	public MediaPlayerService() {
 	}
 
-	public void play(String path) {
-		System.out.println("Beginning playback for: " + path);
+	public void play(CollectionItem item) {
+		System.out.println("Beginning playback for: " + item.getPath());
 		player.reset();
 		try {
 			API api = API.getInstance();
-			MediaDataSource media = api.getAudio(path);
+			// TODO close old media
+			MediaDataSource media = api.getAudio(item);
 			player.setDataSource(media);
 			player.prepareAsync();
 		} catch (Exception e) {
