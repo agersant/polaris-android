@@ -26,6 +26,7 @@ public class OfflineCache {
 	static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
 	private File root;
+
 	private OfflineCache(Context context) {
 		root = new File(context.getExternalCacheDir(), "collection_cache");
 	}

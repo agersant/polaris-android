@@ -3,8 +3,8 @@ package agersant.polaris.api;
 import android.media.MediaDataSource;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Created by agersant on 12/26/2016.
@@ -12,12 +12,12 @@ import java.io.IOException;
 
 class StreamingMediaDataSource extends MediaDataSource {
 
-	private File tempFile;
+	private RandomAccessFile streamFile;
 	private boolean completed;
 
-	StreamingMediaDataSource(File tempFile) {
+	StreamingMediaDataSource(File streamFile) throws IOException {
 		super();
-		this.tempFile = tempFile;
+		this.streamFile = new RandomAccessFile(streamFile, "r");
 		completed = false;
 	}
 
@@ -27,41 +27,31 @@ class StreamingMediaDataSource extends MediaDataSource {
 
 	@Override
 	public int readAt(long position, byte[] buffer, int offset, int size) throws IOException {
-		FileInputStream input = null;
 		try {
 
-			input = new FileInputStream(tempFile);
-
-			int skipped = 0;
-			while (skipped < position) {
-				skipped += input.skip(position);
-			}
-
+			streamFile.seek(position);
 			int read = 0;
 			while (read < size) {
-				int bytes = input.read(buffer, offset, size);
+				int bytes = streamFile.read(buffer, offset, size);
 				if (bytes > 0) {
 					size -= bytes;
 					read += bytes;
 					offset += bytes;
 				}
 				if (bytes < 0 && completed) {
+					if (read == 0) {
+						return -1;
+					}
 					break;
 				}
 			}
 
-			input.close();
 			return read;
 
 		} catch (IOException e) {
 			System.out.println("Streaming error: " + e);
 		}
 
-		if (input != null) {
-			input.close();
-		}
-
-		// TODO can only get here from exception. should reach from file end
 		return -1;
 	}
 
@@ -72,5 +62,6 @@ class StreamingMediaDataSource extends MediaDataSource {
 
 	@Override
 	public void close() throws IOException {
+		streamFile.close();
 	}
 }
