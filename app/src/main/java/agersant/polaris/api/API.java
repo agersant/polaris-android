@@ -1,4 +1,4 @@
-package agersant.polaris;
+package agersant.polaris.api;
 
 import android.media.MediaDataSource;
 
@@ -7,14 +7,15 @@ import com.android.volley.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import agersant.polaris.api.ServerAPI;
-import agersant.polaris.cache.LocalAPI;
+import agersant.polaris.CollectionItem;
+import agersant.polaris.api.local.LocalAPI;
+import agersant.polaris.api.remote.ServerAPI;
 
 /**
  * Created by agersant on 12/25/2016.
  */
 
-class API {
+public class API {
 
 	private static API instance;
 	private ServerAPI serverAPI;
@@ -25,7 +26,7 @@ class API {
 		localAPI = LocalAPI.getInstance();
 	}
 
-	static void init() {
+	public static void init() {
 		instance = new API();
 	}
 
@@ -37,7 +38,7 @@ class API {
 		return false;
 	}
 
-	MediaDataSource getAudio(CollectionItem item) throws IOException {
+	public MediaDataSource getAudio(CollectionItem item) throws IOException {
 		return getAPI().getAudio(item);
 	}
 

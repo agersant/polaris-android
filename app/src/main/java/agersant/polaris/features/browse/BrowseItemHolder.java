@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
-import agersant.polaris.api.ServerAPI;
+import agersant.polaris.api.remote.ServerAPI;
 
 /**
  * Created by agersant on 12/11/2016.

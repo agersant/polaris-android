@@ -1,4 +1,4 @@
-package agersant.polaris.api;
+package agersant.polaris.api.remote;
 
 
 import android.content.Context;
@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.IPolarisAPI;
 import agersant.polaris.R;
+import agersant.polaris.api.IPolarisAPI;
 
 public class ServerAPI
 		implements IPolarisAPI {

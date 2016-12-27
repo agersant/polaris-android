@@ -16,7 +16,7 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
-import agersant.polaris.api.ServerAPI;
+import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 import agersant.polaris.ui.FetchImageTask;
 

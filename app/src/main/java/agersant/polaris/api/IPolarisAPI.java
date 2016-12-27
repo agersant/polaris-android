@@ -1,4 +1,4 @@
-package agersant.polaris;
+package agersant.polaris.api;
 
 import android.media.MediaDataSource;
 
@@ -6,6 +6,8 @@ import com.android.volley.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import agersant.polaris.CollectionItem;
 
 /**
  * Created by agersant on 12/25/2016.

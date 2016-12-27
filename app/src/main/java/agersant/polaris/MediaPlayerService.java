@@ -7,6 +7,8 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 
+import agersant.polaris.api.API;
+
 public class MediaPlayerService
 		extends Service
 		implements MediaPlayer.OnCompletionListener {

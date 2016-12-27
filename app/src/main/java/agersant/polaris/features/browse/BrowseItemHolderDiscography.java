@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.api.ServerAPI;
+import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.ui.FetchImageTask;
 
 /**

@@ -1,4 +1,4 @@
-package agersant.polaris.api;
+package agersant.polaris.api.remote;
 
 import android.content.Context;
 

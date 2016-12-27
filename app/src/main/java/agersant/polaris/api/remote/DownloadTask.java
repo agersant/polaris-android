@@ -1,4 +1,4 @@
-package agersant.polaris.api;
+package agersant.polaris.api.remote;
 
 import android.os.AsyncTask;
 
@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.cache.OfflineCache;
+import agersant.polaris.api.local.OfflineCache;
 
 /**
  * Created by agersant on 12/26/2016.

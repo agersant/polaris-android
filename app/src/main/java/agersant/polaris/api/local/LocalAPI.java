@@ -1,4 +1,4 @@
-package agersant.polaris.cache;
+package agersant.polaris.api.local;
 
 import android.media.MediaDataSource;
 
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.IPolarisAPI;
+import agersant.polaris.api.IPolarisAPI;
 
 /**
  * Created by agersant on 12/25/2016.

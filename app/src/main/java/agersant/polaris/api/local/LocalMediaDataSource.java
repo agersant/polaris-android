@@ -1,4 +1,4 @@
-package agersant.polaris.cache;
+package agersant.polaris.api.local;
 
 import android.media.MediaDataSource;
 

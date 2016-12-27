@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.api.ServerAPI;
+import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
 public class BrowseActivity extends PolarisActivity {

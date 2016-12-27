@@ -2,7 +2,7 @@ package agersant.polaris;
 
 import android.content.Context;
 
-import agersant.polaris.api.ServerAPI;
+import agersant.polaris.api.remote.ServerAPI;
 
 public class Player {
 

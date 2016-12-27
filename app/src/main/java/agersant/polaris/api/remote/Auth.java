@@ -1,4 +1,4 @@
-package agersant.polaris.api;
+package agersant.polaris.api.remote;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
