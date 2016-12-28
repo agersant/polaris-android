@@ -8,10 +8,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import agersant.polaris.api.API;
-import agersant.polaris.api.remote.DownloadQueue;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.DownloadQueue;
+import agersant.polaris.api.remote.ServerAPI;
 
 public class PolarisApplication extends Application {
 
