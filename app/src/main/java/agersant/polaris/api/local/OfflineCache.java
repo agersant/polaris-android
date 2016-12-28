@@ -1,6 +1,7 @@
 package agersant.polaris.api.local;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaDataSource;
 
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisApplication;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -22,6 +24,7 @@ import agersant.polaris.CollectionItem;
 
 public class OfflineCache {
 
+	public static final String AUDIO_CACHED = "AUDIO_CACHED";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
@@ -63,25 +66,34 @@ public class OfflineCache {
 
 	public void put(CollectionItem item, FileInputStream audio, Bitmap image) {
 		String path = item.getPath();
-		try (
-				FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM));
-				FileOutputStream audioOut = new FileOutputStream(getCacheFile(path, CacheDataType.AUDIO));
-				FileOutputStream artworkOut = new FileOutputStream(getCacheFile(path, CacheDataType.ARTWORK));
-		) {
+
+		try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM, true))) {
 			write(item, itemOut);
-			if (audio != null) {
-				write(audio, audioOut);
-			}
-			if (image != null) {
-				write(image, artworkOut);
-			}
-			System.out.println("Saved to offline cache: " + path);
 		} catch (IOException e) {
-			System.out.println("Error while caching for local use: " + e);
+			System.out.println("Error while caching item for local use: " + e);
 		}
+
+		if (audio != null) {
+			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.AUDIO, true))) {
+				write(audio, itemOut);
+				broadcast(AUDIO_CACHED);
+			} catch (IOException e) {
+				System.out.println("Error while caching audio for local use: " + e);
+			}
+		}
+
+		if (image != null) {
+			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ARTWORK, true))) {
+				write(image, itemOut);
+			} catch (IOException e) {
+				System.out.println("Error while caching artwork for local use: " + e);
+			}
+		}
+
+		System.out.println("Saved to offline cache: " + path);
 	}
 
-	private File getCacheFile(String virtualPath, CacheDataType type) throws IOException {
+	private File getCacheFile(String virtualPath, CacheDataType type, boolean create) throws IOException {
 		String path = virtualPath.replace("\\", File.separator);
 		File file = new File(root, path);
 		if (file.isDirectory()) {
@@ -96,16 +108,30 @@ public class OfflineCache {
 			default:
 				file = new File(file, "artwork");
 		}
-		if (!file.exists()) {
-			file.getParentFile().mkdirs();
-			file.createNewFile();
+		if (create) {
+			if (!file.exists()) {
+				file.getParentFile().mkdirs();
+				file.createNewFile();
+			}
 		}
 		return file;
 	}
 
-	MediaDataSource getAudio(String path) {
+	public boolean hasAudio(String path) {
 		try {
-			File source = getCacheFile(path, CacheDataType.AUDIO);
+			File file = getCacheFile(path, CacheDataType.AUDIO, false);
+			return file.exists();
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	MediaDataSource getAudio(String path) {
+		if (!hasAudio(path)) {
+			return null;
+		}
+		try {
+			File source = getCacheFile(path, CacheDataType.AUDIO, false);
 			return new LocalMediaDataSource(source);
 		} catch (IOException e) {
 			return null;
@@ -118,6 +144,13 @@ public class OfflineCache {
 			failure.onErrorResponse(null);
 			return;
 		}
+	}
+
+	private void broadcast(String event) {
+		PolarisApplication application = PolarisApplication.getInstance();
+		Intent intent = new Intent();
+		intent.setAction(event);
+		application.sendBroadcast(intent);
 	}
 
 	private enum CacheDataType {

@@ -20,8 +20,8 @@
 		android:layout_height="match_parent"
 		android:orientation="vertical"
 		android:gravity="center_vertical"
-		android:paddingStart="12dp"
-		android:paddingEnd="12dp"
+		android:layout_marginStart="12dp"
+		android:layout_marginEnd="48dp"
 		android:duplicateParentState="true">
 
 		<TextView
@@ -48,6 +48,16 @@
 
 	</LinearLayout>
 
-
+	<ImageView
+		android:id="@+id/cache_icon"
+		android:layout_width="24dp"
+		android:layout_height="24dp"
+		android:layout_marginEnd="12dp"
+		android:layout_centerVertical="true"
+		android:layout_alignParentEnd="true"
+		android:visibility="invisible"
+		android:duplicateParentState="true"
+		android:background="@drawable/ic_sd_storage_black_24dp"
+	    android:backgroundTint="@color/queue_item_cache_icon"/>
 
 </RelativeLayout>

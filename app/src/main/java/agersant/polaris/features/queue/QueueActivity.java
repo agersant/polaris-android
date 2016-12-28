@@ -17,6 +17,7 @@ import java.util.Random;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
+import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.features.PolarisActivity;
 
 public class QueueActivity extends PolarisActivity {
@@ -49,12 +50,14 @@ public class QueueActivity extends PolarisActivity {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
 		filter.addAction(Player.PLAYING_TRACK);
+		filter.addAction(OfflineCache.AUDIO_CACHED);
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
 					case PlaybackQueue.QUEUED_ITEMS:
 					case Player.PLAYING_TRACK:
+					case OfflineCache.AUDIO_CACHED:
 						adapter.notifyDataSetChanged();
 						break;
 				}

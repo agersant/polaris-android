@@ -4,12 +4,14 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
+import agersant.polaris.api.local.OfflineCache;
 
 
 class QueueAdapter
@@ -54,6 +56,7 @@ class QueueAdapter
 		private QueueItemView queueItemView;
 		private TextView titleText;
 		private TextView artistText;
+		private ImageView cacheIcon;
 		private Player player;
 
 		QueueItemHolder(QueueItemView view) {
@@ -62,15 +65,22 @@ class QueueAdapter
 			player = Player.getInstance(view.getContext());
 			titleText = (TextView) view.findViewById(R.id.title);
 			artistText = (TextView) view.findViewById(R.id.artist);
+			cacheIcon = (ImageView) view.findViewById(R.id.cache_icon);
 			view.setOnClickListener(this);
 		}
 
 		void bindItem(CollectionItem item) {
+			OfflineCache offlineCache = OfflineCache.getInstance();
 			this.item = item;
 			boolean isPlaying = player.getCurrentItem() == this.item;
 			titleText.setText(item.getTitle());
 			artistText.setText(item.getArtist());
 			queueItemView.setIsPlaying(isPlaying);
+			if (offlineCache.hasAudio(item.getPath())) {
+				cacheIcon.setVisibility(View.VISIBLE);
+			} else {
+				cacheIcon.setVisibility(View.INVISIBLE);
+			}
 		}
 
 		@Override
