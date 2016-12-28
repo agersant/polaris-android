@@ -44,17 +44,19 @@ public class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	@Override
 	protected Integer doInBackground(Object... params) {
 
-		FileOutputStream outputStream = null;
-		InputStream inputStream = null;
-
+		HttpURLConnection connection;
 		try {
-
 			URL url = new URL(targetURL);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty("Cookie", authCookie);
+		} catch (IOException e) {
+			System.out.println("Error establishing stream connection: " + e);
+			return 1;
+		}
 
-			outputStream = new FileOutputStream(outFile);
-			inputStream = connection.getInputStream();
+		try (InputStream inputStream = connection.getInputStream();
+		     FileOutputStream outputStream = new FileOutputStream(outFile);
+		) {
 			byte[] chunk = new byte[BUFFER_SIZE];
 			while (true) {
 				int bytesRead = inputStream.read(chunk);
@@ -69,25 +71,8 @@ public class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 					break;
 				}
 			}
-
 		} catch (IOException e) {
-			System.out.println("IO Error during download");
-		}
-
-		if (inputStream != null) {
-			try {
-				inputStream.close();
-			} catch (IOException e) {
-				System.out.println("IO Error during download input cleanup");
-			}
-		}
-
-		if (outputStream != null) {
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				System.out.println("IO Error during download output cleanup");
-			}
+			System.out.println("Stream download error: " + e);
 		}
 
 		return 0;
