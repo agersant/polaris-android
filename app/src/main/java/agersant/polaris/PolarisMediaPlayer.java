@@ -88,6 +88,7 @@ public class PolarisMediaPlayer
 		switch (state) {
 			case PREPARED:
 			case PAUSED:
+			case PLAYBACK_COMPLETED:
 				state = State.STARTED;
 				player.start();
 				break;

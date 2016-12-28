@@ -7,6 +7,8 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 
+import java.io.IOException;
+
 import agersant.polaris.api.API;
 
 public class MediaPlayerService
@@ -15,17 +17,29 @@ public class MediaPlayerService
 
 	private final IBinder binder = new MediaPlayerBinder();
 	private PolarisMediaPlayer player;
+	private MediaDataSource media;
 
 	public MediaPlayerService() {
 	}
 
+	public void stop() {
+		player.reset();
+		if (media != null) {
+			try {
+				media.close();
+			} catch (IOException e) {
+				System.out.println("Error while closing media datasource: " + e);
+			}
+			media = null;
+		}
+	}
+
 	public void play(CollectionItem item) {
 		System.out.println("Beginning playback for: " + item.getPath());
-		player.reset();
+		stop();
 		try {
 			API api = API.getInstance();
-			// TODO close old media
-			MediaDataSource media = api.getAudio(item);
+			media = api.getAudio(item);
 			player.setDataSource(media);
 			player.prepareAsync();
 		} catch (Exception e) {

@@ -80,6 +80,7 @@ public class PlayerActivity extends PolarisActivity {
 		filter.addAction(Player.PLAYING_TRACK);
 		filter.addAction(Player.PAUSED_TRACK);
 		filter.addAction(Player.RESUMED_TRACK);
+		filter.addAction(Player.COMPLETED_TRACK);
 		filter.addAction(PlaybackQueue.CHANGED_ORDERING);
 		filter.addAction(PlaybackQueue.QUEUED_ITEM);
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
@@ -96,6 +97,7 @@ public class PlayerActivity extends PolarisActivity {
 						break;
 					case Player.PAUSED_TRACK:
 					case Player.RESUMED_TRACK:
+					case Player.COMPLETED_TRACK:
 					case PlaybackQueue.CHANGED_ORDERING:
 					case PlaybackQueue.REMOVED_ITEM:
 					case PlaybackQueue.REMOVED_ITEMS:
