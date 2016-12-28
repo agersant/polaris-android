@@ -13,8 +13,8 @@ import java.lang.ref.WeakReference;
 import java.net.URLConnection;
 
 import agersant.polaris.PolarisApplication;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.api.local.ImageCache;
+import agersant.polaris.api.remote.ServerAPI;
 
 public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
