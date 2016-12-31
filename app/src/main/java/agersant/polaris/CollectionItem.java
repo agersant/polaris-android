@@ -43,6 +43,19 @@ public class CollectionItem
 		return item;
 	}
 
+	public static CollectionItem directory(String path) {
+		CollectionItem item = new CollectionItem();
+		item.isDirectory = true;
+		item.path = path;
+		item.name = getNameFromPath(path);
+		return item;
+	}
+
+	private static String getNameFromPath(String path) {
+		String[] chunks = path.split("/|\\\\");
+		return chunks[chunks.length - 1];
+	}
+
 	private void parseFields(JSONObject fields) throws JSONException {
 		path = fields.getString("path");
 		artist = readStringField(fields, "artist");
@@ -51,9 +64,7 @@ public class CollectionItem
 		album = readStringField(fields, "album");
 		trackNumber = readIntField(fields, "track_number");
 		albumArtist = readStringField(fields, "album_artist");
-
-		String[] chunks = path.split("/|\\\\");
-		name = chunks[chunks.length - 1];
+		name = getNameFromPath(path);
 	}
 
 	private String readStringField(JSONObject fields, String name) {

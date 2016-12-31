@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaDataSource;
 
-import com.android.volley.Response;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -31,7 +30,8 @@ public class OfflineCache {
 	private File root;
 
 	private OfflineCache(Context context) {
-		root = new File(context.getExternalCacheDir(), "collection_cache");
+		root = new File(context.getExternalCacheDir(), "collection");
+		root = new File(root, "v" + VERSION);
 	}
 
 	public static void init(Context context) {
@@ -44,15 +44,13 @@ public class OfflineCache {
 		return instance;
 	}
 
-	private static void write(CollectionItem item, OutputStream storage) throws IOException {
-		storage.write(OfflineCache.VERSION);
+	private void write(CollectionItem item, OutputStream storage) throws IOException {
 		ObjectOutputStream objOut = new ObjectOutputStream(storage);
 		objOut.writeObject(item);
 		objOut.close();
 	}
 
-	private static void write(FileInputStream audio, OutputStream storage) throws IOException {
-		storage.write(OfflineCache.VERSION);
+	private void write(FileInputStream audio, OutputStream storage) throws IOException {
 		byte[] buffer = new byte[BUFFER_SIZE];
 		int read;
 		while ((read = audio.read(buffer)) > 0) {
@@ -60,8 +58,7 @@ public class OfflineCache {
 		}
 	}
 
-	private static void write(Bitmap image, OutputStream storage) throws IOException {
-		storage.write(OfflineCache.VERSION);
+	private void write(Bitmap image, OutputStream storage) throws IOException {
 	}
 
 	public void put(CollectionItem item, FileInputStream audio, Bitmap image) {
@@ -93,24 +90,29 @@ public class OfflineCache {
 		System.out.println("Saved to offline cache: " + path);
 	}
 
-	private File getCacheFile(String virtualPath, CacheDataType type, boolean create) throws IOException {
+	private File getCacheDir(String virtualPath) {
 		String path = virtualPath.replace("\\", File.separator);
-		File file = new File(root, path);
-		if (file.isDirectory()) {
-			file = new File(file, "__polaris__dir__");
-		}
+		return new File(root, path);
+	}
+
+	private File getCacheFile(String virtualPath, CacheDataType type, boolean create) throws IOException {
+		File file = getCacheDir(virtualPath);
 		switch (type) {
 			case ITEM:
 				file = new File(file, "item");
+				break;
 			case AUDIO:
 				file = new File(file, "audio");
+				break;
 			case ARTWORK:
 			default:
 				file = new File(file, "artwork");
+				break;
 		}
 		if (create) {
 			if (!file.exists()) {
-				file.getParentFile().mkdirs();
+				File parent = file.getParentFile();
+				parent.mkdirs();
 				file.createNewFile();
 			}
 		}
@@ -138,11 +140,42 @@ public class OfflineCache {
 		}
 	}
 
-	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
-		File file = new File(root, path);
-		if (!file.exists() || !file.isDirectory()) {
-			failure.onErrorResponse(null);
-			return;
+	public ArrayList<CollectionItem> browse(String path) {
+		ArrayList<CollectionItem> out = new ArrayList<>();
+
+		File dir = getCacheDir(path);
+		if (!dir.exists()) {
+			return out;
+		}
+
+		File[] files = dir.listFiles();
+		if (files == null) {
+			return out;
+		}
+
+		for (File file : files) {
+			try {
+				CollectionItem item = readItem(file);
+				out.add(item);
+			} catch (IOException | ClassNotFoundException e) {
+				System.out.println("Error while reading offline cache: " + e);
+				return null;
+			}
+		}
+
+		return out;
+	}
+
+	private CollectionItem readItem(File dir) throws IOException, ClassNotFoundException {
+		File itemFile = new File(dir, "item");
+		if (!itemFile.exists()) {
+			String path = root.toURI().relativize(dir.toURI()).getPath();
+			return CollectionItem.directory(path);
+		}
+		try (FileInputStream fileInputStream = new FileInputStream(itemFile);
+		     ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+		) {
+			return (CollectionItem) objectInputStream.readObject();
 		}
 	}
 

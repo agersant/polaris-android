@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
@@ -100,8 +101,8 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadPath(String path) {
-		ServerAPI server = ServerAPI.getInstance();
-		server.browse(path, onLoad, onFail);
+		API api = API.getInstance();
+		api.browse(path, onLoad, onFail);
 	}
 
 	private void loadRandom() {

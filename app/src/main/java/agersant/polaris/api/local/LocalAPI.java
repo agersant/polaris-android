@@ -38,6 +38,12 @@ public class LocalAPI implements IPolarisAPI {
 	}
 
 	public void browse(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
-		// TODO
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		ArrayList<CollectionItem> items = offlineCache.browse(path);
+		if (items == null) {
+			failure.onErrorResponse(null);
+		} else {
+			success.onResponse(items);
+		}
 	}
 }
