@@ -3,6 +3,7 @@ package agersant.polaris.features.browse;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -74,6 +75,11 @@ public class BrowseActivity extends PolarisActivity {
 		}
 
 		loadContent();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return true;
 	}
 
 	private void loadContent() {
