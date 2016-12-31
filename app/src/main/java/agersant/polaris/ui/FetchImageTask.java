@@ -85,7 +85,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		Bitmap bitmap = null;
 		try {
 			URLConnection connection = new java.net.URL(url).openConnection();
-			connection.setRequestProperty("Cookie", authCookie);
+			connection.setRequestProperty("Cookie", authCookie); // TODO not guaranteed
 			InputStream stream = connection.getInputStream();
 			bitmap = BitmapFactory.decodeStream(stream);
 		} catch (Exception e) {
