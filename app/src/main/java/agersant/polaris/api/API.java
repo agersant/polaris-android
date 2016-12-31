@@ -1,6 +1,9 @@
 package agersant.polaris.api;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaDataSource;
+import android.preference.PreferenceManager;
 
 import com.android.volley.Response;
 
@@ -8,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.R;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.remote.ServerAPI;
 
@@ -20,14 +24,18 @@ public class API {
 	private static API instance;
 	private ServerAPI serverAPI;
 	private LocalAPI localAPI;
+	private SharedPreferences preferences;
+	private String offlineModePreferenceKey;
 
-	private API() {
+	private API(Context context) {
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		offlineModePreferenceKey = context.getString(R.string.pref_key_offline);
 		serverAPI = ServerAPI.getInstance();
 		localAPI = LocalAPI.getInstance();
 	}
 
-	public static void init() {
-		instance = new API();
+	public static void init(Context context) {
+		instance = new API(context);
 	}
 
 	public static API getInstance() {
@@ -35,7 +43,7 @@ public class API {
 	}
 
 	private boolean isOffline() {
-		return false;
+		return preferences.getBoolean(offlineModePreferenceKey, false);
 	}
 
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {

@@ -30,7 +30,7 @@ public class PolarisApplication extends Application {
 		OfflineCache.init(this);
 		ServerAPI.init(this);
 		LocalAPI.init();
-		API.init();
+		API.init(this);
 
 		DownloadQueue.init(this, ServerAPI.getInstance());
 		initMediaPlayerService();

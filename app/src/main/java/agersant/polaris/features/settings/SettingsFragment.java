@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
+import java.util.Map;
+
 import agersant.polaris.R;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -42,6 +44,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 		if (preference == null) {
 			return;
 		}
-		preference.setSummary(getSharedPreferences().getString(key, ""));
+		Map<String, ?> all = getSharedPreferences().getAll();
+		if (all.get(key) instanceof String) {
+			preference.setSummary(getSharedPreferences().getString(key, ""));
+		}
 	}
 }
