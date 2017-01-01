@@ -42,7 +42,7 @@ public class API {
 		return instance;
 	}
 
-	private boolean isOffline() {
+	public boolean isOffline() {
 		return preferences.getBoolean(offlineModePreferenceKey, false);
 	}
 

@@ -7,9 +7,12 @@ import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
 
 public class CollectionActivity extends PolarisActivity {
+
+	private Button randomAlbums;
 
 	public CollectionActivity() {
 		super(R.string.collection, R.id.nav_collection);
@@ -20,6 +23,8 @@ public class CollectionActivity extends PolarisActivity {
 		setContentView(R.layout.activity_collection);
 		super.onCreate(savedInstanceState);
 
+		randomAlbums = (Button) findViewById(R.id.random);
+
 		// Disable unimplemented features
 		{
 			Button button;
@@ -28,6 +33,14 @@ public class CollectionActivity extends PolarisActivity {
 			button = (Button) findViewById(R.id.playlists);
 			button.setEnabled(false);
 		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		API api = API.getInstance();
+		boolean isOffline = api.isOffline();
+		randomAlbums.setEnabled(!isOffline);
 	}
 
 	public void browseDirectories(View view) {
