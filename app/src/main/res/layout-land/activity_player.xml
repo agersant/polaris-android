@@ -6,8 +6,8 @@
 	android:id="@+id/activity_player"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
 	android:background="@color/white"
+	android:orientation="vertical"
 	tools:context="agersant.polaris.features.player.PlayerActivity">
 
 	<android.support.v7.widget.Toolbar
@@ -26,33 +26,33 @@
 		>
 
 		<agersant.polaris.ui.SquareLayout
+			android:id="@+id/viewGroup"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
-			app:preserveWidth="false"
-			android:id="@+id/viewGroup">
+			app:preserveWidth="false">
 
 			<ImageView
 				android:id="@+id/artwork"
-				tools:src="@drawable/artwork"
-				android:contentDescription="@string/player_artwork"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:adjustViewBounds="true"/>
+				android:adjustViewBounds="true"
+				android:contentDescription="@string/player_artwork"
+				tools:src="@drawable/artwork"/>
 		</agersant.polaris.ui.SquareLayout>
 
 		<LinearLayout
-			android:orientation="vertical"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:gravity="center_vertical"
+			android:orientation="vertical"
 			>
 
 			<LinearLayout
 				android:id="@+id/controls"
 				android:layout_width="match_parent"
 				android:layout_height="48dp"
-				android:orientation="horizontal"
-				android:gravity="center_horizontal">
+				android:gravity="center_horizontal"
+				android:orientation="horizontal">
 
 				<ImageView
 					android:id="@+id/skip_previous"
@@ -65,13 +65,13 @@
 
 				<ImageView
 					android:id="@+id/pause_toggle"
-					android:onClick="togglePause"
 					android:layout_width="wrap_content"
 					android:layout_height="match_parent"
 					android:layout_marginLeft="32dp"
 					android:layout_marginRight="32dp"
 					android:adjustViewBounds="true"
 					android:contentDescription="@string/player_play_pause"
+					android:onClick="togglePause"
 					android:src="@drawable/ic_play_arrow_black_24dp"/>
 
 				<ImageView

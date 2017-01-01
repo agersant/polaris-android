@@ -22,8 +22,8 @@
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:orientation="vertical"
 			android:layout_gravity="center_vertical"
+			android:orientation="vertical"
 			android:padding="15dp"
 			>
 
@@ -31,10 +31,10 @@
 				android:id="@+id/album_title"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:textSize="20sp"
-				android:maxLines="2"
 				android:ellipsize="end"
+				android:maxLines="2"
 				android:textColor="@color/white"
+				android:textSize="20sp"
 				tools:text="Calcium Engine"/>
 
 			<TextView
@@ -42,8 +42,8 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_below="@+id/album_title"
-				android:textSize="16sp"
 				android:textColor="@color/blueGrey400"
+				android:textSize="16sp"
 				tools:text="Botanical"/>
 		</RelativeLayout>
 	</LinearLayout>

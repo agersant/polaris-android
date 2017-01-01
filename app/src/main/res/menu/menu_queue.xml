@@ -3,41 +3,41 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
-		app:showAsAction="ifRoom"
 		android:id="@+id/action_ordering"
+		android:icon="@drawable/ic_reorder_white_24dp"
 		android:title="@string/ordering"
-		android:icon="@drawable/ic_reorder_white_24dp">
+		app:showAsAction="ifRoom">
 		<menu>
 			<item
-				app:showAsAction="never|withText"
 				android:id="@+id/action_ordering_sequence"
+				android:icon="@drawable/ic_reorder_black_24dp"
 				android:title="@string/ordering_sequence"
-				android:icon="@drawable/ic_reorder_black_24dp"/>
+				app:showAsAction="never|withText"/>
 			<item
-				app:showAsAction="never|withText"
 				android:id="@+id/action_ordering_repeat_one"
+				android:icon="@drawable/ic_repeat_one_black_24dp"
 				android:title="@string/ordering_repeat_one"
-				android:icon="@drawable/ic_repeat_one_black_24dp"/>
+				app:showAsAction="never|withText"/>
 			<item
-				app:showAsAction="never|withText"
 				android:id="@+id/action_ordering_repeat_all"
+				android:icon="@drawable/ic_repeat_black_24dp"
 				android:title="@string/ordering_repeat_all"
-				android:icon="@drawable/ic_repeat_black_24dp"/>
+				app:showAsAction="never|withText"/>
 			<item
-				app:showAsAction="never|withText"
 				android:id="@+id/action_ordering_random"
+				android:icon="@drawable/ic_shuffle_black_24dp"
 				android:title="@string/ordering_random"
-				android:icon="@drawable/ic_shuffle_black_24dp"/>
+				app:showAsAction="never|withText"/>
 		</menu>
 	</item>
 	<item
-		app:showAsAction="ifRoom"
 		android:id="@+id/action_shuffle"
+		android:icon="@drawable/ic_swap_vert_white_24dp"
 		android:title="@string/shuffle"
-		android:icon="@drawable/ic_swap_vert_white_24dp"/>
+		app:showAsAction="ifRoom"/>
 	<item
-		app:showAsAction="ifRoom"
 		android:id="@+id/action_clear"
+		android:icon="@drawable/ic_delete_white_24dp"
 		android:title="@string/clear"
-		android:icon="@drawable/ic_delete_white_24dp"/>
+		app:showAsAction="ifRoom"/>
 </menu>

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<EditTextPreference
+		android:defaultValue=""
 		android:key="@string/pref_key_server_url"
-		android:title="@string/pref_server_url"
-		android:defaultValue=""/>
+		android:title="@string/pref_server_url"/>
 	<EditTextPreference
+		android:defaultValue=""
 		android:key="@string/pref_key_username"
-		android:title="@string/pref_username"
-		android:defaultValue=""/>
+		android:title="@string/pref_username"/>
 	<EditTextPreference
+		android:defaultValue=""
 		android:key="@string/pref_key_password"
-		android:title="@string/pref_password"
-		android:defaultValue=""/>
+		android:title="@string/pref_password"/>
 	<SwitchPreference
+		android:defaultValue="false"
 		android:key="@string/pref_key_offline"
-		android:title="@string/pref_offline"
-		android:defaultValue="false"/>
+		android:title="@string/pref_offline"/>
 </PreferenceScreen>

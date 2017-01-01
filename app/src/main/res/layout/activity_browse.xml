@@ -18,9 +18,9 @@
 
 	<ProgressBar
 		android:id="@+id/progress_bar"
-		android:layout_centerVertical="true"
 		android:layout_width="match_parent"
 		android:layout_height="48dp"
+		android:layout_centerVertical="true"
 		android:indeterminateTint="@color/lightBlue600"
 		tools:visibility="gone"/>
 
@@ -28,8 +28,8 @@
 		android:id="@+id/browse_content_holder"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@+id/toolbar"
-		android:layout_above="@+id/navigation"/>
+		android:layout_above="@+id/navigation"
+		android:layout_below="@+id/toolbar"/>
 
 	<android.support.design.widget.BottomNavigationView
 		android:id="@+id/navigation"

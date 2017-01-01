@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item
 		android:id="@+id/nav_collection"
-		android:title="@string/collection"
-		android:icon="@drawable/ic_library_music_black_24dp"/>
+		android:icon="@drawable/ic_library_music_black_24dp"
+		android:title="@string/collection"/>
 	<item
 		android:id="@+id/nav_queue"
-		android:title="@string/queue"
-		android:icon="@drawable/ic_playlist_play_black_24dp"/>
+		android:icon="@drawable/ic_playlist_play_black_24dp"
+		android:title="@string/queue"/>
 	<item
 		android:id="@+id/nav_now_playing"
-		android:title="@string/now_playing"
-		android:icon="@drawable/ic_play_circle_outline_black_24dp"/>
+		android:icon="@drawable/ic_play_circle_outline_black_24dp"
+		android:title="@string/now_playing"/>
 </menu>

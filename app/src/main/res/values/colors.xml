@@ -3,6 +3,8 @@
 	<color name="lightBlue600">#039be5</color>
 	<color name="lightBlue800">#0277bd</color>
 
+	<color name="grey400">#bdbdbd</color>
+
 	<color name="blueGrey400">#78909C</color>
 	<color name="blueGrey700">#455A64</color>
 	<color name="blueGrey900">#263238</color>
