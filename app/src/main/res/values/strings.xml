@@ -42,5 +42,6 @@
 	<string name="queuing">Fetching…</string>
 	<string name="queuing_error">Something went wrong</string>
 	<string name="album_artwork">Album Artwork</string>
+	<string name="playback_error">A media playback error occured</string>
 
 </resources>

@@ -16,6 +16,7 @@ public class PolarisMediaPlayer
 
 	private MediaPlayer player;
 	private MediaPlayer.OnCompletionListener onCompletionListener;
+	private MediaPlayer.OnErrorListener onErrorListener;
 	private State state;
 	private boolean pause;
 
@@ -37,14 +38,20 @@ public class PolarisMediaPlayer
 		}
 	}
 
-	public void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
+	void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
 		onCompletionListener = listener;
+	}
+
+	void setOnErrorListener(MediaPlayer.OnErrorListener listener) {
+		onErrorListener = listener;
 	}
 
 	@Override
 	public boolean onError(MediaPlayer mediaPlayer, int what, int extra) {
-		// TODO Handle
 		state = State.ERROR;
+		if (onErrorListener != null) {
+			return onErrorListener.onError(mediaPlayer, what, extra);
+		}
 		return false;
 	}
 

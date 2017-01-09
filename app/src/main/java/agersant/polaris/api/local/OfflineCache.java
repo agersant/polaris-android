@@ -7,6 +7,7 @@ import android.media.MediaDataSource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -128,16 +129,12 @@ public class OfflineCache {
 		}
 	}
 
-	MediaDataSource getAudio(String path) {
+	MediaDataSource getAudio(String path) throws IOException {
 		if (!hasAudio(path)) {
-			return null;
+			throw new FileNotFoundException();
 		}
-		try {
-			File source = getCacheFile(path, CacheDataType.AUDIO, false);
-			return new LocalMediaDataSource(source);
-		} catch (IOException e) {
-			return null;
-		}
+		File source = getCacheFile(path, CacheDataType.AUDIO, false);
+		return new LocalMediaDataSource(source);
 	}
 
 	public ArrayList<CollectionItem> browse(String path) {
