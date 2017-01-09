@@ -54,8 +54,11 @@ public class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 			return 1;
 		}
 
+		int contentLength = connection.getContentLength();
+		dataSource.setContentLength(contentLength);
+
 		try (InputStream inputStream = connection.getInputStream();
-		     FileOutputStream outputStream = new FileOutputStream(outFile);
+			 FileOutputStream outputStream = new FileOutputStream(outFile);
 		) {
 			byte[] chunk = new byte[BUFFER_SIZE];
 			while (true) {

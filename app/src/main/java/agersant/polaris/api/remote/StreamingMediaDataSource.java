@@ -15,11 +15,14 @@ class StreamingMediaDataSource extends MediaDataSource {
 	private RandomAccessFile streamFile;
 	private boolean completed;
 	private boolean errored;
+	private int size;
 
 	StreamingMediaDataSource(File streamFile) throws IOException {
 		super();
 		this.streamFile = new RandomAccessFile(streamFile, "r");
 		completed = false;
+		errored = false;
+		size = -1;
 	}
 
 	void markAsComplete() {
@@ -28,6 +31,10 @@ class StreamingMediaDataSource extends MediaDataSource {
 
 	void handleError() {
 		errored = true;
+	}
+
+	void setContentLength(int length) {
+		size = length;
 	}
 
 	@Override
@@ -66,7 +73,7 @@ class StreamingMediaDataSource extends MediaDataSource {
 
 	@Override
 	public long getSize() throws IOException {
-		return -1;
+		return size;
 	}
 
 	@Override

@@ -170,7 +170,7 @@ public class OfflineCache {
 			return CollectionItem.directory(path);
 		}
 		try (FileInputStream fileInputStream = new FileInputStream(itemFile);
-		     ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 		) {
 			return (CollectionItem) objectInputStream.readObject();
 		}
