@@ -26,7 +26,7 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	private boolean reachedEOF;
 	private StreamingMediaDataSource dataSource;
 
-	DownloadTask(ServerAPI server, CollectionItem item, File file, StreamingMediaDataSource stream) {
+	DownloadTask(CollectionItem item, File file, StreamingMediaDataSource stream) {
 		this.item = item;
 		path = item.getPath();
 		outFile = file;

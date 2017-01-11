@@ -32,7 +32,7 @@ public class PolarisApplication extends Application {
 		LocalAPI.init();
 		API.init(this);
 
-		DownloadQueue.init(this, ServerAPI.getInstance());
+		DownloadQueue.init(this);
 		initMediaPlayerService();
 		instance = this;
 	}

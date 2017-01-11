@@ -15,19 +15,17 @@ import agersant.polaris.CollectionItem;
 public class DownloadQueue {
 
 	private static DownloadQueue instance;
-	private ServerAPI server;
 	private File tempFile;
 
 	private DownloadTask job;
 	private StreamingMediaDataSource mediaDataSource;
 
-	private DownloadQueue(Context context, ServerAPI server) {
-		this.server = server;
+	private DownloadQueue(Context context) {
 		this.tempFile = new File(context.getExternalCacheDir(), "stream.tmp");
 	}
 
-	public static void init(Context context, ServerAPI server) {
-		instance = new DownloadQueue(context, server);
+	public static void init(Context context) {
+		instance = new DownloadQueue(context);
 	}
 
 	public static DownloadQueue getInstance() {
@@ -65,7 +63,7 @@ public class DownloadQueue {
 		}
 
 		mediaDataSource = new StreamingMediaDataSource(tempFile);
-		job = new DownloadTask(server, item, tempFile, mediaDataSource);
+		job = new DownloadTask(item, tempFile, mediaDataSource);
 
 		job.execute();
 	}
