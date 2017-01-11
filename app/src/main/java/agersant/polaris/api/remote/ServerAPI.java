@@ -12,7 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
@@ -70,7 +73,7 @@ public class ServerAPI
 		return auth.getCookie();
 	}
 
-	public String getMediaURL(String path) {
+	private String getMediaURL(String path) {
 		String serverAddress = this.getURL();
 		return serverAddress + "/serve/" + path;
 	}
@@ -79,6 +82,12 @@ public class ServerAPI
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
 		DownloadQueue downloadQueue = DownloadQueue.getInstance();
 		return downloadQueue.getAudio(item);
+	}
+
+	// Can block!
+	public URLConnection serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+		String url = getMediaURL(path);
+		return auth.connect(url);
 	}
 
 	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

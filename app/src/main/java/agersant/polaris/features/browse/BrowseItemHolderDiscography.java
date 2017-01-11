@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.ui.FetchImageTask;
 
 /**
@@ -48,9 +47,7 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 		{
 			String artworkValue = item.getArtwork();
 			if (artworkValue != null) {
-				ServerAPI serverAPI = ServerAPI.getInstance();
-				String url = serverAPI.getMediaURL(artworkValue);
-				FetchImageTask.load(url, artwork);
+				FetchImageTask.load(artworkValue, artwork);
 			}
 		}
 	}

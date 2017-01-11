@@ -16,7 +16,6 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 import agersant.polaris.ui.FetchImageTask;
 
@@ -204,9 +203,7 @@ public class PlayerActivity extends PolarisActivity {
 
 		String artworkPath = item.getArtwork();
 		if (artworkPath != null) {
-			ServerAPI serverAPI = ServerAPI.getInstance();
-			String url = serverAPI.getMediaURL(artworkPath);
-			FetchImageTask.load(url, artwork);
+			FetchImageTask.load(artworkPath, artwork);
 		}
 	}
 

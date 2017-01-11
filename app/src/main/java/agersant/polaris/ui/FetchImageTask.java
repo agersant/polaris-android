@@ -20,27 +20,23 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final WeakReference<ImageView> imageViewReference;
 
-	private String url;
-	private String authCookie;
+	private String path;
 
-	private FetchImageTask(String url, ImageView imageView, String authCookie) {
-		this.url = url;
-		this.authCookie = authCookie;
+	private FetchImageTask(String path, ImageView imageView) {
+		this.path = path;
 		imageViewReference = new WeakReference<>(imageView);
 	}
 
-	public static void load(String url, ImageView imageView) {
-		if (FetchImageTask.cancelPotentialWork(url, imageView)) {
-			if (FetchImageTask.loadFromCache(url, imageView)) {
+	public static void load(String path, ImageView imageView) {
+		if (FetchImageTask.cancelPotentialWork(path, imageView)) {
+			if (FetchImageTask.loadFromCache(path, imageView)) {
 				return;
 			}
 
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
-			ServerAPI serverAPI = ServerAPI.getInstance();
-			String authCookie = serverAPI.getAuthCookie();
 
-			FetchImageTask task = new FetchImageTask(url, imageView, authCookie);
+			FetchImageTask task = new FetchImageTask(path, imageView);
 			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, null, task);
 			imageView.setImageDrawable(asyncDrawable);
 			task.execute();
@@ -58,10 +54,10 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		return null;
 	}
 
-	private static boolean cancelPotentialWork(String newURL, ImageView imageView) {
+	private static boolean cancelPotentialWork(String newPath, ImageView imageView) {
 		FetchImageTask task = getTask(imageView);
 		if (task != null) {
-			if (task.url.equals(newURL)) {
+			if (task.path.equals(newPath)) {
 				return false;
 			} else {
 				task.cancel(true);
@@ -70,9 +66,9 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		return true;
 	}
 
-	private static boolean loadFromCache(String url, ImageView imageView) {
+	private static boolean loadFromCache(String path, ImageView imageView) {
 		ImageCache cache = ImageCache.getInstance();
-		Bitmap cacheEntry = cache.get(url);
+		Bitmap cacheEntry = cache.get(path);
 		if (cacheEntry != null) {
 			imageView.setImageBitmap(cacheEntry);
 			return true;
@@ -84,8 +80,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 	protected Bitmap doInBackground(Void... params) {
 		Bitmap bitmap = null;
 		try {
-			URLConnection connection = new java.net.URL(url).openConnection();
-			connection.setRequestProperty("Cookie", authCookie); // TODO not guaranteed
+			URLConnection connection = ServerAPI.getInstance().serve(path);
 			InputStream stream = connection.getInputStream();
 			bitmap = BitmapFactory.decodeStream(stream);
 		} catch (Exception e) {
@@ -101,7 +96,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		}
 		if (bitmap != null) {
 			ImageCache cache = ImageCache.getInstance();
-			cache.put(url, bitmap);
+			cache.put(path, bitmap);
 
 			ImageView imageView = imageViewReference.get();
 			FetchImageTask task = getTask(imageView);

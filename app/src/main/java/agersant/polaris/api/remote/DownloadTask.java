@@ -7,8 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URLConnection;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.api.local.OfflineCache;
@@ -17,21 +16,19 @@ import agersant.polaris.api.local.OfflineCache;
  * Created by agersant on 12/26/2016.
  */
 
-public class DownloadTask extends AsyncTask<Object, Integer, Integer> {
+class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 
 	private static final int BUFFER_SIZE = 1024 * 64; // 64 kB
 
 	private CollectionItem item;
-	private String targetURL;
-	private String authCookie;
+	private String path;
 	private File outFile;
 	private boolean reachedEOF;
 	private StreamingMediaDataSource dataSource;
 
 	DownloadTask(ServerAPI server, CollectionItem item, File file, StreamingMediaDataSource stream) {
 		this.item = item;
-		targetURL = server.getMediaURL(item.getPath());
-		authCookie = server.getAuthCookie(); // TODO not guaranteed
+		path = item.getPath();
 		outFile = file;
 		reachedEOF = false;
 		dataSource = stream;
@@ -44,12 +41,10 @@ public class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	@Override
 	protected Integer doInBackground(Object... params) {
 
-		HttpURLConnection connection;
+		URLConnection connection;
 		try {
-			URL url = new URL(targetURL);
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty("Cookie", authCookie);
-		} catch (IOException e) {
+			connection = ServerAPI.getInstance().serve(path);
+		} catch (Exception e) {
 			System.out.println("Error establishing stream connection: " + e);
 			return 1;
 		}

@@ -7,12 +7,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +30,18 @@ class Auth {
 
 	Auth(ServerAPI serverAPI) {
 		this.serverAPI = serverAPI;
+		this.cookie = null;
+	}
+
+	private static Response<String> parseAuthResponse(NetworkResponse networkResponse) {
+		String setCookie = networkResponse.headers.get("Set-Cookie");
+		Matcher matcher = setCookiePattern.matcher(setCookie);
+		if (!matcher.find()) {
+			return Response.error(new VolleyError("No session cookie in response"));
+		}
+		String sessionID = matcher.group(1);
+		assert sessionID != null;
+		return Response.success(sessionID, HttpHeaderParser.parseCacheHeaders(networkResponse));
 	}
 
 	void doJsonArrayRequest(String requestURL, Response.Listener<JSONArray> success, Response.ErrorListener failure) {
@@ -41,7 +59,7 @@ class Auth {
 	private void doRequest(final Request userRequest) {
 		final Auth that = this;
 		if (cookie == null) {
-			doAuthRequest(new Response.Listener<String>() {
+			doAsyncAuthRequest(new Response.Listener<String>() {
 				@Override
 				public void onResponse(String response) {
 					that.doUserRequest(userRequest);
@@ -57,11 +75,42 @@ class Auth {
 		this.serverAPI.getRequestQueue().addRequest(userRequest);
 	}
 
-	private void doAuthRequest(final Response.Listener<String> success, final Response.ErrorListener failure) {
+	URLConnection connect(String url) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+		if (cookie == null) {
+			cookie = doSyncAuthRequest();
+		}
+		URLConnection connection = new java.net.URL(url).openConnection();
+		connection.setRequestProperty("Cookie", this.cookie);
+		return connection;
+	}
+
+	private String getAuthRequestURL() {
+		String serverAddress = this.serverAPI.getURL();
+		return serverAddress + "/auth";
+	}
+
+	private String doSyncAuthRequest() throws InterruptedException, ExecutionException, TimeoutException {
+		String requestURL = getAuthRequestURL();
+		RequestFuture<String> future = RequestFuture.newFuture();
+		StringRequest request = new StringRequest(Request.Method.POST, requestURL, future, future) {
+			@Override
+			protected Map<String, String> getParams() {
+				return getAuthParams();
+			}
+
+			@Override
+			protected Response<String> parseNetworkResponse(NetworkResponse networkResponse) {
+				return Auth.parseAuthResponse(networkResponse);
+			}
+		};
+		this.serverAPI.getRequestQueue().addRequest(request);
+		return future.get(10, TimeUnit.SECONDS);
+	}
+
+	private void doAsyncAuthRequest(final Response.Listener<String> success, final Response.ErrorListener failure) {
 
 		final Auth that = this;
-		String serverAddress = this.serverAPI.getURL();
-		String requestURL = serverAddress + "/auth";
+		String requestURL = getAuthRequestURL();
 
 		StringRequest request = new StringRequest(Request.Method.POST, requestURL, new Response.Listener<String>() {
 			@Override
@@ -72,26 +121,23 @@ class Auth {
 		}, failure) {
 			@Override
 			protected Map<String, String> getParams() {
-				Map<String, String> params = new HashMap<>();
-				params.put("username", that.serverAPI.getUsername());
-				params.put("password", that.serverAPI.getPassword());
-				return params;
+				return getAuthParams();
 			}
 
 			@Override
 			protected Response<String> parseNetworkResponse(NetworkResponse networkResponse) {
-				String setCookie = networkResponse.headers.get("Set-Cookie");
-				Matcher matcher = setCookiePattern.matcher(setCookie);
-				if (!matcher.find()) {
-					return Response.error(new VolleyError("No session cookie in response"));
-				}
-				String sessionID = matcher.group(1);
-				assert sessionID != null;
-				return Response.success(sessionID, HttpHeaderParser.parseCacheHeaders(networkResponse));
+				return Auth.parseAuthResponse(networkResponse);
 			}
 		};
 
 		this.serverAPI.getRequestQueue().addRequest(request);
+	}
+
+	private Map<String, String> getAuthParams() {
+		Map<String, String> params = new HashMap<>();
+		params.put("username", serverAPI.getUsername());
+		params.put("password", serverAPI.getPassword());
+		return params;
 	}
 
 	String getCookie() {
