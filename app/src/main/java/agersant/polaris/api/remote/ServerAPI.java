@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeoutException;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
+import agersant.polaris.ui.FetchImageTask;
 
 public class ServerAPI
 		implements IPolarisAPI {
@@ -78,6 +80,11 @@ public class ServerAPI
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
 		DownloadQueue downloadQueue = DownloadQueue.getInstance();
 		return downloadQueue.getAudio(item);
+	}
+
+	@Override
+	public void getImage(CollectionItem item, ImageView view) {
+		FetchImageTask.load(item, view);
 	}
 
 	// Can block!

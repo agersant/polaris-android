@@ -3,6 +3,7 @@ package agersant.polaris.api.local;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaDataSource;
 
 import java.io.File;
@@ -60,6 +61,7 @@ public class OfflineCache {
 	}
 
 	private void write(Bitmap image, OutputStream storage) throws IOException {
+		image.compress(Bitmap.CompressFormat.PNG, 100, storage);
 	}
 
 	public void put(CollectionItem item, FileInputStream audio, Bitmap image) {
@@ -129,12 +131,30 @@ public class OfflineCache {
 		}
 	}
 
+	boolean hasImage(String path) {
+		try {
+			File file = getCacheFile(path, CacheDataType.ARTWORK, false);
+			return file.exists();
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	MediaDataSource getAudio(String path) throws IOException {
 		if (!hasAudio(path)) {
 			throw new FileNotFoundException();
 		}
 		File source = getCacheFile(path, CacheDataType.AUDIO, false);
 		return new LocalMediaDataSource(source);
+	}
+
+	Bitmap getImage(String path) throws IOException {
+		if (!hasImage(path)) {
+			throw new FileNotFoundException();
+		}
+		File file = getCacheFile(path, CacheDataType.ARTWORK, false);
+		FileInputStream fileInputStream = new FileInputStream(file);
+		return BitmapFactory.decodeFileDescriptor(fileInputStream.getFD());
 	}
 
 	public ArrayList<CollectionItem> browse(String path) {

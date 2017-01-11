@@ -16,8 +16,8 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
-import agersant.polaris.ui.FetchImageTask;
 
 public class PlayerActivity extends PolarisActivity {
 
@@ -201,10 +201,7 @@ public class PlayerActivity extends PolarisActivity {
 			toolbar.setSubtitle(artist);
 		}
 
-		String artworkPath = item.getArtwork();
-		if (artworkPath != null) {
-			FetchImageTask.load(artworkPath, artwork);
-		}
+		API.getInstance().getImage(item, artwork);
 	}
 
 	public void togglePause(View view) {

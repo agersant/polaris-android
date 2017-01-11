@@ -2,8 +2,10 @@ package agersant.polaris.api;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
+import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.remote.ServerAPI;
 
@@ -47,7 +50,30 @@ public class API {
 	}
 
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
+		if (localAPI.hasAudio(item)) {
+			return localAPI.getAudio(item);
+		}
 		return getAPI().getAudio(item);
+	}
+
+	public void getImage(CollectionItem item, ImageView view) {
+		{
+			String artworkPath = item.getArtwork();
+			if (artworkPath == null) {
+				return;
+			}
+
+			ImageCache cache = ImageCache.getInstance();
+			Bitmap cacheEntry = cache.get(artworkPath);
+			if (cacheEntry != null) {
+				view.setImageBitmap(cacheEntry);
+				return;
+			}
+		}
+		if (localAPI.hasImage(item)) {
+			localAPI.getImage(item, view);
+		}
+		getAPI().getImage(item, view);
 	}
 
 	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

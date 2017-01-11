@@ -1,6 +1,8 @@
 package agersant.polaris.api.local;
 
+import android.graphics.Bitmap;
 import android.media.MediaDataSource;
+import android.widget.ImageView;
 
 import com.android.volley.Response;
 
@@ -30,11 +32,38 @@ public class LocalAPI implements IPolarisAPI {
 		return instance;
 	}
 
+	public boolean hasAudio(CollectionItem item) {
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		String path = item.getPath();
+		return offlineCache.hasAudio(path);
+	}
+
 	@Override
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
 		OfflineCache offlineCache = OfflineCache.getInstance();
 		String path = item.getPath();
 		return offlineCache.getAudio(path);
+	}
+
+	public boolean hasImage(CollectionItem item) {
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		String path = item.getPath();
+		return offlineCache.hasImage(path);
+	}
+
+	@Override
+	public void getImage(CollectionItem item, ImageView view) {
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		String path = item.getPath();
+		try {
+			Bitmap image = offlineCache.getImage(path);
+			view.setImageBitmap(image);
+
+			ImageCache imageCache = ImageCache.getInstance();
+			String artworkPath = item.getArtwork();
+			imageCache.put(artworkPath, image);
+		} catch (IOException e) {
+		}
 	}
 
 	public void browse(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {

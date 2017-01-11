@@ -12,31 +12,31 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URLConnection;
 
+import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.api.local.ImageCache;
+import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.ServerAPI;
 
 public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final WeakReference<ImageView> imageViewReference;
 
+	private CollectionItem item;
 	private String path;
 
-	private FetchImageTask(String path, ImageView imageView) {
-		this.path = path;
+	private FetchImageTask(CollectionItem item, ImageView imageView) {
+		this.item = item;
+		this.path = item.getArtwork();
 		imageViewReference = new WeakReference<>(imageView);
 	}
 
-	public static void load(String path, ImageView imageView) {
-		if (FetchImageTask.cancelPotentialWork(path, imageView)) {
-			if (FetchImageTask.loadFromCache(path, imageView)) {
-				return;
-			}
-
+	public static void load(CollectionItem item, ImageView imageView) {
+		if (FetchImageTask.cancelPotentialWork(item, imageView)) {
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
 
-			FetchImageTask task = new FetchImageTask(path, imageView);
+			FetchImageTask task = new FetchImageTask(item, imageView);
 			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, null, task);
 			imageView.setImageDrawable(asyncDrawable);
 			task.execute();
@@ -54,26 +54,16 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		return null;
 	}
 
-	private static boolean cancelPotentialWork(String newPath, ImageView imageView) {
+	private static boolean cancelPotentialWork(CollectionItem newItem, ImageView imageView) {
 		FetchImageTask task = getTask(imageView);
 		if (task != null) {
-			if (task.path.equals(newPath)) {
+			if (task.path.equals(newItem.getPath())) {
 				return false;
 			} else {
 				task.cancel(true);
 			}
 		}
 		return true;
-	}
-
-	private static boolean loadFromCache(String path, ImageView imageView) {
-		ImageCache cache = ImageCache.getInstance();
-		Bitmap cacheEntry = cache.get(path);
-		if (cacheEntry != null) {
-			imageView.setImageBitmap(cacheEntry);
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -97,6 +87,9 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		if (bitmap != null) {
 			ImageCache cache = ImageCache.getInstance();
 			cache.put(path, bitmap);
+
+			OfflineCache offlineCache = OfflineCache.getInstance();
+			offlineCache.put(item, null, bitmap);
 
 			ImageView imageView = imageViewReference.get();
 			FetchImageTask task = getTask(imageView);

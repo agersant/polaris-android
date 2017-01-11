@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.ui.FetchImageTask;
+import agersant.polaris.api.API;
 
 
 public class BrowseViewAlbum extends BrowseViewContent {
@@ -52,10 +52,8 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		adapter.setItems(items);
 
 		CollectionItem item = items.get(0);
-		String artworkPath = item.getArtwork();
-		if (artworkPath != null) {
-			FetchImageTask.load(artworkPath, artwork);
-		}
+
+		API.getInstance().getImage(item, artwork);
 
 		String titleString = item.getAlbum();
 		if (title != null) {
