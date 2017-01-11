@@ -69,10 +69,6 @@ public class ServerAPI
 		return this.requestQueue;
 	}
 
-	public String getAuthCookie() {
-		return auth.getCookie();
-	}
-
 	private String getMediaURL(String path) {
 		String serverAddress = this.getURL();
 		return serverAddress + "/serve/" + path;
