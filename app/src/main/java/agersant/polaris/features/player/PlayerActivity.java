@@ -40,8 +40,8 @@ public class PlayerActivity extends PolarisActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_player);
 		super.onCreate(savedInstanceState);
-		queue = PlaybackQueue.getInstance(this);
-		player = Player.getInstance(this);
+		queue = PlaybackQueue.getInstance();
+		player = Player.getInstance();
 		artwork = (ImageView) findViewById(R.id.artwork);
 		pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
 		skipNext = (ImageView) findViewById(R.id.skip_next);

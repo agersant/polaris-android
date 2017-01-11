@@ -1,9 +1,5 @@
 package agersant.polaris;
 
-import android.content.Context;
-
-import agersant.polaris.api.remote.ServerAPI;
-
 public class Player {
 
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
@@ -13,15 +9,13 @@ public class Player {
 	private static Player instance;
 
 	private CollectionItem currentItem;
-	private ServerAPI serverAPI;
 
-	private Player(Context context) {
-		serverAPI = ServerAPI.getInstance();
+	private Player() {
 	}
 
-	public static Player getInstance(Context context) {
+	public static Player getInstance() {
 		if (instance == null) {
-			instance = new Player(context);
+			instance = new Player();
 		}
 		return instance;
 	}

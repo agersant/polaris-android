@@ -62,20 +62,18 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 			queueDirectory();
 			setStatusToFetching();
 		} else {
-			Context context = view.getContext();
-			PlaybackQueue.getInstance(context).addItem(item);
+			PlaybackQueue.getInstance().addItem(item);
 			setStatusToQueued();
 		}
 	}
 
 	private void queueDirectory() {
-		final Context context = itemView.getContext();
 		final CollectionItem fetchingItem = item;
 
 		Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
 			@Override
 			public void onResponse(ArrayList<CollectionItem> response) {
-				PlaybackQueue.getInstance(context).addItems(response);
+				PlaybackQueue.getInstance().addItems(response);
 				if (item == fetchingItem) {
 					setStatusToQueued();
 				}

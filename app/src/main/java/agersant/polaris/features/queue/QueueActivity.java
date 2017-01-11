@@ -34,7 +34,7 @@ public class QueueActivity extends PolarisActivity {
 		setContentView(R.layout.activity_queue);
 		super.onCreate(savedInstanceState);
 
-		adapter = new QueueAdapter(PlaybackQueue.getInstance(this));
+		adapter = new QueueAdapter(PlaybackQueue.getInstance());
 
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
 		recyclerView.setHasFixedSize(true);
@@ -114,7 +114,7 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	private void clear() {
-		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		PlaybackQueue queue = PlaybackQueue.getInstance();
 		int oldCount = adapter.getItemCount();
 		queue.clear();
 		adapter.notifyItemRangeRemoved(0, oldCount);
@@ -122,7 +122,7 @@ public class QueueActivity extends PolarisActivity {
 
 	private void shuffle() {
 		Random rng = new Random();
-		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		PlaybackQueue queue = PlaybackQueue.getInstance();
 		int count = adapter.getItemCount();
 		for (int i = 0; i <= count - 2; i++) {
 			int j = i + rng.nextInt(count - i);
@@ -132,7 +132,7 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	private void setOrdering(MenuItem item) {
-		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		PlaybackQueue queue = PlaybackQueue.getInstance();
 		switch (item.getItemId()) {
 			case R.id.action_ordering_sequence:
 				queue.setOrdering(PlaybackQueue.Ordering.SEQUENCE);
@@ -151,7 +151,7 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	private void updateOrderingIcon() {
-		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		PlaybackQueue queue = PlaybackQueue.getInstance();
 		int icon = getIconForOrdering(queue.getOrdering());
 		MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
 		orderingItem.setIcon(icon);

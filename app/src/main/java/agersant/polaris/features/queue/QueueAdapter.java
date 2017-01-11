@@ -1,6 +1,5 @@
 package agersant.polaris.features.queue;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +61,7 @@ class QueueAdapter
 		QueueItemHolder(QueueItemView view) {
 			super(view);
 			queueItemView = view;
-			player = Player.getInstance(view.getContext());
+			player = Player.getInstance();
 			titleText = (TextView) view.findViewById(R.id.title);
 			artistText = (TextView) view.findViewById(R.id.artist);
 			cacheIcon = (ImageView) view.findViewById(R.id.cache_icon);
@@ -85,8 +84,7 @@ class QueueAdapter
 
 		@Override
 		public void onClick(View view) {
-			Context context = view.getContext();
-			Player.getInstance(context).play(item);
+			Player.getInstance().play(item);
 		}
 	}
 }

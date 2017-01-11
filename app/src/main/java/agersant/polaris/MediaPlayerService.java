@@ -95,7 +95,7 @@ public class MediaPlayerService
 	@Override
 	public void onCompletion(MediaPlayer mp) {
 		broadcast(Player.COMPLETED_TRACK);
-		PlaybackQueue queue = PlaybackQueue.getInstance(this);
+		PlaybackQueue queue = PlaybackQueue.getInstance();
 		queue.skipNext();
 	}
 

@@ -1,6 +1,5 @@
 package agersant.polaris;
 
-import android.content.Context;
 import android.content.Intent;
 
 import java.util.ArrayList;
@@ -22,16 +21,16 @@ public class PlaybackQueue {
 	private Player player;
 	private Ordering ordering;
 
-	private PlaybackQueue(Context context) {
+	private PlaybackQueue() {
 		rng = new Random();
-		player = Player.getInstance(context);
+		player = Player.getInstance();
 		content = new ArrayList<>();
 		ordering = Ordering.SEQUENCE;
 	}
 
-	public static PlaybackQueue getInstance(Context context) {
+	public static PlaybackQueue getInstance() {
 		if (instance == null) {
-			instance = new PlaybackQueue(context);
+			instance = new PlaybackQueue();
 		}
 		return instance;
 	}
