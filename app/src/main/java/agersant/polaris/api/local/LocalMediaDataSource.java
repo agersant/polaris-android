@@ -44,7 +44,7 @@ public class LocalMediaDataSource extends MediaDataSource {
 
 	@Override
 	public long getSize() throws IOException {
-		return -1;
+		return file.length();
 	}
 
 
