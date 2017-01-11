@@ -26,6 +26,7 @@ import agersant.polaris.PolarisApplication;
 public class OfflineCache {
 
 	public static final String AUDIO_CACHED = "AUDIO_CACHED";
+	private static final String CACHE_DATA_DIR = "__polaris__";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
@@ -100,6 +101,7 @@ public class OfflineCache {
 
 	private File getCacheFile(String virtualPath, CacheDataType type, boolean create) throws IOException {
 		File file = getCacheDir(virtualPath);
+		file = new File(file, CACHE_DATA_DIR);
 		switch (type) {
 			case ITEM:
 				file = new File(file, "item");
@@ -172,6 +174,9 @@ public class OfflineCache {
 
 		for (File file : files) {
 			try {
+				if (file.getName().equals(CACHE_DATA_DIR)) {
+					continue;
+				}
 				CollectionItem item = readItem(file);
 				out.add(item);
 			} catch (IOException | ClassNotFoundException e) {
@@ -184,7 +189,7 @@ public class OfflineCache {
 	}
 
 	private CollectionItem readItem(File dir) throws IOException, ClassNotFoundException {
-		File itemFile = new File(dir, "item");
+		File itemFile = new File(dir, CACHE_DATA_DIR + "/item");
 		if (!itemFile.exists()) {
 			String path = root.toURI().relativize(dir.toURI()).getPath();
 			return CollectionItem.directory(path);
