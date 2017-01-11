@@ -16,6 +16,7 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
+import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.ServerAPI;
 
 /**
@@ -66,6 +67,7 @@ public class API {
 			ImageCache cache = ImageCache.getInstance();
 			Bitmap cacheEntry = cache.get(artworkPath);
 			if (cacheEntry != null) {
+				OfflineCache.getInstance().put(item, null, cacheEntry);
 				view.setImageBitmap(cacheEntry);
 				return;
 			}
