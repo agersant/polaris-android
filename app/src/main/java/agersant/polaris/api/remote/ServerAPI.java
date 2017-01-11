@@ -21,7 +21,6 @@ import java.util.concurrent.TimeoutException;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
-import agersant.polaris.ui.FetchImageTask;
 
 public class ServerAPI
 		implements IPolarisAPI {

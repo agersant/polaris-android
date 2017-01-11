@@ -1,4 +1,4 @@
-package agersant.polaris.ui;
+package agersant.polaris.api.remote;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -16,9 +16,8 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.OfflineCache;
-import agersant.polaris.api.remote.ServerAPI;
 
-public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
+class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final WeakReference<ImageView> imageViewReference;
 
@@ -31,7 +30,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		imageViewReference = new WeakReference<>(imageView);
 	}
 
-	public static void load(CollectionItem item, ImageView imageView) {
+	static void load(CollectionItem item, ImageView imageView) {
 		if (FetchImageTask.cancelPotentialWork(item, imageView)) {
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
