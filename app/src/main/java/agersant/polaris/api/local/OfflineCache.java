@@ -161,12 +161,7 @@ public class OfflineCache {
 
 	public ArrayList<CollectionItem> browse(String path) {
 		ArrayList<CollectionItem> out = new ArrayList<>();
-
 		File dir = getCacheDir(path);
-		if (!dir.exists()) {
-			return out;
-		}
-
 		File[] files = dir.listFiles();
 		if (files == null) {
 			return out;
@@ -185,6 +180,38 @@ public class OfflineCache {
 			}
 		}
 
+		return out;
+	}
+
+	public ArrayList<CollectionItem> flatten(String path) {
+		File dir = getCacheDir(path);
+		return flattenDir(dir);
+	}
+
+	private ArrayList<CollectionItem> flattenDir(File source) {
+		assert (source.isDirectory());
+		ArrayList<CollectionItem> out = new ArrayList<>();
+		File[] files = source.listFiles();
+		if (files == null) {
+			return out;
+		}
+
+		for (File file : files) {
+			try {
+				if (file.getName().equals(CACHE_DATA_DIR)) {
+					continue;
+				}
+				CollectionItem item = readItem(file);
+				if (item.isDirectory()) {
+					out.addAll(flattenDir(file));
+				} else {
+					out.add(item);
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.out.println("Error while reading offline cache: " + e);
+				return null;
+			}
+		}
 		return out;
 	}
 

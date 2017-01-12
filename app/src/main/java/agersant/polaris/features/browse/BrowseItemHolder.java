@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
-import agersant.polaris.api.remote.ServerAPI;
+import agersant.polaris.api.API;
 
 /**
  * Created by agersant on 12/11/2016.
@@ -89,8 +89,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 			}
 		};
 
-		ServerAPI server = ServerAPI.getInstance();
-		server.flatten(item.getPath(), success, failure);
+		API.getInstance().flatten(item.getPath(), success, failure);
 	}
 
 	private void setStatusToQueueable() {

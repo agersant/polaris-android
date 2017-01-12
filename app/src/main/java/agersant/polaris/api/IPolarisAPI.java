@@ -22,4 +22,6 @@ public interface IPolarisAPI {
 
 	void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure);
 
+	void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure);
+
 }

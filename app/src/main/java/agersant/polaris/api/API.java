@@ -82,6 +82,10 @@ public class API {
 		getAPI().browse(path, success, failure);
 	}
 
+	public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+		getAPI().flatten(path, success, failure);
+	}
+
 	private IPolarisAPI getAPI() {
 		if (isOffline()) {
 			return localAPI;

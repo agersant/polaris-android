@@ -75,4 +75,14 @@ public class LocalAPI implements IPolarisAPI {
 			success.onResponse(items);
 		}
 	}
+
+	public void flatten(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		ArrayList<CollectionItem> items = offlineCache.flatten(path);
+		if (items == null) {
+			failure.onErrorResponse(null);
+		} else {
+			success.onResponse(items);
+		}
+	}
 }
