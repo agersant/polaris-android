@@ -51,6 +51,10 @@ public class MediaPlayerService
 		broadcast(Player.PLAYING_TRACK);
 	}
 
+	public boolean isUsing(MediaDataSource media) {
+		return this.media == media;
+	}
+
 	public void resume() {
 		player.resume();
 		broadcast(Player.RESUMED_TRACK);

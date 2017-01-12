@@ -15,13 +15,19 @@ import agersant.polaris.CollectionItem;
 public class DownloadQueue {
 
 	private static DownloadQueue instance;
-	private File tempFile;
 
-	private DownloadTask job;
-	private StreamingMediaDataSource mediaDataSource;
+	private DownloadQueueWorkItem flip;
+	private DownloadQueueWorkItem flop;
 
 	private DownloadQueue(Context context) {
-		this.tempFile = new File(context.getExternalCacheDir(), "stream.tmp");
+		{
+			File tempFile = new File(context.getExternalCacheDir(), "streamA.tmp");
+			flip = new DownloadQueueWorkItem(tempFile);
+		}
+		{
+			File tempFile = new File(context.getExternalCacheDir(), "streamB.tmp");
+			flop = new DownloadQueueWorkItem(tempFile);
+		}
 	}
 
 	public static void init(Context context) {
@@ -33,39 +39,21 @@ public class DownloadQueue {
 	}
 
 	MediaDataSource getAudio(CollectionItem item) throws IOException {
-		beginDownload(item);
-		return mediaDataSource;
-	}
-
-	private void beginDownload(CollectionItem item) throws IOException {
-		String path = item.getPath();
-		if (job != null) {
-			String currentJobPath = job.getPath();
-			if (currentJobPath.equals(path)) {
-				return;
-			}
-			job.cancel(false);
+		if (flip.isHandling(item)) {
+			return flip.getMediaDataSource();
 		}
-
-		if (mediaDataSource != null) {
-			mediaDataSource.close();
-			mediaDataSource = null;
+		if (flop.isHandling(item)) {
+			return flop.getMediaDataSource();
 		}
-
-		if (tempFile.exists()) {
-			if (!tempFile.delete()) {
-				System.out.println("Could not delete streaming file");
-			}
+		if (flip.isIdle()) {
+			flip.beginDownload(item);
+			return flip.getMediaDataSource();
 		}
-
-		if (!tempFile.createNewFile()) {
-			System.out.println("Could not create streaming file");
+		if (flop.isIdle()) {
+			flop.beginDownload(item);
+			return flop.getMediaDataSource();
 		}
-
-		mediaDataSource = new StreamingMediaDataSource(tempFile);
-		job = new DownloadTask(item, tempFile, mediaDataSource);
-
-		job.execute();
+		return null;
 	}
 
 }
