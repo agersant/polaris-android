@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.DownloadQueue;
+
 public class PlaybackQueue {
 
 	public static final String CHANGED_ORDERING = "CHANGED_ORDERING";
@@ -166,6 +169,39 @@ public class PlaybackQueue {
 		Intent intent = new Intent();
 		intent.setAction(event);
 		application.sendBroadcast(intent);
+	}
+
+	public CollectionItem getNextItemToDownload() {
+		CollectionItem currentItem = player.getCurrentItem();
+		final int currentIndex = content.indexOf(currentItem);
+
+		int bestScore = 0;
+		CollectionItem bestItem = null;
+
+		OfflineCache offlineCache = OfflineCache.getInstance();
+		DownloadQueue downloadQueue = DownloadQueue.getInstance();
+		int playlistSize = content.size();
+
+		for (int i = 0; i < playlistSize; i++) {
+			int score = (playlistSize + i - currentIndex) % playlistSize;
+			if (i == currentIndex) {
+				continue;
+			}
+			if (bestItem != null && score > bestScore) {
+				continue;
+			}
+			CollectionItem item = content.get(i);
+			if (offlineCache.hasAudio(item.getPath())) {
+				continue;
+			}
+			if (downloadQueue.isWorkingOn(item)) {
+				continue;
+			}
+			bestScore = score;
+			bestItem = item;
+		}
+
+		return bestItem;
 	}
 
 	public enum Ordering {

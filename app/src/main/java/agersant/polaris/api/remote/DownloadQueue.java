@@ -5,8 +5,11 @@ import android.media.MediaDataSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -16,6 +19,7 @@ public class DownloadQueue {
 
 	private static DownloadQueue instance;
 
+	private Timer timer;
 	private DownloadQueueWorkItem flip;
 	private DownloadQueueWorkItem flop;
 
@@ -28,6 +32,14 @@ public class DownloadQueue {
 			File tempFile = new File(context.getExternalCacheDir(), "streamB.tmp");
 			flop = new DownloadQueueWorkItem(tempFile);
 		}
+
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				downloadNext();
+			}
+		}, 0, 500);
 	}
 
 	public static void init(Context context) {
@@ -54,6 +66,33 @@ public class DownloadQueue {
 			return flop.getMediaDataSource();
 		}
 		return null;
+	}
+
+	public boolean isWorkingOn(CollectionItem item) {
+		return flip.isHandling(item) || flop.isHandling(item);
+	}
+
+	private void downloadNext() {
+		DownloadQueueWorkItem worker = null;
+		if (flip.isIdle()) {
+			worker = flip;
+		} else if (flop.isIdle()) {
+			worker = flop;
+		}
+
+		if (worker == null) {
+			return;
+		}
+
+		PlaybackQueue queue = PlaybackQueue.getInstance();
+		CollectionItem nextItem = queue.getNextItemToDownload();
+		if (nextItem != null) {
+			try {
+				worker.beginDownload(nextItem);
+			} catch (IOException e) {
+				System.out.println("Error while downloading item ahead of time: " + e);
+			}
+		}
 	}
 
 }
