@@ -201,7 +201,7 @@ public class OfflineCache {
 		}
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
-			if (files.length == 1) {
+			if (file != null && files.length == 1) {
 				if (files[0].getName().equals(IMAGE_FILENAME)) {
 					return true;
 				}
