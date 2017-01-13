@@ -87,7 +87,7 @@ public class OfflineCache {
 
 		if (image != null) {
 			String artworkPath = item.getArtwork();
-			assert(artworkPath != null);
+			assert (artworkPath != null);
 			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(artworkPath, CacheDataType.ARTWORK, true))) {
 				write(image, itemOut);
 			} catch (IOException e) {
