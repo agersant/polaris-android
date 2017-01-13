@@ -27,6 +27,7 @@ public class PolarisApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		instance = this;
 		OfflineCache.init(this);
 		ServerAPI.init(this);
 		LocalAPI.init();
@@ -34,7 +35,6 @@ public class PolarisApplication extends Application {
 
 		DownloadQueue.init(this);
 		initMediaPlayerService();
-		instance = this;
 	}
 
 	private void initMediaPlayerService() {
