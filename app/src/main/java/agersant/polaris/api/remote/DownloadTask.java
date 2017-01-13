@@ -74,11 +74,11 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 			return 1;
 		}
 
+		saveForOfflineUse();
 		return 0;
 	}
 
-	@Override
-	protected void onPostExecute(Integer result) {
+	private void saveForOfflineUse() {
 		if (reachedEOF) {
 			OfflineCache cache = OfflineCache.getInstance();
 			try (FileInputStream audioStreamFile = new FileInputStream(outFile)) {
@@ -86,6 +86,12 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 			} catch (IOException e) {
 				System.out.println("Error while storing item to offline cache: " + e);
 			}
+		}
+	}
+
+	@Override
+	protected void onPostExecute(Integer result) {
+		if (reachedEOF) {
 			dataSource.markAsComplete();
 		} else {
 			dataSource.handleError();
