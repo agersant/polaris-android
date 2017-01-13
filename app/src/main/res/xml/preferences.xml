@@ -16,4 +16,11 @@
 		android:defaultValue="false"
 		android:key="@string/pref_key_offline"
 		android:title="@string/pref_offline"/>
+	<ListPreference
+		android:defaultValue="5"
+		android:key="@string/pref_key_num_songs_preload"
+		android:title="@string/pref_num_songs_preload"
+		android:entries="@array/pref_num_songs_preload_entries"
+		android:entryValues="@array/pref_num_songs_preload_entry_values"
+		/>
 </PreferenceScreen>

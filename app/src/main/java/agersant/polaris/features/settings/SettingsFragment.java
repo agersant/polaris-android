@@ -2,15 +2,19 @@ package agersant.polaris.features.settings;
 
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import agersant.polaris.R;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+	private Resources resources;
 
 	public SettingsFragment() {
 	}
@@ -22,6 +26,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		resources = getResources();
 		addPreferencesFromResource(R.xml.preferences);
 		getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
@@ -45,7 +50,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 			return;
 		}
 		Map<String, ?> all = getSharedPreferences().getAll();
-		if (all.get(key) instanceof String) {
+		if (key.equals(resources.getString(R.string.pref_key_num_songs_preload))) {
+			String[] entryValues = resources.getStringArray(R.array.pref_num_songs_preload_entry_values);
+			String[] entries = resources.getStringArray(R.array.pref_num_songs_preload_entries);
+			String entryValue = getSharedPreferences().getString(key, "");
+			int selectedIndex = Arrays.asList(entryValues).indexOf(entryValue);
+			String display = "";
+			if (selectedIndex >= 0) {
+				display = entries[selectedIndex];
+			}
+			preference.setSummary(display);
+		} else if (all.get(key) instanceof String) {
 			preference.setSummary(getSharedPreferences().getString(key, ""));
 		}
 	}

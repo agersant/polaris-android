@@ -1,6 +1,9 @@
 package agersant.polaris;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -199,6 +202,16 @@ public class PlaybackQueue {
 			}
 			bestScore = score;
 			bestItem = item;
+		}
+
+		PolarisApplication application = PolarisApplication.getInstance();
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(application);
+		Resources resources = application.getResources();
+		String numSongsToPreloadKey = resources.getString(R.string.pref_key_num_songs_preload);
+		String numSongsToPreloadString = preferences.getString(numSongsToPreloadKey, "0");
+		int numSongsToPreload = Integer.parseInt(numSongsToPreloadString);
+		if (numSongsToPreload >= 0 && bestScore > numSongsToPreload) {
+			bestItem = null;
 		}
 
 		return bestItem;
