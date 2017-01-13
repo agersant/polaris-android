@@ -23,4 +23,11 @@
 		android:entries="@array/pref_num_songs_preload_entries"
 		android:entryValues="@array/pref_num_songs_preload_entry_values"
 		/>
+	<ListPreference
+		android:defaultValue="500"
+		android:key="@string/pref_key_offline_cache_size"
+		android:title="@string/pref_offline_cache_size"
+		android:entries="@array/pref_offline_cache_size_entries"
+		android:entryValues="@array/pref_offline_cache_size_entry_values"
+		/>
 </PreferenceScreen>

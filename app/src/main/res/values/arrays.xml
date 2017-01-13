@@ -16,6 +16,23 @@
         <item>20</item>
         <item>-1</item>
     </string-array>
+    <string-array name="pref_offline_cache_size_entries">
+        <item>100MB</item>
+        <item>500MB</item>
+        <item>2GB</item>
+        <item>5GB</item>
+        <item>10GB</item>
+        <item>@string/pref_offline_cache_size_unlimited</item>
+    </string-array>
+    <string-array name="pref_offline_cache_size_entry_values">
+        <item>100</item>
+        <item>500</item>
+        <item>2000</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>-1</item>
+    </string-array>
     <string name="pref_num_songs_preload_unlimited">Unlimited</string>
     <string name="pref_num_songs_preload_none">None</string>
+    <string name="pref_offline_cache_size_unlimited">Unlimited</string>
 </resources>

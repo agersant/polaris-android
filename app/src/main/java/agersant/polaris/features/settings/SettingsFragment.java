@@ -60,6 +60,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 				display = entries[selectedIndex];
 			}
 			preference.setSummary(display);
+		} else if (key.equals(resources.getString(R.string.pref_key_offline_cache_size))) {
+			String[] entryValues = resources.getStringArray(R.array.pref_offline_cache_size_entry_values);
+			String[] entries = resources.getStringArray(R.array.pref_offline_cache_size_entries);
+			String entryValue = getSharedPreferences().getString(key, "");
+			int selectedIndex = Arrays.asList(entryValues).indexOf(entryValue);
+			String display = "";
+			if (selectedIndex >= 0) {
+				display = entries[selectedIndex];
+			}
+			preference.setSummary(display);
 		} else if (all.get(key) instanceof String) {
 			preference.setSummary(getSharedPreferences().getString(key, ""));
 		}

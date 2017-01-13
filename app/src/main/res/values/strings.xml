@@ -45,5 +45,7 @@
 	<string name="playback_error">A media playback error occured</string>
 	<string name="pref_key_num_songs_preload">num_songs_preload</string>
 	<string name="pref_num_songs_preload">Songs to preload</string>
+	<string name="pref_key_offline_cache_size">offline_cache_size</string>
+	<string name="pref_offline_cache_size">Offline cache size</string>
 
 </resources>
