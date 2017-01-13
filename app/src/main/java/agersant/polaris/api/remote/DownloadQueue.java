@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
+import agersant.polaris.api.API;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -73,6 +74,11 @@ public class DownloadQueue {
 	}
 
 	private void downloadNext() {
+
+		if (API.getInstance().isOffline()) {
+			return;
+		}
+
 		DownloadQueueWorkItem worker = null;
 		if (flip.isIdle()) {
 			worker = flip;
