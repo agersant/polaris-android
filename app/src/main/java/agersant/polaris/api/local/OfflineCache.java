@@ -26,7 +26,9 @@ import agersant.polaris.PolarisApplication;
 public class OfflineCache {
 
 	public static final String AUDIO_CACHED = "AUDIO_CACHED";
-	private static final String CACHE_DATA_DIR = "__polaris__";
+	private static final String ITEM_FILENAME = "__polaris__item";
+	private static final String AUDIO_FILENAME = "__polaris__audio";
+	private static final String IMAGE_FILENAME = "__polaris__image";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
@@ -84,7 +86,9 @@ public class OfflineCache {
 		}
 
 		if (image != null) {
-			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ARTWORK, true))) {
+			String artworkPath = item.getArtwork();
+			assert(artworkPath != null);
+			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(artworkPath, CacheDataType.ARTWORK, true))) {
 				write(image, itemOut);
 			} catch (IOException e) {
 				System.out.println("Error while caching artwork for local use: " + e);
@@ -101,17 +105,16 @@ public class OfflineCache {
 
 	private File getCacheFile(String virtualPath, CacheDataType type, boolean create) throws IOException {
 		File file = getCacheDir(virtualPath);
-		file = new File(file, CACHE_DATA_DIR);
 		switch (type) {
 			case ITEM:
-				file = new File(file, "item");
+				file = new File(file, ITEM_FILENAME);
 				break;
 			case AUDIO:
-				file = new File(file, "audio");
+				file = new File(file, AUDIO_FILENAME);
 				break;
 			case ARTWORK:
 			default:
-				file = new File(file, "artwork");
+				file = new File(file, IMAGE_FILENAME);
 				break;
 		}
 		if (create) {
@@ -169,7 +172,7 @@ public class OfflineCache {
 
 		for (File file : files) {
 			try {
-				if (file.getName().equals(CACHE_DATA_DIR)) {
+				if (isInternalFile(file)) {
 					continue;
 				}
 				CollectionItem item = readItem(file);
@@ -183,9 +186,28 @@ public class OfflineCache {
 		return out;
 	}
 
-	public ArrayList<CollectionItem> flatten(String path) {
+	ArrayList<CollectionItem> flatten(String path) {
 		File dir = getCacheDir(path);
 		return flattenDir(dir);
+	}
+
+	private boolean isInternalFile(File file) {
+		String name = file.getName();
+		boolean isItem = name.equals(ITEM_FILENAME);
+		boolean isAudio = name.equals(AUDIO_FILENAME);
+		boolean isImage = name.equals(IMAGE_FILENAME);
+		if (isItem || isAudio || isImage) {
+			return true;
+		}
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			if (files.length == 1) {
+				if (files[0].getName().equals(IMAGE_FILENAME)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private ArrayList<CollectionItem> flattenDir(File source) {
@@ -198,7 +220,7 @@ public class OfflineCache {
 
 		for (File file : files) {
 			try {
-				if (file.getName().equals(CACHE_DATA_DIR)) {
+				if (isInternalFile(file)) {
 					continue;
 				}
 				CollectionItem item = readItem(file);
@@ -216,7 +238,7 @@ public class OfflineCache {
 	}
 
 	private CollectionItem readItem(File dir) throws IOException, ClassNotFoundException {
-		File itemFile = new File(dir, CACHE_DATA_DIR + "/item");
+		File itemFile = new File(dir, ITEM_FILENAME);
 		if (!itemFile.exists()) {
 			String path = root.toURI().relativize(dir.toURI()).getPath();
 			return CollectionItem.directory(path);

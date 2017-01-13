@@ -54,13 +54,16 @@ public class LocalAPI implements IPolarisAPI {
 	@Override
 	public void getImage(CollectionItem item, ImageView view) {
 		OfflineCache offlineCache = OfflineCache.getInstance();
-		String path = item.getPath();
+		String artworkPath = item.getArtwork();
+		if (artworkPath == null) {
+			return;
+		}
+
 		try {
-			Bitmap image = offlineCache.getImage(path);
+			Bitmap image = offlineCache.getImage(artworkPath);
 			view.setImageBitmap(image);
 
 			ImageCache imageCache = ImageCache.getInstance();
-			String artworkPath = item.getArtwork();
 			imageCache.put(artworkPath, image);
 		} catch (IOException e) {
 		}
