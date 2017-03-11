@@ -67,7 +67,8 @@ public class OfflineCache {
 		image.compress(Bitmap.CompressFormat.PNG, 100, storage);
 	}
 
-	public void put(CollectionItem item, FileInputStream audio, Bitmap image) {
+
+	public synchronized void put(CollectionItem item, FileInputStream audio, Bitmap image) {
 		String path = item.getPath();
 
 		try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM, true))) {
@@ -201,7 +202,7 @@ public class OfflineCache {
 		}
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
-			if (file != null && files.length == 1) {
+			if (files != null && files.length == 1) {
 				if (files[0].getName().equals(IMAGE_FILENAME)) {
 					return true;
 				}
@@ -225,7 +226,11 @@ public class OfflineCache {
 				}
 				CollectionItem item = readItem(file);
 				if (item.isDirectory()) {
-					out.addAll(flattenDir(file));
+					ArrayList<CollectionItem> content = flattenDir(file);
+					if (content != null)
+					{
+						out.addAll(content);
+					}
 				} else {
 					out.add(item);
 				}
