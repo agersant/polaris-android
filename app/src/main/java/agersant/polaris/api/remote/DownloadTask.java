@@ -82,7 +82,7 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 		if (reachedEOF) {
 			OfflineCache cache = OfflineCache.getInstance();
 			try (FileInputStream audioStreamFile = new FileInputStream(outFile)) {
-				cache.put(item, audioStreamFile, null);
+				cache.putAudio(item, audioStreamFile);
 			} catch (IOException e) {
 				System.out.println("Error while storing item to offline cache: " + e);
 			}

@@ -67,7 +67,7 @@ public class API {
 			ImageCache cache = ImageCache.getInstance();
 			Bitmap cacheEntry = cache.get(artworkPath);
 			if (cacheEntry != null) {
-				OfflineCache.getInstance().put(item, null, cacheEntry);
+				OfflineCache.getInstance().putImage(item, cacheEntry);
 				view.setImageBitmap(cacheEntry);
 				return;
 			}

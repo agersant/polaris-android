@@ -68,7 +68,7 @@ public class OfflineCache {
 	}
 
 
-	public synchronized void put(CollectionItem item, FileInputStream audio, Bitmap image) {
+	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 		String path = item.getPath();
 
 		try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM, true))) {
@@ -86,6 +86,18 @@ public class OfflineCache {
 			}
 		}
 
+		System.out.println("Saved audio to offline cache: " + path);
+	}
+
+	public synchronized void putImage(CollectionItem item, Bitmap image) {
+		String path = item.getPath();
+
+		try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM, true))) {
+			write(item, itemOut);
+		} catch (IOException e) {
+			System.out.println("Error while caching item for local use: " + e);
+		}
+
 		if (image != null) {
 			String artworkPath = item.getArtwork();
 			assert (artworkPath != null);
@@ -96,7 +108,7 @@ public class OfflineCache {
 			}
 		}
 
-		System.out.println("Saved to offline cache: " + path);
+		System.out.println("Saved image to offline cache: " + path);
 	}
 
 	private File getCacheDir(String virtualPath) {

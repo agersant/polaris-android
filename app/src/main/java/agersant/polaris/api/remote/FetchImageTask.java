@@ -88,7 +88,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			cache.put(path, bitmap);
 
 			OfflineCache offlineCache = OfflineCache.getInstance();
-			offlineCache.put(item, null, bitmap);
+			offlineCache.putImage(item, bitmap);
 
 			ImageView imageView = imageViewReference.get();
 			FetchImageTask task = getTask(imageView);
