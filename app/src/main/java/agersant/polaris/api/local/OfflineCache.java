@@ -197,7 +197,7 @@ public class OfflineCache {
 				out.add(item);
 			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("Error while reading offline cache: " + e);
-				return null;
+				continue;
 			}
 		}
 
