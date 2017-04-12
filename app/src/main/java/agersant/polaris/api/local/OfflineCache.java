@@ -189,6 +189,11 @@ public class OfflineCache {
 					continue;
 				}
 				CollectionItem item = readItem(file);
+				if (item.isDirectory()) {
+					if (!containsAudio(file)) {
+						continue;
+					}
+				}
 				out.add(item);
 			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("Error while reading offline cache: " + e);
@@ -212,12 +217,17 @@ public class OfflineCache {
 		if (isItem || isAudio || isImage) {
 			return true;
 		}
-		if (file.isDirectory()) {
-			File[] files = file.listFiles();
-			if (files != null && files.length == 1) {
-				if (files[0].getName().equals(IMAGE_FILENAME)) {
-					return true;
-				}
+		return false;
+	}
+
+	private boolean containsAudio(File file) {
+		if (!file.isDirectory()) {
+			return file.getName().equals(AUDIO_FILENAME);
+		}
+		File[] files = file.listFiles();
+		for (File child : files) {
+			if (containsAudio(child)) {
+				return true;
 			}
 		}
 		return false;
