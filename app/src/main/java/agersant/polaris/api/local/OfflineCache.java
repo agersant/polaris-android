@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
@@ -29,6 +30,7 @@ public class OfflineCache {
 	private static final String ITEM_FILENAME = "__polaris__item";
 	private static final String AUDIO_FILENAME = "__polaris__audio";
 	private static final String IMAGE_FILENAME = "__polaris__image";
+	private static final String META_FILENAME = "__polaris__meta";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
@@ -67,6 +69,11 @@ public class OfflineCache {
 		image.compress(Bitmap.CompressFormat.PNG, 100, storage);
 	}
 
+	private void write(ItemCacheMetadata metadata, OutputStream storage) throws IOException {
+		ObjectOutputStream objOut = new ObjectOutputStream(storage);
+		objOut.writeObject(metadata);
+		objOut.close();
+	}
 
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 		String path = item.getPath();
@@ -84,6 +91,10 @@ public class OfflineCache {
 			} catch (IOException e) {
 				System.out.println("Error while caching audio for local use: " + e);
 			}
+		}
+
+		if (!hasMetadata(path)) {
+			saveMetadata(path, new ItemCacheMetadata());
 		}
 
 		System.out.println("Saved audio to offline cache: " + path);
@@ -126,8 +137,10 @@ public class OfflineCache {
 				file = new File(file, AUDIO_FILENAME);
 				break;
 			case ARTWORK:
-			default:
 				file = new File(file, IMAGE_FILENAME);
+			case META:
+			default:
+				file = new File(file, META_FILENAME);
 				break;
 		}
 		if (create) {
@@ -149,30 +162,67 @@ public class OfflineCache {
 		}
 	}
 
-	boolean hasImage(String path) {
+	boolean hasImage(String virtualPath) {
 		try {
-			File file = getCacheFile(path, CacheDataType.ARTWORK, false);
+			File file = getCacheFile(virtualPath, CacheDataType.ARTWORK, false);
 			return file.exists();
 		} catch (IOException e) {
 			return false;
 		}
 	}
 
-	MediaDataSource getAudio(String path) throws IOException {
-		if (!hasAudio(path)) {
+	MediaDataSource getAudio(String virtualPath) throws IOException {
+		if (!hasAudio(virtualPath)) {
 			throw new FileNotFoundException();
 		}
-		File source = getCacheFile(path, CacheDataType.AUDIO, false);
+		if (hasMetadata(virtualPath)) {
+			ItemCacheMetadata metadata = getMetadata(virtualPath);
+			metadata.lastUse = new Date();
+			saveMetadata(virtualPath, metadata);
+		}
+		File source = getCacheFile(virtualPath, CacheDataType.AUDIO, false);
 		return new LocalMediaDataSource(source);
 	}
 
-	Bitmap getImage(String path) throws IOException {
-		if (!hasImage(path)) {
+	Bitmap getImage(String virtualPath) throws IOException {
+		if (!hasImage(virtualPath)) {
 			throw new FileNotFoundException();
 		}
-		File file = getCacheFile(path, CacheDataType.ARTWORK, false);
+		File file = getCacheFile(virtualPath, CacheDataType.ARTWORK, false);
 		FileInputStream fileInputStream = new FileInputStream(file);
 		return BitmapFactory.decodeFileDescriptor(fileInputStream.getFD());
+	}
+
+	private void saveMetadata(String virtualPath, ItemCacheMetadata metadata) {
+		try (FileOutputStream metaOut = new FileOutputStream(getCacheFile(virtualPath, CacheDataType.META, true))) {
+			write(metadata, metaOut);
+		} catch (IOException e) {
+			System.out.println("Error while caching metadata for local use: " + e);
+		}
+	}
+
+	private boolean hasMetadata(String virtualPath) {
+		try {
+			File file = getCacheFile(virtualPath, CacheDataType.META, false);
+			return file.exists();
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	private ItemCacheMetadata getMetadata(String virtualPath) throws IOException {
+		if (!hasMetadata(virtualPath)) {
+			throw new FileNotFoundException();
+		}
+		File file = getCacheFile(virtualPath, CacheDataType.META, false);
+		try (FileInputStream fileInputStream = new FileInputStream(file);
+			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+		) {
+			ItemCacheMetadata metadata = (ItemCacheMetadata) objectInputStream.readObject();
+			return metadata;
+		} catch ( ClassNotFoundException e) {
+			throw new FileNotFoundException();
+		}
 	}
 
 	public ArrayList<CollectionItem> browse(String path) {
@@ -214,10 +264,8 @@ public class OfflineCache {
 		boolean isItem = name.equals(ITEM_FILENAME);
 		boolean isAudio = name.equals(AUDIO_FILENAME);
 		boolean isImage = name.equals(IMAGE_FILENAME);
-		if (isItem || isAudio || isImage) {
-			return true;
-		}
-		return false;
+		boolean isMeta = name.equals(META_FILENAME);
+		return isItem || isAudio || isImage || isMeta;
 	}
 
 	private boolean containsAudio(File file) {
@@ -288,6 +336,7 @@ public class OfflineCache {
 		ITEM,
 		AUDIO,
 		ARTWORK,
+		META,
 	}
 
 }
