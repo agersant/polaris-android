@@ -53,6 +53,15 @@ public class PlaybackQueue {
 		broadcast(QUEUED_ITEM);
 	}
 
+	public boolean isInQueue(CollectionItem item) {
+		for (CollectionItem queueItem : content) {
+			if (queueItem.getPath().equals(item.getPath())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void addItemInternal(CollectionItem item) {
 		CollectionItem newItem;
 		try {

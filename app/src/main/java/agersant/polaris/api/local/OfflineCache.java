@@ -2,9 +2,12 @@ package agersant.polaris.api.local;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaDataSource;
+import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,10 +18,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
+import agersant.polaris.R;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -29,14 +36,16 @@ public class OfflineCache {
 	public static final String AUDIO_CACHED = "AUDIO_CACHED";
 	private static final String ITEM_FILENAME = "__polaris__item";
 	private static final String AUDIO_FILENAME = "__polaris__audio";
-	private static final String IMAGE_FILENAME = "__polaris__image";
 	private static final String META_FILENAME = "__polaris__meta";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
+	private static final float CACHE_FILL_THRESHOLD = .9f;
 	private static OfflineCache instance;
+	private SharedPreferences preferences;
 	private File root;
 
 	private OfflineCache(Context context) {
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		root = new File(context.getExternalCacheDir(), "collection");
 		root = new File(root, "v" + VERSION);
 	}
@@ -75,7 +84,137 @@ public class OfflineCache {
 		objOut.close();
 	}
 
+	private class DeletionCandidate {
+		File path;
+		ItemCacheMetadata metadata;
+		DeletionCandidate(File path, ItemCacheMetadata metadata) {
+			this.path = path;
+			this.metadata = metadata;
+		}
+	}
+
+	private long getCacheSize(File file) {
+		long size = 0;
+		assert(file.isDirectory());
+		File[] files = file.listFiles();
+		for(File child : files) {
+			size += child.length();
+			if (child.isDirectory()) {
+				size += getCacheSize(child);
+			}
+		}
+		return size;
+	}
+
+	private long getCacheCapacity() {
+		PolarisApplication application = PolarisApplication.getInstance();
+		Resources resources = application.getResources();
+		String cacheSizeKey = resources.getString(R.string.pref_key_offline_cache_size);
+		String cacheSizeString = preferences.getString(cacheSizeKey, "0");
+		return Long.parseLong(cacheSizeString) * 1024 * 1024;
+	}
+
+
+	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
+		assert(path.isDirectory());
+		File[] files = path.listFiles();
+		for(File child : files) {
+			File audio = new File(child, AUDIO_FILENAME);
+			File meta = new File(child, META_FILENAME);
+			if (audio.exists() && meta.exists()) {
+				ItemCacheMetadata metadata = new ItemCacheMetadata();
+				metadata.lastUse = new Date(0L);
+				try {
+					metadata = readMetadata(meta);
+				} catch (IOException e) {
+					System.out.println("Error reading file metadata for " + child + " " + e);
+				}
+				DeletionCandidate candidate = new DeletionCandidate(child, metadata);
+				candidates.add(candidate);
+			} else if (child.isDirectory()) {
+				listDeletionCandidates(child, candidates);
+			}
+		}
+	}
+
+
+	private void removeOldAudio(File path, long sizeToClear) {
+		ArrayList<DeletionCandidate> candidates = new ArrayList<>();
+		listDeletionCandidates(path, candidates);
+		Collections.sort(candidates, new Comparator<DeletionCandidate>() {
+			@Override
+			public int compare(DeletionCandidate a, DeletionCandidate b) {
+				return (int) ( a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime() );
+			}
+		} );
+
+		long cleared = 0;
+		PlaybackQueue queue = PlaybackQueue.getInstance();
+		for (DeletionCandidate candidate : candidates) {
+			try {
+				CollectionItem item = readItem(candidate.path);
+				if (queue.isInQueue(item)) {
+					continue;
+				}
+			} catch (Exception e) {}
+
+			File audio = new File(candidate.path, AUDIO_FILENAME);
+			if (audio.exists()) {
+				long size = audio.length();
+				if (audio.delete()) {
+					System.out.println("Deleting " + audio);
+					cleared += size;
+				}
+				if (cleared >= sizeToClear) {
+					break;
+				}
+			}
+		}
+	}
+
+	private void deleteDirectory(File path) {
+		assert(path.isDirectory());
+		File[] files = path.listFiles();
+		for(File child : files) {
+			if (child.isDirectory()) {
+				deleteDirectory(child);
+			} else {
+				child.delete();
+			}
+		}
+		path.delete();
+	}
+
+	private void removeEmptyDirectories(File path) {
+		// TODO: Catastrophic complexity
+		assert(path.isDirectory());
+		File[] files = path.listFiles();
+		for(File child : files) {
+			if (child.isDirectory()) {
+				if (!containsAudio(child)) {
+					System.out.println("Deleting " + child);
+					deleteDirectory(child);
+				} else {
+					removeEmptyDirectories(child);
+				}
+			}
+		}
+	}
+
+	void makeSpace() {
+		long cacheSize = getCacheSize(root);
+		long cacheCapacity = getCacheCapacity();
+		long threshold = (long)(CACHE_FILL_THRESHOLD * cacheCapacity);
+		if (cacheSize > threshold) {
+			removeOldAudio(root, cacheSize - threshold);
+			removeEmptyDirectories(root);
+		}
+	}
+
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
+
+		makeSpace();
+
 		String path = item.getPath();
 
 		try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(path, CacheDataType.ITEM, true))) {
@@ -137,7 +276,7 @@ public class OfflineCache {
 				file = new File(file, AUDIO_FILENAME);
 				break;
 			case ARTWORK:
-				file = new File(file, IMAGE_FILENAME);
+				break;
 			case META:
 			default:
 				file = new File(file, META_FILENAME);
@@ -210,19 +349,22 @@ public class OfflineCache {
 		}
 	}
 
+	private ItemCacheMetadata readMetadata(File file) throws IOException {
+		try (FileInputStream fileInputStream = new FileInputStream(file);
+			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+		) {
+			return (ItemCacheMetadata) objectInputStream.readObject();
+		} catch ( ClassNotFoundException e) {
+			throw new FileNotFoundException();
+		}
+	}
+
 	private ItemCacheMetadata getMetadata(String virtualPath) throws IOException {
 		if (!hasMetadata(virtualPath)) {
 			throw new FileNotFoundException();
 		}
 		File file = getCacheFile(virtualPath, CacheDataType.META, false);
-		try (FileInputStream fileInputStream = new FileInputStream(file);
-			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-		) {
-			ItemCacheMetadata metadata = (ItemCacheMetadata) objectInputStream.readObject();
-			return metadata;
-		} catch ( ClassNotFoundException e) {
-			throw new FileNotFoundException();
-		}
+		return readMetadata(file);
 	}
 
 	public ArrayList<CollectionItem> browse(String path) {
@@ -235,6 +377,9 @@ public class OfflineCache {
 
 		for (File file : files) {
 			try {
+				if (!file.isDirectory()) {
+					continue;
+				}
 				if (isInternalFile(file)) {
 					continue;
 				}
@@ -263,9 +408,8 @@ public class OfflineCache {
 		String name = file.getName();
 		boolean isItem = name.equals(ITEM_FILENAME);
 		boolean isAudio = name.equals(AUDIO_FILENAME);
-		boolean isImage = name.equals(IMAGE_FILENAME);
 		boolean isMeta = name.equals(META_FILENAME);
-		return isItem || isAudio || isImage || isMeta;
+		return isItem || isAudio || isMeta;
 	}
 
 	private boolean containsAudio(File file) {
