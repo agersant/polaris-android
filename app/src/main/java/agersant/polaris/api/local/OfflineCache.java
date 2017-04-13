@@ -201,7 +201,7 @@ public class OfflineCache {
 		}
 	}
 
-	void makeSpace() {
+	synchronized void makeSpace() {
 		long cacheSize = getCacheSize(root);
 		long cacheCapacity = getCacheCapacity();
 		long threshold = (long)(CACHE_FILL_THRESHOLD * cacheCapacity);
