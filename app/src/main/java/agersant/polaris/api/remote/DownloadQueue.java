@@ -96,10 +96,8 @@ public class DownloadQueue {
 		if (nextItem != null) {
 
 			OfflineCache offlineCache = OfflineCache.getInstance();
-			if (offlineCache.isFull()) {
-				if (!offlineCache.makeSpace(nextItem)) {
-					return;
-				}
+			if (!offlineCache.makeSpace(nextItem)) {
+				return;
 			}
 
 			try {

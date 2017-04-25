@@ -228,12 +228,6 @@ public class OfflineCache {
 		}
 	}
 
-	public synchronized boolean isFull() {
-		long cacheSize = getCacheSize(root);
-		long cacheCapacity = getCacheCapacity();
-		return cacheSize > cacheCapacity;
-	}
-
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 
 		if (!makeSpace(item)) {
