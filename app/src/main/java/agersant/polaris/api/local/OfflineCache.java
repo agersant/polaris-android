@@ -34,6 +34,7 @@ import agersant.polaris.R;
 public class OfflineCache {
 
 	public static final String AUDIO_CACHED = "AUDIO_CACHED";
+	public static final String AUDIO_REMOVED_FROM_CACHE = "AUDIO_REMOVED_FROM_CACHE";
 	private static final String ITEM_FILENAME = "__polaris__item";
 	private static final String AUDIO_FILENAME = "__polaris__audio";
 	private static final String META_FILENAME = "__polaris__meta";
@@ -183,7 +184,9 @@ public class OfflineCache {
 			}
 		}
 
-		// TODO Broadcast event so UI can update
+		if (cleared > 0) {
+			broadcast(AUDIO_REMOVED_FROM_CACHE);
+		}
 		return cleared >= bytesToSave;
 	}
 

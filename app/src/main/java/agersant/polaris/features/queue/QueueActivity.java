@@ -51,6 +51,7 @@ public class QueueActivity extends PolarisActivity {
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
 		filter.addAction(Player.PLAYING_TRACK);
 		filter.addAction(OfflineCache.AUDIO_CACHED);
+		filter.addAction(OfflineCache.AUDIO_REMOVED_FROM_CACHE);
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -58,6 +59,7 @@ public class QueueActivity extends PolarisActivity {
 					case PlaybackQueue.QUEUED_ITEMS:
 					case Player.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
+					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
 						adapter.notifyDataSetChanged();
 						break;
 				}
