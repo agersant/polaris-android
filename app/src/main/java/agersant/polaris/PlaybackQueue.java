@@ -130,10 +130,7 @@ public class PlaybackQueue {
 			return null;
 		}
 
-		if (ordering == Ordering.RANDOM) {
-			int newIndex = rng.nextInt(content.size());
-			return content.get(newIndex);
-		} else if (ordering == Ordering.REPEAT_ONE) {
+		if (ordering == Ordering.REPEAT_ONE) {
 			return from;
 		} else {
 			int currentIndex = content.indexOf(from);
@@ -243,7 +240,6 @@ public class PlaybackQueue {
 
 	public enum Ordering {
 		SEQUENCE,
-		RANDOM,
 		REPEAT_ONE,
 		REPEAT_ALL,
 	}

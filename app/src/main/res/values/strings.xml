@@ -35,7 +35,6 @@
 	<string name="ordering_sequence">Default</string>
 	<string name="ordering_repeat_one">Repeat One</string>
 	<string name="ordering_repeat_all">Repeat All</string>
-	<string name="ordering_random">Random</string>
 
 	<string name="add_to_queue">Queue</string>
 	<string name="queued">Added to queue</string>

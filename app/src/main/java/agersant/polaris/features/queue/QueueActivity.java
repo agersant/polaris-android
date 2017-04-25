@@ -107,7 +107,6 @@ public class QueueActivity extends PolarisActivity {
 			case R.id.action_ordering_sequence:
 			case R.id.action_ordering_repeat_one:
 			case R.id.action_ordering_repeat_all:
-			case R.id.action_ordering_random:
 				setOrdering(item);
 				return true;
 			default:
@@ -145,9 +144,6 @@ public class QueueActivity extends PolarisActivity {
 			case R.id.action_ordering_repeat_all:
 				queue.setOrdering(PlaybackQueue.Ordering.REPEAT_ALL);
 				break;
-			case R.id.action_ordering_random:
-				queue.setOrdering(PlaybackQueue.Ordering.RANDOM);
-				break;
 		}
 		updateOrderingIcon();
 	}
@@ -165,8 +161,6 @@ public class QueueActivity extends PolarisActivity {
 				return R.drawable.ic_repeat_one_white_24dp;
 			case REPEAT_ALL:
 				return R.drawable.ic_repeat_white_24dp;
-			case RANDOM:
-				return R.drawable.ic_shuffle_white_24dp;
 			case SEQUENCE:
 			default:
 				return R.drawable.ic_reorder_white_24dp;
