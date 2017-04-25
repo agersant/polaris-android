@@ -39,7 +39,6 @@ public class OfflineCache {
 	private static final String META_FILENAME = "__polaris__meta";
 	private static final int VERSION = 1;
 	private static final int BUFFER_SIZE = 1024 * 64;
-	private static final float CACHE_FILL_THRESHOLD = .9f;
 	private static OfflineCache instance;
 	private SharedPreferences preferences;
 	private File root;
@@ -84,12 +83,37 @@ public class OfflineCache {
 		objOut.close();
 	}
 
-	private class DeletionCandidate {
-		File path;
-		ItemCacheMetadata metadata;
-		DeletionCandidate(File path, ItemCacheMetadata metadata) {
-			this.path = path;
-			this.metadata = metadata;
+	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
+		assert(path.isDirectory());
+		File[] files = path.listFiles();
+		for(File child : files) {
+			File audio = new File(child, AUDIO_FILENAME);
+			if (audio.exists()) {
+
+				ItemCacheMetadata metadata = new ItemCacheMetadata();
+				metadata.lastUse = new Date(0L);
+
+				File meta = new File(child, META_FILENAME);
+				if (meta.exists()) {
+					try {
+						metadata = readMetadata(meta);
+					} catch (IOException e) {
+						System.out.println("Error reading file metadata for " + child + " " + e);
+					}
+				}
+
+				CollectionItem item = null;
+				try {
+					item = readItem(child);
+				} catch (Exception e) {
+					System.out.println("Error reading collection item for " + child + " " + e);
+				}
+
+				DeletionCandidate candidate = new DeletionCandidate(child, metadata, item);
+				candidates.add(candidate);
+			} else if (child.isDirectory()) {
+				listDeletionCandidates(child, candidates);
+			}
 		}
 	}
 
@@ -114,62 +138,65 @@ public class OfflineCache {
 		return Long.parseLong(cacheSizeString) * 1024 * 1024;
 	}
 
-
-	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
-		assert(path.isDirectory());
-		File[] files = path.listFiles();
-		for(File child : files) {
-			File audio = new File(child, AUDIO_FILENAME);
-			File meta = new File(child, META_FILENAME);
-			if (audio.exists() && meta.exists()) {
-				ItemCacheMetadata metadata = new ItemCacheMetadata();
-				metadata.lastUse = new Date(0L);
-				try {
-					metadata = readMetadata(meta);
-				} catch (IOException e) {
-					System.out.println("Error reading file metadata for " + child + " " + e);
-				}
-				DeletionCandidate candidate = new DeletionCandidate(child, metadata);
-				candidates.add(candidate);
-			} else if (child.isDirectory()) {
-				listDeletionCandidates(child, candidates);
-			}
-		}
-	}
-
-
-	private void removeOldAudio(File path, long sizeToClear) {
+	private boolean removeOldAudio(File path, CollectionItem newItem, long bytesToSave) {
+		final PlaybackQueue queue = PlaybackQueue.getInstance();
 		ArrayList<DeletionCandidate> candidates = new ArrayList<>();
 		listDeletionCandidates(path, candidates);
+
 		Collections.sort(candidates, new Comparator<DeletionCandidate>() {
 			@Override
 			public int compare(DeletionCandidate a, DeletionCandidate b) {
+				if (a.item == null && b.item != null) {
+					return -1;
+				}
+				if (b.item == null && a.item != null) {
+					return 1;
+				}
+				if (b.item != null && a.item != null) {
+
+					return -queue.comparePriorities(a.item, b.item);
+				}
 				return (int) ( a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime() );
 			}
 		} );
 
 		long cleared = 0;
-		PlaybackQueue queue = PlaybackQueue.getInstance();
 		for (DeletionCandidate candidate : candidates) {
 			try {
-				CollectionItem item = readItem(candidate.path);
-				if (queue.isInQueue(item)) {
-					continue;
+				if (candidate.item != null) {
+					if (queue.comparePriorities(candidate.item, newItem) <= 0) {
+						continue;
+					}
 				}
 			} catch (Exception e) {}
 
-			File audio = new File(candidate.path, AUDIO_FILENAME);
+			File audio = new File(candidate.cachePath, AUDIO_FILENAME);
 			if (audio.exists()) {
 				long size = audio.length();
 				if (audio.delete()) {
 					System.out.println("Deleting " + audio);
 					cleared += size;
 				}
-				if (cleared >= sizeToClear) {
+				if (cleared >= bytesToSave) {
 					break;
 				}
 			}
 		}
+
+		// TODO Broadcast event so UI can update
+		return cleared >= bytesToSave;
+	}
+
+	public synchronized boolean makeSpace(CollectionItem item) {
+		long cacheSize = getCacheSize(root);
+		long cacheCapacity = getCacheCapacity();
+		long overflow = cacheSize - cacheCapacity;
+		boolean success = true;
+		if (overflow > 0) {
+			success = removeOldAudio(root, item, overflow);
+			removeEmptyDirectories(root);
+		}
+		return success;
 	}
 
 	private void deleteDirectory(File path) {
@@ -201,19 +228,18 @@ public class OfflineCache {
 		}
 	}
 
-	synchronized void makeSpace() {
+	public synchronized boolean isFull() {
 		long cacheSize = getCacheSize(root);
 		long cacheCapacity = getCacheCapacity();
-		long threshold = (long)(CACHE_FILL_THRESHOLD * cacheCapacity);
-		if (cacheSize > threshold) {
-			removeOldAudio(root, cacheSize - threshold);
-			removeEmptyDirectories(root);
-		}
+		return cacheSize > cacheCapacity;
 	}
 
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 
-		makeSpace();
+		if (!makeSpace(item)) {
+			System.out.println("Cache is too full to save item.");
+			return;
+		}
 
 		String path = item.getPath();
 
@@ -221,6 +247,7 @@ public class OfflineCache {
 			write(item, itemOut);
 		} catch (IOException e) {
 			System.out.println("Error while caching item for local use: " + e);
+			return;
 		}
 
 		if (audio != null) {
@@ -229,6 +256,7 @@ public class OfflineCache {
 				broadcast(AUDIO_CACHED);
 			} catch (IOException e) {
 				System.out.println("Error while caching audio for local use: " + e);
+				return;
 			}
 		}
 
@@ -237,6 +265,18 @@ public class OfflineCache {
 		}
 
 		System.out.println("Saved audio to offline cache: " + path);
+	}
+
+	private class DeletionCandidate {
+		File cachePath;
+		ItemCacheMetadata metadata;
+		CollectionItem item;
+
+		DeletionCandidate(File cachePath, ItemCacheMetadata metadata, CollectionItem item) {
+			this.cachePath = cachePath;
+			this.metadata = metadata;
+			this.item = item;
+		}
 	}
 
 	public synchronized void putImage(CollectionItem item, Bitmap image) {

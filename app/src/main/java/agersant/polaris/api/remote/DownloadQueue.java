@@ -11,6 +11,7 @@ import java.util.TimerTask;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.api.API;
+import agersant.polaris.api.local.OfflineCache;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -93,6 +94,14 @@ public class DownloadQueue {
 		PlaybackQueue queue = PlaybackQueue.getInstance();
 		CollectionItem nextItem = queue.getNextItemToDownload();
 		if (nextItem != null) {
+
+			OfflineCache offlineCache = OfflineCache.getInstance();
+			if (offlineCache.isFull()) {
+				if (!offlineCache.makeSpace(nextItem)) {
+					return;
+				}
+			}
+
 			try {
 				worker.beginDownload(nextItem);
 			} catch (IOException e) {

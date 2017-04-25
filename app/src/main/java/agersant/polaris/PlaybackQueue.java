@@ -53,13 +53,28 @@ public class PlaybackQueue {
 		broadcast(QUEUED_ITEM);
 	}
 
-	public boolean isInQueue(CollectionItem item) {
-		for (CollectionItem queueItem : content) {
-			if (queueItem.getPath().equals(item.getPath())) {
-				return true;
+	// Return negative value if a is going to play before b, positive if a is going to play after b
+	public int comparePriorities(CollectionItem a, CollectionItem b) {
+		CollectionItem currentItem = player.getCurrentItem();
+		final int currentIndex = content.indexOf(currentItem);
+		int playlistSize = content.size();
+
+		int scoreA = playlistSize + 1;
+		int scoreB = playlistSize + 1;
+
+		for (int i = 0; i < playlistSize; i++) {
+			CollectionItem item = content.get(i);
+			final String path = item.getPath();
+			final int score = (playlistSize + i - currentIndex) % playlistSize;
+			if (score < scoreA && path.equals(a.getPath())) {
+				scoreA = score;
+			}
+			if (score < scoreB && path.equals(b.getPath())) {
+				scoreB = score;
 			}
 		}
-		return false;
+
+		return scoreA - scoreB;
 	}
 
 	private void addItemInternal(CollectionItem item) {
@@ -185,7 +200,7 @@ public class PlaybackQueue {
 
 	public CollectionItem getNextItemToDownload() {
 		CollectionItem currentItem = player.getCurrentItem();
-		final int currentIndex = content.indexOf(currentItem);
+		final int currentIndex = Math.max(0, content.indexOf(currentItem));
 
 		int bestScore = 0;
 		CollectionItem bestItem = null;
@@ -195,14 +210,14 @@ public class PlaybackQueue {
 		int playlistSize = content.size();
 
 		for (int i = 0; i < playlistSize; i++) {
-			int score = (playlistSize + i - currentIndex) % playlistSize;
-			if (i == currentIndex) {
-				continue;
-			}
+			final int score = (playlistSize + i - currentIndex) % playlistSize;
 			if (bestItem != null && score > bestScore) {
 				continue;
 			}
 			CollectionItem item = content.get(i);
+			if (item == currentItem) {
+				continue;
+			}
 			if (offlineCache.hasAudio(item.getPath())) {
 				continue;
 			}
