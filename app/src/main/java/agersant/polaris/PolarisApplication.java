@@ -35,6 +35,7 @@ public class PolarisApplication extends Application {
 
 		DownloadQueue.init(this);
 		initMediaPlayerService();
+		PlaybackQueueState.init(this);
 	}
 
 	private void initMediaPlayerService() {
@@ -44,6 +45,7 @@ public class PolarisApplication extends Application {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				MediaPlayerService.MediaPlayerBinder binder = (MediaPlayerService.MediaPlayerBinder) service;
 				mediaPlayerService = binder.getService();
+				PlaybackQueueState.loadFromDisk();
 			}
 
 			@Override

@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
@@ -37,6 +36,26 @@ public class PlaybackQueue {
 			instance = new PlaybackQueue();
 		}
 		return instance;
+	}
+
+	PlaybackQueueState getState() {
+		PlaybackQueueState state = new PlaybackQueueState();
+		state.queueContent = content;
+		state.queueOrdering = ordering;
+		CollectionItem currentItem = player.getCurrentItem();
+		state.queueIndex = content.indexOf(currentItem);
+		return state;
+	}
+
+	void restore(PlaybackQueueState state) {
+		content = state.queueContent;
+		ordering = state.queueOrdering;
+		if (state.queueIndex >= 0) {
+			CollectionItem currentItem = content.get(state.queueIndex);
+			player.play(currentItem);
+			player.pause();
+			// TODO seek
+		}
 	}
 
 	public void addItems(ArrayList<CollectionItem> items) {
