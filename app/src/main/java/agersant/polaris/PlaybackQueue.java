@@ -22,13 +22,11 @@ public class PlaybackQueue {
 	public static final String REORDERED_ITEMS = "REORDERED_ITEMS";
 
 	private static PlaybackQueue instance;
-	private Random rng;
 	private ArrayList<CollectionItem> content;
 	private Player player;
 	private Ordering ordering;
 
 	private PlaybackQueue() {
-		rng = new Random();
 		player = Player.getInstance();
 		content = new ArrayList<>();
 		ordering = Ordering.SEQUENCE;
