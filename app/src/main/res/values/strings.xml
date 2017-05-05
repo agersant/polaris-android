@@ -47,4 +47,5 @@
 	<string name="pref_key_offline_cache_size">offline_cache_size</string>
 	<string name="pref_offline_cache_size">Offline cache size</string>
 
+	<string name="media_player_service_description">Audio playback service for Polaris</string>
 </resources>

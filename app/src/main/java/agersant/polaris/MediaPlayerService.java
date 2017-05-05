@@ -1,7 +1,11 @@
 package agersant.polaris;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.os.Binder;
@@ -19,9 +23,6 @@ public class MediaPlayerService
 	private final IBinder binder = new MediaPlayerBinder();
 	private PolarisMediaPlayer player;
 	private MediaDataSource media;
-
-	public MediaPlayerService() {
-	}
 
 	public void stop() {
 		player.reset();
@@ -89,6 +90,13 @@ public class MediaPlayerService
 		player = new PolarisMediaPlayer();
 		player.setOnCompletionListener(this);
 		player.setOnErrorListener(this);
+		registerReceiver(receiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(receiver);
 	}
 
 	@Override
@@ -114,9 +122,19 @@ public class MediaPlayerService
 		toast.show();
 	}
 
-	public class MediaPlayerBinder extends Binder {
+	class MediaPlayerBinder extends Binder {
 		MediaPlayerService getService() {
 			return MediaPlayerService.this;
 		}
 	}
+
+	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+				pause();
+			}
+		}
+	};
 }
