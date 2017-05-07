@@ -5,6 +5,7 @@ import android.media.MediaDataSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,19 +23,16 @@ public class DownloadQueue {
 	private static DownloadQueue instance;
 
 	private Timer timer;
-	private DownloadQueueWorkItem flip;
-	private DownloadQueueWorkItem flop;
+	private ArrayList<DownloadQueueWorkItem> workers;
 
 	private DownloadQueue(Context context) {
+		workers = new ArrayList<>();
+		for (int i = 0; i < 2; i++)
 		{
-			File tempFile = new File(context.getExternalCacheDir(), "streamA.tmp");
-			flip = new DownloadQueueWorkItem(tempFile);
+			File file = new File(context.getExternalCacheDir(), "stream" + i + ".tmp");
+			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file);
+			workers.add(worker);
 		}
-		{
-			File tempFile = new File(context.getExternalCacheDir(), "streamB.tmp");
-			flop = new DownloadQueueWorkItem(tempFile);
-		}
-
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
@@ -52,41 +50,60 @@ public class DownloadQueue {
 		return instance;
 	}
 
-	MediaDataSource getAudio(CollectionItem item) throws IOException {
-		if (flip.isHandling(item)) {
-			return flip.getMediaDataSource();
+	synchronized MediaDataSource getAudio(CollectionItem item) throws IOException {
+		DownloadQueueWorkItem existingWorker = findActiveWorker(item);
+		if (existingWorker != null) {
+			return existingWorker.getMediaDataSource();
 		}
-		if (flop.isHandling(item)) {
-			return flop.getMediaDataSource();
+
+		DownloadQueueWorkItem newWorker = findIdleWorker();
+		if (newWorker == null) {
+			newWorker = findInterruptibleWorker();
+			assert newWorker != null;
 		}
-		if (flip.isIdle()) {
-			flip.beginDownload(item);
-			return flip.getMediaDataSource();
+
+		newWorker.beginDownload(item);
+		return newWorker.getMediaDataSource();
+	}
+
+	private DownloadQueueWorkItem findActiveWorker(CollectionItem item) {
+		for (DownloadQueueWorkItem worker : workers) {
+			if (worker.isHandling(item)) {
+				return worker;
+			}
 		}
-		if (flop.isIdle()) {
-			flop.beginDownload(item);
-			return flop.getMediaDataSource();
+		return null;
+	}
+
+	private DownloadQueueWorkItem findIdleWorker() {
+		for (DownloadQueueWorkItem worker : workers) {
+			if (worker.isIdle()) {
+				return worker;
+			}
+		}
+		return null;
+	}
+
+	private DownloadQueueWorkItem findInterruptibleWorker() {
+		for (DownloadQueueWorkItem worker : workers) {
+			if (worker.isInterruptible()) {
+				return worker;
+			}
 		}
 		return null;
 	}
 
 	public boolean isWorkingOn(CollectionItem item) {
-		return flip.isHandling(item) || flop.isHandling(item);
+		return findActiveWorker(item) != null;
 	}
 
-	private void downloadNext() {
+	private synchronized void downloadNext() {
 
 		if (API.getInstance().isOffline()) {
 			return;
 		}
 
-		DownloadQueueWorkItem worker = null;
-		if (flip.isIdle()) {
-			worker = flip;
-		} else if (flop.isIdle()) {
-			worker = flop;
-		}
-
+		DownloadQueueWorkItem worker = findIdleWorker();
 		if (worker == null) {
 			return;
 		}

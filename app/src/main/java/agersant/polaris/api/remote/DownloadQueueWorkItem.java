@@ -38,13 +38,23 @@ class DownloadQueueWorkItem {
 			case PENDING:
 			case RUNNING:
 				return false;
-			case FINISHED: {
-				PolarisApplication application = PolarisApplication.getInstance();
-				MediaPlayerService playerService = application.getMediaPlayerService();
-				return !playerService.isUsing(mediaDataSource);
-			}
+			case FINISHED:
+				return !isDataSourceInUse();
 		}
 		return true;
+	}
+
+	private boolean isDataSourceInUse() {
+		if (mediaDataSource == null) {
+			return false;
+		}
+		PolarisApplication application = PolarisApplication.getInstance();
+		MediaPlayerService playerService = application.getMediaPlayerService();
+		return playerService.isUsing(mediaDataSource);
+	}
+
+	boolean isInterruptible() {
+		return !isDataSourceInUse();
 	}
 
 	MediaDataSource getMediaDataSource() {
@@ -53,19 +63,9 @@ class DownloadQueueWorkItem {
 
 	void beginDownload(CollectionItem item) throws IOException {
 
-		String path = item.getPath();
-		if (job != null) {
-			String currentJobPath = job.getPath();
-			if (currentJobPath.equals(path)) {
-				return;
-			}
-			job.cancel(false);
-		}
+		assert !isHandling(item);
 
-		if (mediaDataSource != null) {
-			mediaDataSource.close();
-			mediaDataSource = null;
-		}
+		stop();
 
 		if (tempFile.exists()) {
 			if (!tempFile.delete()) {
@@ -82,6 +82,18 @@ class DownloadQueueWorkItem {
 		this.item = item;
 
 		job.execute();
+	}
+
+	private void stop() throws IOException {
+		if (job != null) {
+			job.cancel(true);
+			job = null;
+		}
+		if (mediaDataSource != null) {
+			mediaDataSource.close();
+			mediaDataSource = null;
+		}
+		item = null;
 	}
 
 }
