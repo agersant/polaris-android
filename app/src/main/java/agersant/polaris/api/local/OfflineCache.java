@@ -234,10 +234,7 @@ public class OfflineCache {
 
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 
-		if (!makeSpace(item)) {
-			System.out.println("Cache is too full to save item.");
-			return;
-		}
+		makeSpace(item);
 
 		String path = item.getPath();
 
