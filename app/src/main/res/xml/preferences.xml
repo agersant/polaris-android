@@ -10,6 +10,7 @@
 		android:title="@string/pref_username"/>
 	<EditTextPreference
 		android:defaultValue=""
+		android:inputType="textPassword"
 		android:key="@string/pref_key_password"
 		android:title="@string/pref_password"/>
 	<SwitchPreference

@@ -70,6 +70,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 				display = entries[selectedIndex];
 			}
 			preference.setSummary(display);
+		} else if (key.equals(resources.getString(R.string.pref_key_password))) {
+			String password = getSharedPreferences().getString(key, "");
+			String stars = password.replaceAll(".", "*");
+			preference.setSummary(stars);
 		} else if (all.get(key) instanceof String) {
 			preference.setSummary(getSharedPreferences().getString(key, ""));
 		}
