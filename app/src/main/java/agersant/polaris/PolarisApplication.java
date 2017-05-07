@@ -11,6 +11,7 @@ import agersant.polaris.api.API;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
+import agersant.polaris.api.remote.RequestQueue;
 import agersant.polaris.api.remote.ServerAPI;
 
 public class PolarisApplication extends Application {
@@ -28,6 +29,7 @@ public class PolarisApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		instance = this;
+		RequestQueue.init(this);
 		OfflineCache.init(this);
 		ServerAPI.init(this);
 		LocalAPI.init();

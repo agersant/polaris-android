@@ -1,54 +1,28 @@
 package agersant.polaris;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 
 public class CollectionItem
 		implements Cloneable, Serializable {
 
-	private String name;
-	private String path;
-	private String artist;
-	private String title;
-	private String artwork;
-	private String album;
-	private String albumArtist;
-	private Integer trackNumber;
-	private boolean isDirectory;
+	protected String path;
+	protected String name;
+	protected String artist;
+	protected String title;
+	protected String artwork;
+	protected String album;
+	protected String albumArtist;
+	protected Integer trackNumber;
+	protected boolean isDirectory;
 
 	private CollectionItem() {
-	}
-
-	public static CollectionItem parse(JSONObject source) throws JSONException {
-		CollectionItem item = new CollectionItem();
-		item.isDirectory = source.optString("variant", "").equals("Directory");
-		JSONObject fields = source.getJSONArray("fields").getJSONObject(0);
-		item.parseFields(fields);
-		return item;
-	}
-
-	public static CollectionItem parseSong(JSONObject fields) throws JSONException {
-		CollectionItem item = new CollectionItem();
-		item.isDirectory = false;
-		item.parseFields(fields);
-		return item;
-	}
-
-	public static CollectionItem parseDirectory(JSONObject fields) throws JSONException {
-		CollectionItem item = new CollectionItem();
-		item.isDirectory = true;
-		item.parseFields(fields);
-		return item;
-	}
-
-	public static CollectionItem directory(String path) {
-		CollectionItem item = new CollectionItem();
-		item.isDirectory = true;
-		item.path = path;
-		item.name = getNameFromPath(path);
-		return item;
 	}
 
 	private static String getNameFromPath(String path) {
@@ -56,31 +30,72 @@ public class CollectionItem
 		return chunks[chunks.length - 1];
 	}
 
-	private void parseFields(JSONObject fields) throws JSONException {
-		path = fields.getString("path");
-		artist = readStringField(fields, "artist");
-		title = readStringField(fields, "title");
-		artwork = readStringField(fields, "artwork");
-		album = readStringField(fields, "album");
-		trackNumber = readIntField(fields, "track_number");
-		albumArtist = readStringField(fields, "album_artist");
+	public static CollectionItem directory(String path) {
+		CollectionItem item = new CollectionItem();
+		item.isDirectory = true;
+		item.path = path;
+		return item;
+	}
+
+	void parseFields(JsonObject fields) {
+		path = getOptionalString(fields, "path");
+		artist = getOptionalString(fields, "artist");
+		title = getOptionalString(fields, "title");
+		artwork = getOptionalString(fields, "artwork");
+		album = getOptionalString(fields, "album");
+		albumArtist = getOptionalString(fields, "album_artist");
+		trackNumber = getOptionalInt(fields, "track_number");
 		name = getNameFromPath(path);
 	}
 
-	private String readStringField(JSONObject fields, String name) {
-
-		String value = fields.optString(name);
-		if (value != null && value.equals("null")) {
+	private String getOptionalString(JsonObject fields, String key) {
+		if (!fields.has(key)) {
 			return null;
 		}
-		return value;
+		JsonElement element = fields.get(key);
+		if (element.isJsonNull()) {
+			return null;
+		}
+		return element.getAsString();
 	}
 
-	private Integer readIntField(JSONObject fields, String name) throws JSONException {
-		if (fields.isNull(name)) {
-			return null;
+	private int getOptionalInt(JsonObject fields, String key) {
+		if (!fields.has(key)) {
+			return 0;
 		}
-		return Integer.valueOf(fields.getInt(name));
+		JsonElement element = fields.get(key);
+		if (element.isJsonNull()) {
+			return 0;
+		}
+		return element.getAsInt();
+	}
+
+	public String getName() {
+		return getNameFromPath(path);
+	}
+
+	public static class Directory extends CollectionItem {
+		public static class Deserializer implements JsonDeserializer<CollectionItem> {
+			public Directory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				Directory item = new Directory();
+				item.isDirectory = true;
+				JsonObject fields = json.getAsJsonObject();
+				item.parseFields(fields);
+				return item;
+			}
+		}
+	}
+
+	public static class Song extends CollectionItem {
+		public static class Deserializer implements JsonDeserializer<CollectionItem> {
+			public Song deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				Song item = new Song();
+				item.isDirectory = false;
+				JsonObject fields = json.getAsJsonObject();
+				item.parseFields(fields);
+				return item;
+			}
+		}
 	}
 
 	@Override
@@ -88,8 +103,14 @@ public class CollectionItem
 		return (CollectionItem) super.clone();
 	}
 
-	public String getName() {
-		return name;
+	public static class Deserializer implements JsonDeserializer<CollectionItem> {
+		public CollectionItem deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			CollectionItem item = new CollectionItem();
+			item.isDirectory = json.getAsJsonObject().get("variant").getAsString().equals("Directory");
+			JsonObject fields = json.getAsJsonObject().get("fields").getAsJsonArray().get(0).getAsJsonObject();
+			item.parseFields(fields);
+			return item;
+		}
 	}
 
 	public String getPath() {

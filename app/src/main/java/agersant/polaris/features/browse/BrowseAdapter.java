@@ -10,14 +10,14 @@ import agersant.polaris.CollectionItem;
 abstract class BrowseAdapter
 		extends RecyclerView.Adapter<BrowseItemHolder> {
 
-	private ArrayList<CollectionItem> items;
+	private ArrayList<? extends CollectionItem> items;
 
 	BrowseAdapter() {
 		super();
 		setItems(new ArrayList<CollectionItem>());
 	}
 
-	void setItems(ArrayList<CollectionItem> items) {
+	void setItems(ArrayList<? extends CollectionItem> items) {
 		this.items = items;
 		notifyDataSetChanged();
 	}

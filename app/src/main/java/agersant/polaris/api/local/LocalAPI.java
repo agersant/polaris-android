@@ -4,13 +4,12 @@ import android.graphics.Bitmap;
 import android.media.MediaDataSource;
 import android.widget.ImageView;
 
-import com.android.volley.Response;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.api.IPolarisAPI;
+import agersant.polaris.api.ItemsCallback;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -69,23 +68,23 @@ public class LocalAPI implements IPolarisAPI {
 		}
 	}
 
-	public void browse(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+	public void browse(String path, ItemsCallback handlers) {
 		OfflineCache offlineCache = OfflineCache.getInstance();
 		ArrayList<CollectionItem> items = offlineCache.browse(path);
 		if (items == null) {
-			failure.onErrorResponse(null);
+			handlers.onError();
 		} else {
-			success.onResponse(items);
+			handlers.onSuccess(items);
 		}
 	}
 
-	public void flatten(String path, Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+	public void flatten(String path, ItemsCallback handlers) {
 		OfflineCache offlineCache = OfflineCache.getInstance();
 		ArrayList<CollectionItem> items = offlineCache.flatten(path);
 		if (items == null) {
-			failure.onErrorResponse(null);
+			handlers.onError();
 		} else {
-			success.onResponse(items);
+			handlers.onSuccess(items);
 		}
 	}
 }

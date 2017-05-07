@@ -43,7 +43,7 @@ class BrowseViewDiscography extends BrowseViewContent {
 	}
 
 	@Override
-	void setItems(ArrayList<CollectionItem> items) {
+	void setItems(ArrayList<? extends CollectionItem> items) {
 		adapter.setItems(items);
 	}
 

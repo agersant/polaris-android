@@ -8,14 +8,15 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.URLConnection;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.OfflineCache;
+import okhttp3.ResponseBody;
 
 class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
@@ -69,8 +70,8 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 	protected Bitmap doInBackground(Void... params) {
 		Bitmap bitmap = null;
 		try {
-			URLConnection connection = ServerAPI.getInstance().serve(path);
-			InputStream stream = connection.getInputStream();
+			ResponseBody responseBody = ServerAPI.getInstance().serve(path);
+			InputStream stream = new BufferedInputStream(responseBody.byteStream());
 			bitmap = BitmapFactory.decodeStream(stream);
 		} catch (Exception e) {
 			System.out.println("Error while downloading image: " + e.toString());

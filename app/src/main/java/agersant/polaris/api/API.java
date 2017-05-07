@@ -7,10 +7,7 @@ import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
-import com.android.volley.Response;
-
 import java.io.IOException;
-import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
@@ -78,12 +75,12 @@ public class API {
 		getAPI().getImage(item, view);
 	}
 
-	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
-		getAPI().browse(path, success, failure);
+	public void browse(String path, ItemsCallback handlers) {
+		getAPI().browse(path, handlers);
 	}
 
-	public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
-		getAPI().flatten(path, success, failure);
+	public void flatten(String path, ItemsCallback handlers) {
+		getAPI().flatten(path, handlers);
 	}
 
 	private IPolarisAPI getAPI() {

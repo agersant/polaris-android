@@ -7,13 +7,12 @@ import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
-import com.android.volley.Response;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.net.URLConnection;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -21,27 +20,31 @@ import java.util.concurrent.TimeoutException;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
+import agersant.polaris.api.ItemsCallback;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class ServerAPI
 		implements IPolarisAPI {
 
 	private static ServerAPI instance;
-	private RequestQueue requestQueue;
-	private SharedPreferences preferences;
-	private Auth auth;
-
-	private String serverAddressKey;
-	private String usernameKey;
-	private String passwordKey;
+	private final RequestQueue requestQueue;
+	private final Gson gson;
+	private final SharedPreferences preferences;
+	private final String serverAddressKey;
 
 	private ServerAPI(Context context) {
-		this.requestQueue = RequestQueue.getInstance(context);
+		this.serverAddressKey = context.getString(R.string.pref_key_server_url);
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		this.auth = new Auth(this);
-
-		serverAddressKey = context.getString(R.string.pref_key_server_url);
-		usernameKey = context.getString(R.string.pref_key_username);
-		passwordKey = context.getString(R.string.pref_key_password);
+		this.requestQueue = RequestQueue.getInstance();
+		this.gson = new GsonBuilder()
+				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
+				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
+				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
+				.create();
 	}
 
 	public static void init(Context context) {
@@ -56,18 +59,6 @@ public class ServerAPI
 		String address = this.preferences.getString(serverAddressKey, "");
 		address = address.replaceAll("/$", "");
 		return address + "/api";
-	}
-
-	String getUsername() {
-		return this.preferences.getString(usernameKey, "");
-	}
-
-	String getPassword() {
-		return this.preferences.getString(passwordKey, "");
-	}
-
-	RequestQueue getRequestQueue() {
-		return this.requestQueue;
 	}
 
 	private String getMediaURL(String path) {
@@ -86,79 +77,75 @@ public class ServerAPI
 		FetchImageTask.load(item, view);
 	}
 
-	// Can block!
-	public URLConnection serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+	ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
 		String url = getMediaURL(path);
-		return auth.connect(url);
+		Request request = new Request.Builder().url(url).build();
+		return requestQueue.requestSync(request);
 	}
 
-	public void browse(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+	public void browse(String path, final ItemsCallback handlers) {
 		String serverAddress = this.getURL();
 		String requestURL = serverAddress + "/browse/" + path;
-
-		Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
+		Request request = new Request.Builder().url(requestURL).build();
+		Callback callback = new Callback() {
 			@Override
-			public void onResponse(JSONArray response) {
-				ArrayList<CollectionItem> items = new ArrayList<>(response.length());
-				for (int i = 0; i < response.length(); i++) {
-					try {
-						JSONObject item = response.getJSONObject(i);
-						CollectionItem browseItem = CollectionItem.parse(item);
-						items.add(browseItem);
-					} catch (Exception e) {
-					}
-				}
-				success.onResponse(items);
+			public void onFailure(Call call, IOException e) {
+				handlers.onError();
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
+				}.getType();
+				ArrayList<CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
+				handlers.onSuccess(items);
 			}
 		};
-
-		this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
+		requestQueue.requestAsync(request, callback);
 	}
 
-	public void getRandomAlbums(final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+	public void getRandomAlbums(final ItemsCallback handlers) {
 		String serverAddress = this.getURL();
 		String requestURL = serverAddress + "/random/";
-
-		Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
+		Request request = new Request.Builder().url(requestURL).build();
+		Callback callback = new Callback() {
 			@Override
-			public void onResponse(JSONArray response) {
-				ArrayList<CollectionItem> items = new ArrayList<>(response.length());
-				for (int i = 0; i < response.length(); i++) {
-					try {
-						JSONObject item = response.getJSONObject(i);
-						CollectionItem browseItem = CollectionItem.parseDirectory(item);
-						items.add(browseItem);
-					} catch (Exception e) {
-					}
-				}
-				success.onResponse(items);
+			public void onFailure(Call call, IOException e) {
+				handlers.onError();
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
+				}.getType();
+				ArrayList<CollectionItem.Directory> directories = gson.fromJson(response.body().string(), collectionType);
+				ArrayList<? extends CollectionItem> items = directories;
+				handlers.onSuccess(items);
 			}
 		};
-
-		this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
+		requestQueue.requestAsync(request, callback);
 	}
 
-	public void flatten(String path, final Response.Listener<ArrayList<CollectionItem>> success, Response.ErrorListener failure) {
+	public void flatten(String path, final ItemsCallback handlers) {
 		String serverAddress = this.getURL();
 		String requestURL = serverAddress + "/flatten/" + path;
-
-		Response.Listener<JSONArray> successWrapper = new Response.Listener<JSONArray>() {
+		Request request = new Request.Builder().url(requestURL).build();
+		Callback callback = new Callback() {
 			@Override
-			public void onResponse(JSONArray response) {
-				ArrayList<CollectionItem> items = new ArrayList<>(response.length());
-				for (int i = 0; i < response.length(); i++) {
-					try {
-						JSONObject item = response.getJSONObject(i);
-						CollectionItem browseItem = CollectionItem.parseSong(item);
-						items.add(browseItem);
-					} catch (Exception e) {
-					}
-				}
-				success.onResponse(items);
+			public void onFailure(Call call, IOException e) {
+				handlers.onError();
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
+				}.getType();
+				ArrayList<CollectionItem.Song> songs = gson.fromJson(response.body().string(), collectionType);
+				ArrayList<? extends CollectionItem> items = songs;
+				handlers.onSuccess(items);
 			}
 		};
-
-		this.auth.doJsonArrayRequest(requestURL, successWrapper, failure);
+		requestQueue.requestAsync(request, callback);
 	}
 }
 

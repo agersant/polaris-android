@@ -1,6 +1,5 @@
 package agersant.polaris.features.browse;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -19,6 +16,7 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
+import agersant.polaris.api.ItemsCallback;
 import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
@@ -28,8 +26,7 @@ public class BrowseActivity extends PolarisActivity {
 	public static final String NAVIGATION_MODE = "NAVIGATION_MODE";
 	private ProgressBar progressBar;
 	private ViewGroup contentHolder;
-	private Response.Listener<ArrayList<CollectionItem>> onLoad;
-	private Response.ErrorListener onFail;
+	private ItemsCallback fetchCallback;
 	private NavigationMode navigationMode;
 	private SwipyRefreshLayout.OnRefreshListener onRefresh;
 
@@ -45,20 +42,27 @@ public class BrowseActivity extends PolarisActivity {
 		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 		contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
-		onLoad = new Response.Listener<ArrayList<CollectionItem>>() {
+		final BrowseActivity that = this;
+		fetchCallback = new ItemsCallback() {
 			@Override
-			public void onResponse(ArrayList<CollectionItem> response) {
-				progressBar.setVisibility(View.GONE);
-				displayContent(response);
+			public void onSuccess(final ArrayList<? extends CollectionItem> items) {
+				that.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						that.progressBar.setVisibility(View.GONE);
+						that.displayContent(items);
+					}
+				});
 			}
-		};
-
-		final Context that = this;
-		onFail = new Response.ErrorListener() {
 			@Override
-			public void onErrorResponse(VolleyError error) {
-				Toast toast = Toast.makeText(that, R.string.browse_error, Toast.LENGTH_SHORT);
-				toast.show();
+			public void onError() {
+				that.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast toast = Toast.makeText(that, R.string.browse_error, Toast.LENGTH_SHORT);
+						toast.show();
+					}
+				});
 			}
 		};
 
@@ -108,15 +112,15 @@ public class BrowseActivity extends PolarisActivity {
 
 	private void loadPath(String path) {
 		API api = API.getInstance();
-		api.browse(path, onLoad, onFail);
+		api.browse(path, fetchCallback);
 	}
 
 	private void loadRandom() {
 		ServerAPI server = ServerAPI.getInstance();
-		server.getRandomAlbums(onLoad, onFail);
+		server.getRandomAlbums(fetchCallback);
 	}
 
-	private void displayContent(ArrayList<CollectionItem> items) {
+	private void displayContent(ArrayList<? extends CollectionItem> items) {
 		BrowseViewContent contentView = null;
 		switch (getDisplayModeForItems(items)) {
 			case EXPLORER:
@@ -135,7 +139,7 @@ public class BrowseActivity extends PolarisActivity {
 		contentHolder.addView(contentView);
 	}
 
-	private DisplayMode getDisplayModeForItems(ArrayList<CollectionItem> items) {
+	private DisplayMode getDisplayModeForItems(ArrayList<? extends CollectionItem> items) {
 		if (items.isEmpty()) {
 			return DisplayMode.EXPLORER;
 		}

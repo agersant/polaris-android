@@ -19,7 +19,7 @@ abstract class BrowseViewContent extends FrameLayout {
 		super(context);
 	}
 
-	void setItems(ArrayList<CollectionItem> items) {
+	void setItems(ArrayList<? extends CollectionItem> items) {
 	}
 
 	void setOnRefreshListener(SwipyRefreshLayout.OnRefreshListener listener) {

@@ -4,14 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 
 import java.util.ArrayList;
 
@@ -19,6 +17,7 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
+import agersant.polaris.api.ItemsCallback;
 
 /**
  * Created by agersant on 12/11/2016.
@@ -69,27 +68,33 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 
 	private void queueDirectory() {
 		final CollectionItem fetchingItem = item;
-
-		Response.Listener<ArrayList<CollectionItem>> success = new Response.Listener<ArrayList<CollectionItem>>() {
+		ItemsCallback handlers = new ItemsCallback() {
 			@Override
-			public void onResponse(ArrayList<CollectionItem> response) {
-				PlaybackQueue.getInstance().addItems(response);
-				if (item == fetchingItem) {
-					setStatusToQueued();
-				}
+			public void onSuccess(final ArrayList<? extends CollectionItem> items) {
+				new Handler(Looper.getMainLooper()).post(new Runnable() {
+					@Override
+					public void run() {
+						PlaybackQueue.getInstance().addItems(items);
+						if (item == fetchingItem) {
+							setStatusToQueued();
+						}
+					}
+				});
+			}
+
+			@Override
+			public void onError() {
+				new Handler(Looper.getMainLooper()).post(new Runnable() {
+					@Override
+					public void run() {
+						if (item == fetchingItem) {
+							setStatusToQueueError();
+						}
+					}
+				});
 			}
 		};
-
-		Response.ErrorListener failure = new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				if (item == fetchingItem) {
-					setStatusToQueueError();
-				}
-			}
-		};
-
-		API.getInstance().flatten(item.getPath(), success, failure);
+		API.getInstance().flatten(item.getPath(), handlers);
 	}
 
 	private void setStatusToQueueable() {

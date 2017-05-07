@@ -58,7 +58,7 @@ public class PlaybackQueue {
 		}
 	}
 
-	public void addItems(ArrayList<CollectionItem> items) {
+	public void addItems(ArrayList<? extends CollectionItem> items) {
 		for (CollectionItem item : items) {
 			addItemInternal(item);
 		}

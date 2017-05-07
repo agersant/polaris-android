@@ -7,10 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.api.local.OfflineCache;
+import okhttp3.ResponseBody;
 
 /**
  * Created by agersant on 12/26/2016.
@@ -41,18 +41,22 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	@Override
 	protected Integer doInBackground(Object... params) {
 
-		URLConnection connection;
+		ResponseBody responseBody;
 		try {
-			connection = ServerAPI.getInstance().serve(path);
+			responseBody = ServerAPI.getInstance().serve(path);
 		} catch (Exception e) {
 			System.out.println("Error establishing stream connection: " + e);
 			return 1;
 		}
 
-		int contentLength = connection.getContentLength();
-		dataSource.setContentLength(contentLength);
+		if (responseBody == null) {
+			System.out.println("Stream content has no response");
+			return 1;
+		}
+		long contentLength = responseBody.contentLength();
+		dataSource.setContentLength((int) contentLength);
 
-		try (InputStream inputStream = connection.getInputStream();
+		try (InputStream inputStream = responseBody.byteStream();
 			 FileOutputStream outputStream = new FileOutputStream(outFile);
 		) {
 			byte[] chunk = new byte[BUFFER_SIZE];
