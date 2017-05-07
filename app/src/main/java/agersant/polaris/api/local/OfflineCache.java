@@ -85,9 +85,9 @@ public class OfflineCache {
 	}
 
 	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
-		assert(path.isDirectory());
+		assert (path.isDirectory());
 		File[] files = path.listFiles();
-		for(File child : files) {
+		for (File child : files) {
 			File audio = new File(child, AUDIO_FILENAME);
 			if (audio.exists()) {
 
@@ -120,9 +120,9 @@ public class OfflineCache {
 
 	private long getCacheSize(File file) {
 		long size = 0;
-		assert(file.isDirectory());
+		assert (file.isDirectory());
 		File[] files = file.listFiles();
-		for(File child : files) {
+		for (File child : files) {
 			size += child.length();
 			if (child.isDirectory()) {
 				size += getCacheSize(child);
@@ -157,9 +157,9 @@ public class OfflineCache {
 
 					return -queue.comparePriorities(a.item, b.item);
 				}
-				return (int) ( a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime() );
+				return (int) (a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime());
 			}
-		} );
+		});
 
 		long cleared = 0;
 		for (DeletionCandidate candidate : candidates) {
@@ -169,7 +169,8 @@ public class OfflineCache {
 						continue;
 					}
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 
 			File audio = new File(candidate.cachePath, AUDIO_FILENAME);
 			if (audio.exists()) {
@@ -203,9 +204,9 @@ public class OfflineCache {
 	}
 
 	private void deleteDirectory(File path) {
-		assert(path.isDirectory());
+		assert (path.isDirectory());
 		File[] files = path.listFiles();
-		for(File child : files) {
+		for (File child : files) {
 			if (child.isDirectory()) {
 				deleteDirectory(child);
 			} else {
@@ -217,9 +218,9 @@ public class OfflineCache {
 
 	private void removeEmptyDirectories(File path) {
 		// TODO: Catastrophic complexity
-		assert(path.isDirectory());
+		assert (path.isDirectory());
 		File[] files = path.listFiles();
-		for(File child : files) {
+		for (File child : files) {
 			if (child.isDirectory()) {
 				if (!containsAudio(child)) {
 					System.out.println("Deleting " + child);
@@ -262,18 +263,6 @@ public class OfflineCache {
 		}
 
 		System.out.println("Saved audio to offline cache: " + path);
-	}
-
-	private class DeletionCandidate {
-		File cachePath;
-		ItemCacheMetadata metadata;
-		CollectionItem item;
-
-		DeletionCandidate(File cachePath, ItemCacheMetadata metadata, CollectionItem item) {
-			this.cachePath = cachePath;
-			this.metadata = metadata;
-			this.item = item;
-		}
 	}
 
 	public synchronized void putImage(CollectionItem item, Bitmap image) {
@@ -391,7 +380,7 @@ public class OfflineCache {
 			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 		) {
 			return (ItemCacheMetadata) objectInputStream.readObject();
-		} catch ( ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			throw new FileNotFoundException();
 		}
 	}
@@ -478,8 +467,7 @@ public class OfflineCache {
 				CollectionItem item = readItem(file);
 				if (item.isDirectory()) {
 					ArrayList<CollectionItem> content = flattenDir(file);
-					if (content != null)
-					{
+					if (content != null) {
 						out.addAll(content);
 					}
 				} else {
@@ -518,6 +506,18 @@ public class OfflineCache {
 		AUDIO,
 		ARTWORK,
 		META,
+	}
+
+	private class DeletionCandidate {
+		File cachePath;
+		ItemCacheMetadata metadata;
+		CollectionItem item;
+
+		DeletionCandidate(File cachePath, ItemCacheMetadata metadata, CollectionItem item) {
+			this.cachePath = cachePath;
+			this.metadata = metadata;
+			this.item = item;
+		}
 	}
 
 }

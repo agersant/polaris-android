@@ -74,43 +74,9 @@ public class CollectionItem
 		return getNameFromPath(path);
 	}
 
-	public static class Directory extends CollectionItem {
-		public static class Deserializer implements JsonDeserializer<CollectionItem> {
-			public Directory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				Directory item = new Directory();
-				item.isDirectory = true;
-				JsonObject fields = json.getAsJsonObject();
-				item.parseFields(fields);
-				return item;
-			}
-		}
-	}
-
-	public static class Song extends CollectionItem {
-		public static class Deserializer implements JsonDeserializer<CollectionItem> {
-			public Song deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				Song item = new Song();
-				item.isDirectory = false;
-				JsonObject fields = json.getAsJsonObject();
-				item.parseFields(fields);
-				return item;
-			}
-		}
-	}
-
 	@Override
 	public CollectionItem clone() throws CloneNotSupportedException {
 		return (CollectionItem) super.clone();
-	}
-
-	public static class Deserializer implements JsonDeserializer<CollectionItem> {
-		public CollectionItem deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-			CollectionItem item = new CollectionItem();
-			item.isDirectory = json.getAsJsonObject().get("variant").getAsString().equals("Directory");
-			JsonObject fields = json.getAsJsonObject().get("fields").getAsJsonArray().get(0).getAsJsonObject();
-			item.parseFields(fields);
-			return item;
-		}
 	}
 
 	public String getPath() {
@@ -143,5 +109,39 @@ public class CollectionItem
 
 	public Integer getTrackNumber() {
 		return trackNumber;
+	}
+
+	public static class Directory extends CollectionItem {
+		public static class Deserializer implements JsonDeserializer<CollectionItem> {
+			public Directory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				Directory item = new Directory();
+				item.isDirectory = true;
+				JsonObject fields = json.getAsJsonObject();
+				item.parseFields(fields);
+				return item;
+			}
+		}
+	}
+
+	public static class Song extends CollectionItem {
+		public static class Deserializer implements JsonDeserializer<CollectionItem> {
+			public Song deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				Song item = new Song();
+				item.isDirectory = false;
+				JsonObject fields = json.getAsJsonObject();
+				item.parseFields(fields);
+				return item;
+			}
+		}
+	}
+
+	public static class Deserializer implements JsonDeserializer<CollectionItem> {
+		public CollectionItem deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			CollectionItem item = new CollectionItem();
+			item.isDirectory = json.getAsJsonObject().get("variant").getAsString().equals("Directory");
+			JsonObject fields = json.getAsJsonObject().get("fields").getAsJsonArray().get(0).getAsJsonObject();
+			item.parseFields(fields);
+			return item;
+		}
 	}
 }

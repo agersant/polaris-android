@@ -1,7 +1,6 @@
 package agersant.polaris;
 
 import android.content.Context;
-import android.media.session.PlaybackState;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,20 +19,20 @@ public class PlaybackQueueState implements Serializable {
 
 	private static int VERSION = 1;
 
-	private static  File storage;
+	private static File storage;
 
 	ArrayList<CollectionItem> queueContent;
 	int queueIndex;
 	PlaybackQueue.Ordering queueOrdering;
 
-	static void init(Context context) {
-		storage = new File(context.getCacheDir(), "playlist.v" + VERSION);
-	}
-
 	PlaybackQueueState() {
 		queueContent = new ArrayList<>();
 		queueOrdering = PlaybackQueue.Ordering.SEQUENCE;
 		queueIndex = -1;
+	}
+
+	static void init(Context context) {
+		storage = new File(context.getCacheDir(), "playlist.v" + VERSION);
 	}
 
 	public static void saveToDisk() {

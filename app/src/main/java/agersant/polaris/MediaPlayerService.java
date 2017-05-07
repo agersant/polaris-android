@@ -22,6 +22,15 @@ public class MediaPlayerService
 
 	private final IBinder binder = new MediaPlayerBinder();
 	private PolarisMediaPlayer player;
+	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+				pause();
+			}
+		}
+	};
 	private MediaDataSource media;
 
 	public void stop() {
@@ -127,14 +136,4 @@ public class MediaPlayerService
 			return MediaPlayerService.this;
 		}
 	}
-
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			if (action.equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-				pause();
-			}
-		}
-	};
 }

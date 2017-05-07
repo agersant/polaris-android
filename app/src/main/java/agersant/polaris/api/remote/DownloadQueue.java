@@ -27,8 +27,7 @@ public class DownloadQueue {
 
 	private DownloadQueue(Context context) {
 		workers = new ArrayList<>();
-		for (int i = 0; i < 2; i++)
-		{
+		for (int i = 0; i < 2; i++) {
 			File file = new File(context.getExternalCacheDir(), "stream" + i + ".tmp");
 			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file);
 			workers.add(worker);

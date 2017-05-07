@@ -54,6 +54,7 @@ public class BrowseActivity extends PolarisActivity {
 					}
 				});
 			}
+
 			@Override
 			public void onError() {
 				that.runOnUiThread(new Runnable() {
