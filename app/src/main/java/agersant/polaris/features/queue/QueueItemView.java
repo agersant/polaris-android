@@ -58,10 +58,6 @@ public class QueueItemView extends FrameLayout {
 		return drawableState;
 	}
 
-	public boolean isPlaying() {
-		return isPlaying;
-	}
-
 	public void setIsPlaying(boolean isPlaying) {
 		this.isPlaying = isPlaying;
 		refreshDrawableState();

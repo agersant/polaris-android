@@ -20,6 +20,8 @@ import agersant.polaris.api.local.OfflineCache;
 
 public class DownloadQueue {
 
+	public static final String WORKLOAD_CHANGED = "WORKLOAD_CHANGED";
+
 	private static DownloadQueue instance;
 
 	private Timer timer;

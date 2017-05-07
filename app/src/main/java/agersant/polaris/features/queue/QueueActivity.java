@@ -18,6 +18,7 @@ import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.DownloadQueue;
 import agersant.polaris.features.PolarisActivity;
 
 public class QueueActivity extends PolarisActivity {
@@ -51,6 +52,7 @@ public class QueueActivity extends PolarisActivity {
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
 		filter.addAction(Player.PLAYING_TRACK);
 		filter.addAction(OfflineCache.AUDIO_CACHED);
+		filter.addAction(DownloadQueue.WORKLOAD_CHANGED);
 		filter.addAction(OfflineCache.AUDIO_REMOVED_FROM_CACHE);
 		receiver = new BroadcastReceiver() {
 			@Override

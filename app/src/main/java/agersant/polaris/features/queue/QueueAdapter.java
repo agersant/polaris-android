@@ -11,16 +11,17 @@ import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
 import agersant.polaris.R;
 import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.DownloadQueue;
 
 
 class QueueAdapter
 		extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
 
-	private PlaybackQueue queue;
+	private PlaybackQueue playbackQueue;
 
-	QueueAdapter(PlaybackQueue queue) {
+	QueueAdapter(PlaybackQueue playbackQueue) {
 		super();
-		this.queue = queue;
+		this.playbackQueue = playbackQueue;
 	}
 
 	@Override
@@ -31,21 +32,21 @@ class QueueAdapter
 
 	@Override
 	public void onBindViewHolder(QueueAdapter.QueueItemHolder holder, int position) {
-		holder.bindItem(queue.getItem(position));
+		holder.bindItem(playbackQueue.getItem(position));
 	}
 
 	@Override
 	public int getItemCount() {
-		return queue.size();
+		return playbackQueue.size();
 	}
 
 	void onItemMove(int fromPosition, int toPosition) {
-		queue.swap(fromPosition, toPosition);
+		playbackQueue.swap(fromPosition, toPosition);
 		notifyItemMoved(fromPosition, toPosition);
 	}
 
 	void onItemDismiss(int position) {
-		queue.remove(position);
+		playbackQueue.remove(position);
 		notifyItemRemoved(position);
 	}
 
@@ -56,6 +57,7 @@ class QueueAdapter
 		private TextView titleText;
 		private TextView artistText;
 		private ImageView cacheIcon;
+		private ImageView downloadIcon;
 		private Player player;
 
 		QueueItemHolder(QueueItemView view) {
@@ -65,11 +67,13 @@ class QueueAdapter
 			titleText = (TextView) view.findViewById(R.id.title);
 			artistText = (TextView) view.findViewById(R.id.artist);
 			cacheIcon = (ImageView) view.findViewById(R.id.cache_icon);
+			downloadIcon = (ImageView) view.findViewById(R.id.download_icon);
 			view.setOnClickListener(this);
 		}
 
 		void bindItem(CollectionItem item) {
 			OfflineCache offlineCache = OfflineCache.getInstance();
+			DownloadQueue downloadQueue = DownloadQueue.getInstance();
 			this.item = item;
 			boolean isPlaying = player.getCurrentItem() == this.item;
 			titleText.setText(item.getTitle());
@@ -77,8 +81,13 @@ class QueueAdapter
 			queueItemView.setIsPlaying(isPlaying);
 			if (offlineCache.hasAudio(item.getPath())) {
 				cacheIcon.setVisibility(View.VISIBLE);
+				downloadIcon.setVisibility(View.INVISIBLE);
+			} else if (downloadQueue.isWorkingOn(item)) {
+				cacheIcon.setVisibility(View.INVISIBLE);
+				downloadIcon.setVisibility(View.VISIBLE);
 			} else {
 				cacheIcon.setVisibility(View.INVISIBLE);
+				downloadIcon.setVisibility(View.INVISIBLE);
 			}
 		}
 

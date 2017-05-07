@@ -1,5 +1,6 @@
 package agersant.polaris.api.remote;
 
+import android.content.Intent;
 import android.media.MediaDataSource;
 import android.os.AsyncTask;
 
@@ -80,6 +81,7 @@ class DownloadQueueWorkItem {
 		mediaDataSource = new StreamingMediaDataSource(tempFile);
 		job = new DownloadTask(item, tempFile, mediaDataSource);
 		this.item = item;
+		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 
 		job.execute();
 	}
@@ -94,6 +96,14 @@ class DownloadQueueWorkItem {
 			mediaDataSource = null;
 		}
 		item = null;
+		broadcast(DownloadQueue.WORKLOAD_CHANGED);
+	}
+
+	private void broadcast(String event) {
+		PolarisApplication application = PolarisApplication.getInstance();
+		Intent intent = new Intent();
+		intent.setAction(event);
+		application.sendBroadcast(intent);
 	}
 
 }

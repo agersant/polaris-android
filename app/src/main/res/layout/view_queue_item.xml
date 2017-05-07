@@ -60,4 +60,16 @@
 		android:duplicateParentState="true"
 		android:visibility="invisible"/>
 
+	<ImageView
+		android:id="@+id/download_icon"
+		android:layout_width="24dp"
+		android:layout_height="24dp"
+		android:layout_alignParentEnd="true"
+		android:layout_centerVertical="true"
+		android:layout_marginEnd="12dp"
+		android:background="@drawable/ic_sync_black_24dp"
+		android:backgroundTint="@color/queue_item_cache_icon"
+		android:duplicateParentState="true"
+		android:visibility="invisible"/>
+
 </RelativeLayout>
