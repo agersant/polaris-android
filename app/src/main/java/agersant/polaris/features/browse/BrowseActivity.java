@@ -102,6 +102,10 @@ public class BrowseActivity extends PolarisActivity {
 				loadRandom();
 				break;
 			}
+			case RECENT: {
+				loadRecent();
+				break;
+			}
 		}
 	}
 
@@ -119,6 +123,11 @@ public class BrowseActivity extends PolarisActivity {
 	private void loadRandom() {
 		ServerAPI server = ServerAPI.getInstance();
 		server.getRandomAlbums(fetchCallback);
+	}
+
+	private void loadRecent() {
+		ServerAPI server = ServerAPI.getInstance();
+		server.getRecentAlbums(fetchCallback);
 	}
 
 	private void displayContent(ArrayList<? extends CollectionItem> items) {
@@ -179,6 +188,7 @@ public class BrowseActivity extends PolarisActivity {
 	enum NavigationMode {
 		PATH,
 		RANDOM,
+		RECENT,
 	}
 
 }

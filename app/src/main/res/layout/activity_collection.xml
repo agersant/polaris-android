@@ -62,6 +62,7 @@
 			android:drawablePadding="12dp"
 			android:drawableStart="@drawable/ic_new_releases_black_24dp"
 			android:gravity="center_vertical"
+			android:onClick="browseRecent"
 			android:text="@string/collection_recently_added"
 			android:textColor="@color/collection_button_text"
 			android:textSize="18sp"/>

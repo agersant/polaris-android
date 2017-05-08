@@ -55,7 +55,7 @@ public class ServerAPI
 		return instance;
 	}
 
-	String getURL() {
+	private String getURL() {
 		String address = this.preferences.getString(serverAddressKey, "");
 		address = address.replaceAll("/$", "");
 		return address + "/api";
@@ -84,8 +84,7 @@ public class ServerAPI
 	}
 
 	public void browse(String path, final ItemsCallback handlers) {
-		String serverAddress = this.getURL();
-		String requestURL = serverAddress + "/browse/" + path;
+		String requestURL = this.getURL() + "/browse/" + path;
 		Request request = new Request.Builder().url(requestURL).build();
 		Callback callback = new Callback() {
 			@Override
@@ -104,10 +103,8 @@ public class ServerAPI
 		requestQueue.requestAsync(request, callback);
 	}
 
-	public void getRandomAlbums(final ItemsCallback handlers) {
-		String serverAddress = this.getURL();
-		String requestURL = serverAddress + "/random/";
-		Request request = new Request.Builder().url(requestURL).build();
+	private void getAlbums(String url, final ItemsCallback handlers) {
+		Request request = new Request.Builder().url(url).build();
 		Callback callback = new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
@@ -126,9 +123,18 @@ public class ServerAPI
 		requestQueue.requestAsync(request, callback);
 	}
 
+	public void getRandomAlbums(ItemsCallback handlers) {
+		String requestURL = this.getURL() + "/random/";
+		getAlbums(requestURL, handlers);
+	}
+
+	public void getRecentAlbums(ItemsCallback handlers) {
+		String requestURL = this.getURL() + "/recent/";
+		getAlbums(requestURL, handlers);
+	}
+
 	public void flatten(String path, final ItemsCallback handlers) {
-		String serverAddress = this.getURL();
-		String requestURL = serverAddress + "/flatten/" + path;
+		String requestURL = this.getURL() + "/flatten/" + path;
 		Request request = new Request.Builder().url(requestURL).build();
 		Callback callback = new Callback() {
 			@Override

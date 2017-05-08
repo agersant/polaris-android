@@ -13,6 +13,7 @@ import agersant.polaris.features.PolarisActivity;
 public class CollectionActivity extends PolarisActivity {
 
 	private Button randomAlbums;
+	private Button recentAlbums;
 
 	public CollectionActivity() {
 		super(R.string.collection, R.id.nav_collection);
@@ -24,12 +25,11 @@ public class CollectionActivity extends PolarisActivity {
 		super.onCreate(savedInstanceState);
 
 		randomAlbums = (Button) findViewById(R.id.random);
+		recentAlbums = (Button) findViewById(R.id.recently_added);
 
 		// Disable unimplemented features
 		{
 			Button button;
-			button = (Button) findViewById(R.id.recently_added);
-			button.setEnabled(false);
 			button = (Button) findViewById(R.id.playlists);
 			button.setEnabled(false);
 		}
@@ -41,6 +41,7 @@ public class CollectionActivity extends PolarisActivity {
 		API api = API.getInstance();
 		boolean isOffline = api.isOffline();
 		randomAlbums.setEnabled(!isOffline);
+		recentAlbums.setEnabled(!isOffline);
 	}
 
 	public void browseDirectories(View view) {
@@ -55,6 +56,14 @@ public class CollectionActivity extends PolarisActivity {
 		Context context = view.getContext();
 		Intent intent = new Intent(context, BrowseActivity.class);
 		intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.RANDOM);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+		context.startActivity(intent);
+	}
+
+	public void browseRecent(View view) {
+		Context context = view.getContext();
+		Intent intent = new Intent(context, BrowseActivity.class);
+		intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.RECENT);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		context.startActivity(intent);
 	}
