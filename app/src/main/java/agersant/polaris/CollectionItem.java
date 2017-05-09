@@ -138,8 +138,13 @@ public class CollectionItem
 	public static class Deserializer implements JsonDeserializer<CollectionItem> {
 		public CollectionItem deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 			CollectionItem item = new CollectionItem();
-			item.isDirectory = json.getAsJsonObject().get("variant").getAsString().equals("Directory");
-			JsonObject fields = json.getAsJsonObject().get("fields").getAsJsonArray().get(0).getAsJsonObject();
+			item.isDirectory = json.getAsJsonObject().has("Directory");
+			JsonObject fields;
+			if (item.isDirectory()) {
+				fields = json.getAsJsonObject().get("Directory").getAsJsonObject();
+			} else {
+				fields = json.getAsJsonObject().get("Song").getAsJsonObject();
+			}
 			item.parseFields(fields);
 			return item;
 		}
