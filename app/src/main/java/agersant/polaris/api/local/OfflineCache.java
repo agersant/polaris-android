@@ -467,7 +467,7 @@ public class OfflineCache {
 					if (content != null) {
 						out.addAll(content);
 					}
-				} else {
+				} else if (hasAudio(item.getPath()))  {
 					out.add(item);
 				}
 			} catch (IOException | ClassNotFoundException e) {
