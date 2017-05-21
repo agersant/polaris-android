@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
@@ -42,6 +44,12 @@ public class BrowseViewExplorer extends BrowseViewContent {
 
 	@Override
 	void setItems(ArrayList<? extends CollectionItem> items) {
+		Collections.sort(items, new Comparator<CollectionItem>() {
+			@Override
+			public int compare(CollectionItem a, CollectionItem b) {
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		adapter.setItems(items);
 	}
 
