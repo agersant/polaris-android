@@ -38,7 +38,8 @@ public class OfflineCache {
 	private static final String ITEM_FILENAME = "__polaris__item";
 	private static final String AUDIO_FILENAME = "__polaris__audio";
 	private static final String META_FILENAME = "__polaris__meta";
-	private static final int VERSION = 1;
+	private static final int FIRST_VERSION = 1;
+	private static final int VERSION = 2;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private static OfflineCache instance;
 	private SharedPreferences preferences;
@@ -46,8 +47,14 @@ public class OfflineCache {
 
 	private OfflineCache(Context context) {
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		root = new File(context.getExternalCacheDir(), "collection");
-		root = new File(root, "v" + VERSION);
+
+		for (int i = FIRST_VERSION; i <= VERSION; i++) {
+			root = new File(context.getExternalCacheDir(), "collection");
+			root = new File(root, "v" + VERSION);
+			if (i != VERSION) {
+				deleteDirectory(root);
+			}
+		}
 	}
 
 	public static void init(Context context) {
@@ -206,6 +213,9 @@ public class OfflineCache {
 	private void deleteDirectory(File path) {
 		assert (path.isDirectory());
 		File[] files = path.listFiles();
+		if (files == null) {
+			return;
+		}
 		for (File child : files) {
 			if (child.isDirectory()) {
 				deleteDirectory(child);
