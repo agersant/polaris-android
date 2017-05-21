@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
@@ -49,6 +51,12 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	void setItems(ArrayList<? extends CollectionItem> items) {
 		assert !items.isEmpty();
 
+		Collections.sort(items, new Comparator<CollectionItem>() {
+			@Override
+			public int compare(CollectionItem a, CollectionItem b) {
+				return a.getTrackNumber() - b.getTrackNumber();
+			}
+		});
 		adapter.setItems(items);
 
 		CollectionItem item = items.get(0);

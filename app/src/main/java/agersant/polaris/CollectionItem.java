@@ -12,14 +12,14 @@ import java.lang.reflect.Type;
 public class CollectionItem
 		implements Cloneable, Serializable {
 
-	protected String path;
-	protected String name;
-	protected String artist;
-	protected String title;
-	protected String artwork;
-	protected String album;
-	protected String albumArtist;
-	protected Integer trackNumber;
+	private String path;
+	private String name;
+	private String artist;
+	private String title;
+	private String artwork;
+	private String album;
+	private String albumArtist;
+	private int trackNumber;
 	protected boolean isDirectory;
 
 	private CollectionItem() {
@@ -37,7 +37,7 @@ public class CollectionItem
 		return item;
 	}
 
-	void parseFields(JsonObject fields) {
+	protected void parseFields(JsonObject fields) {
 		path = getOptionalString(fields, "path");
 		artist = getOptionalString(fields, "artist");
 		title = getOptionalString(fields, "title");
