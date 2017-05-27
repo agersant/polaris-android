@@ -129,10 +129,12 @@ public class OfflineCache {
 		long size = 0;
 		assert (file.isDirectory());
 		File[] files = file.listFiles();
-		for (File child : files) {
-			size += child.length();
-			if (child.isDirectory()) {
-				size += getCacheSize(child);
+		if (files != null) {
+			for (File child : files) {
+				size += child.length();
+				if (child.isDirectory()) {
+					size += getCacheSize(child);
+				}
 			}
 		}
 		return size;
