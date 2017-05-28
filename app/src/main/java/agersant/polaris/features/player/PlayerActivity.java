@@ -62,6 +62,7 @@ public class PlayerActivity extends PolarisActivity {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				player.seekTo(newPosition / 100.f);
 				seeking = false;
+				updateControls();
 			}
 		});
 	}

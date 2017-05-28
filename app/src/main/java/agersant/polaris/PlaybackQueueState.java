@@ -17,18 +17,20 @@ import java.util.ArrayList;
 
 public class PlaybackQueueState implements Serializable {
 
-	private static int VERSION = 1;
+	private static int VERSION = 2;
 
 	private static File storage;
 
 	ArrayList<CollectionItem> queueContent;
 	int queueIndex;
 	PlaybackQueue.Ordering queueOrdering;
+	float trackProgress;
 
 	PlaybackQueueState() {
 		queueContent = new ArrayList<>();
 		queueOrdering = PlaybackQueue.Ordering.SEQUENCE;
 		queueIndex = -1;
+		trackProgress = 0;
 	}
 
 	static void init(Context context) {

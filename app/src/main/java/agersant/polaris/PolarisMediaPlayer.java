@@ -19,8 +19,10 @@ public class PolarisMediaPlayer
 	private MediaPlayer.OnErrorListener onErrorListener;
 	private State state;
 	private boolean pause;
+	private Float seekTarget;
 
 	PolarisMediaPlayer() {
+		seekTarget = null;
 		pause = false;
 		state = State.IDLE;
 		player = new MediaPlayer();
@@ -61,12 +63,17 @@ public class PolarisMediaPlayer
 		if (!pause) {
 			state = State.STARTED;
 			player.start();
+			if (seekTarget != null) {
+				seekTo(seekTarget);
+				seekTarget = null;
+			}
 		}
 	}
 
 	void reset() {
 		state = State.IDLE;
 		pause = false;
+		seekTarget = null;
 		player.reset();
 	}
 
@@ -98,6 +105,10 @@ public class PolarisMediaPlayer
 			case PLAYBACK_COMPLETED:
 				state = State.STARTED;
 				player.start();
+				if (seekTarget != null) {
+					seekTo(seekTarget);
+					seekTarget = null;
+				}
 				break;
 		}
 	}
@@ -119,10 +130,19 @@ public class PolarisMediaPlayer
 			case IDLE:
 			case INITIALIZED:
 			case PREPARING:
-			case END:
+			case PREPARED:
+				seekTarget = progress;
+				break;
+			case STOPPED:
 			case ERROR:
+			case END:
 				return;
-			default: {
+			case PLAYBACK_COMPLETED:
+				resume();
+				// Fallthrough
+			case STARTED:
+			case PAUSED:
+			{
 				int duration = (int) (progress * player.getDuration());
 				player.seekTo(duration);
 			}
@@ -135,18 +155,25 @@ public class PolarisMediaPlayer
 			case INITIALIZED:
 			case PREPARING:
 			case PREPARED:
+				if (seekTarget != null) {
+					return seekTarget;
+				}
+				return 0.f;
 			case STOPPED:
 			case ERROR:
 				return 0.f;
 			case END:
 			case PLAYBACK_COMPLETED:
 				return 1.f;
-			default: {
+			case STARTED:
+			case PAUSED:
+			{
 				int duration = player.getDuration();
 				int position = player.getCurrentPosition();
 				return (float) position / duration;
 			}
 		}
+		return 0;
 	}
 
 	private enum State {

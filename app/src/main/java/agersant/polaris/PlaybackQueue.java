@@ -44,6 +44,7 @@ public class PlaybackQueue {
 		state.queueOrdering = ordering;
 		CollectionItem currentItem = player.getCurrentItem();
 		state.queueIndex = content.indexOf(currentItem);
+		state.trackProgress = player.getProgress();
 		return state;
 	}
 
@@ -54,7 +55,9 @@ public class PlaybackQueue {
 			CollectionItem currentItem = content.get(state.queueIndex);
 			player.play(currentItem);
 			player.pause();
-			// TODO seek
+			if (state.trackProgress < 1.f) {
+				player.seekTo(state.trackProgress);
+			}
 		}
 	}
 
