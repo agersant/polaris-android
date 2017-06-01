@@ -24,6 +24,30 @@
 		android:indeterminateTint="@color/lightBlue600"
 		tools:visibility="gone"/>
 
+	<LinearLayout
+		android:id="@+id/browse_error_message"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:gravity="center"
+		android:orientation="vertical">
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="24dp"
+			android:gravity="center"
+			android:text="@string/browse_error"
+			android:drawableStart="@drawable/ic_error_black_24dp"
+			android:drawableTint="@color/red500"
+			android:drawablePadding="8dp"/>
+		<Button
+			android:id="@+id/browse_error_retry"
+			android:layout_width="80dp"
+			android:layout_height="40dp"
+			android:textColor="@color/blueGrey900"
+			android:onClick="retry"
+			android:text="@string/browse_error_retry"/>
+	</LinearLayout>
+
 	<FrameLayout
 		android:id="@+id/browse_content_holder"
 		android:layout_width="match_parent"

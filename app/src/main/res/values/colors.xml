@@ -12,6 +12,8 @@
 	<color name="pink100">#f8bbd0</color>
 	<color name="pink400">#ec407a</color>
 
+	<color name="red500">#F44336</color>
+
 	<color name="white">#FFFFFF</color>
 	<color name="black">#000000</color>
 </resources>

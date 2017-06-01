@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -25,6 +24,7 @@ public class BrowseActivity extends PolarisActivity {
 	public static final String PATH = "PATH";
 	public static final String NAVIGATION_MODE = "NAVIGATION_MODE";
 	private ProgressBar progressBar;
+	private View errorMessage;
 	private ViewGroup contentHolder;
 	private ItemsCallback fetchCallback;
 	private NavigationMode navigationMode;
@@ -39,6 +39,7 @@ public class BrowseActivity extends PolarisActivity {
 		setContentView(R.layout.activity_browse);
 		super.onCreate(savedInstanceState);
 
+		errorMessage = findViewById(R.id.browse_error_message);
 		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 		contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
 
@@ -60,8 +61,8 @@ public class BrowseActivity extends PolarisActivity {
 				that.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Toast toast = Toast.makeText(that, R.string.browse_error, Toast.LENGTH_SHORT);
-						toast.show();
+						progressBar.setVisibility(View.GONE);
+						errorMessage.setVisibility(View.VISIBLE);
 					}
 				});
 			}
@@ -88,6 +89,8 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadContent() {
+		progressBar.setVisibility(View.VISIBLE);
+		errorMessage.setVisibility(View.GONE);
 		Intent intent = getIntent();
 		switch (navigationMode) {
 			case PATH: {
@@ -107,6 +110,10 @@ public class BrowseActivity extends PolarisActivity {
 				break;
 			}
 		}
+	}
+
+	public void retry(View view) {
+		loadContent();
 	}
 
 	@Override

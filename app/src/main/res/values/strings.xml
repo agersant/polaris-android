@@ -8,6 +8,7 @@
 	<string name="collection_playlists">Playlists</string>
 
 	<string name="browse_error">An error occurred while listing content</string>
+	<string name="browse_error_retry">Retry</string>
 
 	<string name="queue">Queue</string>
 
