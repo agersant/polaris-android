@@ -24,14 +24,14 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	private String path;
 	private File outFile;
 	private boolean reachedEOF;
-	private StreamingMediaDataSource dataSource;
+	private DownloadQueueWorkItem workItem;
 
-	DownloadTask(CollectionItem item, File file, StreamingMediaDataSource stream) {
+	DownloadTask(DownloadQueueWorkItem workItem, CollectionItem item, File file) {
+		this.workItem = workItem;
 		this.item = item;
 		path = item.getPath();
 		outFile = file;
 		reachedEOF = false;
-		dataSource = stream;
 	}
 
 	public String getPath() {
@@ -54,7 +54,7 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 			return 1;
 		}
 		long contentLength = responseBody.contentLength();
-		dataSource.setContentLength((int) contentLength);
+		workItem.setContentLength((int) contentLength);
 
 		try (InputStream inputStream = responseBody.byteStream();
 			 FileOutputStream outputStream = new FileOutputStream(outFile);
@@ -96,9 +96,9 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	@Override
 	protected void onPostExecute(Integer result) {
 		if (reachedEOF) {
-			dataSource.markAsComplete();
+			workItem.onJobSuccess();
 		} else {
-			dataSource.handleError();
+			workItem.onJobError();
 		}
 	}
 

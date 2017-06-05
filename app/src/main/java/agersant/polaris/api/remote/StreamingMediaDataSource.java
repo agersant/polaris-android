@@ -14,14 +14,12 @@ class StreamingMediaDataSource extends MediaDataSource {
 
 	private RandomAccessFile streamFile;
 	private boolean completed;
-	private boolean errored;
 	private int size;
 
 	StreamingMediaDataSource(File streamFile) throws IOException {
 		super();
 		this.streamFile = new RandomAccessFile(streamFile, "r");
 		completed = false;
-		errored = false;
 		size = -1;
 	}
 
@@ -29,36 +27,29 @@ class StreamingMediaDataSource extends MediaDataSource {
 		completed = true;
 	}
 
-	void handleError() {
-		errored = true;
-	}
-
 	void setContentLength(int length) {
 		size = length;
 	}
 
 	@Override
-	public int readAt(long position, byte[] buffer, int offset, int size) throws IOException {
+	public int readAt(long position, byte[] buffer, int offset, int bytesToRead) throws IOException {
 		try {
 
 			streamFile.seek(position);
 
 			int read = 0;
-			while (read < size) {
-				int bytes = streamFile.read(buffer, offset, size);
+			while (read < bytesToRead) {
+				int bytes = streamFile.read(buffer, offset, bytesToRead - read);
 				if (bytes > 0) {
-					size -= bytes;
 					read += bytes;
 					offset += bytes;
 				}
 				if (bytes < 0 && completed) {
 					if (read == 0) {
 						return -1;
+					} else {
+						return read;
 					}
-					break;
-				}
-				if (bytes <= 0 && errored) {
-					return -1;
 				}
 			}
 
