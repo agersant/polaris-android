@@ -33,15 +33,10 @@ public class RequestQueue {
 		return instance;
 	}
 
-	ResponseBody requestSync(Request request) {
-		Response response;
-		try {
-			response = client.newCall(request).execute();
-		} catch (Exception e) {
-			return null;
-		}
+	ResponseBody requestSync(Request request) throws IOException {
+		Response response = client.newCall(request).execute();
 		if (!response.isSuccessful()) {
-			return null;
+			throw new IOException("Request failed with error code: " + response.code());
 		}
 		return response.body();
 	}
