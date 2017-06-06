@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.Random;
 
@@ -25,13 +26,55 @@ public class QueueActivity extends PolarisActivity {
 
 	private QueueAdapter adapter;
 	private BroadcastReceiver receiver;
+	private View tutorial;
 
 	public QueueActivity() {
 		super(R.string.queue, R.id.nav_queue);
 	}
 
+	private void subscribeToEvents() {
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(PlaybackQueue.REMOVED_ITEM);
+		filter.addAction(PlaybackQueue.REMOVED_ITEMS);
+		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
+		filter.addAction(Player.PLAYING_TRACK);
+		filter.addAction(OfflineCache.AUDIO_CACHED);
+		filter.addAction(DownloadQueue.WORKLOAD_CHANGED);
+		filter.addAction(OfflineCache.AUDIO_REMOVED_FROM_CACHE);
+		receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				switch (intent.getAction()) {
+					case PlaybackQueue.REMOVED_ITEM:
+					case PlaybackQueue.REMOVED_ITEMS:
+						updateTutorial();
+						break;
+					case PlaybackQueue.QUEUED_ITEMS:
+						updateTutorial();
+						// Fallthrough
+					case Player.PLAYING_TRACK:
+					case OfflineCache.AUDIO_CACHED:
+					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
+						adapter.notifyDataSetChanged();
+						break;
+				}
+			}
+		};
+		registerReceiver(receiver, filter);
+	}
+
+	void updateTutorial() {
+		boolean empty = adapter.getItemCount() == 0;
+		if (empty) {
+			tutorial.setVisibility(View.VISIBLE);
+		} else {
+			tutorial.setVisibility(View.GONE);
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		setContentView(R.layout.activity_queue);
 		super.onCreate(savedInstanceState);
 
@@ -45,29 +88,9 @@ public class QueueActivity extends PolarisActivity {
 		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
-	}
 
-	private void subscribeToEvents() {
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
-		filter.addAction(Player.PLAYING_TRACK);
-		filter.addAction(OfflineCache.AUDIO_CACHED);
-		filter.addAction(DownloadQueue.WORKLOAD_CHANGED);
-		filter.addAction(OfflineCache.AUDIO_REMOVED_FROM_CACHE);
-		receiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				switch (intent.getAction()) {
-					case PlaybackQueue.QUEUED_ITEMS:
-					case Player.PLAYING_TRACK:
-					case OfflineCache.AUDIO_CACHED:
-					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
-						adapter.notifyDataSetChanged();
-						break;
-				}
-			}
-		};
-		registerReceiver(receiver, filter);
+		tutorial = findViewById(R.id.queue_tutorial);
+		updateTutorial();
 	}
 
 	@Override

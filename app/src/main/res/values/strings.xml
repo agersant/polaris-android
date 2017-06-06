@@ -11,6 +11,7 @@
 	<string name="browse_error_retry">Retry</string>
 
 	<string name="queue">Queue</string>
+	<string name="queue_empty">Make a playlist by swiping music from your collection to here.</string>
 
 	<string name="now_playing">Now Playing</string>
 	<string name="player_artwork">Album Artwork</string>
