@@ -97,6 +97,11 @@ public class PolarisMediaPlayer
 		}
 	}
 
+	void release() {
+		player.release();
+		state = State.END;
+	}
+
 	void resume() {
 		pause = false;
 		switch (state) {
@@ -161,8 +166,8 @@ public class PolarisMediaPlayer
 				return 0.f;
 			case STOPPED:
 			case ERROR:
-				return 0.f;
 			case END:
+				return 0.f;
 			case PLAYBACK_COMPLETED:
 				return 1.f;
 			case STARTED:
