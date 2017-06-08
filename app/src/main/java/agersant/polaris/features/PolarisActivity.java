@@ -51,6 +51,7 @@ public class PolarisActivity extends AppCompatActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		// TODO this isnt called when track ends??
 		PlaybackQueueState.saveToDisk();
 	}
 
