@@ -47,7 +47,10 @@ public class MediaPlayerService
 	private CollectionItem item;
 
 	public void stop() {
-		player.reset();
+		if (player != null) {
+			player.release();
+			player = null;
+		}
 		if (media != null) {
 			try {
 				media.close();
@@ -62,6 +65,11 @@ public class MediaPlayerService
 	public void play(CollectionItem item) {
 		System.out.println("Beginning playback for: " + item.getPath());
 		stop();
+
+		player = new PolarisMediaPlayer();
+		player.setOnCompletionListener(this);
+		player.setOnErrorListener(this);
+
 		try {
 			API api = API.getInstance();
 			media = api.getAudio(item);
@@ -120,9 +128,6 @@ public class MediaPlayerService
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		player = new PolarisMediaPlayer();
-		player.setOnCompletionListener(this);
-		player.setOnErrorListener(this);
 		registerReceiver(receiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 	}
 
