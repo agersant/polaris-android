@@ -180,7 +180,7 @@ public class MediaPlayerService
 	private void pushSystemNotification() {
 		Notification.Builder notificationBuilder = new Notification.Builder(this)
 				.setShowWhen(false)
-				.setSmallIcon(R.drawable.launcher_icon) // TODO: Make notification icon
+				.setSmallIcon(R.drawable.notification_icon)
 				.setContentTitle(item.getTitle())
 				.setContentText(item.getArtist())
 				.setVisibility(Notification.VISIBILITY_PUBLIC)
