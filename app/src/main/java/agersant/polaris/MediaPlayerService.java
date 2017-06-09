@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import agersant.polaris.api.API;
+import agersant.polaris.features.player.PlayerActivity;
 
 public class MediaPlayerService
 		extends Service
@@ -199,12 +201,19 @@ public class MediaPlayerService
 	private void pushSystemNotification() {
 		boolean isPlaying = isPlaying();
 
+		Intent resultIntent = new Intent(this, PlayerActivity.class);
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
+			.addParentStack(PlayerActivity.class)
+			.addNextIntent(resultIntent);
+		PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		Notification.Builder notificationBuilder = new Notification.Builder(this)
 				.setShowWhen(false)
 				.setSmallIcon(R.drawable.notification_icon)
 				.setContentTitle(item.getTitle())
 				.setContentText(item.getArtist())
 				.setVisibility(Notification.VISIBILITY_PUBLIC)
+				.setContentIntent(pendingIntent)
 				.setStyle(new Notification.MediaStyle()
 						.setShowActionsInCompactView()
 				);
