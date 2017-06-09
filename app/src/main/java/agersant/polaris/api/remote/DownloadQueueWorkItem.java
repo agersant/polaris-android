@@ -106,12 +106,14 @@ class DownloadQueueWorkItem {
 	void onJobError() {
 		float mediaProgress = 0.f;
 		MediaPlayerService playerService = null;
+		boolean isPaused = true;
 
 		boolean stopActiveMedia = isDataSourceInUse();
 		if (stopActiveMedia) {
 			System.out.println("Stopping active datasource");
 			PolarisApplication application = PolarisApplication.getInstance();
 			playerService = application.getMediaPlayerService();
+			isPaused = !playerService.isPlaying();
 			mediaProgress = playerService.getProgress();
 			playerService.stop();
 		}
@@ -124,6 +126,9 @@ class DownloadQueueWorkItem {
 					System.out.println("Resuming playback from " + mediaProgress + "%");
 					playerService.play(item);
 					playerService.seekTo(mediaProgress);
+					if (isPaused) {
+						playerService.pause();
+					}
 				}
 				return;
 			} catch (Exception e) {

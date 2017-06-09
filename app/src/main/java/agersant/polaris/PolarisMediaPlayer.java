@@ -60,13 +60,17 @@ public class PolarisMediaPlayer
 	@Override
 	public void onPrepared(MediaPlayer mediaPlayer) {
 		state = State.PREPARED;
-		if (!pause) {
-			state = State.STARTED;
-			player.start();
-			if (seekTarget != null) {
-				seekTo(seekTarget);
-				seekTarget = null;
-			}
+
+		player.start();
+		state = State.STARTED;
+
+		if (seekTarget != null) {
+			seekTo(seekTarget);
+			seekTarget = null;
+		}
+
+		if (pause) {
+			player.pause();
 		}
 	}
 

@@ -90,26 +90,40 @@ public class MediaPlayerService
 	}
 
 	public void resume() {
+		if (player == null) {
+			return;
+		}
 		player.resume();
 		broadcast(Player.RESUMED_TRACK);
 		pushSystemNotification();
 	}
 
 	public void pause() {
+		if (player == null) {
+			return;
+		}
 		player.pause();
 		broadcast(Player.PAUSED_TRACK);
 		pushSystemNotification();
 	}
 
 	public boolean isPlaying() {
+		if (player == null) {
+			return false;
+		}
 		return player.isPlaying();
 	}
 
 	public void seekTo(float progress) {
-		player.seekTo(progress);
+		if (player != null) {
+			player.seekTo(progress);
+		}
 	}
 
 	public float getProgress() {
+		if (player == null) {
+			return 0.f;
+		}
 		return player.getProgress();
 	}
 
