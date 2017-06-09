@@ -197,6 +197,8 @@ public class MediaPlayerService
 	}
 
 	private void pushSystemNotification() {
+		boolean isPlaying = isPlaying();
+
 		Notification.Builder notificationBuilder = new Notification.Builder(this)
 				.setShowWhen(false)
 				.setSmallIcon(R.drawable.notification_icon)
@@ -208,7 +210,7 @@ public class MediaPlayerService
 				);
 
 		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
-		if (player.isPlaying()) {
+		if (isPlaying) {
 			notificationBuilder.addAction(generateAction(R.drawable.ic_pause_black_24dp, R.string.player_pause, MEDIA_INTENT_PAUSE));
 		} else {
 			notificationBuilder.addAction(generateAction(R.drawable.ic_play_arrow_black_24dp, R.string.player_play, MEDIA_INTENT_PLAY));
@@ -216,9 +218,14 @@ public class MediaPlayerService
 		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, R.string.player_previous_track, MEDIA_INTENT_SKIP_NEXT));
 
 		Notification notification = notificationBuilder.build();
-		startForeground(MEDIA_NOTIFICATION, notification);
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
+
+		if (isPlaying) {
+			startForeground(MEDIA_NOTIFICATION, notification);
+		} else {
+			stopForeground(false);
+		}
 	}
 
 	private Notification.Action generateAction(int icon, int text, String intentAction) {
