@@ -70,7 +70,7 @@ public class PolarisMediaPlayer
 		}
 
 		if (pause) {
-			player.pause();
+			pause();
 		}
 	}
 
