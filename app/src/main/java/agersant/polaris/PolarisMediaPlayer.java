@@ -74,13 +74,6 @@ public class PolarisMediaPlayer
 		}
 	}
 
-	void reset() {
-		state = State.IDLE;
-		pause = false;
-		seekTarget = null;
-		player.reset();
-	}
-
 	void setDataSource(MediaDataSource media) {
 		state = State.INITIALIZED;
 		player.setDataSource(media);
@@ -102,7 +95,15 @@ public class PolarisMediaPlayer
 	}
 
 	void release() {
-		player.release();
+		switch (state) {
+			case IDLE:
+			case INITIALIZED:
+			case PREPARING:
+			case END:
+				break;
+			default:
+				player.release();
+		}
 		state = State.END;
 	}
 
