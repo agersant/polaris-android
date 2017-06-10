@@ -57,7 +57,6 @@ public class PolarisApplication extends Application {
 
 		Intent intent = new Intent(this, MediaPlayerService.class);
 		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-		startService(intent);
 	}
 
 	public MediaPlayerService getMediaPlayerService() {
