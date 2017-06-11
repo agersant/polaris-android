@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 
 
 public class BrowseViewAlbum extends BrowseViewContent {
@@ -24,9 +24,11 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	private ImageView artwork;
 	private TextView artist;
 	private TextView title;
+	private PolarisService service;
 
-	public BrowseViewAlbum(Context context) {
+	public BrowseViewAlbum(Context context, PolarisService service) {
 		super(context);
+		this.service = service;
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_browse_album, this, true);
@@ -43,7 +45,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-		adapter = new BrowseAdapterAlbum();
+		adapter = new BrowseAdapterAlbum(service);
 		recyclerView.setAdapter(adapter);
 	}
 
@@ -61,7 +63,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 
 		CollectionItem item = items.get(0);
 
-		API.getInstance().getImage(item, artwork);
+		service.getAPI().getImage(item, artwork);
 
 		String titleString = item.getAlbum();
 		if (title != null) {

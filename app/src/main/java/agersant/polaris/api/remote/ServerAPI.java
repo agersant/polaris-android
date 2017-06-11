@@ -1,7 +1,6 @@
 package agersant.polaris.api.remote;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaDataSource;
 import android.preference.PreferenceManager;
@@ -18,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
@@ -30,29 +30,22 @@ import okhttp3.ResponseBody;
 public class ServerAPI
 		implements IPolarisAPI {
 
-	private static ServerAPI instance;
 	private final RequestQueue requestQueue;
 	private final Gson gson;
 	private final SharedPreferences preferences;
 	private final String serverAddressKey;
+	private PolarisService service;
 
-	private ServerAPI(Context context) {
-		this.serverAddressKey = context.getString(R.string.pref_key_server_url);
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+	public ServerAPI(PolarisService service) {
+		this.service = service;
+		this.serverAddressKey = service.getString(R.string.pref_key_server_url);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(service);
 		this.requestQueue = RequestQueue.getInstance();
 		this.gson = new GsonBuilder()
 				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
 				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
 				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
 				.create();
-	}
-
-	public static void init(Context context) {
-		instance = new ServerAPI(context);
-	}
-
-	public static ServerAPI getInstance() {
-		return instance;
 	}
 
 	private String getURL() {
@@ -68,16 +61,15 @@ public class ServerAPI
 
 	@Override
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
-		DownloadQueue downloadQueue = DownloadQueue.getInstance();
-		return downloadQueue.getAudio(item);
+		return service.downloadAudio(item);
 	}
 
 	@Override
 	public void getImage(CollectionItem item, ImageView view) {
-		FetchImageTask.load(item, view);
+		FetchImageTask.load(service, item, view);
 	}
 
-	ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+	public ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
 		String url = getMediaURL(path);
 		Request request = new Request.Builder().url(url).build();
 		return requestQueue.requestSync(request);

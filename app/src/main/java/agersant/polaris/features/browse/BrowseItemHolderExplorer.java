@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
 /**
@@ -15,8 +16,8 @@ class BrowseItemHolderExplorer extends BrowseItemHolder {
 
 	private Button button;
 
-	BrowseItemHolderExplorer(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(adapter, itemView, itemQueueStatusView);
+	BrowseItemHolderExplorer(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(service, adapter, itemView, itemQueueStatusView);
 		button = (Button) itemView.findViewById(R.id.browse_explorer_button);
 		button.setOnClickListener(this);
 	}

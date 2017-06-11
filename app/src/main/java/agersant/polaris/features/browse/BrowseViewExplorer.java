@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
 
@@ -22,7 +23,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 	private BrowseAdapter adapter;
 	private SwipyRefreshLayout swipeRefresh;
 
-	public BrowseViewExplorer(Context context) {
+	public BrowseViewExplorer(Context context, PolarisService service) {
 		super(context);
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -36,7 +37,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-		adapter = new BrowseAdapterExplorer();
+		adapter = new BrowseAdapterExplorer(service);
 		recyclerView.setAdapter(adapter);
 
 		swipeRefresh = (SwipyRefreshLayout) findViewById(R.id.swipe_refresh);

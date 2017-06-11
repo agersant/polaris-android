@@ -5,8 +5,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 
 /**
  * Created by agersant on 12/11/2016.
@@ -17,9 +17,11 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 	private ImageView artwork;
 	private TextView artist;
 	private TextView album;
+	private PolarisService service;
 
-	BrowseItemHolderDiscography(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(adapter, itemView, itemQueueStatusView);
+	BrowseItemHolderDiscography(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(service, adapter, itemView, itemQueueStatusView);
+		this.service = service;
 		artwork = (ImageView) itemView.findViewById(R.id.artwork);
 		artist = (TextView) itemView.findViewById(R.id.artist);
 		album = (TextView) itemView.findViewById(R.id.album);
@@ -44,6 +46,6 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 			}
 		}
 
-		API.getInstance().getImage(item, artwork);
+		service.getAPI().getImage(item, artwork);
 	}
 }

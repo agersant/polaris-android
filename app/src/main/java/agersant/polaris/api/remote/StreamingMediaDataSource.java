@@ -10,7 +10,7 @@ import java.io.RandomAccessFile;
  * Created by agersant on 12/26/2016.
  */
 
-class StreamingMediaDataSource extends MediaDataSource {
+public class StreamingMediaDataSource extends MediaDataSource {
 
 	private RandomAccessFile streamFile;
 	private boolean completed;

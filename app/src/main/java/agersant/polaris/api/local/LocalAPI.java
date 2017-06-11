@@ -17,42 +17,30 @@ import agersant.polaris.api.ItemsCallback;
 
 public class LocalAPI implements IPolarisAPI {
 
-	private static LocalAPI instance;
+	private OfflineCache offlineCache;
 
-	private LocalAPI() {
-
-	}
-
-	public static void init() {
-		instance = new LocalAPI();
-	}
-
-	public static LocalAPI getInstance() {
-		return instance;
+	public LocalAPI(OfflineCache offlineCache) {
+		this.offlineCache = offlineCache;
 	}
 
 	public boolean hasAudio(CollectionItem item) {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		String path = item.getPath();
 		return offlineCache.hasAudio(path);
 	}
 
 	@Override
 	public MediaDataSource getAudio(CollectionItem item) throws IOException {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		String path = item.getPath();
 		return offlineCache.getAudio(path);
 	}
 
 	public boolean hasImage(CollectionItem item) {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		String path = item.getPath();
 		return offlineCache.hasImage(path);
 	}
 
 	@Override
 	public void getImage(CollectionItem item, ImageView view) {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		String artworkPath = item.getArtwork();
 		if (artworkPath == null) {
 			return;
@@ -69,7 +57,6 @@ public class LocalAPI implements IPolarisAPI {
 	}
 
 	public void browse(String path, ItemsCallback handlers) {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		ArrayList<CollectionItem> items = offlineCache.browse(path);
 		if (items == null) {
 			handlers.onError();
@@ -79,7 +66,6 @@ public class LocalAPI implements IPolarisAPI {
 	}
 
 	public void flatten(String path, ItemsCallback handlers) {
-		OfflineCache offlineCache = OfflineCache.getInstance();
 		ArrayList<CollectionItem> items = offlineCache.flatten(path);
 		if (items == null) {
 			handlers.onError();

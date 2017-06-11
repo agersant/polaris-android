@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import agersant.polaris.PlaybackQueueState;
 import agersant.polaris.R;
 import agersant.polaris.features.browse.CollectionActivity;
 import agersant.polaris.features.player.PlayerActivity;
@@ -46,13 +45,6 @@ public class PolarisActivity extends AppCompatActivity {
 				return that.onNavigationItemSelected(menuItem);
 			}
 		});
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		// TODO this isnt called when track ends??
-		PlaybackQueueState.saveToDisk();
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.PolarisService;
 import okhttp3.ResponseBody;
 
 /**
@@ -25,12 +25,14 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 	private File outFile;
 	private boolean reachedEOF;
 	private DownloadQueueWorkItem workItem;
+	private PolarisService service;
 
-	DownloadTask(DownloadQueueWorkItem workItem, CollectionItem item, File file) {
+	DownloadTask(PolarisService service, DownloadQueueWorkItem workItem, CollectionItem item, File outFile) {
 		this.workItem = workItem;
 		this.item = item;
+		this.outFile = outFile;
+		this.service = service;
 		path = item.getPath();
-		outFile = file;
 		reachedEOF = false;
 	}
 
@@ -43,7 +45,7 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 
 		ResponseBody responseBody;
 		try {
-			responseBody = ServerAPI.getInstance().serve(path);
+			responseBody = service.getServerAPI().serve(path);
 		} catch (Exception e) {
 			System.out.println("Error establishing stream connection: " + e);
 			return 1;
@@ -84,9 +86,8 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 
 	private void saveForOfflineUse() {
 		if (reachedEOF) {
-			OfflineCache cache = OfflineCache.getInstance();
 			try (FileInputStream audioStreamFile = new FileInputStream(outFile)) {
-				cache.putAudio(item, audioStreamFile);
+				service.saveAudio(item, audioStreamFile);
 			} catch (IOException e) {
 				System.out.println("Error while storing item to offline cache: " + e);
 			}

@@ -15,6 +15,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
 class BrowseViewDiscography extends BrowseViewContent {
@@ -22,7 +23,7 @@ class BrowseViewDiscography extends BrowseViewContent {
 	private BrowseAdapter adapter;
 	private SwipyRefreshLayout swipeRefresh;
 
-	public BrowseViewDiscography(Context context) {
+	public BrowseViewDiscography(Context context, PolarisService service) {
 		super(context);
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -36,7 +37,7 @@ class BrowseViewDiscography extends BrowseViewContent {
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-		adapter = new BrowseAdapterDiscography();
+		adapter = new BrowseAdapterDiscography(service);
 		recyclerView.setAdapter(adapter);
 
 		swipeRefresh = (SwipyRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -46,7 +47,6 @@ class BrowseViewDiscography extends BrowseViewContent {
 	void setItems(ArrayList<? extends CollectionItem> items) {
 		adapter.setItems(items);
 	}
-
 
 	@Override
 	void setOnRefreshListener(SwipyRefreshLayout.OnRefreshListener listener) {

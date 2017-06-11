@@ -1,6 +1,5 @@
 package agersant.polaris.api.remote;
 
-import android.content.Context;
 import android.media.MediaDataSource;
 
 import java.io.File;
@@ -10,9 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PlaybackQueue;
-import agersant.polaris.api.API;
-import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.PolarisService;
 
 /**
  * Created by agersant on 12/25/2016.
@@ -22,16 +19,17 @@ public class DownloadQueue {
 
 	public static final String WORKLOAD_CHANGED = "WORKLOAD_CHANGED";
 
-	private static DownloadQueue instance;
-
+	private PolarisService service;
 	private Timer timer;
 	private ArrayList<DownloadQueueWorkItem> workers;
 
-	private DownloadQueue(Context context) {
+	public DownloadQueue(PolarisService service) {
+		this.service = service;
+
 		workers = new ArrayList<>();
 		for (int i = 0; i < 2; i++) {
-			File file = new File(context.getExternalCacheDir(), "stream" + i + ".tmp");
-			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file);
+			File file = new File(service.getExternalCacheDir(), "stream" + i + ".tmp");
+			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file, service);
 			workers.add(worker);
 		}
 		timer = new Timer();
@@ -40,18 +38,10 @@ public class DownloadQueue {
 			public void run() {
 				downloadNext();
 			}
-		}, 0, 500);
+		}, 1500, 500);
 	}
 
-	public static void init(Context context) {
-		instance = new DownloadQueue(context);
-	}
-
-	public static DownloadQueue getInstance() {
-		return instance;
-	}
-
-	synchronized MediaDataSource getAudio(CollectionItem item) throws IOException {
+	public synchronized MediaDataSource getAudio(CollectionItem item) throws IOException {
 		DownloadQueueWorkItem existingWorker = findActiveWorker(item);
 		if (existingWorker != null) {
 			return existingWorker.getMediaDataSource();
@@ -100,7 +90,7 @@ public class DownloadQueue {
 
 	private synchronized void downloadNext() {
 
-		if (API.getInstance().isOffline()) {
+		if (service.isOffline()) {
 			return;
 		}
 
@@ -109,15 +99,11 @@ public class DownloadQueue {
 			return;
 		}
 
-		PlaybackQueue queue = PlaybackQueue.getInstance();
-		CollectionItem nextItem = queue.getNextItemToDownload();
+		CollectionItem nextItem = service.getNextItemToDownload();
 		if (nextItem != null) {
-
-			OfflineCache offlineCache = OfflineCache.getInstance();
-			if (!offlineCache.makeSpace(nextItem)) {
+			if (!service.makeSpace(nextItem)) {
 				return;
 			}
-
 			try {
 				worker.beginDownload(nextItem);
 			} catch (IOException e) {
@@ -125,5 +111,4 @@ public class DownloadQueue {
 			}
 		}
 	}
-
 }

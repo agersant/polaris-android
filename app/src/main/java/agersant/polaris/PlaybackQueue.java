@@ -20,62 +20,24 @@ public class PlaybackQueue {
 	public static final String REMOVED_ITEMS = "REMOVED_ITEMS";
 	public static final String REORDERED_ITEMS = "REORDERED_ITEMS";
 
-	private static PlaybackQueue instance;
 	private ArrayList<CollectionItem> content;
-	private Player player;
 	private Ordering ordering;
 
-	private PlaybackQueue() {
-		player = Player.getInstance();
+	PlaybackQueue() {
 		content = new ArrayList<>();
 		ordering = Ordering.SEQUENCE;
 	}
 
-	public static PlaybackQueue getInstance() {
-		if (instance == null) {
-			instance = new PlaybackQueue();
-		}
-		return instance;
+	ArrayList<CollectionItem> getContent() {
+		return content;
 	}
 
-	PlaybackQueueState getState() {
-		PlaybackQueueState state = new PlaybackQueueState();
-		state.queueContent = content;
-		state.queueOrdering = ordering;
-		CollectionItem currentItem = player.getCurrentItem();
-		state.queueIndex = content.indexOf(currentItem);
-		state.trackProgress = player.getProgress();
-		return state;
-	}
-
-	void restore(PlaybackQueueState state) {
-		content = state.queueContent;
-		ordering = state.queueOrdering;
-		if (state.queueIndex >= 0) {
-			CollectionItem currentItem = content.get(state.queueIndex);
-			player.play(currentItem);
-			player.pause();
-			if (state.trackProgress < 1.f) {
-				player.seekTo(state.trackProgress);
-			}
-		}
-	}
-
-	public void addItems(ArrayList<? extends CollectionItem> items) {
-		for (CollectionItem item : items) {
-			addItemInternal(item);
-		}
-		broadcast(QUEUED_ITEMS);
-	}
-
-	public void addItem(CollectionItem item) {
-		addItemInternal(item);
-		broadcast(QUEUED_ITEM);
+	void setContent(ArrayList<CollectionItem> content) {
+		this.content = content;
 	}
 
 	// Return negative value if a is going to play before b, positive if a is going to play after b
-	public int comparePriorities(CollectionItem a, CollectionItem b) {
-		CollectionItem currentItem = player.getCurrentItem();
+	public int comparePriorities(CollectionItem currentItem, CollectionItem a, CollectionItem b) {
 		final int currentIndex = content.indexOf(currentItem);
 		int playlistSize = content.size();
 
@@ -106,9 +68,18 @@ public class PlaybackQueue {
 			return;
 		}
 		content.add(newItem);
-		if (player.isIdle()) {
-			player.play(newItem);
+	}
+
+	void addItems(ArrayList<? extends CollectionItem> items) {
+		for (CollectionItem item : items) {
+			addItemInternal(item);
 		}
+		broadcast(PlaybackQueue.QUEUED_ITEMS);
+	}
+
+	void addItem(CollectionItem item) {
+		addItemInternal(item);
+		broadcast(PlaybackQueue.QUEUED_ITEM);
 	}
 
 	public void remove(int position) {
@@ -145,7 +116,7 @@ public class PlaybackQueue {
 		return content.get(position);
 	}
 
-	private CollectionItem getNextTrack(CollectionItem from, int delta) {
+	CollectionItem getNextTrack(CollectionItem from, int delta) {
 		if (content.isEmpty()) {
 			return null;
 		}
@@ -182,29 +153,11 @@ public class PlaybackQueue {
 		broadcast(CHANGED_ORDERING);
 	}
 
-	private void advance(int delta) {
-		CollectionItem currentItem = player.getCurrentItem();
-		CollectionItem newTrack = getNextTrack(currentItem, delta);
-		if (newTrack != null) {
-			player.play(newTrack);
-		}
-	}
-
-	public void skipPrevious() {
-		advance(-1);
-	}
-
-	public void skipNext() {
-		advance(1);
-	}
-
-	public boolean hasNextTrack() {
-		CollectionItem currentItem = player.getCurrentItem();
+	boolean hasNextTrack(CollectionItem currentItem) {
 		return getNextTrack(currentItem, 1) != null;
 	}
 
-	public boolean hasPreviousTrack() {
-		CollectionItem currentItem = player.getCurrentItem();
+	boolean hasPreviousTrack(CollectionItem currentItem) {
 		return getNextTrack(currentItem, -1) != null;
 	}
 
@@ -215,15 +168,12 @@ public class PlaybackQueue {
 		application.sendBroadcast(intent);
 	}
 
-	public CollectionItem getNextItemToDownload() {
-		CollectionItem currentItem = player.getCurrentItem();
+	public CollectionItem getNextItemToDownload(CollectionItem currentItem, OfflineCache offlineCache, DownloadQueue downloadQueue) {
 		final int currentIndex = Math.max(0, content.indexOf(currentItem));
 
 		int bestScore = 0;
 		CollectionItem bestItem = null;
 
-		OfflineCache offlineCache = OfflineCache.getInstance();
-		DownloadQueue downloadQueue = DownloadQueue.getInstance();
 		int playlistSize = content.size();
 
 		for (int i = 0; i < playlistSize; i++) {

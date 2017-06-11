@@ -1,6 +1,5 @@
 package agersant.polaris.api;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.MediaDataSource;
@@ -10,10 +9,10 @@ import android.widget.ImageView;
 import java.io.IOException;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
-import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.ServerAPI;
 
 /**
@@ -22,25 +21,18 @@ import agersant.polaris.api.remote.ServerAPI;
 
 public class API {
 
-	private static API instance;
 	private ServerAPI serverAPI;
 	private LocalAPI localAPI;
 	private SharedPreferences preferences;
 	private String offlineModePreferenceKey;
+	private PolarisService service;
 
-	private API(Context context) {
-		preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		offlineModePreferenceKey = context.getString(R.string.pref_key_offline);
-		serverAPI = ServerAPI.getInstance();
-		localAPI = LocalAPI.getInstance();
-	}
-
-	public static void init(Context context) {
-		instance = new API(context);
-	}
-
-	public static API getInstance() {
-		return instance;
+	public API(PolarisService service, ServerAPI serverAPI, LocalAPI localAPI) {
+		this.service = service;
+		this.serverAPI = serverAPI;
+		this.localAPI = localAPI;
+		preferences = PreferenceManager.getDefaultSharedPreferences(service);
+		offlineModePreferenceKey = service.getString(R.string.pref_key_offline);
 	}
 
 	public boolean isOffline() {
@@ -64,7 +56,7 @@ public class API {
 			ImageCache cache = ImageCache.getInstance();
 			Bitmap cacheEntry = cache.get(artworkPath);
 			if (cacheEntry != null) {
-				OfflineCache.getInstance().putImage(item, cacheEntry);
+				service.saveImage(item, cacheEntry);
 				view.setImageBitmap(cacheEntry);
 				return;
 			}

@@ -14,8 +14,8 @@ import java.lang.ref.WeakReference;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
+import agersant.polaris.PolarisService;
 import agersant.polaris.api.local.ImageCache;
-import agersant.polaris.api.local.OfflineCache;
 import okhttp3.ResponseBody;
 
 class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
@@ -24,19 +24,21 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private CollectionItem item;
 	private String path;
+	private PolarisService service;
 
-	private FetchImageTask(CollectionItem item, ImageView imageView) {
+	private FetchImageTask(PolarisService service, CollectionItem item, ImageView imageView) {
+		this.service = service;
 		this.item = item;
 		this.path = item.getArtwork();
 		imageViewReference = new WeakReference<>(imageView);
 	}
 
-	static void load(CollectionItem item, ImageView imageView) {
+	static void load(PolarisService service, CollectionItem item, ImageView imageView) {
 		if (FetchImageTask.cancelPotentialWork(item, imageView)) {
 			PolarisApplication polarisApplication = PolarisApplication.getInstance();
 			Resources resources = polarisApplication.getResources();
 
-			FetchImageTask task = new FetchImageTask(item, imageView);
+			FetchImageTask task = new FetchImageTask(service, item, imageView);
 			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, null, task);
 			imageView.setImageDrawable(asyncDrawable);
 			task.execute();
@@ -70,7 +72,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 	protected Bitmap doInBackground(Void... params) {
 		Bitmap bitmap = null;
 		try {
-			ResponseBody responseBody = ServerAPI.getInstance().serve(path);
+			ResponseBody responseBody = service.getServerAPI().serve(path);
 			InputStream stream = new BufferedInputStream(responseBody.byteStream());
 			bitmap = BitmapFactory.decodeStream(stream);
 		} catch (Exception e) {
@@ -88,8 +90,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			ImageCache cache = ImageCache.getInstance();
 			cache.put(path, bitmap);
 
-			OfflineCache offlineCache = OfflineCache.getInstance();
-			offlineCache.putImage(item, bitmap);
+			service.saveImage(item, bitmap);
 
 			ImageView imageView = imageViewReference.get();
 			FetchImageTask task = getTask(imageView);

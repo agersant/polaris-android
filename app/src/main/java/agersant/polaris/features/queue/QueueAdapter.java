@@ -7,46 +7,43 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PlaybackQueue;
-import agersant.polaris.Player;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.local.OfflineCache;
-import agersant.polaris.api.remote.DownloadQueue;
 
 
 class QueueAdapter
 		extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
 
-	private PlaybackQueue playbackQueue;
+	private PolarisService service;
 
-	QueueAdapter(PlaybackQueue playbackQueue) {
+	QueueAdapter(PolarisService service) {
 		super();
-		this.playbackQueue = playbackQueue;
+		this.service = service;
 	}
 
 	@Override
 	public QueueAdapter.QueueItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		QueueItemView queueItemView = new QueueItemView(parent.getContext());
-		return new QueueAdapter.QueueItemHolder(queueItemView);
+		return new QueueAdapter.QueueItemHolder(queueItemView, service);
 	}
 
 	@Override
 	public void onBindViewHolder(QueueAdapter.QueueItemHolder holder, int position) {
-		holder.bindItem(playbackQueue.getItem(position));
+		holder.bindItem(service.getItem(position));
 	}
 
 	@Override
 	public int getItemCount() {
-		return playbackQueue.size();
+		return service.size();
 	}
 
 	void onItemMove(int fromPosition, int toPosition) {
-		playbackQueue.swap(fromPosition, toPosition);
+		service.swap(fromPosition, toPosition);
 		notifyItemMoved(fromPosition, toPosition);
 	}
 
 	void onItemDismiss(int position) {
-		playbackQueue.remove(position);
+		service.remove(position);
 		notifyItemRemoved(position);
 	}
 
@@ -58,31 +55,29 @@ class QueueAdapter
 		private TextView artistText;
 		private ImageView cacheIcon;
 		private ImageView downloadIcon;
-		private Player player;
+		private PolarisService service;
 
-		QueueItemHolder(QueueItemView view) {
-			super(view);
-			queueItemView = view;
-			player = Player.getInstance();
-			titleText = (TextView) view.findViewById(R.id.title);
-			artistText = (TextView) view.findViewById(R.id.artist);
-			cacheIcon = (ImageView) view.findViewById(R.id.cache_icon);
-			downloadIcon = (ImageView) view.findViewById(R.id.download_icon);
-			view.setOnClickListener(this);
+		QueueItemHolder(QueueItemView queueItemView, PolarisService service) {
+			super(queueItemView);
+			this.queueItemView = queueItemView;
+			this.service = service;
+			titleText = (TextView) queueItemView.findViewById(R.id.title);
+			artistText = (TextView) queueItemView.findViewById(R.id.artist);
+			cacheIcon = (ImageView) queueItemView.findViewById(R.id.cache_icon);
+			downloadIcon = (ImageView) queueItemView.findViewById(R.id.download_icon);
+			queueItemView.setOnClickListener(this);
 		}
 
 		void bindItem(CollectionItem item) {
-			OfflineCache offlineCache = OfflineCache.getInstance();
-			DownloadQueue downloadQueue = DownloadQueue.getInstance();
 			this.item = item;
-			boolean isPlaying = player.getCurrentItem() == this.item;
+			boolean isPlaying = service.getCurrentItem() == this.item;
 			titleText.setText(item.getTitle());
 			artistText.setText(item.getArtist());
 			queueItemView.setIsPlaying(isPlaying);
-			if (offlineCache.hasAudio(item.getPath())) {
+			if (service.hasLocalAudio(item)) {
 				cacheIcon.setVisibility(View.VISIBLE);
 				downloadIcon.setVisibility(View.INVISIBLE);
-			} else if (downloadQueue.isWorkingOn(item)) {
+			} else if (service.isDownloading(item)) {
 				cacheIcon.setVisibility(View.INVISIBLE);
 				downloadIcon.setVisibility(View.VISIBLE);
 			} else {
@@ -93,7 +88,7 @@ class QueueAdapter
 
 		@Override
 		public void onClick(View view) {
-			Player.getInstance().play(item);
+			service.play(item);
 		}
 	}
 }

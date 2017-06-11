@@ -1,10 +1,13 @@
 package agersant.polaris.features.player;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -15,8 +18,8 @@ import java.util.TimerTask;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
 
 public class PlayerActivity extends PolarisActivity {
@@ -24,48 +27,29 @@ public class PlayerActivity extends PolarisActivity {
 	boolean seeking = false;
 	private Timer timer;
 	private BroadcastReceiver receiver;
-	private PlaybackQueue queue;
-	private Player player;
 	private ImageView artwork;
 	private ImageView pauseToggle;
 	private ImageView skipNext;
 	private ImageView skipPrevious;
 	private SeekBar seekBar;
+	private PolarisService service;
 
 	public PlayerActivity() {
 		super(R.string.now_playing, R.id.nav_now_playing);
 	}
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			service = null;
+		}
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.activity_player);
-		super.onCreate(savedInstanceState);
-		queue = PlaybackQueue.getInstance();
-		player = Player.getInstance();
-		artwork = (ImageView) findViewById(R.id.artwork);
-		pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
-		skipNext = (ImageView) findViewById(R.id.skip_next);
-		skipPrevious = (ImageView) findViewById(R.id.skip_previous);
-		seekBar = (SeekBar) findViewById(R.id.seek_bar);
-
-		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			int newPosition = 0;
-
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				newPosition = progress;
-			}
-
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				seeking = true;
-			}
-
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				player.seekTo(newPosition / 100.f);
-				seeking = false;
-				updateControls();
-			}
-		});
-	}
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder iBinder) {
+			service = ((PolarisService.PolarisBinder) iBinder).getService();
+			updateContent();
+			updateControls();
+		}
+	};
 
 	@Override
 	public void onResume() {
@@ -125,7 +109,42 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity_player);
+		super.onCreate(savedInstanceState);
+		artwork = (ImageView) findViewById(R.id.artwork);
+		pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
+		skipNext = (ImageView) findViewById(R.id.skip_next);
+		skipPrevious = (ImageView) findViewById(R.id.skip_previous);
+		seekBar = (SeekBar) findViewById(R.id.seek_bar);
+
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			int newPosition = 0;
+
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				newPosition = progress;
+			}
+
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				seeking = true;
+			}
+
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				if (service != null) {
+					service.seekTo(newPosition / 100.f);
+				}
+				seeking = false;
+				updateControls();
+			}
+		});
+	}
+
+	@Override
 	public void onStart() {
+		Intent intent = new Intent(this, PolarisService.class);
+		startService(intent);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+
 		subscribeToEvents();
 		scheduleSeekBarUpdates();
 		super.onStart();
@@ -133,6 +152,9 @@ public class PlayerActivity extends PolarisActivity {
 
 	@Override
 	public void onStop() {
+		if (service != null) {
+			unbindService(serviceConnection);
+		}
 		unregisterReceiver(receiver);
 		receiver = null;
 		timer.cancel();
@@ -141,29 +163,35 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	public void skipPrevious(View view) {
-		queue.skipPrevious();
+		service.skipPrevious();
 	}
 
 	public void skipNext(View view) {
-		queue.skipNext();
+		service.skipNext();
 	}
 
 	private void updateContent() {
-		CollectionItem currentItem = player.getCurrentItem();
+		if (service == null) {
+			return;
+		}
+		CollectionItem currentItem = service.getCurrentItem();
 		if (currentItem != null) {
 			populateWithTrack(currentItem);
 		}
 	}
 
 	private void updateControls() {
+
+		if (service == null) {
+			return;
+		}
 		final float disabledAlpha = 0.2f;
 
-		int playPauseIcon = player.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
+		int playPauseIcon = service.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 		pauseToggle.setImageResource(playPauseIcon);
-		pauseToggle.setAlpha(player.isIdle() ? disabledAlpha : 1.f);
+		pauseToggle.setAlpha(service.isIdle() ? disabledAlpha : 1.f);
 
-
-		if (queue.hasNextTrack()) {
+		if (service.hasNextTrack()) {
 			skipNext.setClickable(true);
 			skipNext.setAlpha(1.0f);
 		} else {
@@ -171,7 +199,7 @@ public class PlayerActivity extends PolarisActivity {
 			skipNext.setAlpha(disabledAlpha);
 		}
 
-		if (queue.hasPreviousTrack()) {
+		if (service.hasPreviousTrack()) {
 			skipPrevious.setClickable(true);
 			skipPrevious.setAlpha(1.0f);
 		} else {
@@ -181,15 +209,18 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void updateSeekBar() {
-		int progress = (int) (seekBar.getMax() * player.getProgress());
+		if (service == null) {
+			return;
+		}
+		int progress = (int) (seekBar.getMax() * service.getProgress());
 		seekBar.setProgress(progress);
 	}
 
-	private void populateWithBlank() {
-		// TODO?
-	}
-
 	private void populateWithTrack(CollectionItem item) {
+		if (service == null) {
+			return;
+		}
+
 		assert item != null;
 
 		String title = item.getTitle();
@@ -202,15 +233,17 @@ public class PlayerActivity extends PolarisActivity {
 			toolbar.setSubtitle(artist);
 		}
 
-		API.getInstance().getImage(item, artwork);
+		service.getAPI().getImage(item, artwork);
 	}
 
 	public void togglePause(View view) {
-		if (player.isPlaying()) {
-			player.pause();
+		if (service == null) {
+			return;
+		}
+		if (service.isPlaying()) {
+			service.pause();
 		} else {
-			player.resume();
+			service.resume();
 		}
 	}
-
 }

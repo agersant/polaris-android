@@ -14,9 +14,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PlaybackQueue;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 import agersant.polaris.api.ItemsCallback;
 
 /**
@@ -30,10 +29,12 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 	private View queueStatusView;
 	private TextView queueStatusText;
 	private ImageView queueStatusIcon;
+	private PolarisService service;
 
-	BrowseItemHolder(BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+	BrowseItemHolder(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(itemView);
 		this.adapter = adapter;
+		this.service = service;
 		queueStatusView = itemQueueStatusView;
 		queueStatusText = (TextView) queueStatusView.findViewById(R.id.status_text);
 		queueStatusIcon = (ImageView) queueStatusView.findViewById(R.id.status_icon);
@@ -61,7 +62,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 			queueDirectory();
 			setStatusToFetching();
 		} else {
-			PlaybackQueue.getInstance().addItem(item);
+			adapter.getService().addItem(item);
 			setStatusToQueued();
 		}
 	}
@@ -74,7 +75,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 				new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
-						PlaybackQueue.getInstance().addItems(items);
+						adapter.getService().addItems(items);
 						if (item == fetchingItem) {
 							setStatusToQueued();
 						}
@@ -94,7 +95,8 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 				});
 			}
 		};
-		API.getInstance().flatten(item.getPath(), handlers);
+
+		service.getAPI().flatten(item.getPath(), handlers);
 	}
 
 	private void setStatusToQueueable() {

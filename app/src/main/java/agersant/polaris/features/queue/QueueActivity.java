@@ -1,10 +1,13 @@
 package agersant.polaris.features.queue;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -17,6 +20,7 @@ import java.util.Random;
 
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.Player;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
@@ -27,10 +31,25 @@ public class QueueActivity extends PolarisActivity {
 	private QueueAdapter adapter;
 	private BroadcastReceiver receiver;
 	private View tutorial;
+	private PolarisService service;
 
 	public QueueActivity() {
 		super(R.string.queue, R.id.nav_queue);
 	}
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			service = null;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder iBinder) {
+			service = ((PolarisService.PolarisBinder) iBinder).getService();
+			populate();
+			updateOrderingIcon();
+			updateTutorial();
+		}
+	};
 
 	private void subscribeToEvents() {
 		IntentFilter filter = new IntentFilter();
@@ -55,7 +74,9 @@ public class QueueActivity extends PolarisActivity {
 					case Player.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
-						adapter.notifyDataSetChanged();
+						if (adapter != null) {
+							adapter.notifyDataSetChanged();
+						}
 						break;
 				}
 			}
@@ -63,7 +84,18 @@ public class QueueActivity extends PolarisActivity {
 		registerReceiver(receiver, filter);
 	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity_queue);
+		super.onCreate(savedInstanceState);
+		tutorial = findViewById(R.id.queue_tutorial);
+		updateTutorial();
+	}
+
 	void updateTutorial() {
+		if (adapter == null) {
+			return;
+		}
 		boolean empty = adapter.getItemCount() == 0;
 		if (empty) {
 			tutorial.setVisibility(View.VISIBLE);
@@ -73,43 +105,22 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-
-		setContentView(R.layout.activity_queue);
-		super.onCreate(savedInstanceState);
-
-		adapter = new QueueAdapter(PlaybackQueue.getInstance());
-
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
-		recyclerView.setHasFixedSize(true);
-		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(adapter);
-
-		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
-		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-		itemTouchHelper.attachToRecyclerView(recyclerView);
-
-		tutorial = findViewById(R.id.queue_tutorial);
-		updateTutorial();
-	}
-
-	@Override
 	public void onStart() {
-		subscribeToEvents();
 		super.onStart();
+		Intent intent = new Intent(this, PolarisService.class);
+		startService(intent);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		subscribeToEvents();
 	}
 
 	@Override
 	public void onStop() {
+		super.onStop();
+		if (service != null) {
+			unbindService(serviceConnection);
+		}
 		unregisterReceiver(receiver);
 		receiver = null;
-		super.onStop();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -118,6 +129,14 @@ public class QueueActivity extends PolarisActivity {
 		inflater.inflate(R.menu.menu_queue, menu);
 		updateOrderingIcon();
 		return true;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (adapter != null) {
+			adapter.notifyDataSetChanged();
+		}
 	}
 
 	@Override
@@ -139,45 +158,58 @@ public class QueueActivity extends PolarisActivity {
 		}
 	}
 
+	private void populate() {
+		adapter = new QueueAdapter(service);
+
+		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+		itemTouchHelper.attachToRecyclerView(recyclerView);
+
+		recyclerView.setAdapter(adapter);
+	}
+
 	private void clear() {
-		PlaybackQueue queue = PlaybackQueue.getInstance();
+		if (service == null) {
+			return;
+		}
 		int oldCount = adapter.getItemCount();
-		queue.clear();
+		service.clear();
 		adapter.notifyItemRangeRemoved(0, oldCount);
 	}
 
 	private void shuffle() {
+		if (service == null) {
+			return;
+		}
 		Random rng = new Random();
-		PlaybackQueue queue = PlaybackQueue.getInstance();
 		int count = adapter.getItemCount();
 		for (int i = 0; i <= count - 2; i++) {
 			int j = i + rng.nextInt(count - i);
-			queue.move(i, j);
+			service.move(i, j);
 			adapter.notifyItemMoved(i, j);
 		}
 	}
 
 	private void setOrdering(MenuItem item) {
-		PlaybackQueue queue = PlaybackQueue.getInstance();
+		if (service == null) {
+			return;
+		}
 		switch (item.getItemId()) {
 			case R.id.action_ordering_sequence:
-				queue.setOrdering(PlaybackQueue.Ordering.SEQUENCE);
+				service.setOrdering(PlaybackQueue.Ordering.SEQUENCE);
 				break;
 			case R.id.action_ordering_repeat_one:
-				queue.setOrdering(PlaybackQueue.Ordering.REPEAT_ONE);
+				service.setOrdering(PlaybackQueue.Ordering.REPEAT_ONE);
 				break;
 			case R.id.action_ordering_repeat_all:
-				queue.setOrdering(PlaybackQueue.Ordering.REPEAT_ALL);
+				service.setOrdering(PlaybackQueue.Ordering.REPEAT_ALL);
 				break;
 		}
 		updateOrderingIcon();
-	}
-
-	private void updateOrderingIcon() {
-		PlaybackQueue queue = PlaybackQueue.getInstance();
-		int icon = getIconForOrdering(queue.getOrdering());
-		MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
-		orderingItem.setIcon(icon);
 	}
 
 	private int getIconForOrdering(PlaybackQueue.Ordering ordering) {
@@ -189,6 +221,17 @@ public class QueueActivity extends PolarisActivity {
 			case SEQUENCE:
 			default:
 				return R.drawable.ic_reorder_white_24dp;
+		}
+	}
+
+	private void updateOrderingIcon() {
+		if (service == null) {
+			return;
+		}
+		int icon = getIconForOrdering(service.getOrdering());
+		MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
+		if (orderingItem != null) {
+			orderingItem.setIcon(icon);
 		}
 	}
 }

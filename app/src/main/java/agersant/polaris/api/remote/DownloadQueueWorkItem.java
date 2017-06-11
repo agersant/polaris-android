@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.IOException;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.MediaPlayerService;
 import agersant.polaris.PolarisApplication;
+import agersant.polaris.PolarisService;
 
 /**
  * Created by agersant on 1/11/2017.
@@ -23,10 +23,12 @@ class DownloadQueueWorkItem {
 	private CollectionItem item;
 	private DownloadTask job;
 	private StreamingMediaDataSource mediaDataSource;
+	private PolarisService service;
 	private int attempts;
 
-	DownloadQueueWorkItem(File file) {
-		tempFile = file;
+	DownloadQueueWorkItem(File tempFile, PolarisService service) {
+		this.tempFile = tempFile;
+		this.service = service;
 	}
 
 	boolean isHandling(CollectionItem item) {
@@ -52,9 +54,7 @@ class DownloadQueueWorkItem {
 		if (mediaDataSource == null) {
 			return false;
 		}
-		PolarisApplication application = PolarisApplication.getInstance();
-		MediaPlayerService playerService = application.getMediaPlayerService();
-		return playerService.isUsing(mediaDataSource);
+		return service.isUsing(mediaDataSource);
 	}
 
 	boolean isInterruptible() {
@@ -89,7 +89,7 @@ class DownloadQueueWorkItem {
 
 		System.out.println("Downloading " + item.getPath() + " (attempt #" + attempts + ")" );
 		mediaDataSource = new StreamingMediaDataSource(tempFile);
-		job = new DownloadTask(this, item, tempFile);
+		job = new DownloadTask(service, this, item, tempFile);
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 
 		job.execute();
@@ -105,17 +105,14 @@ class DownloadQueueWorkItem {
 
 	void onJobError() {
 		float mediaProgress = 0.f;
-		MediaPlayerService playerService = null;
 		boolean isPaused = true;
 
 		boolean stopActiveMedia = isDataSourceInUse();
 		if (stopActiveMedia) {
 			System.out.println("Stopping active datasource");
-			PolarisApplication application = PolarisApplication.getInstance();
-			playerService = application.getMediaPlayerService();
-			isPaused = !playerService.isPlaying();
-			mediaProgress = playerService.getProgress();
-			playerService.stop();
+			isPaused = !service.isPlaying();
+			mediaProgress = service.getProgress();
+			service.stop();
 		}
 
 		if (attempts < MAX_ATTEMPTS) {
@@ -124,10 +121,10 @@ class DownloadQueueWorkItem {
 				tryDownload();
 				if (stopActiveMedia) {
 					System.out.println("Resuming playback from " + mediaProgress + "%");
-					playerService.play(item);
-					playerService.seekTo(mediaProgress);
+					service.play(item);
+					service.seekTo(mediaProgress);
 					if (isPaused) {
-						playerService.pause();
+						service.pause();
 					}
 				}
 				return;

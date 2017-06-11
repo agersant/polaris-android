@@ -1,19 +1,21 @@
 package agersant.polaris.features.browse;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.StrictMode;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 
-import agersant.polaris.BuildConfig;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
 
 public class CollectionActivity extends PolarisActivity {
 
+	private PolarisService service;
 	private Button randomAlbums;
 	private Button recentAlbums;
 
@@ -23,14 +25,6 @@ public class CollectionActivity extends PolarisActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
-		if (BuildConfig.DEBUG) {
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-					.detectAll()
-					.penaltyDeath()
-					.build());
-		}
-
 		setContentView(R.layout.activity_collection);
 		super.onCreate(savedInstanceState);
 
@@ -44,14 +38,33 @@ public class CollectionActivity extends PolarisActivity {
 			button.setEnabled(false);
 		}
 	}
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			service = null;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder iBinder) {
+			service = ((PolarisService.PolarisBinder) iBinder).getService();
+			updateButtons();
+		}
+	};
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		API api = API.getInstance();
-		boolean isOffline = api.isOffline();
-		randomAlbums.setEnabled(!isOffline);
-		recentAlbums.setEnabled(!isOffline);
+	public void onStart() {
+		Intent intent = new Intent(this, PolarisService.class);
+		startService(intent);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		super.onStart();
+	}
+
+	@Override
+	public void onStop() {
+		if (service != null) {
+			unbindService(serviceConnection);
+		}
+		super.onStop();
 	}
 
 	public void browseDirectories(View view) {
@@ -76,5 +89,17 @@ public class CollectionActivity extends PolarisActivity {
 		intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.RECENT);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 		context.startActivity(intent);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		updateButtons();
+	}
+
+	private void updateButtons() {
+		boolean isOffline = service == null || service.isOffline();
+		randomAlbums.setEnabled(!isOffline);
+		recentAlbums.setEnabled(!isOffline);
 	}
 }

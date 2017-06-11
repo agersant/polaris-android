@@ -1,6 +1,5 @@
 package agersant.polaris.api.local;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -23,8 +22,8 @@ import java.util.Comparator;
 import java.util.Date;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
 /**
@@ -41,30 +40,21 @@ public class OfflineCache {
 	private static final int FIRST_VERSION = 1;
 	private static final int VERSION = 2;
 	private static final int BUFFER_SIZE = 1024 * 64;
-	private static OfflineCache instance;
 	private SharedPreferences preferences;
 	private File root;
+	private PolarisService service;
 
-	private OfflineCache(Context context) {
-		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+	public OfflineCache(PolarisService service) {
+		this.service = service;
+		preferences = PreferenceManager.getDefaultSharedPreferences(service);
 
 		for (int i = FIRST_VERSION; i <= VERSION; i++) {
-			root = new File(context.getExternalCacheDir(), "collection");
+			root = new File(service.getExternalCacheDir(), "collection");
 			root = new File(root, "v" + VERSION);
 			if (i != VERSION) {
 				deleteDirectory(root);
 			}
 		}
-	}
-
-	public static void init(Context context) {
-		if (instance == null) {
-			instance = new OfflineCache(context);
-		}
-	}
-
-	public static OfflineCache getInstance() {
-		return instance;
 	}
 
 	private void write(CollectionItem item, OutputStream storage) throws IOException {
@@ -141,15 +131,13 @@ public class OfflineCache {
 	}
 
 	private long getCacheCapacity() {
-		PolarisApplication application = PolarisApplication.getInstance();
-		Resources resources = application.getResources();
+		Resources resources = service.getResources();
 		String cacheSizeKey = resources.getString(R.string.pref_key_offline_cache_size);
 		String cacheSizeString = preferences.getString(cacheSizeKey, "0");
 		return Long.parseLong(cacheSizeString) * 1024 * 1024;
 	}
 
 	private boolean removeOldAudio(File path, CollectionItem newItem, long bytesToSave) {
-		final PlaybackQueue queue = PlaybackQueue.getInstance();
 		ArrayList<DeletionCandidate> candidates = new ArrayList<>();
 		listDeletionCandidates(path, candidates);
 
@@ -163,8 +151,7 @@ public class OfflineCache {
 					return 1;
 				}
 				if (b.item != null && a.item != null) {
-
-					return -queue.comparePriorities(a.item, b.item);
+					return -service.comparePriorities(a.item, b.item);
 				}
 				return (int) (a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime());
 			}
@@ -174,7 +161,7 @@ public class OfflineCache {
 		for (DeletionCandidate candidate : candidates) {
 			try {
 				if (candidate.item != null) {
-					if (queue.comparePriorities(candidate.item, newItem) <= 0) {
+					if (service.comparePriorities(candidate.item, newItem) <= 0) {
 						continue;
 					}
 				}

@@ -1,7 +1,11 @@
 package agersant.polaris.features.browse;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +17,9 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisService;
 import agersant.polaris.R;
-import agersant.polaris.api.API;
 import agersant.polaris.api.ItemsCallback;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
 public class BrowseActivity extends PolarisActivity {
@@ -29,10 +32,25 @@ public class BrowseActivity extends PolarisActivity {
 	private ItemsCallback fetchCallback;
 	private NavigationMode navigationMode;
 	private SwipyRefreshLayout.OnRefreshListener onRefresh;
+	private ArrayList<? extends CollectionItem> items;
+	private PolarisService service;
 
 	public BrowseActivity() {
 		super(R.string.collection, R.id.nav_collection);
 	}
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			service = null;
+		}
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder iBinder) {
+			service = ((PolarisService.PolarisBinder) iBinder).getService();
+			loadContent();
+			displayContent();
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +69,8 @@ public class BrowseActivity extends PolarisActivity {
 					@Override
 					public void run() {
 						that.progressBar.setVisibility(View.GONE);
-						that.displayContent(items);
+						that.items = items;
+						that.displayContent();
 					}
 				});
 			}
@@ -80,12 +99,22 @@ public class BrowseActivity extends PolarisActivity {
 			};
 		}
 
-		loadContent();
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		return true;
+	public void onStart() {
+		Intent intent = new Intent(this, PolarisService.class);
+		startService(intent);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		super.onStart();
+	}
+
+	@Override
+	public void onStop() {
+		if (service != null) {
+			unbindService(serviceConnection);
+		}
+		super.onStop();
 	}
 
 	private void loadContent() {
@@ -122,38 +151,21 @@ public class BrowseActivity extends PolarisActivity {
 		overridePendingTransition(0, 0);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		return true;
+	}
+
 	private void loadPath(String path) {
-		API api = API.getInstance();
-		api.browse(path, fetchCallback);
+		service.getAPI().browse(path, fetchCallback);
 	}
 
 	private void loadRandom() {
-		ServerAPI server = ServerAPI.getInstance();
-		server.getRandomAlbums(fetchCallback);
+		service.getServerAPI().getRandomAlbums(fetchCallback);
 	}
 
 	private void loadRecent() {
-		ServerAPI server = ServerAPI.getInstance();
-		server.getRecentAlbums(fetchCallback);
-	}
-
-	private void displayContent(ArrayList<? extends CollectionItem> items) {
-		BrowseViewContent contentView = null;
-		switch (getDisplayModeForItems(items)) {
-			case EXPLORER:
-				contentView = new BrowseViewExplorer(this);
-				break;
-			case ALBUM:
-				contentView = new BrowseViewAlbum(this);
-				break;
-			case DISCOGRAPHY:
-				contentView = new BrowseViewDiscography(this);
-				break;
-		}
-
-		contentView.setItems(items);
-		contentView.setOnRefreshListener(onRefresh);
-		contentHolder.addView(contentView);
+		service.getServerAPI().getRecentAlbums(fetchCallback);
 	}
 
 	private DisplayMode getDisplayModeForItems(ArrayList<? extends CollectionItem> items) {
@@ -198,4 +210,29 @@ public class BrowseActivity extends PolarisActivity {
 		RECENT,
 	}
 
+	private void displayContent() {
+		if (service == null) {
+			return;
+		}
+		if (items == null) {
+			return;
+		}
+
+		BrowseViewContent contentView = null;
+		switch (getDisplayModeForItems(items)) {
+			case EXPLORER:
+				contentView = new BrowseViewExplorer(this, service);
+				break;
+			case ALBUM:
+				contentView = new BrowseViewAlbum(this, service);
+				break;
+			case DISCOGRAPHY:
+				contentView = new BrowseViewDiscography(this, service);
+				break;
+		}
+
+		contentView.setItems(items);
+		contentView.setOnRefreshListener(onRefresh);
+		contentHolder.addView(contentView);
+	}
 }
