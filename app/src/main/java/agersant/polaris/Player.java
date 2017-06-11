@@ -1,57 +1,39 @@
 package agersant.polaris;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.app.TaskStackBuilder;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.drawable.Icon;
-import android.media.AudioManager;
 import android.media.MediaDataSource;
 import android.media.MediaPlayer;
-import android.os.Binder;
-import android.os.IBinder;
-import android.widget.Toast;
 
 import java.io.IOException;
 
-import agersant.polaris.api.API;
-import agersant.polaris.features.player.PlayerActivity;
+public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
-public class MediaPlayerService implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
-
-	private static final int MEDIA_NOTIFICATION = 1;
-	private static final String MEDIA_INTENT_PAUSE = "MEDIA_INTENT_PAUSE";
-	private static final String MEDIA_INTENT_PLAY = "MEDIA_INTENT_PLAY";
-	private static final String MEDIA_INTENT_SKIP_NEXT = "MEDIA_INTENT_SKIP_NEXT";
-	private static final String MEDIA_INTENT_SKIP_PREVIOUS = "MEDIA_INTENT_SKIP_PREVIOUS";
-
+	public static final String PLAYBACK_ERROR = "PLAYBACK_ERROR";
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
 	public static final String PAUSED_TRACK = "PAUSED_TRACK";
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 
-	private PolarisMediaPlayer player;
-	private final BroadcastReceiver receiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			if (action.equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-				pause();
-			}
-		}
-	};
+	private PolarisMediaPlayer mediaPlayer;
 	private MediaDataSource media;
 	private CollectionItem item;
+	private PolarisService service;
 
-	public void stop() {
-		if (player != null) {
-			player.release();
-			player = null;
+	Player(PolarisService service) {
+		this.service = service;
+	}
+
+	private void broadcast(String event) {
+		PolarisApplication application = PolarisApplication.getInstance();
+		Intent intent = new Intent();
+		intent.setAction(event);
+		application.sendBroadcast(intent);
+	}
+
+	void stop() {
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+			mediaPlayer = null;
 		}
 		if (media != null) {
 			try {
@@ -63,175 +45,84 @@ public class MediaPlayerService implements MediaPlayer.OnCompletionListener, Med
 		}
 	}
 
-	public void play(CollectionItem item) {
+	void play(CollectionItem item) {
 		System.out.println("Beginning playback for: " + item.getPath());
 		stop();
 
-		player = new PolarisMediaPlayer();
-		player.setOnCompletionListener(this);
-		player.setOnErrorListener(this);
+		mediaPlayer = new PolarisMediaPlayer();
+		mediaPlayer.setOnCompletionListener(this);
+		mediaPlayer.setOnErrorListener(this);
 
 		try {
-			API api = API.getInstance();
-			media = api.getAudio(item);
-			player.setDataSource(media);
-			player.prepareAsync();
+			media = service.getAPI().getAudio(item);
+			mediaPlayer.setDataSource(media);
+			mediaPlayer.prepareAsync();
 		} catch (Exception e) {
 			System.out.println("Error while beginning media playback: " + e);
-			displayError();
+			broadcast(PLAYBACK_ERROR);
 			return;
 		}
 		this.item = item;
-		pushSystemNotification();
-		broadcast(MediaPlayerService.PLAYING_TRACK);
+		broadcast(PLAYING_TRACK);
 	}
 
-	public CollectionItem getCurrentItem() {
+	CollectionItem getCurrentItem() {
 		return item;
 	}
 
-	public boolean isIdle () {
+	boolean isIdle() {
 		return item == null;
 	}
 
-	public boolean isUsing(MediaDataSource media) {
+	boolean isUsing(MediaDataSource media) {
 		return this.media == media;
 	}
 
-	public void resume() {
-		if (player == null) {
+	void resume() {
+		if (mediaPlayer == null) {
 			return;
 		}
-		player.resume();
-		broadcast(MediaPlayerService.RESUMED_TRACK);
-		pushSystemNotification();
+		mediaPlayer.resume();
+		broadcast(Player.RESUMED_TRACK);
 	}
 
-	public void pause() {
-		if (player == null) {
+	void pause() {
+		if (mediaPlayer == null) {
 			return;
 		}
-		player.pause();
-		broadcast(MediaPlayerService.PAUSED_TRACK);
-		pushSystemNotification();
+		mediaPlayer.pause();
+		broadcast(Player.PAUSED_TRACK);
 	}
 
-	public boolean isPlaying() {
-		if (player == null) {
+	boolean isPlaying() {
+		if (mediaPlayer == null) {
 			return false;
 		}
-		return player.isPlaying();
+		return mediaPlayer.isPlaying();
 	}
 
-	public void seekTo(float progress) {
-		if (player != null) {
-			player.seekTo(progress);
+	void seekTo(float progress) {
+		if (mediaPlayer != null) {
+			mediaPlayer.seekTo(progress);
 		}
 	}
 
-	public float getProgress() {
-		if (player == null) {
+	float getProgress() {
+		if (mediaPlayer == null) {
 			return 0.f;
 		}
-		return player.getProgress();
-	}
-
-	private void broadcast(String event) {
-		Intent intent = new Intent();
-		intent.setAction(event);
-		sendBroadcast(intent);
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		handleIntent(intent);
-		return super.onStartCommand(intent, flags, startId);
+		return mediaPlayer.getProgress();
 	}
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		broadcast(MediaPlayerService.COMPLETED_TRACK);
-		pushSystemNotification();
-		PlaybackQueue queue = PlaybackQueue.getInstance();
-		queue.skipNext();
+		broadcast(COMPLETED_TRACK);
 	}
 
 	@Override
 	public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-		displayError();
+		broadcast(PLAYBACK_ERROR);
 		return false;
-	}
-
-	private void handleIntent(Intent intent) {
-		if (intent == null || intent.getAction() == null) {
-			return;
-		}
-		String action = intent.getAction();
-		switch (action) {
-			case MEDIA_INTENT_PAUSE:
-				pause();
-				break;
-			case MEDIA_INTENT_PLAY:
-				resume();
-				break;
-			case MEDIA_INTENT_SKIP_NEXT:
-				PlaybackQueue.getInstance().skipNext();
-				break;
-			case MEDIA_INTENT_SKIP_PREVIOUS:
-				PlaybackQueue.getInstance().skipPrevious();
-				break;
-		}
-	}
-
-	private void displayError() {
-		Toast toast = Toast.makeText(this, R.string.playback_error, Toast.LENGTH_SHORT);
-		toast.show();
-	}
-
-	private void pushSystemNotification() {
-		boolean isPlaying = isPlaying();
-
-		Intent resultIntent = new Intent(this, PlayerActivity.class);
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
-			.addParentStack(PlayerActivity.class)
-			.addNextIntent(resultIntent);
-		PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		Notification.Builder notificationBuilder = new Notification.Builder(this)
-				.setShowWhen(false)
-				.setSmallIcon(R.drawable.notification_icon)
-				.setContentTitle(item.getTitle())
-				.setContentText(item.getArtist())
-				.setVisibility(Notification.VISIBILITY_PUBLIC)
-				.setContentIntent(pendingIntent)
-				.setStyle(new Notification.MediaStyle()
-						.setShowActionsInCompactView()
-				);
-
-		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
-		if (isPlaying) {
-			notificationBuilder.addAction(generateAction(R.drawable.ic_pause_black_24dp, R.string.player_pause, MEDIA_INTENT_PAUSE));
-		} else {
-			notificationBuilder.addAction(generateAction(R.drawable.ic_play_arrow_black_24dp, R.string.player_play, MEDIA_INTENT_PLAY));
-		}
-		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, R.string.player_previous_track, MEDIA_INTENT_SKIP_NEXT));
-
-		Notification notification = notificationBuilder.build();
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(MEDIA_NOTIFICATION, notification);
-
-		if (isPlaying) {
-			startForeground(MEDIA_NOTIFICATION, notification);
-		} else {
-			stopForeground(false);
-		}
-	}
-
-	private Notification.Action generateAction(int icon, int text, String intentAction) {
-		Intent intent = new Intent(this, MediaPlayerService.class);
-		intent.setAction(intentAction);
-		PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-		return new Notification.Action.Builder(Icon.createWithResource(this, icon), getResources().getString(text), pendingIntent).build();
 	}
 
 }
