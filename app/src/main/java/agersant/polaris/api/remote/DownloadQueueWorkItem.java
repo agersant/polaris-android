@@ -115,7 +115,7 @@ class DownloadQueueWorkItem {
 			service.stop();
 		}
 
-		if (attempts < MAX_ATTEMPTS) {
+		if (stopActiveMedia || attempts < MAX_ATTEMPTS) {
 			try {
 				endAttempt();
 				tryDownload();
