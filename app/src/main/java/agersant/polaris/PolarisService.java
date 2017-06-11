@@ -277,14 +277,14 @@ public class PolarisService extends Service {
 		}
 		playbackQueue.addItems(items);
 		if (player.isIdle()) {
-			player.play(items.get(0));
+			skipNext();
 		}
 	}
 
 	public void addItem(CollectionItem item) {
 		playbackQueue.addItem(item);
 		if (player.isIdle()) {
-			player.play(item);
+			skipNext();
 		}
 	}
 
