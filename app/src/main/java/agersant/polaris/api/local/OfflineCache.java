@@ -50,7 +50,7 @@ public class OfflineCache {
 
 		for (int i = FIRST_VERSION; i <= VERSION; i++) {
 			root = new File(service.getExternalCacheDir(), "collection");
-			root = new File(root, "v" + VERSION);
+			root = new File(root, "v" + i);
 			if (i != VERSION) {
 				deleteDirectory(root);
 			}
