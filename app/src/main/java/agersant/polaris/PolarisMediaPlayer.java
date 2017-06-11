@@ -94,6 +94,13 @@ public class PolarisMediaPlayer
 		}
 	}
 
+	void reset() {
+		state = State.IDLE;
+		pause = false;
+		seekTarget = null;
+		player.reset();
+	}
+
 	void release() {
 		switch (state) {
 			case IDLE:

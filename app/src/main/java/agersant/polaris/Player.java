@@ -21,6 +21,9 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 
 	Player(PolarisService service) {
 		this.service = service;
+		mediaPlayer = new PolarisMediaPlayer();
+		mediaPlayer.setOnCompletionListener(this);
+		mediaPlayer.setOnErrorListener(this);
 	}
 
 	private void broadcast(String event) {
@@ -31,10 +34,7 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 	}
 
 	void stop() {
-		if (mediaPlayer != null) {
-			mediaPlayer.release();
-			mediaPlayer = null;
-		}
+		mediaPlayer.reset();
 		if (media != null) {
 			try {
 				media.close();
@@ -43,15 +43,19 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 			}
 			media = null;
 		}
+		item = null;
 	}
 
 	void play(CollectionItem item) {
+		if (this.item != null && item.getPath().equals(this.item.getPath())) {
+			System.out.println("Restarting playback for: " + item.getPath());
+			seekTo(0);
+			resume();
+			return;
+		}
+
 		System.out.println("Beginning playback for: " + item.getPath());
 		stop();
-
-		mediaPlayer = new PolarisMediaPlayer();
-		mediaPlayer.setOnCompletionListener(this);
-		mediaPlayer.setOnErrorListener(this);
 
 		try {
 			media = service.getAPI().getAudio(item);
