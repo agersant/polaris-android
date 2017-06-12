@@ -1,16 +1,11 @@
 package agersant.polaris.api.remote;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
-import okhttp3.ResponseBody;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
 /**
  * Created by agersant on 12/26/2016.
@@ -20,85 +15,39 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 
 	private static final int BUFFER_SIZE = 1024 * 64; // 64 kB
 
-	private CollectionItem item;
-	private String path;
-	private File outFile;
-	private boolean reachedEOF;
-	private DownloadQueueWorkItem workItem;
-	private PolarisService service;
+	private DefaultDataSource dataSource;
+	private DataSpec dataSpec;
 
-	DownloadTask(PolarisService service, DownloadQueueWorkItem workItem, CollectionItem item, File outFile) {
-		this.workItem = workItem;
-		this.item = item;
-		this.outFile = outFile;
-		this.service = service;
-		path = item.getPath();
-		reachedEOF = false;
-	}
-
-	public String getPath() {
-		return item.getPath();
+	DownloadTask(DefaultDataSource dataSource, Uri uri) {
+		this.dataSource = dataSource;
+		dataSpec = new DataSpec(uri);
 	}
 
 	@Override
 	protected Integer doInBackground(Object... params) {
-
-		ResponseBody responseBody;
+		byte[] buffer = new byte[BUFFER_SIZE];
 		try {
-			responseBody = service.getServerAPI().serve(path);
-		} catch (Exception e) {
-			System.out.println("Error establishing stream connection: " + e);
-			return 1;
-		}
-
-		if (responseBody == null) {
-			System.out.println("Stream content has no response");
-			return 1;
-		}
-
-		try (InputStream inputStream = responseBody.byteStream();
-			 FileOutputStream outputStream = new FileOutputStream(outFile);
-		) {
-			byte[] chunk = new byte[BUFFER_SIZE];
+			dataSource.open(dataSpec);
 			while (true) {
-				int bytesRead = inputStream.read(chunk);
-				if (bytesRead > 0) {
-					outputStream.write(chunk, 0, bytesRead);
-				}
-				if (bytesRead == -1) {
-					reachedEOF = true;
-					break;
-				}
 				if (isCancelled()) {
 					break;
 				}
+				int bytesRead = dataSource.read(buffer, 0, BUFFER_SIZE);
+				if (bytesRead == 0 || bytesRead == C.RESULT_END_OF_INPUT) {
+					break;
+				}
 			}
-		} catch (IOException e) {
-			System.out.println("Stream download error: " + e);
-			return 1;
+		} catch (Exception e) {
+			System.out.println("Download task error during reads: " + e + " (" + dataSpec.uri + ")");
 		}
 
-		saveForOfflineUse();
+		try {
+			dataSource.close();
+		} catch (Exception e) {
+			System.out.println("Download task error during close: " + e);
+		}
+
 		return 0;
-	}
-
-	private void saveForOfflineUse() {
-		if (reachedEOF) {
-			try (FileInputStream audioStreamFile = new FileInputStream(outFile)) {
-				service.saveAudio(item, audioStreamFile);
-			} catch (IOException e) {
-				System.out.println("Error while storing item to offline cache: " + e);
-			}
-		}
-	}
-
-	@Override
-	protected void onPostExecute(Integer result) {
-		if (reachedEOF) {
-			workItem.onJobSuccess();
-		} else {
-			workItem.onJobError();
-		}
 	}
 
 }

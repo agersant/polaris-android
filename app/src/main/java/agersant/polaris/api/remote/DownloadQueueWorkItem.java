@@ -1,7 +1,13 @@
 package agersant.polaris.api.remote;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,150 +16,100 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
 
+import static android.os.AsyncTask.Status.FINISHED;
+
 /**
  * Created by agersant on 1/11/2017.
  */
 
 class DownloadQueueWorkItem {
 
-	static final int MAX_ATTEMPTS = 10;
-
-	private File tempFile;
+	private File scratchFile;
 	private CollectionItem item;
 	private DownloadTask job;
-	private StreamingMediaDataSource mediaDataSource;
 	private PolarisService service;
-	private int attempts;
+	private MediaSource mediaSource;
+	private DefaultDataSource dataSource;
 
-	DownloadQueueWorkItem(File tempFile, PolarisService service) {
-		this.tempFile = tempFile;
+	DownloadQueueWorkItem(File scratchFile, PolarisService service) {
+		this.scratchFile = scratchFile;
 		this.service = service;
 	}
 
-	boolean isHandling(CollectionItem item) {
+	boolean hasMediaSourceFor(CollectionItem item) {
+		return this.item != null && this.item.getPath().equals(item.getPath());
+	}
+
+	boolean isDownloading(CollectionItem item) {
+		if (job == null) {
+			return false;
+		}
+		if (job.getStatus() == FINISHED) {
+			return false;
+		}
 		return this.item != null && this.item.getPath().equals(item.getPath());
 	}
 
 	boolean isIdle() {
-		if (job == null) {
-			return true;
+		if (job != null) {
+			AsyncTask.Status status = job.getStatus();
+			switch (status) {
+				case PENDING:
+				case RUNNING:
+					return false;
+			}
 		}
-		AsyncTask.Status status = job.getStatus();
-		switch (status) {
-			case PENDING:
-			case RUNNING:
-				return false;
-			case FINISHED:
-				return !isDataSourceInUse();
-		}
-		return true;
+		return !isDataSourceInUse();
 	}
 
 	private boolean isDataSourceInUse() {
-		if (mediaDataSource == null) {
-			return false;
-		}
-		return service.isUsing(mediaDataSource.getFile());
+		return mediaSource != null && service.isUsing(mediaSource);
 	}
 
 	boolean isInterruptible() {
 		return !isDataSourceInUse();
 	}
 
-	File getMediaFile() {
-		return tempFile;
-	}
-
-	void beginDownload(CollectionItem item) throws IOException {
-		assert !isHandling(item);
-		stop();
-		attempts = 0;
+	void assignItem(CollectionItem item) throws IOException {
+		reset();
 		this.item = item;
-		tryDownload();
+		Uri uri = service.getServerAPI().serveUri(item.getPath());
+		PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(service, scratchFile, item);
+		mediaSource = new ExtractorMediaSource(uri, dsf, new DefaultExtractorsFactory(), null, null);
+		dataSource = dsf.createDataSource();
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 	}
 
-	void tryDownload() throws IOException {
-		attempts++;
+	MediaSource getMediaSource() {
+		return mediaSource;
+	}
 
-		if (tempFile.exists()) {
-			if (!tempFile.delete()) {
-				System.out.println("Could not delete streaming file");
-			}
-		}
-
-		if (!tempFile.createNewFile()) {
-			System.out.println("Could not create streaming file");
-		}
-
-		System.out.println("Downloading " + item.getPath() + " (attempt #" + attempts + ")" );
-		mediaDataSource = new StreamingMediaDataSource(tempFile);
-		job = new DownloadTask(service, this, item, tempFile);
-		broadcast(DownloadQueue.WORKLOAD_CHANGED);
-
+	void beginBackgroundDownload() {
+		System.out.println("Beginning background download for: " + item.getPath());
+		Uri uri = service.getServerAPI().serveUri(item.getPath());
+		job = new DownloadTask(dataSource, uri);
 		job.execute();
-	}
-
-	void onJobSuccess() {
-		// TODO?
-		// mediaDataSource.markAsComplete();
-	}
-
-	void onJobError() {
-		float mediaProgress = 0.f;
-		boolean isPaused = true;
-
-		boolean stopActiveMedia = isDataSourceInUse();
-		if (stopActiveMedia) {
-			System.out.println("Stopping active datasource");
-			isPaused = !service.isPlaying();
-			mediaProgress = service.getPosition();
-			service.stop();
-		}
-
-		if (stopActiveMedia || attempts < MAX_ATTEMPTS) {
-			try {
-				endAttempt();
-				tryDownload();
-				if (stopActiveMedia) {
-					System.out.println("Resuming playback from " + mediaProgress + "%");
-					service.play(item);
-					service.seekTo(mediaProgress);
-					if (isPaused) {
-						service.pause();
-					}
-				}
-				return;
-			} catch (Exception e) {
-				System.out.println("Error while retrying download (" + item.getPath() + "): " + e );
-			}
-		} else {
-			System.out.println("Giving up on " + item.getPath() );
-		}
-
-		stop();
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 	}
 
-	private void endAttempt() {
-		assert !isDataSourceInUse();
+	void stopBackgroundDownload() {
+		job.cancel(false);
+		job = null;
+		broadcast(DownloadQueue.WORKLOAD_CHANGED);
+	}
+
+	private void reset() {
+		if (mediaSource != null) {
+			mediaSource.releaseSource();
+			mediaSource = null;
+		}
+		if (dataSource != null) {
+			dataSource = null;
+		}
 		if (job != null) {
-			job.cancel(true);
+			job.cancel(false);
 			job = null;
 		}
-		if (mediaDataSource != null) {
-			try {
-				// TODO?
-				// mediaDataSource.getFile().close();
-			} catch (Exception e) {
-				System.out.println("Error while closing data source for download queue work item");
-			}
-			mediaDataSource = null;
-		}
-	}
-
-	private void stop() {
-		endAttempt();
 		item = null;
 	}
 

@@ -1,7 +1,8 @@
 package agersant.polaris.api;
 
-import android.net.Uri;
 import android.widget.ImageView;
+
+import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ public interface IPolarisAPI {
 
 	void getImage(CollectionItem item, ImageView view);
 
-	Uri getAudio(CollectionItem item) throws IOException;
+	MediaSource getAudio(CollectionItem item) throws IOException;
 
 	void browse(String path, final ItemsCallback handlers);
 

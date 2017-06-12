@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
+import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -70,7 +71,7 @@ public class ServerAPI
 	}
 
 	@Override
-	public Uri getAudio(CollectionItem item) throws IOException {
+	public MediaSource getAudio(CollectionItem item) throws IOException {
 		return service.downloadAudio(item);
 	}
 

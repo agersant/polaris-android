@@ -77,7 +77,7 @@ class QueueAdapter
 			if (service.hasLocalAudio(item)) {
 				cacheIcon.setVisibility(View.VISIBLE);
 				downloadIcon.setVisibility(View.INVISIBLE);
-			} else if (service.isDownloading(item)) {
+			} else if (service.isDownloading(item) || service.isStreaming(item)) {
 				cacheIcon.setVisibility(View.INVISIBLE);
 				downloadIcon.setVisibility(View.VISIBLE);
 			} else {

@@ -12,10 +12,11 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
+
+import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -260,6 +261,10 @@ public class PolarisService extends Service {
 		}
 	}
 
+	private boolean shouldAutoStart() {
+		return isIdle() || (size() == 0 && !isPlaying());
+	}
+
 
 	// API
 	public CollectionItem getCurrentItem() {
@@ -274,15 +279,17 @@ public class PolarisService extends Service {
 		if (items.isEmpty()) {
 			return;
 		}
+		boolean autoStart = shouldAutoStart();
 		playbackQueue.addItems(items);
-		if (player.isIdle()) {
+		if (autoStart) {
 			skipNext();
 		}
 	}
 
 	public void addItem(CollectionItem item) {
 		playbackQueue.addItem(item);
-		if (player.isIdle()) {
+		boolean autoStart = shouldAutoStart();
+		if (autoStart) {
 			skipNext();
 		}
 	}
@@ -368,12 +375,8 @@ public class PolarisService extends Service {
 		player.seekTo(progress);
 	}
 
-	public void stop() {
-		player.stop();
-	}
-
-	public boolean isUsing(File file) {
-		return player.isUsing(file);
+	public boolean isUsing(MediaSource mediaSource) {
+		return player.isUsing(mediaSource);
 	}
 
 	public boolean isOffline() {
@@ -385,7 +388,11 @@ public class PolarisService extends Service {
 	}
 
 	public boolean isDownloading(CollectionItem item) {
-		return downloadQueue.isWorkingOn(item);
+		return downloadQueue.isDownloading(item);
+	}
+
+	public boolean isStreaming(CollectionItem item) {
+		return downloadQueue.isStreaming(item);
 	}
 
 	public CollectionItem getNextItemToDownload() {
@@ -408,16 +415,12 @@ public class PolarisService extends Service {
 		offlineCache.putImage(item, image);
 	}
 
-	public Uri downloadAudio(CollectionItem item) throws IOException {
+	public MediaSource downloadAudio(CollectionItem item) throws IOException {
 		return downloadQueue.getAudio(item);
 	}
 
 	public API getAPI() {
 		return api;
-	}
-
-	public LocalAPI getLocalAPI() {
-		return localAPI;
 	}
 
 	public ServerAPI getServerAPI() {

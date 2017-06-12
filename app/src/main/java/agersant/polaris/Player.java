@@ -1,7 +1,6 @@
 package agersant.polaris;
 
 import android.content.Intent;
-import android.net.Uri;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -9,16 +8,10 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-
-import java.io.File;
-
-import agersant.polaris.api.remote.PolarisExoPlayerDataSourceFactory;
 
 public class Player implements ExoPlayer.EventListener {
 
@@ -29,7 +22,7 @@ public class Player implements ExoPlayer.EventListener {
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 
 	private ExoPlayer mediaPlayer;
-	private Uri currentURI;
+	private MediaSource mediaSource;
 	private CollectionItem item;
 	private PolarisService service;
 	private float resumeProgress;
@@ -51,6 +44,7 @@ public class Player implements ExoPlayer.EventListener {
 	void stop() {
 		mediaPlayer.stop();
 		resumeProgress = -1.f;
+		mediaSource = null;
 		item = null;
 	}
 
@@ -69,9 +63,7 @@ public class Player implements ExoPlayer.EventListener {
 		stop();
 
 		try {
-			currentURI = service.getAPI().getAudio(item);
-			PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(service);
-			MediaSource mediaSource = new ExtractorMediaSource(currentURI, dsf, new DefaultExtractorsFactory(), null, null);
+			mediaSource = service.getAPI().getAudio(item);
 			mediaPlayer.prepare(mediaSource);
 			mediaPlayer.setPlayWhenReady(true);
 		} catch (Exception e) {
@@ -91,9 +83,8 @@ public class Player implements ExoPlayer.EventListener {
 		return item == null;
 	}
 
-	boolean isUsing(File file) {
-		// TODO
-		return false;
+	boolean isUsing(MediaSource mediaSource) {
+		return this.mediaSource == mediaSource;
 	}
 
 	void resume() {

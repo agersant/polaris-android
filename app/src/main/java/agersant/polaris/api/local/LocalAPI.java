@@ -1,8 +1,9 @@
 package agersant.polaris.api.local;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.widget.ImageView;
+
+import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class LocalAPI implements IPolarisAPI {
 	}
 
 	@Override
-	public Uri getAudio(CollectionItem item) throws IOException {
+	public MediaSource getAudio(CollectionItem item) throws IOException {
 		String path = item.getPath();
 		return offlineCache.getAudio(path);
 	}

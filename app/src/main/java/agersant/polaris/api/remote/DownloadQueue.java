@@ -1,6 +1,6 @@
 package agersant.polaris.api.remote;
 
-import android.net.Uri;
+import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,17 +41,47 @@ public class DownloadQueue {
 		}, 1500, 500);
 	}
 
-	public synchronized Uri getAudio(CollectionItem item) throws IOException {
-		return service.getServerAPI().serveUri(item.getPath());
+	public synchronized MediaSource getAudio(CollectionItem item) throws IOException {
+		DownloadQueueWorkItem existingWorker = findWorkerWithAudioForItem(item);
+		if (existingWorker != null) {
+			existingWorker.stopBackgroundDownload();
+			return existingWorker.getMediaSource();
+		}
+
+		DownloadQueueWorkItem newWorker = findIdleWorker();
+		if (newWorker == null) {
+			newWorker = findInterruptibleWorker();
+		}
+
+		newWorker.assignItem(item);
+		return newWorker.getMediaSource();
 	}
 
-	private DownloadQueueWorkItem findActiveWorker(CollectionItem item) {
+	private DownloadQueueWorkItem findWorkerWithAudioForItem(CollectionItem item) {
 		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.isHandling(item)) {
+			if (worker.hasMediaSourceFor(item)) {
 				return worker;
 			}
 		}
 		return null;
+	}
+
+	public boolean isStreaming(CollectionItem item) {
+		for (DownloadQueueWorkItem worker : workers) {
+			if (worker.hasMediaSourceFor(item)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isDownloading(CollectionItem item) {
+		for (DownloadQueueWorkItem worker : workers) {
+			if (worker.isDownloading(item)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private DownloadQueueWorkItem findIdleWorker() {
@@ -72,10 +102,6 @@ public class DownloadQueue {
 		return null;
 	}
 
-	public boolean isWorkingOn(CollectionItem item) {
-		return findActiveWorker(item) != null;
-	}
-
 	private synchronized void downloadNext() {
 
 		if (service.isOffline()) {
@@ -93,7 +119,8 @@ public class DownloadQueue {
 				return;
 			}
 			try {
-				worker.beginDownload(nextItem);
+				worker.assignItem(nextItem);
+				worker.beginBackgroundDownload();
 			} catch (IOException e) {
 				System.out.println("Error while downloading item ahead of time: " + e);
 			}

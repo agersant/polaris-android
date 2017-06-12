@@ -188,7 +188,7 @@ public class PlaybackQueue {
 			if (offlineCache.hasAudio(item.getPath())) {
 				continue;
 			}
-			if (downloadQueue.isWorkingOn(item)) {
+			if (downloadQueue.isDownloading(item)) {
 				continue;
 			}
 			bestScore = score;
