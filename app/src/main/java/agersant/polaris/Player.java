@@ -54,7 +54,7 @@ public class Player implements ExoPlayer.EventListener {
 
 		if (this.item != null && item.getPath().equals(this.item.getPath())) {
 			System.out.println("Restarting playback for: " + item.getPath());
-			seekTo(0);
+			seekToAbsolute(0);
 			resume();
 			return;
 		}
@@ -101,7 +101,12 @@ public class Player implements ExoPlayer.EventListener {
 		return mediaPlayer.getPlayWhenReady();
 	}
 
-	void seekTo(float progress) {
+	void seekToAbsolute(long position) {
+		resumeProgress = -1;
+		mediaPlayer.seekTo(position);
+	}
+
+	void seekToRelative(float progress) {
 		long duration = mediaPlayer.getDuration();
 		if (duration == C.TIME_UNSET) {
 			resumeProgress = progress;
@@ -144,7 +149,7 @@ public class Player implements ExoPlayer.EventListener {
 	public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 		if (playbackState == ExoPlayer.STATE_READY) {
 			if (resumeProgress > 0.f) {
-				seekTo(resumeProgress);
+				seekToRelative(resumeProgress);
 			}
 		}
 		if (playbackState == ExoPlayer.STATE_ENDED) {

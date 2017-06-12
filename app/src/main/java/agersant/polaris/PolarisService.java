@@ -248,9 +248,7 @@ public class PolarisService extends Service {
 						CollectionItem currentItem = getItem(state.queueIndex);
 						play(currentItem);
 						pause();
-						if (state.trackProgress < 1.f) {
-							seekTo(state.trackProgress);
-						}
+						seekToAbsolute(state.trackProgress);
 					}
 				}
 			} catch (ClassNotFoundException e) {
@@ -371,8 +369,12 @@ public class PolarisService extends Service {
 		return player.getPosition();
 	}
 
-	public void seekTo(float progress) {
-		player.seekTo(progress);
+	public void seekToRelative(float progress) {
+		player.seekToRelative(progress);
+	}
+
+	public void seekToAbsolute(long position) {
+		player.seekToAbsolute(position);
 	}
 
 	public boolean isUsing(MediaSource mediaSource) {

@@ -131,7 +131,7 @@ public class PlayerActivity extends PolarisActivity {
 
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				if (service != null) {
-					service.seekTo((float) newPosition / seekBar.getMax());
+					service.seekToRelative((float) newPosition / seekBar.getMax());
 				}
 				seeking = false;
 				updateControls();

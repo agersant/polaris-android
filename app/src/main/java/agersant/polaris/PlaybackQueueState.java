@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 public class PlaybackQueueState implements Serializable {
 
-	public static final int VERSION = 2;
+	public static final int VERSION = 3;
 
 	ArrayList<CollectionItem> queueContent;
 	int queueIndex;
 	PlaybackQueue.Ordering queueOrdering;
-	float trackProgress;
+	long trackProgress;
 
 	PlaybackQueueState() {
 		queueContent = new ArrayList<>();
