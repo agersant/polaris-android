@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaDataSource;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import java.io.File;
@@ -332,7 +332,7 @@ public class OfflineCache {
 		}
 	}
 
-	MediaDataSource getAudio(String virtualPath) throws IOException {
+	Uri getAudio(String virtualPath) throws IOException {
 		if (!hasAudio(virtualPath)) {
 			throw new FileNotFoundException();
 		}
@@ -341,8 +341,7 @@ public class OfflineCache {
 			metadata.lastUse = new Date();
 			saveMetadata(virtualPath, metadata);
 		}
-		File source = getCacheFile(virtualPath, CacheDataType.AUDIO, false);
-		return new LocalMediaDataSource(source);
+		return Uri.fromFile(getCacheFile(virtualPath, CacheDataType.AUDIO, false));
 	}
 
 	Bitmap getImage(String virtualPath) throws IOException {

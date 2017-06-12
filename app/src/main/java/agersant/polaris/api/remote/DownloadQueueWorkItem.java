@@ -1,7 +1,6 @@
 package agersant.polaris.api.remote;
 
 import android.content.Intent;
-import android.media.MediaDataSource;
 import android.os.AsyncTask;
 
 import java.io.File;
@@ -54,15 +53,15 @@ class DownloadQueueWorkItem {
 		if (mediaDataSource == null) {
 			return false;
 		}
-		return service.isUsing(mediaDataSource);
+		return service.isUsing(mediaDataSource.getFile());
 	}
 
 	boolean isInterruptible() {
 		return !isDataSourceInUse();
 	}
 
-	MediaDataSource getMediaDataSource() {
-		return mediaDataSource;
+	File getMediaFile() {
+		return tempFile;
 	}
 
 	void beginDownload(CollectionItem item) throws IOException {
@@ -95,12 +94,9 @@ class DownloadQueueWorkItem {
 		job.execute();
 	}
 
-	void setContentLength(int length) {
-		mediaDataSource.setContentLength(length);
-	}
-
 	void onJobSuccess() {
-		mediaDataSource.markAsComplete();
+		// TODO?
+		// mediaDataSource.markAsComplete();
 	}
 
 	void onJobError() {
@@ -111,7 +107,7 @@ class DownloadQueueWorkItem {
 		if (stopActiveMedia) {
 			System.out.println("Stopping active datasource");
 			isPaused = !service.isPlaying();
-			mediaProgress = service.getProgress();
+			mediaProgress = service.getPosition();
 			service.stop();
 		}
 
@@ -147,7 +143,8 @@ class DownloadQueueWorkItem {
 		}
 		if (mediaDataSource != null) {
 			try {
-				mediaDataSource.close();
+				// TODO?
+				// mediaDataSource.getFile().close();
 			} catch (Exception e) {
 				System.out.println("Error while closing data source for download queue work item");
 			}

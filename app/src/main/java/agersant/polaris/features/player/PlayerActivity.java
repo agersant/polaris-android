@@ -105,7 +105,7 @@ public class PlayerActivity extends PolarisActivity {
 					updateSeekBar();
 				}
 			}
-		}, 0, 100); // in ms
+		}, 0, 20); // in ms
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class PlayerActivity extends PolarisActivity {
 
 			public void onStopTrackingTouch(SeekBar seekBar) {
 				if (service != null) {
-					service.seekTo(newPosition / 100.f);
+					service.seekTo((float) newPosition / seekBar.getMax());
 				}
 				seeking = false;
 				updateControls();
@@ -212,8 +212,10 @@ public class PlayerActivity extends PolarisActivity {
 		if (service == null) {
 			return;
 		}
-		int progress = (int) (seekBar.getMax() * service.getProgress());
-		seekBar.setProgress(progress);
+		int duration = (int) service.getDuration();
+		seekBar.setMax(duration);
+		int position = (int) service.getPosition();
+		seekBar.setProgress(position);
 	}
 
 	private void populateWithTrack(CollectionItem item) {

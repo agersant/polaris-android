@@ -1,7 +1,5 @@
 package agersant.polaris.api.remote;
 
-import android.content.Context;
-
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -13,24 +11,15 @@ import okhttp3.ResponseBody;
 
 public class RequestQueue {
 
-	private static RequestQueue instance;
 	private final OkHttpClient client;
 	private final Auth auth;
 
-	private RequestQueue(Context context) {
-		this.auth = new Auth(context);
+	RequestQueue(Auth auth) {
+		this.auth = auth;
 		this.client = new OkHttpClient.Builder()
 				.retryOnConnectionFailure(true)
 				.authenticator(auth)
 				.build();
-	}
-
-	public static void init(Context context) {
-		instance = new RequestQueue(context);
-	}
-
-	static RequestQueue getInstance() {
-		return instance;
 	}
 
 	ResponseBody requestSync(Request request) throws IOException {

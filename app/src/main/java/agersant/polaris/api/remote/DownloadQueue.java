@@ -1,6 +1,6 @@
 package agersant.polaris.api.remote;
 
-import android.media.MediaDataSource;
+import android.net.Uri;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,20 +41,8 @@ public class DownloadQueue {
 		}, 1500, 500);
 	}
 
-	public synchronized MediaDataSource getAudio(CollectionItem item) throws IOException {
-		DownloadQueueWorkItem existingWorker = findActiveWorker(item);
-		if (existingWorker != null) {
-			return existingWorker.getMediaDataSource();
-		}
-
-		DownloadQueueWorkItem newWorker = findIdleWorker();
-		if (newWorker == null) {
-			newWorker = findInterruptibleWorker();
-			assert newWorker != null;
-		}
-
-		newWorker.beginDownload(item);
-		return newWorker.getMediaDataSource();
+	public synchronized Uri getAudio(CollectionItem item) throws IOException {
+		return service.getServerAPI().serveUri(item.getPath());
 	}
 
 	private DownloadQueueWorkItem findActiveWorker(CollectionItem item) {

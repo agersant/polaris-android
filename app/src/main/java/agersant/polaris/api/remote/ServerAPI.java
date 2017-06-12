@@ -2,7 +2,7 @@ package agersant.polaris.api.remote;
 
 
 import android.content.SharedPreferences;
-import android.media.MediaDataSource;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
@@ -34,18 +34,28 @@ public class ServerAPI
 	private final Gson gson;
 	private final SharedPreferences preferences;
 	private final String serverAddressKey;
-	private PolarisService service;
+	private final Auth auth;
+	private final PolarisService service;
 
 	public ServerAPI(PolarisService service) {
 		this.service = service;
 		this.serverAddressKey = service.getString(R.string.pref_key_server_url);
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(service);
-		this.requestQueue = RequestQueue.getInstance();
+		this.auth = new Auth(service);
+		this.requestQueue = new RequestQueue(auth);
 		this.gson = new GsonBuilder()
 				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
 				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
 				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
 				.create();
+	}
+
+	public String getCookieHeader() {
+		return auth.getCookieHeader();
+	}
+
+	public String getAuthorizationHeader() {
+		return auth.getAuthorizationHeader();
 	}
 
 	private String getURL() {
@@ -60,7 +70,7 @@ public class ServerAPI
 	}
 
 	@Override
-	public MediaDataSource getAudio(CollectionItem item) throws IOException {
+	public Uri getAudio(CollectionItem item) throws IOException {
 		return service.downloadAudio(item);
 	}
 
@@ -69,9 +79,13 @@ public class ServerAPI
 		FetchImageTask.load(service, item, view);
 	}
 
-	public ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+	public Uri serveUri(String path) {
 		String url = getMediaURL(path);
-		Request request = new Request.Builder().url(url).build();
+		return Uri.parse(url);
+	}
+
+	public ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+		Request request = new Request.Builder().url(serveUri(path).toString()).build();
 		return requestQueue.requestSync(request);
 	}
 

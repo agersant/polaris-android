@@ -2,8 +2,6 @@ package agersant.polaris;
 
 import android.app.Application;
 
-import agersant.polaris.api.remote.RequestQueue;
-
 public class PolarisApplication extends Application {
 
 	private static PolarisApplication instance;
@@ -17,7 +15,6 @@ public class PolarisApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		instance = this;
-		RequestQueue.init(this);
 	}
 
 }

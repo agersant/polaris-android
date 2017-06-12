@@ -1,12 +1,26 @@
 package agersant.polaris;
 
 import android.content.Intent;
-import android.media.MediaDataSource;
-import android.media.MediaPlayer;
+import android.net.Uri;
 
-import java.io.IOException;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
+import java.io.File;
+
+import agersant.polaris.api.remote.PolarisExoPlayerDataSourceFactory;
+
+public class Player implements ExoPlayer.EventListener {
 
 	public static final String PLAYBACK_ERROR = "PLAYBACK_ERROR";
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
@@ -14,16 +28,17 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 
-	private PolarisMediaPlayer mediaPlayer;
-	private MediaDataSource media;
+	private ExoPlayer mediaPlayer;
+	private Uri currentURI;
 	private CollectionItem item;
 	private PolarisService service;
+	private float resumeProgress;
 
 	Player(PolarisService service) {
 		this.service = service;
-		mediaPlayer = new PolarisMediaPlayer();
-		mediaPlayer.setOnCompletionListener(this);
-		mediaPlayer.setOnErrorListener(this);
+		resumeProgress = -1.f;
+		mediaPlayer = ExoPlayerFactory.newSimpleInstance(service, new DefaultTrackSelector());
+		mediaPlayer.addListener(this);
 	}
 
 	private void broadcast(String event) {
@@ -34,19 +49,15 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 	}
 
 	void stop() {
-		mediaPlayer.reset();
-		if (media != null) {
-			try {
-				media.close();
-			} catch (IOException e) {
-				System.out.println("Error while closing media datasource: " + e);
-			}
-			media = null;
-		}
+		mediaPlayer.stop();
+		resumeProgress = -1.f;
 		item = null;
 	}
 
 	void play(CollectionItem item) {
+
+		resumeProgress = -1.f;
+
 		if (this.item != null && item.getPath().equals(this.item.getPath())) {
 			System.out.println("Restarting playback for: " + item.getPath());
 			seekTo(0);
@@ -58,9 +69,11 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 		stop();
 
 		try {
-			media = service.getAPI().getAudio(item);
-			mediaPlayer.setDataSource(media);
-			mediaPlayer.prepareAsync();
+			currentURI = service.getAPI().getAudio(item);
+			PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(service);
+			MediaSource mediaSource = new ExtractorMediaSource(currentURI, dsf, new DefaultExtractorsFactory(), null, null);
+			mediaPlayer.prepare(mediaSource);
+			mediaPlayer.setPlayWhenReady(true);
 		} catch (Exception e) {
 			System.out.println("Error while beginning media playback: " + e);
 			broadcast(PLAYBACK_ERROR);
@@ -78,55 +91,86 @@ public class Player implements MediaPlayer.OnCompletionListener, MediaPlayer.OnE
 		return item == null;
 	}
 
-	boolean isUsing(MediaDataSource media) {
-		return this.media == media;
+	boolean isUsing(File file) {
+		// TODO
+		return false;
 	}
 
 	void resume() {
-		if (mediaPlayer == null) {
-			return;
-		}
-		mediaPlayer.resume();
+		mediaPlayer.setPlayWhenReady(true);
 		broadcast(Player.RESUMED_TRACK);
 	}
 
 	void pause() {
-		if (mediaPlayer == null) {
-			return;
-		}
-		mediaPlayer.pause();
+		mediaPlayer.setPlayWhenReady(false);
 		broadcast(Player.PAUSED_TRACK);
 	}
 
 	boolean isPlaying() {
-		if (mediaPlayer == null) {
-			return false;
-		}
-		return mediaPlayer.isPlaying();
+		return mediaPlayer.getPlayWhenReady();
 	}
 
 	void seekTo(float progress) {
-		if (mediaPlayer != null) {
-			mediaPlayer.seekTo(progress);
+		long duration = mediaPlayer.getDuration();
+		if (duration == C.TIME_UNSET) {
+			resumeProgress = progress;
+			return;
 		}
+		resumeProgress = -1;
+		long position = (long)( duration * progress );
+		mediaPlayer.seekTo(position);
 	}
 
-	float getProgress() {
-		if (mediaPlayer == null) {
-			return 0.f;
+	long getDuration() {
+		long duration = mediaPlayer.getDuration();
+		if (duration == C.TIME_UNSET) {
+			return 0;
 		}
-		return mediaPlayer.getProgress();
+		return duration;
+	}
+
+	long getPosition() {
+		long position = mediaPlayer.getCurrentPosition();
+		if (position == C.TIME_UNSET) {
+			return 0;
+		}
+		return position;
 	}
 
 	@Override
-	public void onCompletion(MediaPlayer mp) {
-		broadcast(COMPLETED_TRACK);
+	public void onTimelineChanged(Timeline timeline, Object manifest) {
 	}
 
 	@Override
-	public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+	public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+	}
+
+	@Override
+	public void onLoadingChanged(boolean isLoading) {
+	}
+
+	@Override
+	public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+		if (playbackState == ExoPlayer.STATE_READY) {
+			if (resumeProgress > 0.f) {
+				seekTo(resumeProgress);
+			}
+		}
+		if (playbackState == ExoPlayer.STATE_ENDED) {
+			broadcast(COMPLETED_TRACK);
+		}
+	}
+
+	@Override
+	public void onPlayerError(ExoPlaybackException error) {
 		broadcast(PLAYBACK_ERROR);
-		return false;
 	}
 
+	@Override
+	public void onPositionDiscontinuity() {
+	}
+
+	@Override
+	public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+	}
 }

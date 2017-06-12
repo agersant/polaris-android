@@ -31,17 +31,22 @@ class Auth implements Authenticator {
 		cookie = null;
 	}
 
+	public String getCookieHeader() {
+		return cookie;
+	}
+
+	public String getAuthorizationHeader() {
+		String username = preferences.getString(usernameKey, "");
+		String password = preferences.getString(passwordKey, "");
+		String credentials = username + ":" + password;
+		return "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+	}
+
 	void parseCookie(String header) {
 		Matcher matcher = setCookiePattern.matcher(header);
 		if (matcher.find()) {
 			this.cookie = matcher.group(1);
 		}
-	}
-
-	private String getAuthorizationHeader() {
-		String username = preferences.getString(usernameKey, "");
-		String password = preferences.getString(passwordKey, "");
-		return username + ":" + password;
 	}
 
 	@Override
@@ -56,7 +61,6 @@ class Auth implements Authenticator {
 		}
 
 		String authorization = getAuthorizationHeader();
-		authorization = "Basic " + Base64.encodeToString(authorization.getBytes(), Base64.NO_WRAP);
 		String oldAuthorization = response.request().header("Authorization");
 		boolean newAuthorization = oldAuthorization == null || !authorization.equals(oldAuthorization);
 		if (newAuthorization) {

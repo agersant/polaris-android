@@ -2,7 +2,7 @@ package agersant.polaris.api;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.media.MediaDataSource;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
@@ -39,7 +39,7 @@ public class API {
 		return preferences.getBoolean(offlineModePreferenceKey, false);
 	}
 
-	public MediaDataSource getAudio(CollectionItem item) throws IOException {
+	public Uri getAudio(CollectionItem item) throws IOException {
 		if (localAPI.hasAudio(item)) {
 			return localAPI.getAudio(item);
 		}

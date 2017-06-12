@@ -55,8 +55,6 @@ class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 			System.out.println("Stream content has no response");
 			return 1;
 		}
-		long contentLength = responseBody.contentLength();
-		workItem.setContentLength((int) contentLength);
 
 		try (InputStream inputStream = responseBody.byteStream();
 			 FileOutputStream outputStream = new FileOutputStream(outFile);

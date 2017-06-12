@@ -12,7 +12,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 import android.media.AudioManager;
-import android.media.MediaDataSource;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
@@ -30,7 +30,6 @@ import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
 import agersant.polaris.api.remote.ServerAPI;
-import agersant.polaris.api.remote.StreamingMediaDataSource;
 import agersant.polaris.features.player.PlayerActivity;
 
 /**
@@ -221,7 +220,7 @@ public class PolarisService extends Service {
 		state.queueOrdering = getOrdering();
 		CollectionItem currentItem = getCurrentItem();
 		state.queueIndex = state.queueContent.indexOf(currentItem);
-		state.trackProgress = getProgress();
+		state.trackProgress = getPosition();
 
 		// Persist
 		try (FileOutputStream out = new FileOutputStream(storage)) {
@@ -357,8 +356,12 @@ public class PolarisService extends Service {
 		return player.isPlaying();
 	}
 
-	public float getProgress() {
-		return player.getProgress();
+	public long getDuration() {
+		return player.getDuration();
+	}
+
+	public long getPosition() {
+		return player.getPosition();
 	}
 
 	public void seekTo(float progress) {
@@ -369,8 +372,8 @@ public class PolarisService extends Service {
 		player.stop();
 	}
 
-	public boolean isUsing(StreamingMediaDataSource mediaDataSource) {
-		return player.isUsing(mediaDataSource);
+	public boolean isUsing(File file) {
+		return player.isUsing(file);
 	}
 
 	public boolean isOffline() {
@@ -405,7 +408,7 @@ public class PolarisService extends Service {
 		offlineCache.putImage(item, image);
 	}
 
-	public MediaDataSource downloadAudio(CollectionItem item) throws IOException {
+	public Uri downloadAudio(CollectionItem item) throws IOException {
 		return downloadQueue.getAudio(item);
 	}
 
@@ -419,5 +422,13 @@ public class PolarisService extends Service {
 
 	public ServerAPI getServerAPI() {
 		return serverAPI;
+	}
+
+	public String getAuthCookieHeader() {
+		return serverAPI.getCookieHeader();
+	}
+
+	public String getAuthRawHeader() {
+		return serverAPI.getAuthorizationHeader();
 	}
 }
