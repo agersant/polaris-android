@@ -47,7 +47,9 @@ public class BrowseActivity extends PolarisActivity {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder iBinder) {
 			service = ((PolarisService.PolarisBinder) iBinder).getService();
-			loadContent();
+			if (items == null) {
+				loadContent();
+			}
 			displayContent();
 		}
 	};
