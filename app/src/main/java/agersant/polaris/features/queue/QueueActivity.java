@@ -74,6 +74,7 @@ public class QueueActivity extends PolarisActivity {
 					case Player.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
+					case DownloadQueue.WORKLOAD_CHANGED:
 						if (adapter != null) {
 							adapter.notifyDataSetChanged();
 						}
