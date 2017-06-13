@@ -109,8 +109,7 @@ public class QueueActivity extends PolarisActivity {
 	public void onStart() {
 		super.onStart();
 		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
-		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		bindService(intent, serviceConnection, 0);
 		subscribeToEvents();
 	}
 

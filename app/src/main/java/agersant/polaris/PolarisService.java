@@ -116,7 +116,7 @@ public class PolarisService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		handleIntent(intent);
 		super.onStartCommand(intent, flags, startId);
-		return START_STICKY;
+		return START_NOT_STICKY;
 	}
 
 
