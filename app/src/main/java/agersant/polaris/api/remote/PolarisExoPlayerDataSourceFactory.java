@@ -116,7 +116,7 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 			try {
 				file.write(buffer, offset, out);
 			} catch (Exception e) {
-				System.out.println("Error while audio to stream file: " + e);
+				System.out.println("Error while writing audio to stream file: " + e);
 				file = null;
 			}
 
@@ -125,7 +125,7 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 				try {
 					service.saveAudio(item, new FileInputStream(scratchLocation));
 				} catch (Exception e) {
-					System.out.println("Error while saving stream audio in cache: " + e);
+					System.out.println("Error while saving stream audio in offline cache: " + e);
 				}
 				try {
 					file.close();
