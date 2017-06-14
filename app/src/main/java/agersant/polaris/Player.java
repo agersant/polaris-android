@@ -41,7 +41,7 @@ public class Player implements ExoPlayer.EventListener {
 		application.sendBroadcast(intent);
 	}
 
-	void stop() {
+	private void stop() {
 		mediaPlayer.stop();
 		resumeProgress = -1.f;
 		mediaSource = null;
@@ -77,10 +77,6 @@ public class Player implements ExoPlayer.EventListener {
 
 	CollectionItem getCurrentItem() {
 		return item;
-	}
-
-	boolean isIdle() {
-		return item == null;
 	}
 
 	boolean isUsing(MediaSource mediaSource) {
