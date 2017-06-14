@@ -55,6 +55,7 @@ public class PolarisService extends Service {
 	private LocalAPI localAPI;
 	private API api;
 	private BroadcastReceiver receiver;
+	private boolean bound;
 
 	@Override
 	public void onCreate() {
@@ -104,7 +105,19 @@ public class PolarisService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		bound = true;
 		return binder;
+	}
+
+	@Override
+	public void onRebind(Intent intent) {
+		bound = true;
+	}
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+		bound = false;
+		return true;
 	}
 
 	public class PolarisBinder extends Binder {
@@ -153,7 +166,9 @@ public class PolarisService extends Service {
 				skipPrevious();
 				break;
 			case MEDIA_INTENT_DISMISS:
-				stopSelf();
+				if (!bound) {
+					stopSelf();
+				}
 				break;
 		}
 	}
