@@ -24,6 +24,7 @@ import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -80,19 +81,25 @@ public class ServerAPI
 		FetchImageTask.load(service, item, view);
 	}
 
-	public Uri serveUri(String path) {
+	Uri serveUri(String path) {
 		String url = getMediaURL(path);
 		return Uri.parse(url);
 	}
 
-	public ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+	ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
 		Request request = new Request.Builder().url(serveUri(path).toString()).build();
 		return requestQueue.requestSync(request);
 	}
 
 	public void browse(String path, final ItemsCallback handlers) {
 		String requestURL = this.getURL() + "/browse/" + path;
-		Request request = new Request.Builder().url(requestURL).build();
+		HttpUrl parsedURL = HttpUrl.parse(requestURL);
+		if (parsedURL == null) {
+			handlers.onError();
+			return;
+		}
+
+		Request request = new Request.Builder().url(parsedURL).build();
 		Callback callback = new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
@@ -111,7 +118,13 @@ public class ServerAPI
 	}
 
 	private void getAlbums(String url, final ItemsCallback handlers) {
-		Request request = new Request.Builder().url(url).build();
+		HttpUrl parsedURL = HttpUrl.parse(url);
+		if (parsedURL == null) {
+			handlers.onError();
+			return;
+		}
+
+		Request request = new Request.Builder().url(parsedURL).build();
 		Callback callback = new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
