@@ -54,7 +54,8 @@ public class CollectionActivity extends PolarisActivity {
 	@Override
 	public void onStart() {
 		Intent intent = new Intent(this, PolarisService.class);
-		bindService(intent, serviceConnection, 0);
+		bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+		startService(intent);
 		super.onStart();
 	}
 
@@ -62,6 +63,7 @@ public class CollectionActivity extends PolarisActivity {
 	public void onStop() {
 		if (service != null) {
 			unbindService(serviceConnection);
+			service = null;
 		}
 		super.onStop();
 	}

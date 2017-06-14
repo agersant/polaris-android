@@ -1,7 +1,6 @@
 package agersant.polaris;
 
 import android.app.Application;
-import android.content.Intent;
 
 public class PolarisApplication extends Application {
 
@@ -16,9 +15,6 @@ public class PolarisApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		instance = this;
-
-		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
 	}
 
 }

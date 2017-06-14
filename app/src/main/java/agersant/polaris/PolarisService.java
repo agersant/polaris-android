@@ -199,7 +199,11 @@ public class PolarisService extends Service {
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 
-		startForeground(MEDIA_NOTIFICATION, notification);
+		if (isPlaying) {
+			startForeground(MEDIA_NOTIFICATION, notification);
+		} else {
+			stopForeground(false);
+		}
 	}
 
 	private Notification.Action generateAction(int icon, int text, String intentAction) {
@@ -346,6 +350,7 @@ public class PolarisService extends Service {
 
 	public void pause() {
 		player.pause();
+		saveStateToDisk();
 		pushSystemNotification();
 	}
 
