@@ -69,6 +69,7 @@ public class PolarisService extends Service {
 		api = new API(this, serverAPI, localAPI);
 
 		restoreStateFromDisk();
+		pushSystemNotification();
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
@@ -198,11 +199,7 @@ public class PolarisService extends Service {
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 
-		if (isPlaying()) {
-			startForeground(MEDIA_NOTIFICATION, notification);
-		} else {
-			stopForeground(false);
-		}
+		startForeground(MEDIA_NOTIFICATION, notification);
 	}
 
 	private Notification.Action generateAction(int icon, int text, String intentAction) {
