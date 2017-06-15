@@ -19,6 +19,7 @@ public class CollectionItem
 	private String album;
 	private String albumArtist;
 	private int trackNumber;
+	@SuppressWarnings("WeakerAccess")
 	boolean isDirectory;
 
 	private CollectionItem() {
@@ -57,7 +58,7 @@ public class CollectionItem
 		return element.getAsString();
 	}
 
-	private int getOptionalInt(JsonObject fields, String key) {
+	private int getOptionalInt(JsonObject fields, @SuppressWarnings("SameParameterValue") String key) {
 		if (!fields.has(key)) {
 			return 0;
 		}

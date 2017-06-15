@@ -72,7 +72,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 			preference.setSummary(display);
 		} else if (key.equals(resources.getString(R.string.pref_key_password))) {
 			String password = getSharedPreferences().getString(key, "");
-			String stars = password.replaceAll(".", "*");
+			@SuppressWarnings("ReplaceAllDot") String stars = password.replaceAll(".", "*");
 			preference.setSummary(stars);
 		} else if (all.get(key) instanceof String) {
 			preference.setSummary(getSharedPreferences().getString(key, ""));

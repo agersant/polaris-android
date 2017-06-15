@@ -37,13 +37,11 @@ class DownloadQueueWorkItem {
 	}
 
 	boolean isDownloading(CollectionItem item) {
-		if (job == null) {
+		if (this.item == null || job == null) {
 			return false;
 		}
-		if (job.getStatus() == FINISHED) {
-			return false;
-		}
-		return this.item != null && this.item.getPath().equals(item.getPath());
+		boolean correctItem = this.item.getPath().equals(item.getPath());
+		return correctItem && job.getStatus() != FINISHED;
 	}
 
 	boolean isIdle() {
@@ -109,7 +107,7 @@ class DownloadQueueWorkItem {
 		item = null;
 	}
 
-	private void broadcast(String event) {
+	private void broadcast(@SuppressWarnings("SameParameterValue") String event) {
 		PolarisApplication application = PolarisApplication.getInstance();
 		Intent intent = new Intent();
 		intent.setAction(event);

@@ -163,10 +163,12 @@ public class PlayerActivity extends PolarisActivity {
 		super.onStop();
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void skipPrevious(View view) {
 		service.skipPrevious();
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void skipNext(View view) {
 		service.skipNext();
 	}
@@ -239,6 +241,7 @@ public class PlayerActivity extends PolarisActivity {
 		service.getAPI().getImage(item, artwork);
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void togglePause(View view) {
 		if (service == null) {
 			return;

@@ -433,7 +433,7 @@ public class PolarisService extends Service {
 		offlineCache.putImage(item, image);
 	}
 
-	public MediaSource downloadAudio(CollectionItem item) throws IOException {
+	public MediaSource downloadAudio(CollectionItem item) {
 		return downloadQueue.getAudio(item);
 	}
 

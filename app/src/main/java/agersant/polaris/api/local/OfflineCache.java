@@ -155,6 +155,7 @@ public class OfflineCache {
 				if (b.item == null && a.item != null) {
 					return 1;
 				}
+				//noinspection ConstantConditions
 				if (b.item != null && a.item != null) {
 					return -service.comparePriorities(a.item, b.item);
 				}

@@ -142,6 +142,7 @@ public class BrowseActivity extends PolarisActivity {
 		}
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	public void retry(View view) {
 		loadContent();
 	}

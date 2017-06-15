@@ -54,6 +54,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		}
 	}
 
+	@SuppressWarnings("UnusedParameters")
 	void onSwiped(final View view) {
 		if (item.isDirectory()) {
 			queueDirectory();

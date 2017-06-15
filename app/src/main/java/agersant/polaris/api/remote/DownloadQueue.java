@@ -5,7 +5,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import junit.framework.Assert;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,7 +38,7 @@ public class DownloadQueue {
 		}, 1500, 500);
 	}
 
-	public synchronized MediaSource getAudio(CollectionItem item) throws IOException {
+	public synchronized MediaSource getAudio(CollectionItem item) {
 		DownloadQueueWorkItem existingWorker = findWorkerWithAudioForItem(item);
 		if (existingWorker != null) {
 			existingWorker.stopBackgroundDownload();

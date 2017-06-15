@@ -101,7 +101,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 	}
 
 	private static class AsyncDrawable extends BitmapDrawable {
-		private WeakReference<FetchImageTask> task;
+		private final WeakReference<FetchImageTask> task;
 
 		AsyncDrawable(Resources res, FetchImageTask task) {
 			super(res, (Bitmap) null);
