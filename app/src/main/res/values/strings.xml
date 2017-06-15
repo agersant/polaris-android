@@ -45,7 +45,7 @@
 	<string name="queuing">Fetching…</string>
 	<string name="queuing_error">Something went wrong</string>
 	<string name="album_artwork">Album Artwork</string>
-	<string name="playback_error">A media playback error occured</string>
+	<string name="playback_error">A media playback error occurred</string>
 	<string name="pref_key_num_songs_preload">num_songs_preload</string>
 	<string name="pref_num_songs_preload">Songs to preload</string>
 	<string name="pref_key_offline_cache_size">offline_cache_size</string>

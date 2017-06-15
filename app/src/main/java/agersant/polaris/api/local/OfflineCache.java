@@ -380,7 +380,7 @@ public class OfflineCache {
 
 	private ItemCacheMetadata readMetadata(File file) throws IOException {
 		try (FileInputStream fileInputStream = new FileInputStream(file);
-			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)
 		) {
 			return (ItemCacheMetadata) objectInputStream.readObject();
 		} catch (ClassNotFoundException e) {
@@ -421,7 +421,6 @@ public class OfflineCache {
 				out.add(item);
 			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("Error while reading offline cache: " + e);
-				continue;
 			}
 		}
 
@@ -491,7 +490,7 @@ public class OfflineCache {
 			return CollectionItem.directory(path);
 		}
 		try (FileInputStream fileInputStream = new FileInputStream(itemFile);
-			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)
 		) {
 			return (CollectionItem) objectInputStream.readObject();
 		}
