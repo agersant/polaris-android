@@ -33,9 +33,6 @@ import agersant.polaris.api.remote.DownloadQueue;
 import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.player.PlayerActivity;
 
-/**
- * Created by agersant on 6/10/2017.
- */
 
 public class PolarisService extends Service {
 
@@ -52,7 +49,6 @@ public class PolarisService extends Service {
 	private PlaybackQueue playbackQueue;
 	private Player player;
 	private ServerAPI serverAPI;
-	private LocalAPI localAPI;
 	private API api;
 	private BroadcastReceiver receiver;
 	private boolean bound;
@@ -66,7 +62,7 @@ public class PolarisService extends Service {
 		offlineCache = new OfflineCache(this);
 		downloadQueue = new DownloadQueue(this);
 		serverAPI = new ServerAPI(this);
-		localAPI = new LocalAPI(offlineCache);
+		LocalAPI localAPI = new LocalAPI(offlineCache);
 		api = new API(this, serverAPI, localAPI);
 
 		restoreStateFromDisk();
@@ -351,9 +347,9 @@ public class PolarisService extends Service {
 		return playbackQueue.hasPreviousTrack(player.getCurrentItem());
 	}
 
-	public boolean skipPrevious() {
+	public void skipPrevious() {
 		CollectionItem currentItem = player.getCurrentItem();
-		return advance(currentItem, -1);
+		advance(currentItem, -1);
 	}
 
 	public boolean skipNext() {
@@ -393,7 +389,7 @@ public class PolarisService extends Service {
 		player.seekToRelative(progress);
 	}
 
-	public void seekToAbsolute(long position) {
+	private void seekToAbsolute(long position) {
 		player.seekToAbsolute(position);
 	}
 

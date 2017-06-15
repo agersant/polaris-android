@@ -13,14 +13,13 @@ public class CollectionItem
 		implements Cloneable, Serializable {
 
 	private String path;
-	private String name;
 	private String artist;
 	private String title;
 	private String artwork;
 	private String album;
 	private String albumArtist;
 	private int trackNumber;
-	protected boolean isDirectory;
+	boolean isDirectory;
 
 	private CollectionItem() {
 	}
@@ -37,7 +36,7 @@ public class CollectionItem
 		return item;
 	}
 
-	protected void parseFields(JsonObject fields) {
+	void parseFields(JsonObject fields) {
 		path = getOptionalString(fields, "path");
 		artist = getOptionalString(fields, "artist");
 		title = getOptionalString(fields, "title");
@@ -45,7 +44,6 @@ public class CollectionItem
 		album = getOptionalString(fields, "album");
 		albumArtist = getOptionalString(fields, "album_artist");
 		trackNumber = getOptionalInt(fields, "track_number");
-		name = getNameFromPath(path);
 	}
 
 	private String getOptionalString(JsonObject fields, String key) {

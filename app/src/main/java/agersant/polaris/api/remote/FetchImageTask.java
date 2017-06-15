@@ -22,9 +22,9 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final WeakReference<ImageView> imageViewReference;
 
-	private CollectionItem item;
-	private String path;
-	private PolarisService service;
+	private final CollectionItem item;
+	private final String path;
+	private final PolarisService service;
 
 	private FetchImageTask(PolarisService service, CollectionItem item, ImageView imageView) {
 		this.service = service;
@@ -39,7 +39,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			Resources resources = polarisApplication.getResources();
 
 			FetchImageTask task = new FetchImageTask(service, item, imageView);
-			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, null, task);
+			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, task);
 			imageView.setImageDrawable(asyncDrawable);
 			task.execute();
 		}
@@ -103,8 +103,8 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 	private static class AsyncDrawable extends BitmapDrawable {
 		private WeakReference<FetchImageTask> task;
 
-		AsyncDrawable(Resources res, Bitmap bitmap, FetchImageTask task) {
-			super(res, bitmap);
+		AsyncDrawable(Resources res, FetchImageTask task) {
+			super(res, (Bitmap) null);
 			this.task = new WeakReference<>(task);
 		}
 

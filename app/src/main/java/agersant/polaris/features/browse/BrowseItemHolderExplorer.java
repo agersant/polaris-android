@@ -1,6 +1,5 @@
 package agersant.polaris.features.browse;
 
-import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 
@@ -8,13 +7,10 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-/**
- * Created by agersant on 12/11/2016.
- */
 
 class BrowseItemHolderExplorer extends BrowseItemHolder {
 
-	private Button button;
+	private final Button button;
 
 	BrowseItemHolderExplorer(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(service, adapter, itemView, itemQueueStatusView);
@@ -35,9 +31,7 @@ class BrowseItemHolderExplorer extends BrowseItemHolder {
 		}
 
 		button.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
-		}
+		button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
 	}
 
 }

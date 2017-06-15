@@ -24,7 +24,7 @@ import agersant.polaris.features.PolarisActivity;
 
 public class PlayerActivity extends PolarisActivity {
 
-	boolean seeking = false;
+	private boolean seeking = false;
 	private Timer timer;
 	private BroadcastReceiver receiver;
 	private ImageView artwork;
@@ -37,7 +37,8 @@ public class PlayerActivity extends PolarisActivity {
 	public PlayerActivity() {
 		super(R.string.now_playing, R.id.nav_now_playing);
 	}
-	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			service = null;

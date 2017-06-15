@@ -9,9 +9,6 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 
-/**
- * Created by agersant on 12/7/2016.
- */
 
 abstract class BrowseViewContent extends FrameLayout {
 

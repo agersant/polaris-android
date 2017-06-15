@@ -12,7 +12,7 @@ abstract class BrowseAdapter
 		extends RecyclerView.Adapter<BrowseItemHolder> {
 
 	private ArrayList<? extends CollectionItem> items;
-	protected PolarisService service;
+	final PolarisService service;
 
 	BrowseAdapter(PolarisService service) {
 		super();

@@ -18,18 +18,15 @@ import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.ItemsCallback;
 
-/**
- * Created by agersant on 12/11/2016.
- */
 
 abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-	private BrowseAdapter adapter;
+	private final BrowseAdapter adapter;
 	private CollectionItem item;
-	private View queueStatusView;
-	private TextView queueStatusText;
-	private ImageView queueStatusIcon;
-	private PolarisService service;
+	private final View queueStatusView;
+	private final TextView queueStatusText;
+	private final ImageView queueStatusIcon;
+	private final PolarisService service;
 
 	BrowseItemHolder(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(itemView);
@@ -42,7 +39,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 
 	void bindItem(CollectionItem item) {
 		this.item = item;
-		setStatusToQueueable();
+		setStatusToIdle();
 	}
 
 	@Override
@@ -99,7 +96,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		service.getAPI().flatten(item.getPath(), handlers);
 	}
 
-	private void setStatusToQueueable() {
+	private void setStatusToIdle() {
 		queueStatusText.setText(R.string.add_to_queue);
 		queueStatusIcon.setImageResource(R.drawable.ic_playlist_play_black_24dp);
 		itemView.requestLayout();
@@ -115,17 +112,17 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		queueStatusText.setText(R.string.queued);
 		queueStatusIcon.setImageResource(R.drawable.ic_check_black_24dp);
 		itemView.requestLayout();
-		waitAndUnswipe();
+		waitAndSwipeBack();
 	}
 
 	private void setStatusToQueueError() {
 		queueStatusText.setText(R.string.queuing_error);
 		queueStatusIcon.setImageResource(R.drawable.ic_error_black_24dp);
 		itemView.requestLayout();
-		waitAndUnswipe();
+		waitAndSwipeBack();
 	}
 
-	private void waitAndUnswipe() {
+	private void waitAndSwipeBack() {
 		final CollectionItem oldItem = item;
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {

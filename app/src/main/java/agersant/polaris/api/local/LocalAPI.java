@@ -12,13 +12,10 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
 
-/**
- * Created by agersant on 12/25/2016.
- */
 
 public class LocalAPI implements IPolarisAPI {
 
-	private OfflineCache offlineCache;
+	private final OfflineCache offlineCache;
 
 	public LocalAPI(OfflineCache offlineCache) {
 		this.offlineCache = offlineCache;

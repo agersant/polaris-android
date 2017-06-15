@@ -37,7 +37,7 @@ public class BrowseActivity extends PolarisActivity {
 	public BrowseActivity() {
 		super(R.string.collection, R.id.nav_collection);
 	}
-	private ServiceConnection serviceConnection = new ServiceConnection() {
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			service = null;
@@ -234,6 +234,8 @@ public class BrowseActivity extends PolarisActivity {
 
 		contentView.setItems(items);
 		contentView.setOnRefreshListener(onRefresh);
+
+		contentHolder.removeAllViews();
 		contentHolder.addView(contentView);
 	}
 }

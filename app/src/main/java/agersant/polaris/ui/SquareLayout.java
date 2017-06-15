@@ -25,11 +25,6 @@ public class SquareLayout extends FrameLayout {
 		readAttributes(context, attrs);
 	}
 
-	public SquareLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		super(context, attrs, defStyleAttr, defStyleRes);
-		readAttributes(context, attrs);
-	}
-
 	private void readAttributes(Context context, AttributeSet attrs) {
 		TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.SquareLayout);
 		boolean preserveWidthArg = arr.getBoolean(R.styleable.SquareLayout_preserveWidth, true);
@@ -50,11 +45,7 @@ public class SquareLayout extends FrameLayout {
 		super.onMeasure(measureSpec, measureSpec);
 	}
 
-	public boolean isPreserveWidth() {
-		return preserveWidth;
-	}
-
-	public void setPreserveWidth(boolean preserveWidth) {
+	private void setPreserveWidth(boolean preserveWidth) {
 		this.preserveWidth = preserveWidth;
 	}
 }

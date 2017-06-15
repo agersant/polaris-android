@@ -14,8 +14,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
@@ -90,7 +88,7 @@ public class ServerAPI
 		return Uri.parse(url);
 	}
 
-	ResponseBody serve(String path) throws InterruptedException, ExecutionException, TimeoutException, IOException {
+	ResponseBody serve(String path) throws IOException {
 		Request request = new Request.Builder().url(serveUri(path).toString()).build();
 		return requestQueue.requestSync(request);
 	}
@@ -139,8 +137,7 @@ public class ServerAPI
 			public void onResponse(Call call, Response response) throws IOException {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
 				}.getType();
-				ArrayList<CollectionItem.Directory> directories = gson.fromJson(response.body().string(), collectionType);
-				ArrayList<? extends CollectionItem> items = directories;
+				ArrayList<? extends CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
 				handlers.onSuccess(items);
 			}
 		};
@@ -170,8 +167,7 @@ public class ServerAPI
 			public void onResponse(Call call, Response response) throws IOException {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
 				}.getType();
-				ArrayList<CollectionItem.Song> songs = gson.fromJson(response.body().string(), collectionType);
-				ArrayList<? extends CollectionItem> items = songs;
+				ArrayList<? extends CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
 				handlers.onSuccess(items);
 			}
 		};

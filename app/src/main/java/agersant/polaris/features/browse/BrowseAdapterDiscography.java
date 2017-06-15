@@ -7,9 +7,6 @@ import android.view.ViewGroup;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-/**
- * Created by agersant on 12/11/2016.
- */
 
 class BrowseAdapterDiscography extends BrowseAdapter {
 

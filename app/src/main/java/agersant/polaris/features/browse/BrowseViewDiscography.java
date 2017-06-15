@@ -1,9 +1,5 @@
 package agersant.polaris.features.browse;
 
-/**
- * Created by agersant on 12/11/2016.
- */
-
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,10 +14,16 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
+
 class BrowseViewDiscography extends BrowseViewContent {
 
-	private BrowseAdapter adapter;
-	private SwipyRefreshLayout swipeRefresh;
+	private final BrowseAdapter adapter;
+	private final SwipyRefreshLayout swipeRefresh;
+
+	public BrowseViewDiscography(Context context) {
+		super(context);
+		throw new UnsupportedOperationException();
+	}
 
 	public BrowseViewDiscography(Context context, PolarisService service) {
 		super(context);

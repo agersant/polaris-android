@@ -33,7 +33,7 @@
 			android:maxLines="1"
 			android:textColor="@color/queue_item_title"
 			android:textSize="16sp"
-			tools:text="The Dreams of Swedenborg"/>
+			tools:text="Elevator Sunshine Girl"/>
 
 		<TextView
 			android:id="@+id/artist"
@@ -44,7 +44,7 @@
 			android:maxLines="1"
 			android:textColor="@color/queue_item_artist"
 			android:textSize="12sp"
-			tools:text="Therion"/>
+			tools:text="Solar Fields"/>
 
 	</LinearLayout>
 
@@ -58,6 +58,7 @@
 		android:background="@drawable/ic_sd_storage_black_24dp"
 		android:backgroundTint="@color/queue_item_cache_icon"
 		android:duplicateParentState="true"
+		android:contentDescription="@string/queue_cached"
 		android:visibility="invisible"/>
 
 	<ImageView
@@ -70,6 +71,7 @@
 		android:background="@drawable/ic_sync_black_24dp"
 		android:backgroundTint="@color/queue_item_cache_icon"
 		android:duplicateParentState="true"
+		android:contentDescription="@string/queue_downloading"
 		android:visibility="invisible"/>
 
 </RelativeLayout>

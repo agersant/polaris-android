@@ -14,7 +14,7 @@ import agersant.polaris.R;
 class QueueAdapter
 		extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
 
-	private PolarisService service;
+	private final PolarisService service;
 
 	QueueAdapter(PolarisService service) {
 		super();
@@ -49,13 +49,13 @@ class QueueAdapter
 
 	static class QueueItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+		private final QueueItemView queueItemView;
+		private final TextView titleText;
+		private final TextView artistText;
+		private final ImageView cacheIcon;
+		private final ImageView downloadIcon;
+		private final PolarisService service;
 		private CollectionItem item;
-		private QueueItemView queueItemView;
-		private TextView titleText;
-		private TextView artistText;
-		private ImageView cacheIcon;
-		private ImageView downloadIcon;
-		private PolarisService service;
 
 		QueueItemHolder(QueueItemView queueItemView, PolarisService service) {
 			super(queueItemView);

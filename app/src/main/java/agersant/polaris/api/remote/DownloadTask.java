@@ -7,16 +7,13 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
-/**
- * Created by agersant on 12/26/2016.
- */
 
 class DownloadTask extends AsyncTask<Object, Integer, Integer> {
 
 	private static final int BUFFER_SIZE = 1024 * 64; // 64 kB
 
-	private DefaultDataSource dataSource;
-	private DataSpec dataSpec;
+	private final DefaultDataSource dataSource;
+	private final DataSpec dataSpec;
 
 	DownloadTask(DefaultDataSource dataSource, Uri uri) {
 		this.dataSource = dataSource;

@@ -3,14 +3,11 @@ package agersant.polaris.api.local;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
-/**
- * Created by agersant on 12/22/2016.
- */
 
 public class ImageCache {
 
 	private static ImageCache instance;
-	private LruCache<String, Bitmap> lruCache;
+	private final LruCache<String, Bitmap> lruCache;
 
 	private ImageCache() {
 		final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);

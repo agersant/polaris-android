@@ -8,9 +8,6 @@ import java.io.IOException;
 
 import agersant.polaris.CollectionItem;
 
-/**
- * Created by agersant on 12/25/2016.
- */
 
 public interface IPolarisAPI {
 

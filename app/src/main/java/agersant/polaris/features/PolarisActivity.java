@@ -17,11 +17,11 @@ import agersant.polaris.features.player.PlayerActivity;
 import agersant.polaris.features.queue.QueueActivity;
 import agersant.polaris.features.settings.SettingsActivity;
 
-public class PolarisActivity extends AppCompatActivity {
+public abstract class PolarisActivity extends AppCompatActivity {
 
 	protected Toolbar toolbar;
-	private int title;
-	private int navigationItem;
+	private final int title;
+	private final int navigationItem;
 	private BottomNavigationView navigationView;
 
 	public PolarisActivity(int title, int navigationItem) {

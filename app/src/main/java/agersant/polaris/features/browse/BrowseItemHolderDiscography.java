@@ -8,16 +8,13 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-/**
- * Created by agersant on 12/11/2016.
- */
 
 class BrowseItemHolderDiscography extends BrowseItemHolder {
 
-	private ImageView artwork;
-	private TextView artist;
-	private TextView album;
-	private PolarisService service;
+	private final ImageView artwork;
+	private final TextView artist;
+	private final TextView album;
+	private final PolarisService service;
 
 	BrowseItemHolderDiscography(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(service, adapter, itemView, itemQueueStatusView);

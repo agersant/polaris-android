@@ -16,17 +16,14 @@ import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.remote.ServerAPI;
 
-/**
- * Created by agersant on 12/25/2016.
- */
 
 public class API {
 
-	private ServerAPI serverAPI;
-	private LocalAPI localAPI;
-	private SharedPreferences preferences;
-	private String offlineModePreferenceKey;
-	private PolarisService service;
+	private final ServerAPI serverAPI;
+	private final LocalAPI localAPI;
+	private final SharedPreferences preferences;
+	private final String offlineModePreferenceKey;
+	private final PolarisService service;
 
 	public API(PolarisService service, ServerAPI serverAPI, LocalAPI localAPI) {
 		this.service = service;

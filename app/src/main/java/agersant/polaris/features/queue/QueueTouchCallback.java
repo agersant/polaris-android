@@ -3,11 +3,11 @@ package agersant.polaris.features.queue;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-public class QueueTouchCallback extends ItemTouchHelper.Callback {
+class QueueTouchCallback extends ItemTouchHelper.Callback {
 
 	private final QueueAdapter adapter;
 
-	public QueueTouchCallback(QueueAdapter adapter) {
+	QueueTouchCallback(QueueAdapter adapter) {
 		this.adapter = adapter;
 	}
 

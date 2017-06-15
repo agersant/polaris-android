@@ -2,6 +2,8 @@ package agersant.polaris.api.remote;
 
 import com.google.android.exoplayer2.source.MediaSource;
 
+import junit.framework.Assert;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,17 +13,13 @@ import java.util.TimerTask;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 
-/**
- * Created by agersant on 12/25/2016.
- */
 
 public class DownloadQueue {
 
 	public static final String WORKLOAD_CHANGED = "WORKLOAD_CHANGED";
 
-	private PolarisService service;
-	private Timer timer;
-	private ArrayList<DownloadQueueWorkItem> workers;
+	private final PolarisService service;
+	private final ArrayList<DownloadQueueWorkItem> workers;
 
 	public DownloadQueue(PolarisService service) {
 		this.service = service;
@@ -32,7 +30,7 @@ public class DownloadQueue {
 			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file, service);
 			workers.add(worker);
 		}
-		timer = new Timer();
+		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
@@ -50,9 +48,10 @@ public class DownloadQueue {
 
 		DownloadQueueWorkItem newWorker = findIdleWorker();
 		if (newWorker == null) {
-			newWorker = findInterruptibleWorker();
+			newWorker = findWorkerToInterrupt();
 		}
 
+		Assert.assertNotNull(newWorker);
 		newWorker.assignItem(item);
 		return newWorker.getMediaSource();
 	}
@@ -93,9 +92,9 @@ public class DownloadQueue {
 		return null;
 	}
 
-	private DownloadQueueWorkItem findInterruptibleWorker() {
+	private DownloadQueueWorkItem findWorkerToInterrupt() {
 		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.isInterruptible()) {
+			if (worker.canBeInterrupted()) {
 				return worker;
 			}
 		}
@@ -118,12 +117,8 @@ public class DownloadQueue {
 			if (!service.makeSpace(nextItem)) {
 				return;
 			}
-			try {
-				worker.assignItem(nextItem);
-				worker.beginBackgroundDownload();
-			} catch (IOException e) {
-				System.out.println("Error while downloading item ahead of time: " + e);
-			}
+			worker.assignItem(nextItem);
+			worker.beginBackgroundDownload();
 		}
 	}
 }

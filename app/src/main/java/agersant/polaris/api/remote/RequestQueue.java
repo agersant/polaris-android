@@ -9,7 +9,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class RequestQueue {
+class RequestQueue {
 
 	private final OkHttpClient client;
 	private final Auth auth;

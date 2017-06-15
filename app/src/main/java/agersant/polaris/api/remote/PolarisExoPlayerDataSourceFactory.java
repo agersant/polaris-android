@@ -15,14 +15,11 @@ import java.util.BitSet;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 
-/**
- * Created by agersant on 6/11/2017.
- */
 
 public final class PolarisExoPlayerDataSourceFactory implements DataSource.Factory {
 
-	private PolarisService service;
-	private PolarisExoPlayerHttpDataSource dataSource;
+	private final PolarisService service;
+	private final PolarisExoPlayerHttpDataSource dataSource;
 
 	PolarisExoPlayerDataSourceFactory(PolarisService service, File scratchLocation, CollectionItem item) {
 		this.service = service;
@@ -56,11 +53,11 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 	private class PolarisExoPlayerHttpDataSource extends DefaultHttpDataSource {
 
+		private final File scratchLocation;
+		private final PolarisService service;
+		private final CollectionItem item;
 		private BitSet bytesStreamed;
-		private File scratchLocation;
 		private RandomAccessFile file;
-		private PolarisService service;
-		private CollectionItem item;
 
 		PolarisExoPlayerHttpDataSource(PolarisService service, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
 			super("Polaris Android", null, listener);
@@ -152,9 +149,9 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 	private class PolarisExoPlayerHttpDataSourceFactory implements DataSource.Factory {
 
-		PolarisService service;
-		CollectionItem item;
-		File scratchLocation;
+		final PolarisService service;
+		final CollectionItem item;
+		final File scratchLocation;
 
 		PolarisExoPlayerHttpDataSourceFactory(PolarisService service, File scratchLocation, CollectionItem item) {
 			this.service = service;

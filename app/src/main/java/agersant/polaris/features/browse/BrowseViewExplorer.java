@@ -20,8 +20,13 @@ import agersant.polaris.R;
 
 public class BrowseViewExplorer extends BrowseViewContent {
 
-	private BrowseAdapter adapter;
-	private SwipyRefreshLayout swipeRefresh;
+	private final BrowseAdapter adapter;
+	private final SwipyRefreshLayout swipeRefresh;
+
+	public BrowseViewExplorer(Context context) {
+		super(context);
+		throw new UnsupportedOperationException();
+	}
 
 	public BrowseViewExplorer(Context context, PolarisService service) {
 		super(context);

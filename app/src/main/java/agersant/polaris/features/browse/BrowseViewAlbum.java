@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import junit.framework.Assert;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,11 +22,16 @@ import agersant.polaris.R;
 
 public class BrowseViewAlbum extends BrowseViewContent {
 
-	private BrowseAdapter adapter;
-	private ImageView artwork;
-	private TextView artist;
-	private TextView title;
-	private PolarisService service;
+	private final BrowseAdapter adapter;
+	private final ImageView artwork;
+	private final TextView artist;
+	private final TextView title;
+	private final PolarisService service;
+
+	public BrowseViewAlbum(Context context) {
+		super(context);
+		throw new UnsupportedOperationException();
+	}
 
 	public BrowseViewAlbum(Context context, PolarisService service) {
 		super(context);
@@ -51,7 +58,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 
 	@Override
 	void setItems(ArrayList<? extends CollectionItem> items) {
-		assert !items.isEmpty();
+		Assert.assertFalse(items.isEmpty());
 
 		Collections.sort(items, new Comparator<CollectionItem>() {
 			@Override

@@ -14,6 +14,8 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 
+import junit.framework.Assert;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,9 +34,6 @@ import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-/**
- * Created by agersant on 12/25/2016.
- */
 
 public class OfflineCache {
 
@@ -46,9 +45,9 @@ public class OfflineCache {
 	private static final int FIRST_VERSION = 1;
 	private static final int VERSION = 2;
 	private static final int BUFFER_SIZE = 1024 * 64;
-	private SharedPreferences preferences;
+	private final SharedPreferences preferences;
 	private File root;
-	private PolarisService service;
+	private final PolarisService service;
 
 	public OfflineCache(PolarisService service) {
 		this.service = service;
@@ -77,7 +76,7 @@ public class OfflineCache {
 		}
 	}
 
-	private void write(Bitmap image, OutputStream storage) throws IOException {
+	private void write(Bitmap image, OutputStream storage) {
 		image.compress(Bitmap.CompressFormat.PNG, 100, storage);
 	}
 
@@ -88,7 +87,7 @@ public class OfflineCache {
 	}
 
 	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
-		assert (path.isDirectory());
+		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		for (File child : files) {
 			File audio = new File(child, AUDIO_FILENAME);
@@ -123,7 +122,7 @@ public class OfflineCache {
 
 	private long getCacheSize(File file) {
 		long size = 0;
-		assert (file.isDirectory());
+		Assert.assertTrue(file.isDirectory());
 		File[] files = file.listFiles();
 		if (files != null) {
 			for (File child : files) {
@@ -206,7 +205,10 @@ public class OfflineCache {
 	}
 
 	private void deleteDirectory(File path) {
-		assert (path.isDirectory());
+		if (!path.exists()) {
+			return;
+		}
+		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		if (files == null) {
 			return;
@@ -223,7 +225,7 @@ public class OfflineCache {
 
 	private void removeEmptyDirectories(File path) {
 		// TODO: Catastrophic complexity
-		assert (path.isDirectory());
+		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		for (File child : files) {
 			if (child.isDirectory()) {
@@ -278,7 +280,7 @@ public class OfflineCache {
 
 		if (image != null) {
 			String artworkPath = item.getArtwork();
-			assert (artworkPath != null);
+			Assert.assertNotNull(artworkPath);
 			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(artworkPath, CacheDataType.ARTWORK, true))) {
 				write(image, itemOut);
 			} catch (IOException e) {
@@ -454,7 +456,7 @@ public class OfflineCache {
 	}
 
 	private ArrayList<CollectionItem> flattenDir(File source) {
-		assert (source.isDirectory());
+		Assert.assertTrue (source.isDirectory());
 		ArrayList<CollectionItem> out = new ArrayList<>();
 		File[] files = source.listFiles();
 		if (files == null) {
@@ -511,9 +513,9 @@ public class OfflineCache {
 	}
 
 	private class DeletionCandidate {
-		File cachePath;
-		ItemCacheMetadata metadata;
-		CollectionItem item;
+		final File cachePath;
+		final ItemCacheMetadata metadata;
+		final CollectionItem item;
 
 		DeletionCandidate(File cachePath, ItemCacheMetadata metadata, CollectionItem item) {
 			this.cachePath = cachePath;

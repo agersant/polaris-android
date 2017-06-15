@@ -36,7 +36,8 @@ public class QueueActivity extends PolarisActivity {
 	public QueueActivity() {
 		super(R.string.queue, R.id.nav_queue);
 	}
-	private ServiceConnection serviceConnection = new ServiceConnection() {
+
+	private final ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			service = null;
@@ -93,7 +94,7 @@ public class QueueActivity extends PolarisActivity {
 		updateTutorial();
 	}
 
-	void updateTutorial() {
+	private void updateTutorial() {
 		if (adapter == null) {
 			return;
 		}

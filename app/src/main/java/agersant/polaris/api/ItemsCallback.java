@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 
-/**
- * Created by agersant on 5/6/2017.
- */
 
 public interface ItemsCallback {
 

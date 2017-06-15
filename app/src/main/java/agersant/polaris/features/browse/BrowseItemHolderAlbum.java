@@ -3,18 +3,17 @@ package agersant.polaris.features.browse;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-/**
- * Created by agersant on 12/11/2016.
- */
 
 class BrowseItemHolderAlbum extends BrowseItemHolder {
 
-	private TextView trackNumberText;
-	private TextView titleText;
+	private final TextView trackNumberText;
+	private final TextView titleText;
 
 	BrowseItemHolderAlbum(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(service, adapter, itemView, itemQueueStatusView);
@@ -35,7 +34,7 @@ class BrowseItemHolderAlbum extends BrowseItemHolder {
 
 		Integer trackNumber = item.getTrackNumber();
 		if (trackNumber != null) {
-			trackNumberText.setText(String.format("%1$02d.", trackNumber));
+			trackNumberText.setText(String.format((Locale) null, "%1$02d.", trackNumber));
 		} else {
 			trackNumberText.setText("");
 		}

@@ -18,11 +18,10 @@ import okhttp3.Route;
 class Auth implements Authenticator {
 
 	private static final Pattern setCookiePattern = Pattern.compile("^(.*);");
-	private SharedPreferences preferences;
+	private final SharedPreferences preferences;
+	private final String usernameKey;
+	private final String passwordKey;
 	private String cookie;
-
-	private String usernameKey;
-	private String passwordKey;
 
 	Auth(Context context) {
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);

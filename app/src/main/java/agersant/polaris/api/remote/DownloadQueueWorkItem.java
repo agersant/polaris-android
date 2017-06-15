@@ -10,7 +10,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 
 import java.io.File;
-import java.io.IOException;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
@@ -18,16 +17,13 @@ import agersant.polaris.PolarisService;
 
 import static android.os.AsyncTask.Status.FINISHED;
 
-/**
- * Created by agersant on 1/11/2017.
- */
 
 class DownloadQueueWorkItem {
 
-	private File scratchFile;
+	private final File scratchFile;
+	private final PolarisService service;
 	private CollectionItem item;
 	private DownloadTask job;
-	private PolarisService service;
 	private MediaSource mediaSource;
 	private DefaultDataSource dataSource;
 
@@ -59,18 +55,18 @@ class DownloadQueueWorkItem {
 					return false;
 			}
 		}
-		return !isDataSourceInUse();
+		return isDataSourceIdle();
 	}
 
-	private boolean isDataSourceInUse() {
-		return mediaSource != null && service.isUsing(mediaSource);
+	private boolean isDataSourceIdle() {
+		return mediaSource == null || !service.isUsing(mediaSource);
 	}
 
-	boolean isInterruptible() {
-		return !isDataSourceInUse();
+	boolean canBeInterrupted() {
+		return isDataSourceIdle();
 	}
 
-	void assignItem(CollectionItem item) throws IOException {
+	void assignItem(CollectionItem item) {
 		reset();
 		this.item = item;
 		Uri uri = service.getServerAPI().serveUri(item.getPath());

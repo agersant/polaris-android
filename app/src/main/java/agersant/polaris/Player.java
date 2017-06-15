@@ -21,10 +21,10 @@ public class Player implements ExoPlayer.EventListener {
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 
-	private ExoPlayer mediaPlayer;
+	private final PolarisService service;
+	private final ExoPlayer mediaPlayer;
 	private MediaSource mediaSource;
 	private CollectionItem item;
-	private PolarisService service;
 	private float resumeProgress;
 
 	Player(PolarisService service) {
