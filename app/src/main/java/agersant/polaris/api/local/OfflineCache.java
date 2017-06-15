@@ -165,13 +165,10 @@ public class OfflineCache {
 
 		long cleared = 0;
 		for (DeletionCandidate candidate : candidates) {
-			try {
-				if (candidate.item != null) {
-					if (service.comparePriorities(candidate.item, newItem) <= 0) {
-						continue;
-					}
+			if (candidate.item != null) {
+				if (service.comparePriorities(candidate.item, newItem) <= 0) {
+					continue;
 				}
-			} catch (Exception e) {
 			}
 
 			File audio = new File(candidate.cachePath, AUDIO_FILENAME);
@@ -205,6 +202,7 @@ public class OfflineCache {
 		return success;
 	}
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	private void deleteDirectory(File path) {
 		if (!path.exists()) {
 			return;
@@ -314,10 +312,16 @@ public class OfflineCache {
 				break;
 		}
 		if (create) {
+			File parent = file.getParentFile();
+			if (!parent.exists()) {
+				if (!parent.mkdirs()) {
+					throw new IOException("Could not create cache directory: " + parent);
+				}
+			}
 			if (!file.exists()) {
-				File parent = file.getParentFile();
-				parent.mkdirs();
-				file.createNewFile();
+				if (!file.createNewFile()) {
+					throw new IOException("Could not create cache file: " + file);
+				}
 			}
 		}
 		return file;

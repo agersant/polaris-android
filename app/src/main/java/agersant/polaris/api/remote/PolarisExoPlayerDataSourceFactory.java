@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.upstream.TransferListener;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.util.BitSet;
@@ -95,7 +96,9 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 				bytesStreamed = new BitSet(length);
 				try {
 					if (scratchLocation.exists()) {
-						scratchLocation.delete();
+						if (!scratchLocation.delete()) {
+							throw new IOException("Could not cleanse stream scratch location: " + scratchLocation);
+						}
 					}
 					file = new RandomAccessFile(scratchLocation, "rw");
 				} catch (Exception e) {

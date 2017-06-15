@@ -51,6 +51,7 @@ public class LocalAPI implements IPolarisAPI {
 			ImageCache imageCache = ImageCache.getInstance();
 			imageCache.put(artworkPath, image);
 		} catch (IOException e) {
+			System.out.println( "Error while retrieving image from local cache: " + artworkPath );
 		}
 	}
 
