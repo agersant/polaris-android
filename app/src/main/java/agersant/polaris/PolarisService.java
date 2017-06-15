@@ -81,8 +81,10 @@ public class PolarisService extends Service {
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
 					case Player.COMPLETED_TRACK:
-						skipNext();
-						pushSystemNotification();
+						if (!skipNext()) {
+							seekToAbsolute(0);
+							pause();
+						}
 						break;
 					case Player.PLAYBACK_ERROR:
 						displayError();
@@ -98,9 +100,8 @@ public class PolarisService extends Service {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		saveStateToDisk();
 		unregisterReceiver(receiver);
+		super.onDestroy();
 	}
 
 	@Override
@@ -135,11 +136,13 @@ public class PolarisService extends Service {
 
 
 	// Internals
-	private void advance(CollectionItem currentItem, int delta) {
+	private boolean advance(CollectionItem currentItem, int delta) {
 		CollectionItem newTrack = playbackQueue.getNextTrack(currentItem, delta);
 		if (newTrack != null) {
 			play(newTrack);
+			return true;
 		}
+		return false;
 	}
 
 	private void displayError() {
@@ -348,14 +351,14 @@ public class PolarisService extends Service {
 		return playbackQueue.hasPreviousTrack(player.getCurrentItem());
 	}
 
-	public void skipPrevious() {
+	public boolean skipPrevious() {
 		CollectionItem currentItem = player.getCurrentItem();
-		advance(currentItem, -1);
+		return advance(currentItem, -1);
 	}
 
-	public void skipNext() {
+	public boolean skipNext() {
 		CollectionItem currentItem = player.getCurrentItem();
-		advance(currentItem, 1);
+		return advance(currentItem, 1);
 	}
 
 	public void play(CollectionItem item) {

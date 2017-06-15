@@ -43,6 +43,7 @@ public class Player implements ExoPlayer.EventListener {
 
 	private void stop() {
 		mediaPlayer.stop();
+		seekToAbsolute(0);
 		resumeProgress = -1.f;
 		mediaSource = null;
 		item = null;
