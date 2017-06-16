@@ -112,7 +112,13 @@ public class ServerAPI
 			public void onResponse(Call call, Response response) throws IOException {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
 				}.getType();
-				ArrayList<CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
+				ArrayList<CollectionItem> items;
+				try {
+					items = gson.fromJson(response.body().string(), collectionType);
+				} catch (Exception e) {
+					handlers.onError();
+					return;
+				}
 				handlers.onSuccess(items);
 			}
 		};
@@ -137,7 +143,13 @@ public class ServerAPI
 			public void onResponse(Call call, Response response) throws IOException {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
 				}.getType();
-				ArrayList<? extends CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
+				ArrayList<? extends CollectionItem> items;
+				try {
+					items = gson.fromJson(response.body().string(), collectionType);
+				} catch (Exception e) {
+					handlers.onError();
+					return;
+				}
 				handlers.onSuccess(items);
 			}
 		};
@@ -167,7 +179,13 @@ public class ServerAPI
 			public void onResponse(Call call, Response response) throws IOException {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
 				}.getType();
-				ArrayList<? extends CollectionItem> items = gson.fromJson(response.body().string(), collectionType);
+				ArrayList<? extends CollectionItem> items;
+				try {
+					items = gson.fromJson(response.body().string(), collectionType);
+				} catch (Exception e) {
+					handlers.onError();
+					return;
+				}
 				handlers.onSuccess(items);
 			}
 		};
