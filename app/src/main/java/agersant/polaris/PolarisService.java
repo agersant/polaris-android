@@ -377,6 +377,10 @@ public class PolarisService extends Service {
 		return player.isPlaying();
 	}
 
+	public boolean isBuffering() {
+		return player.isBuffering();
+	}
+
 	public long getDuration() {
 		return player.getDuration();
 	}

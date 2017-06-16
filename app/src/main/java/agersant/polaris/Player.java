@@ -20,6 +20,8 @@ public class Player implements ExoPlayer.EventListener {
 	public static final String PAUSED_TRACK = "PAUSED_TRACK";
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
+	public static final String BUFFERING = "BUFFERING";
+	public static final String NOT_BUFFERING = "NOT_BUFFERING";
 
 	private final PolarisService service;
 	private final ExoPlayer mediaPlayer;
@@ -98,6 +100,10 @@ public class Player implements ExoPlayer.EventListener {
 		return mediaPlayer.getPlayWhenReady();
 	}
 
+	boolean isBuffering() {
+		return mediaPlayer.getPlaybackState() == ExoPlayer.STATE_BUFFERING;
+	}
+
 	void seekToAbsolute(long position) {
 		resumeProgress = -1;
 		mediaPlayer.seekTo(position);
@@ -144,13 +150,21 @@ public class Player implements ExoPlayer.EventListener {
 
 	@Override
 	public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-		if (playbackState == ExoPlayer.STATE_READY) {
-			if (resumeProgress > 0.f) {
-				seekToRelative(resumeProgress);
-			}
+		if (playbackState == ExoPlayer.STATE_BUFFERING) {
+			broadcast(BUFFERING);
+		} else {
+			broadcast(NOT_BUFFERING);
 		}
-		if (playbackState == ExoPlayer.STATE_ENDED) {
-			broadcast(COMPLETED_TRACK);
+
+		switch (playbackState) {
+			case ExoPlayer.STATE_READY:
+				if (resumeProgress > 0.f) {
+					seekToRelative(resumeProgress);
+				}
+				break;
+			case ExoPlayer.STATE_ENDED:
+				broadcast(COMPLETED_TRACK);
+				break;
 		}
 	}
 

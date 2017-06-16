@@ -32,6 +32,7 @@ public class PlayerActivity extends PolarisActivity {
 	private ImageView skipNext;
 	private ImageView skipPrevious;
 	private SeekBar seekBar;
+	private View buffering;
 	private PolarisService service;
 
 	public PlayerActivity() {
@@ -49,6 +50,7 @@ public class PlayerActivity extends PolarisActivity {
 			service = ((PolarisService.PolarisBinder) iBinder).getService();
 			updateContent();
 			updateControls();
+			updateBuffering();
 		}
 	};
 
@@ -66,6 +68,8 @@ public class PlayerActivity extends PolarisActivity {
 		filter.addAction(Player.PAUSED_TRACK);
 		filter.addAction(Player.RESUMED_TRACK);
 		filter.addAction(Player.COMPLETED_TRACK);
+		filter.addAction(Player.BUFFERING);
+		filter.addAction(Player.NOT_BUFFERING);
 		filter.addAction(PlaybackQueue.CHANGED_ORDERING);
 		filter.addAction(PlaybackQueue.QUEUED_ITEM);
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
@@ -76,6 +80,9 @@ public class PlayerActivity extends PolarisActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
+					case Player.BUFFERING:
+					case Player.NOT_BUFFERING:
+						that.updateBuffering();
 					case Player.PLAYING_TRACK:
 						that.updateContent();
 						that.updateControls();
@@ -118,6 +125,7 @@ public class PlayerActivity extends PolarisActivity {
 		skipNext = (ImageView) findViewById(R.id.skip_next);
 		skipPrevious = (ImageView) findViewById(R.id.skip_previous);
 		seekBar = (SeekBar) findViewById(R.id.seek_bar);
+		buffering = findViewById(R.id.buffering);
 
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			int newPosition = 0;
@@ -219,6 +227,17 @@ public class PlayerActivity extends PolarisActivity {
 		seekBar.setMax(duration);
 		int position = (int) service.getPosition();
 		seekBar.setProgress(position);
+	}
+
+	private void updateBuffering() {
+		if (service == null) {
+			return;
+		}
+		if (service.isBuffering()) {
+			buffering.setVisibility(View.VISIBLE);
+		} else {
+			buffering.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	private void populateWithTrack(CollectionItem item) {

@@ -22,6 +22,7 @@
 	<string name="player_play_pause">Play/Pause</string>
 	<string name="player_play">Play</string>
 	<string name="player_pause">Pause</string>
+	<string name="player_buffering">Buffering…</string>
 
 	<string name="pref_server_url">Server address</string>
 	<string name="pref_username">Username</string>

@@ -83,6 +83,19 @@
 					android:src="@drawable/ic_skip_next_black_24dp"/>
 			</LinearLayout>
 
+			<TextView
+				android:id="@+id/buffering"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="-12dp"
+				android:layout_marginBottom="-3dp"
+				android:layout_marginStart="16dp"
+				android:layout_marginEnd="16dp"
+				android:textAlignment="textStart"
+				android:textSize="12sp"
+				android:text="@string/player_buffering"
+				/>
+
 			<SeekBar
 				android:id="@+id/seek_bar"
 				android:layout_width="match_parent"
