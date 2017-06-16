@@ -3,6 +3,7 @@
 
 	<!-- Base application theme. -->
 	<style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="android:windowBackground">@color/white</item>
 		<item name="colorPrimary">@color/lightBlue600</item> <!--Task manager toolbar-->
 		<item name="colorPrimaryDark">@color/lightBlue800</item> <!--Status bar background-->
 		<item name="colorAccent">@color/lightBlue600</item> <!--Media player seek bar-->
