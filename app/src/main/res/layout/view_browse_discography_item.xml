@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="100dp"
-	android:background="@color/white"
 	>
 
 	<ImageView
-		android:id="@+id/artwork"
-		android:layout_width="100dp"
-		android:layout_height="100dp"
-		android:contentDescription="@string/album_artwork"
-		tools:background="@drawable/artwork"/>
-
-	<RelativeLayout
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_vertical"
-		android:padding="15dp"
+		android:layout_height="match_parent"
+		tools:ignore="ContentDescription"
+		android:background="@color/white"/>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
 		>
 
-		<TextView
-			android:id="@+id/album"
+		<ImageView
+			android:id="@+id/artwork"
+			android:layout_width="100dp"
+			android:layout_height="100dp"
+			android:contentDescription="@string/album_artwork"
+			tools:background="@drawable/artwork"/>
+
+		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:ellipsize="end"
-			android:maxLines="2"
-			android:textColor="@color/blueGrey700"
-			android:textSize="20sp"
-			tools:text="Into the Labyrinth"/>
+			android:layout_gravity="center_vertical"
+			android:padding="15dp"
+			>
 
-		<TextView
-			android:id="@+id/artist"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_below="@+id/album"
-			android:maxLines="1"
-			android:textColor="@color/blueGrey400"
-			android:textSize="16sp"
-			tools:text="Dead Can Dance"/>
+			<TextView
+				android:id="@+id/album"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:ellipsize="end"
+				android:maxLines="2"
+				android:textColor="@color/blueGrey700"
+				android:textSize="20sp"
+				tools:text="Into the Labyrinth"/>
 
-	</RelativeLayout>
+			<TextView
+				android:id="@+id/artist"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/album"
+				android:maxLines="1"
+				android:textColor="@color/blueGrey400"
+				android:textSize="16sp"
+				tools:text="Dead Can Dance"/>
 
-</LinearLayout>
+		</RelativeLayout>
+
+	</LinearLayout>
+</RelativeLayout>
