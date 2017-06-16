@@ -146,7 +146,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 
 			canvas.save();
 			canvas.translate(itemView.getLeft(), itemView.getTop());
-			canvas.clipRect(0, 0, (int) dX, queueStatusView.getMeasuredHeight());
+			canvas.clipRect(0, 0, (int) Math.ceil(dX), queueStatusView.getMeasuredHeight());
 			queueStatusView.draw(canvas);
 			canvas.restore();
 		}
