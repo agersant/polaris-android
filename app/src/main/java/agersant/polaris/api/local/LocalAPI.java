@@ -5,6 +5,8 @@ import android.widget.ImageView;
 
 import com.google.android.exoplayer2.source.MediaSource;
 
+import junit.framework.Assert;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -37,22 +39,15 @@ public class LocalAPI implements IPolarisAPI {
 		return offlineCache.hasImage(path);
 	}
 
-	@Override
-	public void getImage(CollectionItem item, ImageView view) {
+	public Bitmap getImage(CollectionItem item) {
 		String artworkPath = item.getArtwork();
-		if (artworkPath == null) {
-			return;
-		}
-
+		Assert.assertNotNull(artworkPath);
 		try {
-			Bitmap image = offlineCache.getImage(artworkPath);
-			view.setImageBitmap(image);
-
-			ImageCache imageCache = ImageCache.getInstance();
-			imageCache.put(artworkPath, image);
+			return offlineCache.getImage(artworkPath);
 		} catch (IOException e) {
 			System.out.println( "Error while retrieving image from local cache: " + artworkPath );
 		}
+		return null;
 	}
 
 	public void browse(String path, ItemsCallback handlers) {

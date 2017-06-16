@@ -1,4 +1,4 @@
-package agersant.polaris.api.remote;
+package agersant.polaris.api;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import junit.framework.Assert;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -16,6 +18,7 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
 import agersant.polaris.api.local.ImageCache;
+import agersant.polaris.api.local.LocalAPI;
 import okhttp3.ResponseBody;
 
 class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
@@ -70,15 +73,36 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
+		String artworkPath = item.getArtwork();
+		Assert.assertNotNull(artworkPath);
+
 		Bitmap bitmap = null;
-		try {
-			ResponseBody responseBody = service.getServerAPI().serve(path);
-			InputStream stream = new BufferedInputStream(responseBody.byteStream());
-			bitmap = BitmapFactory.decodeStream(stream);
-		} catch (Exception e) {
-			System.out.println("Error while downloading image: " + e.toString());
+		boolean fromDiskCache = false;
+
+		LocalAPI localAPI = service.getLocalAPI();
+		if (localAPI.hasImage(item)) {
+			bitmap = localAPI.getImage(item);
+			fromDiskCache = bitmap != null;
 		}
-		return bitmap;
+		if (bitmap == null) {
+			if (!service.isOffline()) {
+				try {
+					ResponseBody responseBody = service.getServerAPI().serve(path);
+					InputStream stream = new BufferedInputStream(responseBody.byteStream());
+					bitmap = BitmapFactory.decodeStream(stream);
+				} catch (Exception e) {
+					System.out.println("Error while downloading image: " + e.toString());
+				}
+			}
+		}
+
+		ImageCache cache = ImageCache.getInstance();
+		cache.put(path, bitmap);
+		if (!fromDiskCache) {
+			service.saveImage(item, bitmap);
+		}
+
+		return  bitmap;
 	}
 
 	@Override
@@ -87,11 +111,6 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			bitmap = null;
 		}
 		if (bitmap != null) {
-			ImageCache cache = ImageCache.getInstance();
-			cache.put(path, bitmap);
-
-			service.saveImage(item, bitmap);
-
 			ImageView imageView = imageViewReference.get();
 			FetchImageTask task = getTask(imageView);
 			if (imageView != null && task == this) {

@@ -78,17 +78,12 @@ public class ServerAPI
 		return service.downloadAudio(item);
 	}
 
-	@Override
-	public void getImage(CollectionItem item, ImageView view) {
-		FetchImageTask.load(service, item, view);
-	}
-
 	Uri serveUri(String path) {
 		String url = getMediaURL(path);
 		return Uri.parse(url);
 	}
 
-	ResponseBody serve(String path) throws IOException {
+	public ResponseBody serve(String path) throws IOException {
 		Request request = new Request.Builder().url(serveUri(path).toString()).build();
 		return requestQueue.requestSync(request);
 	}

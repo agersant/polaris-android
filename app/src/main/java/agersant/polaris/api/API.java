@@ -45,24 +45,17 @@ public class API {
 	}
 
 	public void getImage(CollectionItem item, ImageView view) {
-		{
-			String artworkPath = item.getArtwork();
-			if (artworkPath == null) {
-				return;
-			}
-
-			ImageCache cache = ImageCache.getInstance();
-			Bitmap cacheEntry = cache.get(artworkPath);
-			if (cacheEntry != null) {
-				service.saveImage(item, cacheEntry);
-				view.setImageBitmap(cacheEntry);
-				return;
-			}
+		String artworkPath = item.getArtwork();
+		if (artworkPath == null) {
+			return;
 		}
-		if (localAPI.hasImage(item)) {
-			localAPI.getImage(item, view);
+		ImageCache cache = ImageCache.getInstance();
+		Bitmap bitmap = cache.get(artworkPath);
+		if (bitmap != null){
+			view.setImageBitmap(bitmap);
+			return;
 		}
-		getAPI().getImage(item, view);
+		FetchImageTask.load(service, item, view);
 	}
 
 	public void browse(String path, ItemsCallback handlers) {

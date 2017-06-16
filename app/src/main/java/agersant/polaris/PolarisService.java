@@ -49,6 +49,7 @@ public class PolarisService extends Service {
 	private PlaybackQueue playbackQueue;
 	private Player player;
 	private ServerAPI serverAPI;
+	private LocalAPI localAPI;
 	private API api;
 	private BroadcastReceiver receiver;
 	private boolean bound;
@@ -62,7 +63,7 @@ public class PolarisService extends Service {
 		offlineCache = new OfflineCache(this);
 		downloadQueue = new DownloadQueue(this);
 		serverAPI = new ServerAPI(this);
-		LocalAPI localAPI = new LocalAPI(offlineCache);
+		localAPI = new LocalAPI(offlineCache);
 		api = new API(this, serverAPI, localAPI);
 
 		restoreStateFromDisk();
@@ -447,6 +448,10 @@ public class PolarisService extends Service {
 
 	public ServerAPI getServerAPI() {
 		return serverAPI;
+	}
+
+	public LocalAPI getLocalAPI() {
+		return localAPI;
 	}
 
 	public String getAuthCookieHeader() {
