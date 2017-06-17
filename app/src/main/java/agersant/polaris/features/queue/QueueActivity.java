@@ -99,7 +99,7 @@ public class QueueActivity extends PolarisActivity {
 		setContentView(R.layout.activity_queue);
 		super.onCreate(savedInstanceState);
 
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
+		recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
 		DefaultItemAnimator animator = new DefaultItemAnimator() {
