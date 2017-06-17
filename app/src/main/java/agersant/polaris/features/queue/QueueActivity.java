@@ -108,6 +108,8 @@ public class QueueActivity extends PolarisActivity {
 				return true;
 			}
 		};
+		// TODO: this makes drag an drop glitchy
+		// Removing it makes our cache icons flicker on update though
 		recyclerView.setItemAnimator(animator);
 
 		tutorial = findViewById(R.id.queue_tutorial);
