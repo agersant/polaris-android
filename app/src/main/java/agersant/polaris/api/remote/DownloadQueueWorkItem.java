@@ -82,7 +82,7 @@ class DownloadQueueWorkItem {
 		System.out.println("Beginning background download for: " + item.getPath());
 		Uri uri = service.getServerAPI().serveUri(item.getPath());
 		job = new DownloadTask(dataSource, uri);
-		job.execute();
+		job.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 	}
 
