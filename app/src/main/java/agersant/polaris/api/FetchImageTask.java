@@ -96,13 +96,15 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			}
 		}
 
-		ImageCache cache = ImageCache.getInstance();
-		cache.put(path, bitmap);
-		if (!fromDiskCache) {
-			service.saveImage(item, bitmap);
+		if (bitmap != null) {
+			ImageCache cache = ImageCache.getInstance();
+			cache.put(path, bitmap);
+			if (!fromDiskCache) {
+				service.saveImage(item, bitmap);
+			}
 		}
 
-		return  bitmap;
+		return bitmap;
 	}
 
 	@Override
