@@ -44,7 +44,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			FetchImageTask task = new FetchImageTask(service, item, imageView);
 			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, task);
 			imageView.setImageDrawable(asyncDrawable);
-			task.execute();
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}
 	}
 
