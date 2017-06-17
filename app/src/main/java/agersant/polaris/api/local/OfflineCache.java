@@ -122,6 +122,9 @@ public class OfflineCache {
 
 	private long getCacheSize(File file) {
 		long size = 0;
+		if (!file.exists()) {
+			return 0;
+		}
 		Assert.assertTrue(file.isDirectory());
 		File[] files = file.listFiles();
 		if (files != null) {
