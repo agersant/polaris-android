@@ -21,7 +21,6 @@ class QueueAdapter
 
 	QueueAdapter(PolarisService service) {
 		super();
-		setHasStableIds(true);
 		this.service = service;
 	}
 
@@ -34,12 +33,6 @@ class QueueAdapter
 	@Override
 	public void onBindViewHolder(QueueAdapter.QueueItemHolder holder, int position) {
 		holder.bindItem(service.getItem(position));
-	}
-
-	@Override
-	public long getItemId(int position) {
-		CollectionItem item = service.getItem(position);
-		return item.getPath().hashCode();
 	}
 
 	@Override
