@@ -1,7 +1,5 @@
 package agersant.polaris.api;
 
-import android.widget.ImageView;
-
 import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.IOException;
