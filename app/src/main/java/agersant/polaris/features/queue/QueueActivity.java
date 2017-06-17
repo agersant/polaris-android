@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -15,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import junit.framework.Assert;
 
 import java.util.Random;
 
@@ -31,6 +35,7 @@ public class QueueActivity extends PolarisActivity {
 	private QueueAdapter adapter;
 	private BroadcastReceiver receiver;
 	private View tutorial;
+	private RecyclerView recyclerView;
 	private PolarisService service;
 
 	public QueueActivity() {
@@ -71,13 +76,16 @@ public class QueueActivity extends PolarisActivity {
 						break;
 					case PlaybackQueue.QUEUED_ITEMS:
 						updateTutorial();
-						// Fallthrough
+						if (adapter != null) {
+							adapter.notifyDataSetChanged();
+						}
+						break;
 					case Player.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
 					case DownloadQueue.WORKLOAD_CHANGED:
 						if (adapter != null) {
-							adapter.notifyDataSetChanged();
+							adapter.notifyItemRangeChanged( 0, adapter.getItemCount() );
 						}
 						break;
 				}
@@ -90,6 +98,18 @@ public class QueueActivity extends PolarisActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_queue);
 		super.onCreate(savedInstanceState);
+
+		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setLayoutManager(new LinearLayoutManager(this));
+		DefaultItemAnimator animator = new DefaultItemAnimator() {
+			@Override
+			public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
+				return true;
+			}
+		};
+		recyclerView.setItemAnimator(animator);
+
 		tutorial = findViewById(R.id.queue_tutorial);
 		updateTutorial();
 	}
@@ -161,16 +181,11 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	private void populate() {
+		Assert.assertNotNull(service);
 		adapter = new QueueAdapter(service);
-
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
-		recyclerView.setHasFixedSize(true);
-		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
-
 		recyclerView.setAdapter(adapter);
 	}
 
