@@ -1,10 +1,13 @@
 package agersant.polaris.features.queue;
 
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import junit.framework.Assert;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
@@ -18,6 +21,7 @@ class QueueAdapter
 
 	QueueAdapter(PolarisService service) {
 		super();
+		setHasStableIds(true);
 		this.service = service;
 	}
 
@@ -30,6 +34,12 @@ class QueueAdapter
 	@Override
 	public void onBindViewHolder(QueueAdapter.QueueItemHolder holder, int position) {
 		holder.bindItem(service.getItem(position));
+	}
+
+	@Override
+	public long getItemId(int position) {
+		CollectionItem item = service.getItem(position);
+		return item.getPath().hashCode();
 	}
 
 	@Override
@@ -56,6 +66,8 @@ class QueueAdapter
 		private final ImageView downloadIcon;
 		private final PolarisService service;
 		private CollectionItem item;
+		private QueueItemState state;
+		private AsyncTask<Void, Void, QueueItemState> updateIconTask;
 
 		QueueItemHolder(QueueItemView queueItemView, PolarisService service) {
 			super(queueItemView);
@@ -68,21 +80,72 @@ class QueueAdapter
 			queueItemView.setOnClickListener(this);
 		}
 
-		void bindItem(CollectionItem item) {
+		private void beginIconUpdate() {
+			Assert.assertNull(updateIconTask);
+			final QueueItemHolder that = this;
+			final CollectionItem item = this.item;
+
+			updateIconTask = new AsyncTask<Void, Void, QueueItemState>() {
+				@Override
+				protected QueueItemState doInBackground(Void... objects) {
+					if (service.isDownloading(item) || service.isStreaming(item)) {
+						return QueueItemState.DOWNLOADING;
+					} else if (service.hasLocalAudio(item)) {
+						return QueueItemState.DOWNLOADED;
+					} else {
+						return QueueItemState.IDLE;
+					}
+				}
+
+				@Override
+				protected void onPostExecute(QueueItemState state) {
+					if (that.item != item) {
+						return;
+					}
+					setState( state );
+				}
+			};
+
+			updateIconTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		}
+
+		void bindItem(final CollectionItem item) {
+
+			boolean isNewItem = item != this.item;
 			this.item = item;
-			boolean isPlaying = service.getCurrentItem() == this.item;
-			titleText.setText(item.getTitle());
-			artistText.setText(item.getArtist());
+
+			if (isNewItem) {
+				titleText.setText(item.getTitle());
+				artistText.setText(item.getArtist());
+				setState( QueueItemState.IDLE );
+			}
+
+			boolean isPlaying = service.getCurrentItem() == item;
 			queueItemView.setIsPlaying(isPlaying);
-			if (service.hasLocalAudio(item)) {
-				cacheIcon.setVisibility(View.VISIBLE);
-				downloadIcon.setVisibility(View.INVISIBLE);
-			} else if (service.isDownloading(item) || service.isStreaming(item)) {
-				cacheIcon.setVisibility(View.INVISIBLE);
-				downloadIcon.setVisibility(View.VISIBLE);
-			} else {
-				cacheIcon.setVisibility(View.INVISIBLE);
-				downloadIcon.setVisibility(View.INVISIBLE);
+
+			if (updateIconTask != null) {
+				updateIconTask.cancel(true);
+				updateIconTask = null;
+			}
+
+			beginIconUpdate();
+		}
+
+		private void setState(QueueItemState newState) {
+			state = newState;
+			switch (state) {
+				case IDLE:
+					cacheIcon.setVisibility(View.INVISIBLE);
+					downloadIcon.setVisibility(View.INVISIBLE);
+					break;
+				case DOWNLOADING:
+					cacheIcon.setVisibility(View.INVISIBLE);
+					downloadIcon.setVisibility(View.VISIBLE);
+					break;
+				case DOWNLOADED:
+					cacheIcon.setVisibility(View.VISIBLE);
+					downloadIcon.setVisibility(View.INVISIBLE);
+					break;
 			}
 		}
 
@@ -90,5 +153,11 @@ class QueueAdapter
 		public void onClick(View view) {
 			service.play(item);
 		}
+	}
+
+	private enum QueueItemState {
+		IDLE,
+		DOWNLOADING,
+		DOWNLOADED,
 	}
 }
