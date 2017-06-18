@@ -19,6 +19,7 @@ public class CollectionItem
 	private String album;
 	private String albumArtist;
 	private int trackNumber;
+	private int discNumber;
 	@SuppressWarnings("WeakerAccess")
 	boolean isDirectory;
 
@@ -45,6 +46,7 @@ public class CollectionItem
 		album = getOptionalString(fields, "album");
 		albumArtist = getOptionalString(fields, "album_artist");
 		trackNumber = getOptionalInt(fields, "track_number");
+		discNumber = getOptionalInt(fields, "disc_number");
 	}
 
 	private String getOptionalString(JsonObject fields, String key) {
@@ -106,9 +108,11 @@ public class CollectionItem
 		return album;
 	}
 
-	public Integer getTrackNumber() {
+	public int getTrackNumber() {
 		return trackNumber;
 	}
+
+	public int getDiscNumber() { return discNumber; }
 
 	public static class Directory extends CollectionItem {
 		public static class Deserializer implements JsonDeserializer<CollectionItem> {

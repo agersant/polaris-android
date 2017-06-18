@@ -63,6 +63,10 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		Collections.sort(items, new Comparator<CollectionItem>() {
 			@Override
 			public int compare(CollectionItem a, CollectionItem b) {
+				int discDifference = a.getDiscNumber() - b.getDiscNumber();
+				if (discDifference != 0) {
+					return discDifference;
+				}
 				return a.getTrackNumber() - b.getTrackNumber();
 			}
 		});
