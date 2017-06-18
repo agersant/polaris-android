@@ -53,7 +53,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		Collections.sort(items, new Comparator<CollectionItem>() {
 			@Override
 			public int compare(CollectionItem a, CollectionItem b) {
-				return a.getName().compareTo(b.getName());
+				return a.getName().compareToIgnoreCase(b.getName());
 			}
 		});
 		adapter.setItems(items);
