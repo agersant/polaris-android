@@ -1,15 +1,21 @@
 package agersant.polaris.api;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
 import com.google.android.exoplayer2.source.MediaSource;
 
+import junit.framework.Assert;
+
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.local.ImageCache;
@@ -44,18 +50,44 @@ public class API {
 		return getAPI().getAudio(item);
 	}
 
-	public void getImage(CollectionItem item, ImageView view) {
+	public void loadImage(CollectionItem item, FetchImageTask.Callback callback) {
 		String artworkPath = item.getArtwork();
-		if (artworkPath == null) {
-			return;
-		}
+		Assert.assertNotNull(artworkPath);
 		ImageCache cache = ImageCache.getInstance();
 		Bitmap bitmap = cache.get(artworkPath);
-		if (bitmap != null){
-			view.setImageBitmap(bitmap);
+		if (bitmap != null) {
+			callback.onSuccess(bitmap);
 			return;
 		}
-		FetchImageTask.load(service, item, view);
+		FetchImageTask.load(service, item, callback);
+	}
+
+	public void loadImageIntoView(final CollectionItem item, ImageView view) {
+
+		PolarisApplication polarisApplication = PolarisApplication.getInstance();
+		Resources resources = polarisApplication.getResources();
+		FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, item);
+		view.setImageDrawable(asyncDrawable);
+
+		final WeakReference<ImageView> imageViewReference = new WeakReference<>(view);
+		loadImage(item, new FetchImageTask.Callback() {
+			@Override
+			public void onSuccess(Bitmap bitmap) {
+				Assert.assertNotNull(bitmap);
+				ImageView imageView = imageViewReference.get();
+				if (imageView == null) {
+					return;
+				}
+				Drawable drawable = imageView.getDrawable();
+				if (!(drawable instanceof FetchImageTask.AsyncDrawable)) {
+					return;
+				}
+				FetchImageTask.AsyncDrawable asyncDrawable = (FetchImageTask.AsyncDrawable) drawable;
+				if (asyncDrawable.getItem() == item) {
+					imageView.setImageBitmap(bitmap);
+				}
+			}
+		});
 	}
 
 	public void browse(String path, ItemsCallback handlers) {

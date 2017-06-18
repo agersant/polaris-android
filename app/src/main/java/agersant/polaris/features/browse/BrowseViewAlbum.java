@@ -70,7 +70,10 @@ public class BrowseViewAlbum extends BrowseViewContent {
 
 		CollectionItem item = items.get(0);
 
-		service.getAPI().getImage(item, artwork);
+		String artworkPath = item.getArtwork();
+		if (artworkPath != null) {
+			service.getAPI().loadImageIntoView(item, artwork);
+		}
 
 		String titleString = item.getAlbum();
 		if (title != null) {

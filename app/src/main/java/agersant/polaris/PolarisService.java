@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import agersant.polaris.api.API;
+import agersant.polaris.api.FetchImageTask;
 import agersant.polaris.api.local.LocalAPI;
 import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
@@ -52,6 +53,8 @@ public class PolarisService extends Service {
 	private LocalAPI localAPI;
 	private API api;
 	private BroadcastReceiver receiver;
+	private Notification notification;
+	private CollectionItem notificationItem;
 	private boolean bound;
 
 	@Override
@@ -175,22 +178,25 @@ public class PolarisService extends Service {
 
 	private void pushSystemNotification() {
 
-		CollectionItem item = getCurrentItem();
+		boolean isPlaying = isPlaying();
+		final CollectionItem item = getCurrentItem();
 		if (item == null) {
 			return;
 		}
-		boolean isPlaying = isPlaying();
 
+		// On tap action
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
 				.addParentStack(PlayerActivity.class)
 				.addNextIntent(new Intent(this, PlayerActivity.class));
 		PendingIntent tapPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
+		// On dismiss action
 		Intent dismissIntent = new Intent(this, PolarisService.class);
 		dismissIntent.setAction(MEDIA_INTENT_DISMISS);
 		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
 
-		Notification.Builder notificationBuilder = new Notification.Builder(this)
+		// Create notification
+		final Notification.Builder notificationBuilder = new Notification.Builder(this)
 				.setShowWhen(false)
 				.setSmallIcon(R.drawable.notification_icon)
 				.setContentTitle(item.getTitle())
@@ -202,6 +208,22 @@ public class PolarisService extends Service {
 						.setShowActionsInCompactView()
 				);
 
+		// Add album art
+		if (item == notificationItem && notification != null && notification.getLargeIcon() != null) {
+			notificationBuilder.setLargeIcon(notification.getLargeIcon());
+		}
+		api.loadImage(item, new FetchImageTask.Callback() {
+			@Override
+			public void onSuccess(Bitmap bitmap) {
+				if (item != getCurrentItem()) {
+					return;
+				}
+				notificationBuilder.setLargeIcon(bitmap);
+				emitNotification(notificationBuilder, item);
+			}
+		});
+
+		// Add media control actions
 		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
 		if (isPlaying) {
 			notificationBuilder.addAction(generateAction(R.drawable.ic_pause_black_24dp, R.string.player_pause, MEDIA_INTENT_PAUSE));
@@ -210,15 +232,21 @@ public class PolarisService extends Service {
 		}
 		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, R.string.player_previous_track, MEDIA_INTENT_SKIP_NEXT));
 
-		Notification notification = notificationBuilder.build();
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(MEDIA_NOTIFICATION, notification);
+		// Emit notification
+		emitNotification(notificationBuilder, item);
 
 		if (isPlaying) {
 			startForeground(MEDIA_NOTIFICATION, notification);
 		} else {
 			stopForeground(false);
 		}
+	}
+
+	private void emitNotification(Notification.Builder notificationBuilder, CollectionItem item) {
+		notificationItem = item;
+		notification = notificationBuilder.build();
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 	}
 
 	private Notification.Action generateAction(int icon, int text, String intentAction) {

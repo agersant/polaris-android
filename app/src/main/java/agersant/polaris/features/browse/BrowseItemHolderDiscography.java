@@ -4,6 +4,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import junit.framework.Assert;
+
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
@@ -29,20 +31,17 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 	void bindItem(CollectionItem item) {
 		super.bindItem(item);
 
-		{
-			String artistValue = item.getArtist();
-			if (artistValue != null) {
-				artist.setText(artistValue);
-			}
+		String artistValue = item.getArtist();
+		if (artistValue != null) {
+			artist.setText(artistValue);
 		}
 
-		{
-			String albumValue = item.getAlbum();
-			if (albumValue != null) {
-				album.setText(albumValue);
-			}
+		String albumValue = item.getAlbum();
+		if (albumValue != null) {
+			album.setText(albumValue);
 		}
 
-		service.getAPI().getImage(item, artwork);
+		Assert.assertNotNull(item.getArtwork());
+		service.getAPI().loadImageIntoView(item, artwork);
 	}
 }

@@ -4,71 +4,34 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.widget.ImageView;
 
 import junit.framework.Assert;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
 import okhttp3.ResponseBody;
 
-class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
-
-	private final WeakReference<ImageView> imageViewReference;
+public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final CollectionItem item;
-	private final String path;
 	private final PolarisService service;
+	private final Callback callback;
 
-	private FetchImageTask(PolarisService service, CollectionItem item, ImageView imageView) {
+	private FetchImageTask(PolarisService service, CollectionItem item, Callback callback) {
 		this.service = service;
 		this.item = item;
-		this.path = item.getArtwork();
-		imageViewReference = new WeakReference<>(imageView);
+		this.callback = callback;
 	}
 
-	static void load(PolarisService service, CollectionItem item, ImageView imageView) {
-		if (FetchImageTask.cancelPotentialWork(item, imageView)) {
-			PolarisApplication polarisApplication = PolarisApplication.getInstance();
-			Resources resources = polarisApplication.getResources();
-
-			FetchImageTask task = new FetchImageTask(service, item, imageView);
-			FetchImageTask.AsyncDrawable asyncDrawable = new FetchImageTask.AsyncDrawable(resources, task);
-			imageView.setImageDrawable(asyncDrawable);
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		}
-	}
-
-	private static FetchImageTask getTask(ImageView imageView) {
-		if (imageView != null) {
-			Drawable drawable = imageView.getDrawable();
-			if (drawable instanceof AsyncDrawable) {
-				final AsyncDrawable asyncDrawable = (AsyncDrawable) drawable;
-				return asyncDrawable.getTask();
-			}
-		}
-		return null;
-	}
-
-	private static boolean cancelPotentialWork(CollectionItem newItem, ImageView imageView) {
-		FetchImageTask task = getTask(imageView);
-		if (task != null) {
-			if (task.path.equals(newItem.getPath())) {
-				return false;
-			} else {
-				task.cancel(true);
-			}
-		}
-		return true;
+	static void load(PolarisService service, CollectionItem item, Callback callback) {
+		FetchImageTask task = new FetchImageTask(service, item, callback);
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 	@Override
@@ -87,7 +50,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		if (bitmap == null) {
 			if (!service.isOffline()) {
 				try {
-					ResponseBody responseBody = service.getServerAPI().serve(path);
+					ResponseBody responseBody = service.getServerAPI().serve(item.getArtwork());
 					InputStream stream = new BufferedInputStream(responseBody.byteStream());
 					bitmap = BitmapFactory.decodeStream(stream);
 				} catch (Exception e) {
@@ -98,7 +61,7 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 		if (bitmap != null) {
 			ImageCache cache = ImageCache.getInstance();
-			cache.put(path, bitmap);
+			cache.put(item.getArtwork(), bitmap);
 			if (!fromDiskCache) {
 				service.saveImage(item, bitmap);
 			}
@@ -109,28 +72,25 @@ class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	@Override
 	protected void onPostExecute(Bitmap bitmap) {
-		if (isCancelled()) {
-			bitmap = null;
-		}
 		if (bitmap != null) {
-			ImageView imageView = imageViewReference.get();
-			FetchImageTask task = getTask(imageView);
-			if (imageView != null && task == this) {
-				imageView.setImageBitmap(bitmap);
-			}
+			callback.onSuccess(bitmap);
 		}
 	}
 
-	private static class AsyncDrawable extends BitmapDrawable {
-		private final WeakReference<FetchImageTask> task;
+	public interface Callback {
+		void onSuccess(Bitmap bitmap);
+	}
 
-		AsyncDrawable(Resources res, FetchImageTask task) {
+	static class AsyncDrawable extends BitmapDrawable {
+		private final CollectionItem item;
+
+		AsyncDrawable(Resources res, CollectionItem item) {
 			super(res, (Bitmap) null);
-			this.task = new WeakReference<>(task);
+			this.item = item;
 		}
 
-		FetchImageTask getTask() {
-			return task.get();
+		public CollectionItem getItem() {
+			return item;
 		}
 	}
 }

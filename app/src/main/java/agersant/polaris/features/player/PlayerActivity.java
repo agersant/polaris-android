@@ -257,7 +257,10 @@ public class PlayerActivity extends PolarisActivity {
 			toolbar.setSubtitle(artist);
 		}
 
-		service.getAPI().getImage(item, artwork);
+		String artworkPath = item.getArtwork();
+		if (artworkPath != null) {
+			service.getAPI().loadImageIntoView(item, artwork);
+		}
 	}
 
 	@SuppressWarnings("UnusedParameters")
