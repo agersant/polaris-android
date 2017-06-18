@@ -45,7 +45,7 @@ public class Player implements ExoPlayer.EventListener {
 
 	private void stop() {
 		mediaPlayer.stop();
-		seekToAbsolute(0);
+		seekToRelative(0);
 		resumeProgress = -1.f;
 		mediaSource = null;
 		item = null;
@@ -57,7 +57,7 @@ public class Player implements ExoPlayer.EventListener {
 
 		if (this.item != null && item.getPath().equals(this.item.getPath())) {
 			System.out.println("Restarting playback for: " + item.getPath());
-			seekToAbsolute(0);
+			seekToRelative(0);
 			resume();
 			return;
 		}
@@ -104,36 +104,37 @@ public class Player implements ExoPlayer.EventListener {
 		return mediaPlayer.getPlaybackState() == ExoPlayer.STATE_BUFFERING;
 	}
 
-	void seekToAbsolute(long position) {
-		resumeProgress = -1;
-		mediaPlayer.seekTo(position);
-	}
-
 	void seekToRelative(float progress) {
+		resumeProgress = -1;
+
+		if (progress == 0.f) {
+			mediaPlayer.seekTo(0);
+			return;
+		}
+
 		long duration = mediaPlayer.getDuration();
 		if (duration == C.TIME_UNSET) {
 			resumeProgress = progress;
 			return;
 		}
-		resumeProgress = -1;
+
 		long position = (long)( duration * progress );
 		mediaPlayer.seekTo(position);
 	}
 
-	long getDuration() {
-		long duration = mediaPlayer.getDuration();
-		if (duration == C.TIME_UNSET) {
-			return 0;
+	float getPositionRelative() {
+		if (resumeProgress >= 0) {
+			return resumeProgress;
 		}
-		return duration;
-	}
-
-	long getPosition() {
 		long position = mediaPlayer.getCurrentPosition();
 		if (position == C.TIME_UNSET) {
-			return 0;
+			return 0.f;
 		}
-		return position;
+		long duration = mediaPlayer.getDuration();
+		if (duration == C.TIME_UNSET) {
+			return 0.f;
+		}
+		return (float) position / duration;
 	}
 
 	@Override

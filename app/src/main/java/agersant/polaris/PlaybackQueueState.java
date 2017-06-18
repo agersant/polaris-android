@@ -6,18 +6,18 @@ import java.util.ArrayList;
 
 class PlaybackQueueState implements Serializable {
 
-	static final int VERSION = 3;
+	static final int VERSION = 4;
 
 	ArrayList<CollectionItem> queueContent;
 	int queueIndex;
 	PlaybackQueue.Ordering queueOrdering;
-	long trackProgress;
+	float trackProgress;
 
 	PlaybackQueueState() {
 		queueContent = new ArrayList<>();
 		queueOrdering = PlaybackQueue.Ordering.SEQUENCE;
 		queueIndex = -1;
-		trackProgress = 0;
+		trackProgress = 0.f;
 	}
 
 }

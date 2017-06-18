@@ -223,10 +223,10 @@ public class PlayerActivity extends PolarisActivity {
 		if (service == null) {
 			return;
 		}
-		int duration = (int) service.getDuration();
-		seekBar.setMax(duration);
-		int position = (int) service.getPosition();
-		seekBar.setProgress(position);
+		int precision = 10000;
+		float position = service.getPositionRelative();
+		seekBar.setMax(precision);
+		seekBar.setProgress((int)(precision * position));
 	}
 
 	private void updateBuffering() {

@@ -82,7 +82,7 @@ public class PolarisService extends Service {
 				switch (intent.getAction()) {
 					case Player.COMPLETED_TRACK:
 						if (!skipNext()) {
-							seekToAbsolute(0);
+							seekToRelative(0);
 							pause();
 						}
 						break;
@@ -265,7 +265,7 @@ public class PolarisService extends Service {
 		state.queueOrdering = getOrdering();
 		CollectionItem currentItem = getCurrentItem();
 		state.queueIndex = state.queueContent.indexOf(currentItem);
-		state.trackProgress = getPosition();
+		state.trackProgress = getPositionRelative();
 
 		// Persist
 		try (FileOutputStream out = new FileOutputStream(storage)) {
@@ -292,7 +292,7 @@ public class PolarisService extends Service {
 						CollectionItem currentItem = getItem(state.queueIndex);
 						play(currentItem);
 						pause();
-						seekToAbsolute(state.trackProgress);
+						seekToRelative(state.trackProgress);
 					}
 				}
 			} catch (ClassNotFoundException e) {
@@ -410,20 +410,12 @@ public class PolarisService extends Service {
 		return player.isBuffering();
 	}
 
-	public long getDuration() {
-		return player.getDuration();
-	}
-
-	public long getPosition() {
-		return player.getPosition();
+	public float getPositionRelative() {
+		return player.getPositionRelative();
 	}
 
 	public void seekToRelative(float progress) {
 		player.seekToRelative(progress);
-	}
-
-	private void seekToAbsolute(long position) {
-		player.seekToAbsolute(position);
 	}
 
 	public boolean isUsing(MediaSource mediaSource) {
