@@ -104,6 +104,11 @@ public class QueueActivity extends PolarisActivity {
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
 		DefaultItemAnimator animator = new DefaultItemAnimator() {
 			@Override
+			public boolean animateRemove(RecyclerView.ViewHolder holder) {
+				holder.itemView.setAlpha(0.f);
+				return false;
+			}
+			@Override
 			public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
 				return true;
 			}
