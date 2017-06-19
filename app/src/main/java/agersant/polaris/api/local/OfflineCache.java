@@ -43,7 +43,7 @@ public class OfflineCache {
 	private static final String AUDIO_FILENAME = "__polaris__audio";
 	private static final String META_FILENAME = "__polaris__meta";
 	private static final int FIRST_VERSION = 1;
-	private static final int VERSION = 2;
+	private static final int VERSION = 3;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private final SharedPreferences preferences;
 	private File root;
