@@ -13,7 +13,7 @@ class BrowseTouchCallback extends ItemTouchHelper.SimpleCallback {
 
 	@Override
 	public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-		if (viewHolder instanceof BrowseItemHolderDisc) {
+		if (viewHolder instanceof BrowseItemHolderAlbumDiscHeader) {
 			return 0;
 		}
 		return ItemTouchHelper.RIGHT;

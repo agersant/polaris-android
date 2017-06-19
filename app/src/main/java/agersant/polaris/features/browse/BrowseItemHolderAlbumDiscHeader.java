@@ -8,11 +8,11 @@ import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
-class BrowseItemHolderDisc extends BrowseItemHolder {
+class BrowseItemHolderAlbumDiscHeader extends BrowseItemHolder {
 
 	private final TextView textView;
 
-	BrowseItemHolderDisc(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+	BrowseItemHolderAlbumDiscHeader(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(service, adapter, itemView, itemQueueStatusView);
 		textView = (TextView) itemView.findViewById(R.id.disc);
 	}

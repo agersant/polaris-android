@@ -10,12 +10,12 @@ import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 
 
-class BrowseItemHolderAlbum extends BrowseItemHolder {
+class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 
 	private final TextView trackNumberText;
 	private final TextView titleText;
 
-	BrowseItemHolderAlbum(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+	BrowseItemHolderAlbumTrack(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(service, adapter, itemView, itemQueueStatusView);
 		trackNumberText = (TextView) itemView.findViewById(R.id.track_number);
 		titleText = (TextView) itemView.findViewById(R.id.title);

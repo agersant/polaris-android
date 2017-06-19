@@ -65,18 +65,18 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 		View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
 		if (viewType == DISC_HEADER.ordinal()) {
 			View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_album_disc, parent, false);
-			return new BrowseItemHolderDisc(service, this, itemView, itemQueueStatusView);
+			return new BrowseItemHolderAlbumDiscHeader(service, this, itemView, itemQueueStatusView);
 		} else {
 			Assert.assertEquals(viewType, TRACK.ordinal());
 			View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_album_item, parent, false);
-			return new BrowseItemHolderAlbum(service, this, itemView, itemQueueStatusView);
+			return new BrowseItemHolderAlbumTrack(service, this, itemView, itemQueueStatusView);
 		}
 	}
 
 	@Override
 	public void onBindViewHolder(BrowseItemHolder holder, int position) {
 
-		if (holder instanceof BrowseItemHolderAlbum) {
+		if (holder instanceof BrowseItemHolderAlbumTrack) {
 
 			// Assign track item
 			if (numDiscHeaders > 0) {
@@ -94,8 +94,8 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 		} else {
 
 			// Assign disc number
-			Assert.assertTrue(holder instanceof BrowseItemHolderDisc);
-			BrowseItemHolderDisc header = (BrowseItemHolderDisc) holder;
+			Assert.assertTrue(holder instanceof BrowseItemHolderAlbumDiscHeader);
+			BrowseItemHolderAlbumDiscHeader header = (BrowseItemHolderAlbumDiscHeader) holder;
 			int index = 0;
 			for (int discIndex = 0; discIndex < discSizes.size(); discIndex++) {
 				if (position == index) {
