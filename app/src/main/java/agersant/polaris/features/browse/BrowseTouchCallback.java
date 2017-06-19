@@ -8,7 +8,15 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 class BrowseTouchCallback extends ItemTouchHelper.SimpleCallback {
 
 	BrowseTouchCallback() {
-		super(0, ItemTouchHelper.RIGHT);
+		super(0, 0);
+	}
+
+	@Override
+	public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+		if (viewHolder instanceof BrowseItemHolderDisc) {
+			return 0;
+		}
+		return ItemTouchHelper.RIGHT;
 	}
 
 	@Override

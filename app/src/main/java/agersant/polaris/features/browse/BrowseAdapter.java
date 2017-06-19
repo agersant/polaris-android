@@ -11,7 +11,7 @@ import agersant.polaris.PolarisService;
 abstract class BrowseAdapter
 		extends RecyclerView.Adapter<BrowseItemHolder> {
 
-	private ArrayList<? extends CollectionItem> items;
+	protected ArrayList<? extends CollectionItem> items;
 	final PolarisService service;
 
 	BrowseAdapter(PolarisService service) {
