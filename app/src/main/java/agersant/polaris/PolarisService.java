@@ -212,16 +212,18 @@ public class PolarisService extends Service {
 		if (item == notificationItem && notification != null && notification.getLargeIcon() != null) {
 			notificationBuilder.setLargeIcon(notification.getLargeIcon());
 		}
-		api.loadImage(item, new FetchImageTask.Callback() {
-			@Override
-			public void onSuccess(Bitmap bitmap) {
-				if (item != getCurrentItem()) {
-					return;
+		if (item.getArtwork() != null) {
+			api.loadImage(item, new FetchImageTask.Callback() {
+				@Override
+				public void onSuccess(Bitmap bitmap) {
+					if (item != getCurrentItem()) {
+						return;
+					}
+					notificationBuilder.setLargeIcon(bitmap);
+					emitNotification(notificationBuilder, item);
 				}
-				notificationBuilder.setLargeIcon(bitmap);
-				emitNotification(notificationBuilder, item);
-			}
-		});
+			});
+		}
 
 		// Add media control actions
 		notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
