@@ -119,6 +119,9 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadContent() {
+		if (service == null) {
+			return;
+		}
 		progressBar.setVisibility(View.VISIBLE);
 		errorMessage.setVisibility(View.GONE);
 		Intent intent = getIntent();
