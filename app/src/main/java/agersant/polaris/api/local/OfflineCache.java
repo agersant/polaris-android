@@ -108,6 +108,7 @@ public class OfflineCache {
 				CollectionItem item = null;
 				try {
 					item = readItem(child);
+					Assert.assertNotNull(item);
 				} catch (Exception e) {
 					System.out.println("Error reading collection item for " + child + " " + e);
 				}
@@ -142,7 +143,11 @@ public class OfflineCache {
 		Resources resources = service.getResources();
 		String cacheSizeKey = resources.getString(R.string.pref_key_offline_cache_size);
 		String cacheSizeString = preferences.getString(cacheSizeKey, "0");
-		return Long.parseLong(cacheSizeString) * 1024 * 1024;
+		long cacheSize = Long.parseLong(cacheSizeString);
+		if (cacheSize < 0) {
+			return Long.MAX_VALUE;
+		}
+		return cacheSize * 1024 * 1024;
 	}
 
 	private boolean removeOldAudio(File path, CollectionItem newItem, long bytesToSave) {
@@ -423,6 +428,7 @@ public class OfflineCache {
 					continue;
 				}
 				CollectionItem item = readItem(file);
+				Assert.assertNotNull(item);
 				if (item.isDirectory()) {
 					if (!containsAudio(file)) {
 						continue;
@@ -477,6 +483,9 @@ public class OfflineCache {
 					continue;
 				}
 				CollectionItem item = readItem(file);
+				if (item == null) {
+					continue;
+				}
 				if (item.isDirectory()) {
 					ArrayList<CollectionItem> content = flattenDir(file);
 					if (content != null) {
@@ -496,8 +505,12 @@ public class OfflineCache {
 	private CollectionItem readItem(File dir) throws IOException, ClassNotFoundException {
 		File itemFile = new File(dir, ITEM_FILENAME);
 		if (!itemFile.exists()) {
-			String path = root.toURI().relativize(dir.toURI()).getPath();
-			return CollectionItem.directory(path);
+			if (dir.isDirectory()) {
+				String path = root.toURI().relativize(dir.toURI()).getPath();
+				return CollectionItem.directory(path);
+			} else {
+				return null;
+			}
 		}
 		try (FileInputStream fileInputStream = new FileInputStream(itemFile);
 			 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)
