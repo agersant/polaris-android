@@ -188,6 +188,9 @@ public class QueueActivity extends PolarisActivity {
 
 	private void populate() {
 		Assert.assertNotNull(service);
+		if (adapter != null) {
+			return;
+		}
 		adapter = new QueueAdapter(service);
 		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
