@@ -1,6 +1,7 @@
 package agersant.polaris;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -43,6 +44,8 @@ public class PolarisService extends Service {
 	private static final String MEDIA_INTENT_SKIP_NEXT = "MEDIA_INTENT_SKIP_NEXT";
 	private static final String MEDIA_INTENT_SKIP_PREVIOUS = "MEDIA_INTENT_SKIP_PREVIOUS";
 	private static final String MEDIA_INTENT_DISMISS = "MEDIA_INTENT_DISMISS";
+
+	private static final String NOTIFICATION_CHANNEL_ID = "POLARIS_NOTIFICATION_CHANNEL_ID";
 
 	private final IBinder binder = new PolarisService.PolarisBinder();
 	private DownloadQueue downloadQueue;
@@ -196,7 +199,7 @@ public class PolarisService extends Service {
 		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
 
 		// Create notification
-		final Notification.Builder notificationBuilder = new Notification.Builder(this)
+		final Notification.Builder notificationBuilder = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
 				.setShowWhen(false)
 				.setSmallIcon(R.drawable.notification_icon)
 				.setContentTitle(item.getTitle())
@@ -248,6 +251,12 @@ public class PolarisService extends Service {
 		notificationItem = item;
 		notification = notificationBuilder.build();
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris", NotificationManager.IMPORTANCE_DEFAULT);
+		mChannel.setDescription("Notifications for current song playing in Polaris.");
+		mChannel.enableLights(false);
+		mChannel.enableVibration(false);
+		mChannel.setShowBadge(false);
+		notificationManager.createNotificationChannel(mChannel);
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 	}
 

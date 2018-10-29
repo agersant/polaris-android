@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "agersant.polaris"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode 26
         versionName "0.5.14"
