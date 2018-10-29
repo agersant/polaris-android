@@ -70,7 +70,7 @@ public class ServerAPI
 
 	private String getMediaURL(String path) {
 		String serverAddress = this.getURL();
-		return serverAddress + "/serve/" + path;
+		return serverAddress + "/serve/" + Uri.encode(path);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class ServerAPI
 	}
 
 	public void browse(String path, final ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/browse/" + path;
+		String requestURL = this.getURL() + "/browse/" + Uri.encode(path);
 		HttpUrl parsedURL = HttpUrl.parse(requestURL);
 		if (parsedURL == null) {
 			handlers.onError();
@@ -162,7 +162,7 @@ public class ServerAPI
 	}
 
 	public void flatten(String path, final ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/flatten/" + path;
+		String requestURL = this.getURL() + "/flatten/" + Uri.encode(path);
 		Request request = new Request.Builder().url(requestURL).build();
 		Callback callback = new Callback() {
 			@Override
