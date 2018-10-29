@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 26
     defaultConfig {
         applicationId "agersant.polaris"
         minSdkVersion 23
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 26
         versionName "0.5.14"
     }
@@ -32,11 +31,11 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile "com.android.support:design:25.3.1"
-    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile "com.android.support:design:26.1.0"
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'com.github.orangegangsters:swipy:1.2.3@aar'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
-    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.google.code.gson:gson:2.8.5'
     compile 'com.google.android.exoplayer:exoplayer-core:r2.4.1'
 }
