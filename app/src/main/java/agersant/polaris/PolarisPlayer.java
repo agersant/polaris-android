@@ -13,7 +13,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-public class PolarisPlayer implements ExoPlayer.EventListener {
+public class PolarisPlayer implements Player.EventListener {
 
 	public static final String PLAYBACK_ERROR = "PLAYBACK_ERROR";
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
