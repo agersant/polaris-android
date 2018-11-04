@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
@@ -69,7 +68,7 @@ class DownloadQueueWorkItem {
 		this.item = item;
 		Uri uri = service.getServerAPI().serveUri(item.getPath());
 		PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(service, scratchFile, item);
-		mediaSource = new ExtractorMediaSource(uri, dsf, new DefaultExtractorsFactory(), null, null);
+		mediaSource = new ExtractorMediaSource.Factory(dsf).createMediaSource(uri);
 		dataSource = dsf.createDataSource();
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
 	}

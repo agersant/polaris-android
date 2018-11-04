@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -364,7 +363,7 @@ public class OfflineCache {
 		}
 		Uri uri = Uri.fromFile(getCacheFile(virtualPath, CacheDataType.AUDIO, false));
 		DataSource.Factory factory = new DefaultDataSourceFactory(service, "Polaris Local");
-		return new ExtractorMediaSource(uri, factory, new DefaultExtractorsFactory(), null, null);
+		return new ExtractorMediaSource.Factory(factory).createMediaSource(uri);
 	}
 
 	Bitmap getImage(String virtualPath) throws IOException {
