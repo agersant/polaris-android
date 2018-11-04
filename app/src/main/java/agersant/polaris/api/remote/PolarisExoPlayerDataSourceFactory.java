@@ -33,20 +33,24 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 		return new DefaultDataSource(service, null, dataSource);
 	}
 
-	private class PolarisExoPlayerTransferListener implements TransferListener<DefaultHttpDataSource> {
+	private class PolarisExoPlayerTransferListener implements TransferListener{
 
 		@Override
-		public void onTransferStart(DefaultHttpDataSource source, DataSpec dataSpec) {
+		public void onTransferInitializing(DataSource source, DataSpec dataSpec, boolean isNetwork) {}
+
+
+		@Override
+		public void onTransferStart(DataSource source, DataSpec dataSpec, boolean isNetwork) {
 
 		}
 
 		@Override
-		public void onBytesTransferred(DefaultHttpDataSource source, int bytesTransferred) {
+		public void onBytesTransferred(DataSource source, DataSpec dataSpec, boolean isNetwork, int bytesTransferred) {
 
 		}
 
 		@Override
-		public void onTransferEnd(DefaultHttpDataSource source) {
+		public void onTransferEnd(DataSource source, DataSpec dataSpec, boolean isNetwork) {
 			PolarisExoPlayerHttpDataSource ds = (PolarisExoPlayerHttpDataSource) source;
 			ds.onTransferEnd();
 		}

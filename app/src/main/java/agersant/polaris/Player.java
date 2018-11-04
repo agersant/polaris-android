@@ -138,10 +138,6 @@ public class Player implements ExoPlayer.EventListener {
 	}
 
 	@Override
-	public void onTimelineChanged(Timeline timeline, Object manifest) {
-	}
-
-	@Override
 	public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
 	}
 
@@ -172,10 +168,6 @@ public class Player implements ExoPlayer.EventListener {
 	@Override
 	public void onPlayerError(ExoPlaybackException error) {
 		broadcast(PLAYBACK_ERROR);
-	}
-
-	@Override
-	public void onPositionDiscontinuity() {
 	}
 
 	@Override

@@ -94,7 +94,6 @@ class DownloadQueueWorkItem {
 
 	private void reset() {
 		if (mediaSource != null) {
-			mediaSource.releaseSource();
 			mediaSource = null;
 		}
 		if (dataSource != null) {
