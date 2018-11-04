@@ -26,6 +26,7 @@ public class DownloadQueue {
 	private final OfflineCache offlineCache;
 	private final ArrayList<DownloadQueueWorkItem> workers;
 
+	// TODO It isn't super clear what thread this runs on and whether downloads continue after closing app
 	public DownloadQueue(Context context, API api, PlaybackQueue playbackQueue, PolarisPlayer player, OfflineCache offlineCache, ServerAPI serverAPI) {
 
 		this.api  = api;

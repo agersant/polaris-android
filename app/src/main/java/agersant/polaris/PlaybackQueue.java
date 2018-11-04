@@ -1,6 +1,9 @@
 package agersant.polaris;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
@@ -16,6 +19,7 @@ public class PlaybackQueue {
 	public static final String CHANGED_ORDERING = "CHANGED_ORDERING";
 	public static final String QUEUED_ITEM = "QUEUED_ITEM";
 	public static final String QUEUED_ITEMS = "QUEUED_ITEMS";
+	public static final String NO_LONGER_EMPTY = "NO_LONGER_EMPTY";
 	public static final String REMOVED_ITEM = "REMOVED_ITEM";
 	public static final String REMOVED_ITEMS = "REMOVED_ITEMS";
 	public static final String REORDERED_ITEMS = "REORDERED_ITEMS";
@@ -71,17 +75,23 @@ public class PlaybackQueue {
 	}
 
 	public void addItems(ArrayList<? extends CollectionItem> items) {
+		boolean wasEmpty = size() == 0;
 		for (CollectionItem item : items) {
 			addItemInternal(item);
 		}
 		broadcast(PlaybackQueue.QUEUED_ITEMS);
-		// TODO USE BROADCAST TO TRIGGER AUTOPLAY
+		if (wasEmpty) {
+			broadcast(PlaybackQueue.NO_LONGER_EMPTY);
+		}
 	}
 
 	public void addItem(CollectionItem item) {
+		boolean wasEmpty = size() == 0;
 		addItemInternal(item);
 		broadcast(PlaybackQueue.QUEUED_ITEM);
-		// TODO USE BROADCAST TO TRIGGER AUTOPLAY
+		if (wasEmpty) {
+			broadcast(PlaybackQueue.NO_LONGER_EMPTY);
+		}
 	}
 
 	public void remove(int position) {

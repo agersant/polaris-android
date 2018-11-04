@@ -53,34 +53,47 @@ public class PolarisService extends Service {
 	private CollectionItem notificationItem;
 	private boolean bound;
 
-	/*
+	private API api;
+	private PolarisPlayer player;
+	private PlaybackQueue playbackQueue;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		restoreStateFromDisk();
+		PolarisState state = PolarisApplication.getState();
+		api = state.api;
+		player = state.player;
+		playbackQueue = state.playbackQueue;
+
 		pushSystemNotification();
+
+		restoreStateFromDisk();
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+		filter.addAction(PolarisPlayer.PLAYING_TRACK);
+		filter.addAction(PolarisPlayer.PAUSED_TRACK);
+		filter.addAction(PolarisPlayer.RESUMED_TRACK);
 		filter.addAction(PolarisPlayer.PLAYBACK_ERROR);
 		filter.addAction(PolarisPlayer.COMPLETED_TRACK);
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
-					case PolarisPlayer.COMPLETED_TRACK:
-						if (!skipNext()) {
-							seekToRelative(0);
-							pause();
-						}
-						break;
 					case PolarisPlayer.PLAYBACK_ERROR:
 						displayError();
 						break;
+					case PolarisPlayer.PLAYING_TRACK:
+					case PolarisPlayer.RESUMED_TRACK:
+						pushSystemNotification();
+						break;
+					case PolarisPlayer.PAUSED_TRACK:
+						pushSystemNotification();
+						saveStateToDisk();
+						break;
 					case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
-						pause();
+						player.pause();
 						break;
 				}
 			}
@@ -93,7 +106,7 @@ public class PolarisService extends Service {
 		unregisterReceiver(receiver);
 		super.onDestroy();
 	}
-*/
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		bound = true;
@@ -116,7 +129,7 @@ public class PolarisService extends Service {
 			return PolarisService.this;
 		}
 	}
-/*
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		handleIntent(intent);
@@ -124,17 +137,7 @@ public class PolarisService extends Service {
 		return START_NOT_STICKY;
 	}
 
-
 	// Internals
-	private boolean advance(CollectionItem currentItem, int delta) {
-		CollectionItem newTrack = playbackQueue.getNextTrack(currentItem, delta);
-		if (newTrack != null) {
-			play(newTrack);
-			return true;
-		}
-		return false;
-	}
-
 	private void displayError() {
 		Toast toast = Toast.makeText(this, R.string.playback_error, Toast.LENGTH_SHORT);
 		toast.show();
@@ -147,16 +150,16 @@ public class PolarisService extends Service {
 		String action = intent.getAction();
 		switch (action) {
 			case MEDIA_INTENT_PAUSE:
-				pause();
+				player.pause();
 				break;
 			case MEDIA_INTENT_PLAY:
-				resume();
+				player.resume();
 				break;
 			case MEDIA_INTENT_SKIP_NEXT:
-				skipNext();
+				player.skipNext();
 				break;
 			case MEDIA_INTENT_SKIP_PREVIOUS:
-				skipPrevious();
+				player.skipPrevious();
 				break;
 			case MEDIA_INTENT_DISMISS:
 				if (!bound) {
@@ -168,8 +171,8 @@ public class PolarisService extends Service {
 
 	private void pushSystemNotification() {
 
-		boolean isPlaying = isPlaying();
-		final CollectionItem item = getCurrentItem();
+		boolean isPlaying = player.isPlaying();
+		final CollectionItem item = player.getCurrentItem();
 		if (item == null) {
 			return;
 		}
@@ -206,7 +209,7 @@ public class PolarisService extends Service {
 			api.loadImage(item, new FetchImageTask.Callback() {
 				@Override
 				public void onSuccess(Bitmap bitmap) {
-					if (item != getCurrentItem()) {
+					if (item != player.getCurrentItem()) {
 						return;
 					}
 					notificationBuilder.setLargeIcon(bitmap);
@@ -260,10 +263,10 @@ public class PolarisService extends Service {
 		// Gather state
 		PlaybackQueueState state = new PlaybackQueueState();
 		state.queueContent = playbackQueue.getContent();
-		state.queueOrdering = getOrdering();
-		CollectionItem currentItem = getCurrentItem();
+		state.queueOrdering = playbackQueue.getOrdering();
+		CollectionItem currentItem = player.getCurrentItem();
 		state.queueIndex = state.queueContent.indexOf(currentItem);
-		state.trackProgress = getPositionRelative();
+		state.trackProgress = player.getPositionRelative();
 
 		// Persist
 		try (FileOutputStream out = new FileOutputStream(storage)) {
@@ -285,12 +288,12 @@ public class PolarisService extends Service {
 				if (obj instanceof PlaybackQueueState) {
 					PlaybackQueueState state = (PlaybackQueueState) obj;
 					playbackQueue.setContent(state.queueContent);
-					setOrdering(state.queueOrdering);
+					playbackQueue.setOrdering(state.queueOrdering);
 					if (state.queueIndex >= 0) {
-						CollectionItem currentItem = getItem(state.queueIndex);
-						play(currentItem);
-						pause();
-						seekToRelative(state.trackProgress);
+						CollectionItem currentItem = playbackQueue.getItem(state.queueIndex);
+						player.play(currentItem);
+						player.pause();
+						player.seekToRelative(state.trackProgress);
 					}
 				}
 			} catch (ClassNotFoundException e) {
@@ -300,10 +303,4 @@ public class PolarisService extends Service {
 			System.out.println("Error while reading PlaybackQueueState file: " + e);
 		}
 	}
-
-	private boolean shouldAutoStart() {
-		return isIdle() || (size() == 0 && !isPlaying());
-	}
-
-	*/
 }

@@ -1,25 +1,19 @@
 package agersant.polaris.features.player;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisPlayer;
-import agersant.polaris.PolarisService;
 import agersant.polaris.PolarisState;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
@@ -28,13 +22,14 @@ import agersant.polaris.features.PolarisActivity;
 public class PlayerActivity extends PolarisActivity {
 
 	private boolean seeking = false;
-	private Timer timer;
 	private BroadcastReceiver receiver;
 	private ImageView artwork;
 	private ImageView pauseToggle;
 	private ImageView skipNext;
 	private ImageView skipPrevious;
 	private SeekBar seekBar;
+	private Handler seekBarUpdateHandler;
+	private Runnable updateSeekBar;
 	private View buffering;
 	private API api;
 	private PolarisPlayer player;
@@ -95,15 +90,19 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void scheduleSeekBarUpdates() {
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
+		updateSeekBar = new Runnable() {
 			@Override
 			public void run() {
 				if (!seeking) {
-					updateSeekBar();
+					int precision = 10000;
+					float position = player.getPositionRelative();
+					seekBar.setMax(precision);
+					seekBar.setProgress((int)(precision * position));
 				}
+				seekBarUpdateHandler.postDelayed(updateSeekBar, 20/*ms*/);
 			}
-		}, 0, 20); // in ms
+		};
+		seekBarUpdateHandler.post(updateSeekBar);
 	}
 
 	@Override
@@ -113,14 +112,15 @@ public class PlayerActivity extends PolarisActivity {
 		api = state.api;
 		player = state.player;
 		playbackQueue = state.playbackQueue;
+		seekBarUpdateHandler = new Handler();
 
 		setContentView(R.layout.activity_player);
 		super.onCreate(savedInstanceState);
-		artwork = (ImageView) findViewById(R.id.artwork);
-		pauseToggle = (ImageView) findViewById(R.id.pause_toggle);
-		skipNext = (ImageView) findViewById(R.id.skip_next);
-		skipPrevious = (ImageView) findViewById(R.id.skip_previous);
-		seekBar = (SeekBar) findViewById(R.id.seek_bar);
+		artwork = findViewById(R.id.artwork);
+		pauseToggle = findViewById(R.id.pause_toggle);
+		skipNext = findViewById(R.id.skip_next);
+		skipPrevious = findViewById(R.id.skip_previous);
+		seekBar = findViewById(R.id.seek_bar);
 		buffering = findViewById(R.id.buffering);
 
 		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -157,19 +157,17 @@ public class PlayerActivity extends PolarisActivity {
 	public void onStop() {
 		unregisterReceiver(receiver);
 		receiver = null;
-		timer.cancel();
-		timer = null;
 		super.onStop();
 	}
 
 	@SuppressWarnings("UnusedParameters")
 	public void skipPrevious(View view) {
-		player.skipPrevious(playbackQueue);
+		player.skipPrevious();
 	}
 
 	@SuppressWarnings("UnusedParameters")
 	public void skipNext(View view) {
-		player.skipNext(playbackQueue);
+		player.skipNext();
 	}
 
 	private void updateContent() {
@@ -201,13 +199,6 @@ public class PlayerActivity extends PolarisActivity {
 			skipPrevious.setClickable(false);
 			skipPrevious.setAlpha(disabledAlpha);
 		}
-	}
-
-	private void updateSeekBar() {
-		int precision = 10000;
-		float position = player.getPositionRelative();
-		seekBar.setMax(precision);
-		seekBar.setProgress((int)(precision * position));
 	}
 
 	private void updateBuffering() {

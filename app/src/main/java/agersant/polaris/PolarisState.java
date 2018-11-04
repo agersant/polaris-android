@@ -23,8 +23,8 @@ public class PolarisState {
 		serverAPI = new ServerAPI(context);
 		localAPI = new LocalAPI();
 		api = new API(context);
-		player = new PolarisPlayer(context, api);
 		playbackQueue = new PlaybackQueue();
+		player = new PolarisPlayer(context, api, playbackQueue);
 		offlineCache = new OfflineCache(context, playbackQueue, player);
 		downloadQueue = new DownloadQueue(context, api, playbackQueue, player, offlineCache, serverAPI);
 

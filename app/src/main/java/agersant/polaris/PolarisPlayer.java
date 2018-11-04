@@ -1,7 +1,10 @@
 package agersant.polaris;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -27,16 +30,35 @@ public class PolarisPlayer implements Player.EventListener {
 	public static final String NOT_BUFFERING = "NOT_BUFFERING";
 
 	private final API api;
+	private final PlaybackQueue playbackQueue;
 	private final ExoPlayer mediaPlayer;
 	private MediaSource mediaSource;
 	private CollectionItem item;
 	private float resumeProgress;
 
-	PolarisPlayer(Context context, API api) {
+	PolarisPlayer(Context context, API api, PlaybackQueue playbackQueue) {
 		this.api = api;
+		this.playbackQueue = playbackQueue;
 		resumeProgress = -1.f;
 		mediaPlayer = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector());
 		mediaPlayer.addListener(this);
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(PlaybackQueue.NO_LONGER_EMPTY);
+		BroadcastReceiver receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				switch (intent.getAction()) {
+					case PlaybackQueue.NO_LONGER_EMPTY:
+						if (isIdle() || !isPlaying())
+						{
+							skipNext();
+						}
+						break;
+				}
+			}
+		};
+		context.registerReceiver(receiver, filter);
 	}
 
 	private void broadcast(String event) {
@@ -92,16 +114,14 @@ public class PolarisPlayer implements Player.EventListener {
 	public void resume() {
 		mediaPlayer.setPlayWhenReady(true);
 		broadcast(PolarisPlayer.RESUMED_TRACK);
-		// TODO trigger save and push notification
 	}
 
 	public void pause() {
 		mediaPlayer.setPlayWhenReady(false);
 		broadcast(PolarisPlayer.PAUSED_TRACK);
-		// TODO trigger save and push notification
 	}
 
-	private boolean advance(PlaybackQueue playbackQueue, CollectionItem currentItem, int delta) {
+	private boolean advance(CollectionItem currentItem, int delta) {
 		CollectionItem newTrack = playbackQueue.getNextTrack(currentItem, delta);
 		if (newTrack != null) {
 			play(newTrack);
@@ -110,14 +130,14 @@ public class PolarisPlayer implements Player.EventListener {
 		return false;
 	}
 
-	public void skipPrevious(PlaybackQueue playbackQueue) {
+	public void skipPrevious() {
 		CollectionItem currentItem = getCurrentItem();
-		advance(playbackQueue, currentItem, -1);
+		advance(currentItem, -1);
 	}
 
-	public boolean skipNext(PlaybackQueue playbackQueue) {
+	public boolean skipNext() {
 		CollectionItem currentItem = getCurrentItem();
-		return advance(playbackQueue, currentItem, 1);
+		return advance(currentItem, 1);
 	}
 
 	public boolean isIdle() {
@@ -189,6 +209,10 @@ public class PolarisPlayer implements Player.EventListener {
 				break;
 			case Player.STATE_ENDED:
 				broadcast(COMPLETED_TRACK);
+				if (!skipNext()) {
+					pause();
+					seekToRelative(0);
+				}
 				break;
 		}
 	}
