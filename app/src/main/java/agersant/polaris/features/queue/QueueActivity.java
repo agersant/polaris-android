@@ -23,7 +23,7 @@ import junit.framework.Assert;
 import java.util.Random;
 
 import agersant.polaris.PlaybackQueue;
-import agersant.polaris.Player;
+import agersant.polaris.PolarisPlayer;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.local.OfflineCache;
@@ -62,7 +62,7 @@ public class QueueActivity extends PolarisActivity {
 		filter.addAction(PlaybackQueue.REMOVED_ITEM);
 		filter.addAction(PlaybackQueue.REMOVED_ITEMS);
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
-		filter.addAction(Player.PLAYING_TRACK);
+		filter.addAction(PolarisPlayer.PLAYING_TRACK);
 		filter.addAction(OfflineCache.AUDIO_CACHED);
 		filter.addAction(DownloadQueue.WORKLOAD_CHANGED);
 		filter.addAction(OfflineCache.AUDIO_REMOVED_FROM_CACHE);
@@ -80,7 +80,7 @@ public class QueueActivity extends PolarisActivity {
 							adapter.notifyDataSetChanged();
 						}
 						break;
-					case Player.PLAYING_TRACK:
+					case PolarisPlayer.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
 					case DownloadQueue.WORKLOAD_CHANGED:

@@ -17,7 +17,7 @@ import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
-import agersant.polaris.Player;
+import agersant.polaris.PolarisPlayer;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.features.PolarisActivity;
@@ -64,12 +64,12 @@ public class PlayerActivity extends PolarisActivity {
 	private void subscribeToEvents() {
 		final PlayerActivity that = this;
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(Player.PLAYING_TRACK);
-		filter.addAction(Player.PAUSED_TRACK);
-		filter.addAction(Player.RESUMED_TRACK);
-		filter.addAction(Player.COMPLETED_TRACK);
-		filter.addAction(Player.BUFFERING);
-		filter.addAction(Player.NOT_BUFFERING);
+		filter.addAction(PolarisPlayer.PLAYING_TRACK);
+		filter.addAction(PolarisPlayer.PAUSED_TRACK);
+		filter.addAction(PolarisPlayer.RESUMED_TRACK);
+		filter.addAction(PolarisPlayer.COMPLETED_TRACK);
+		filter.addAction(PolarisPlayer.BUFFERING);
+		filter.addAction(PolarisPlayer.NOT_BUFFERING);
 		filter.addAction(PlaybackQueue.CHANGED_ORDERING);
 		filter.addAction(PlaybackQueue.QUEUED_ITEM);
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
@@ -80,16 +80,16 @@ public class PlayerActivity extends PolarisActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
-					case Player.BUFFERING:
-					case Player.NOT_BUFFERING:
+					case PolarisPlayer.BUFFERING:
+					case PolarisPlayer.NOT_BUFFERING:
 						that.updateBuffering();
-					case Player.PLAYING_TRACK:
+					case PolarisPlayer.PLAYING_TRACK:
 						that.updateContent();
 						that.updateControls();
 						break;
-					case Player.PAUSED_TRACK:
-					case Player.RESUMED_TRACK:
-					case Player.COMPLETED_TRACK:
+					case PolarisPlayer.PAUSED_TRACK:
+					case PolarisPlayer.RESUMED_TRACK:
+					case PolarisPlayer.COMPLETED_TRACK:
 					case PlaybackQueue.CHANGED_ORDERING:
 					case PlaybackQueue.REMOVED_ITEM:
 					case PlaybackQueue.REMOVED_ITEMS:

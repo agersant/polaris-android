@@ -5,15 +5,15 @@ import android.content.Intent;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-public class Player implements ExoPlayer.EventListener {
+public class PolarisPlayer implements ExoPlayer.EventListener {
 
 	public static final String PLAYBACK_ERROR = "PLAYBACK_ERROR";
 	public static final String PLAYING_TRACK = "PLAYING_TRACK";
@@ -29,7 +29,7 @@ public class Player implements ExoPlayer.EventListener {
 	private CollectionItem item;
 	private float resumeProgress;
 
-	Player(PolarisService service) {
+	PolarisPlayer(PolarisService service) {
 		this.service = service;
 		resumeProgress = -1.f;
 		mediaPlayer = ExoPlayerFactory.newSimpleInstance(service, new DefaultTrackSelector());
@@ -88,12 +88,12 @@ public class Player implements ExoPlayer.EventListener {
 
 	void resume() {
 		mediaPlayer.setPlayWhenReady(true);
-		broadcast(Player.RESUMED_TRACK);
+		broadcast(PolarisPlayer.RESUMED_TRACK);
 	}
 
 	void pause() {
 		mediaPlayer.setPlayWhenReady(false);
-		broadcast(Player.PAUSED_TRACK);
+		broadcast(PolarisPlayer.PAUSED_TRACK);
 	}
 
 	boolean isPlaying() {
@@ -147,19 +147,19 @@ public class Player implements ExoPlayer.EventListener {
 
 	@Override
 	public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-		if (playbackState == ExoPlayer.STATE_BUFFERING) {
+		if (playbackState == Player.STATE_BUFFERING) {
 			broadcast(BUFFERING);
 		} else {
 			broadcast(NOT_BUFFERING);
 		}
 
 		switch (playbackState) {
-			case ExoPlayer.STATE_READY:
+			case Player.STATE_READY:
 				if (resumeProgress > 0.f) {
 					seekToRelative(resumeProgress);
 				}
 				break;
-			case ExoPlayer.STATE_ENDED:
+			case Player.STATE_ENDED:
 				broadcast(COMPLETED_TRACK);
 				break;
 		}

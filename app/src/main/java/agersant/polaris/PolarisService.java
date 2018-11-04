@@ -51,7 +51,7 @@ public class PolarisService extends Service {
 	private DownloadQueue downloadQueue;
 	private OfflineCache offlineCache;
 	private PlaybackQueue playbackQueue;
-	private Player player;
+	private PolarisPlayer player;
 	private ServerAPI serverAPI;
 	private LocalAPI localAPI;
 	private API api;
@@ -65,7 +65,7 @@ public class PolarisService extends Service {
 		super.onCreate();
 
 		playbackQueue = new PlaybackQueue();
-		player = new Player(this);
+		player = new PolarisPlayer(this);
 		offlineCache = new OfflineCache(this);
 		downloadQueue = new DownloadQueue(this);
 		serverAPI = new ServerAPI(this);
@@ -77,19 +77,19 @@ public class PolarisService extends Service {
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-		filter.addAction(Player.PLAYBACK_ERROR);
-		filter.addAction(Player.COMPLETED_TRACK);
+		filter.addAction(PolarisPlayer.PLAYBACK_ERROR);
+		filter.addAction(PolarisPlayer.COMPLETED_TRACK);
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
-					case Player.COMPLETED_TRACK:
+					case PolarisPlayer.COMPLETED_TRACK:
 						if (!skipNext()) {
 							seekToRelative(0);
 							pause();
 						}
 						break;
-					case Player.PLAYBACK_ERROR:
+					case PolarisPlayer.PLAYBACK_ERROR:
 						displayError();
 						break;
 					case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
