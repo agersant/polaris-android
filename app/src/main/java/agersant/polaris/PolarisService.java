@@ -48,29 +48,16 @@ public class PolarisService extends Service {
 	private static final String NOTIFICATION_CHANNEL_ID = "POLARIS_NOTIFICATION_CHANNEL_ID";
 
 	private final IBinder binder = new PolarisService.PolarisBinder();
-	private DownloadQueue downloadQueue;
-	private OfflineCache offlineCache;
-	private PlaybackQueue playbackQueue;
-	private PolarisPlayer player;
-	private ServerAPI serverAPI;
-	private LocalAPI localAPI;
-	private API api;
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
 	private boolean bound;
 
+	/*
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		playbackQueue = new PlaybackQueue();
-		player = new PolarisPlayer(this);
-		offlineCache = new OfflineCache(this);
-		downloadQueue = new DownloadQueue(this);
-		serverAPI = new ServerAPI(this);
-		localAPI = new LocalAPI(offlineCache);
-		api = new API(this, serverAPI, localAPI);
 
 		restoreStateFromDisk();
 		pushSystemNotification();
@@ -106,7 +93,7 @@ public class PolarisService extends Service {
 		unregisterReceiver(receiver);
 		super.onDestroy();
 	}
-
+*/
 	@Override
 	public IBinder onBind(Intent intent) {
 		bound = true;
@@ -129,7 +116,7 @@ public class PolarisService extends Service {
 			return PolarisService.this;
 		}
 	}
-
+/*
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		handleIntent(intent);
@@ -318,178 +305,5 @@ public class PolarisService extends Service {
 		return isIdle() || (size() == 0 && !isPlaying());
 	}
 
-
-	// API
-	public CollectionItem getCurrentItem() {
-		return player.getCurrentItem();
-	}
-
-	public boolean isIdle() {
-		return getCurrentItem() == null;
-	}
-
-	public void addItems(ArrayList<? extends CollectionItem> items) {
-		if (items.isEmpty()) {
-			return;
-		}
-		boolean autoStart = shouldAutoStart();
-		playbackQueue.addItems(items);
-		if (autoStart) {
-			skipNext();
-		}
-	}
-
-	public void addItem(CollectionItem item) {
-		playbackQueue.addItem(item);
-		boolean autoStart = shouldAutoStart();
-		if (autoStart) {
-			skipNext();
-		}
-	}
-
-	public int size() {
-		return playbackQueue.size();
-	}
-
-	public void remove(int position) {
-		playbackQueue.remove(position);
-	}
-
-	public void clear() {
-		playbackQueue.clear();
-	}
-
-	public CollectionItem getItem(int position) {
-		return playbackQueue.getItem(position);
-	}
-
-	public PlaybackQueue.Ordering getOrdering() {
-		return playbackQueue.getOrdering();
-	}
-
-	public void setOrdering(PlaybackQueue.Ordering ordering) {
-		playbackQueue.setOrdering(ordering);
-	}
-
-	public void move(int fromPosition, int toPosition) {
-		playbackQueue.move(fromPosition, toPosition);
-	}
-
-	public void swap(int fromPosition, int toPosition) {
-		playbackQueue.swap(fromPosition, toPosition);
-	}
-
-	public boolean hasNextTrack() {
-		return playbackQueue.hasNextTrack(player.getCurrentItem());
-	}
-
-	public boolean hasPreviousTrack() {
-		return playbackQueue.hasPreviousTrack(player.getCurrentItem());
-	}
-
-	public void skipPrevious() {
-		CollectionItem currentItem = player.getCurrentItem();
-		advance(currentItem, -1);
-	}
-
-	public boolean skipNext() {
-		CollectionItem currentItem = player.getCurrentItem();
-		return advance(currentItem, 1);
-	}
-
-	public void play(CollectionItem item) {
-		player.play(item);
-		pushSystemNotification();
-	}
-
-	public void pause() {
-		player.pause();
-		saveStateToDisk();
-		pushSystemNotification();
-	}
-
-	public void resume() {
-		player.resume();
-		pushSystemNotification();
-	}
-
-	public boolean isPlaying() {
-		return player.isPlaying();
-	}
-
-	public boolean isBuffering() {
-		return player.isBuffering();
-	}
-
-	public float getPositionRelative() {
-		return player.getPositionRelative();
-	}
-
-	public void seekToRelative(float progress) {
-		player.seekToRelative(progress);
-	}
-
-	public boolean isUsing(MediaSource mediaSource) {
-		return player.isUsing(mediaSource);
-	}
-
-	public boolean isOffline() {
-		return api.isOffline();
-	}
-
-	public boolean hasLocalAudio(CollectionItem item) {
-		return offlineCache.hasAudio(item.getPath());
-	}
-
-	public boolean isDownloading(CollectionItem item) {
-		return downloadQueue.isDownloading(item);
-	}
-
-	public boolean isStreaming(CollectionItem item) {
-		return downloadQueue.isStreaming(item);
-	}
-
-	public CollectionItem getNextItemToDownload() {
-		return playbackQueue.getNextItemToDownload(getCurrentItem(), offlineCache, downloadQueue);
-	}
-
-	public int comparePriorities(CollectionItem a, CollectionItem b) {
-		return playbackQueue.comparePriorities(getCurrentItem(), a, b);
-	}
-
-	public boolean makeSpace(CollectionItem forItem) {
-		return offlineCache.makeSpace(forItem);
-	}
-
-	public void saveAudio(CollectionItem item, FileInputStream audio) {
-		offlineCache.putAudio(item, audio);
-	}
-
-	public void saveImage(CollectionItem item, Bitmap image) {
-		offlineCache.putImage(item, image);
-	}
-
-	public MediaSource downloadAudio(CollectionItem item) {
-		return downloadQueue.getAudio(item);
-	}
-
-	public API getAPI() {
-		return api;
-	}
-
-	public ServerAPI getServerAPI() {
-		return serverAPI;
-	}
-
-	public LocalAPI getLocalAPI() {
-		return localAPI;
-	}
-
-	public String getAuthCookieHeader() {
-		return serverAPI.getCookieHeader();
-	}
-
-	public String getAuthRawHeader() {
-		return serverAPI.getAuthorizationHeader();
-	}
+	*/
 }

@@ -6,8 +6,10 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
@@ -15,8 +17,8 @@ class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 	private final TextView trackNumberText;
 	private final TextView titleText;
 
-	BrowseItemHolderAlbumTrack(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(service, adapter, itemView, itemQueueStatusView);
+	BrowseItemHolderAlbumTrack(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
 		trackNumberText = (TextView) itemView.findViewById(R.id.track_number);
 		titleText = (TextView) itemView.findViewById(R.id.title);
 	}

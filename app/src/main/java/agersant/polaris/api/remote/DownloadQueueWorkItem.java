@@ -12,7 +12,8 @@ import java.io.File;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PolarisPlayer;
+import agersant.polaris.api.local.OfflineCache;
 
 import static android.os.AsyncTask.Status.FINISHED;
 
@@ -20,15 +21,19 @@ import static android.os.AsyncTask.Status.FINISHED;
 class DownloadQueueWorkItem {
 
 	private final File scratchFile;
-	private final PolarisService service;
+	private final ServerAPI serverAPI;
+	private final OfflineCache offlineCache;
+	private final PolarisPlayer player;
 	private CollectionItem item;
 	private DownloadTask job;
 	private MediaSource mediaSource;
 	private DefaultDataSource dataSource;
 
-	DownloadQueueWorkItem(File scratchFile, PolarisService service) {
+	DownloadQueueWorkItem(File scratchFile, ServerAPI serverAPI, OfflineCache offlineCache, PolarisPlayer player) {
 		this.scratchFile = scratchFile;
-		this.service = service;
+		this.serverAPI = serverAPI;
+		this.offlineCache = offlineCache;
+		this.player = player;
 	}
 
 	boolean hasMediaSourceFor(CollectionItem item) {
@@ -56,7 +61,7 @@ class DownloadQueueWorkItem {
 	}
 
 	private boolean isDataSourceIdle() {
-		return mediaSource == null || !service.isUsing(mediaSource);
+		return mediaSource == null || !player.isUsing(mediaSource);
 	}
 
 	boolean canBeInterrupted() {
@@ -66,8 +71,8 @@ class DownloadQueueWorkItem {
 	void assignItem(CollectionItem item) {
 		reset();
 		this.item = item;
-		Uri uri = service.getServerAPI().serveUri(item.getPath());
-		PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(service, scratchFile, item);
+		Uri uri = serverAPI.serveUri(item.getPath());
+		PolarisExoPlayerDataSourceFactory dsf = new PolarisExoPlayerDataSourceFactory(offlineCache, serverAPI, scratchFile, item);
 		mediaSource = new ExtractorMediaSource.Factory(dsf).createMediaSource(uri);
 		dataSource = dsf.createDataSource();
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);
@@ -79,7 +84,7 @@ class DownloadQueueWorkItem {
 
 	void beginBackgroundDownload() {
 		System.out.println("Beginning background download for: " + item.getPath());
-		Uri uri = service.getServerAPI().serveUri(item.getPath());
+		Uri uri = serverAPI.serveUri(item.getPath());
 		job = new DownloadTask(dataSource, uri);
 		job.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		broadcast(DownloadQueue.WORKLOAD_CHANGED);

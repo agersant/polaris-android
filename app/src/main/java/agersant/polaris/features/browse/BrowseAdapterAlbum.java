@@ -5,13 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import junit.framework.Assert;
 
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 import static agersant.polaris.features.browse.BrowseAdapterAlbum.AlbumViewType.DISC_HEADER;
 import static agersant.polaris.features.browse.BrowseAdapterAlbum.AlbumViewType.TRACK;
@@ -21,6 +21,8 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 
 	private SparseIntArray discSizes; // Key is disc number, value is number of tracks
 	private int numDiscHeaders;
+	private final API api;
+	private final PlaybackQueue playbackQueue;
 
 	@Override
 	void setItems(ArrayList<? extends CollectionItem> items) {
@@ -36,8 +38,10 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 		super.setItems(items);
 	}
 
-	BrowseAdapterAlbum(PolarisService service) {
-		super(service);
+	BrowseAdapterAlbum(API api, PlaybackQueue playbackQueue) {
+		super();
+		this.api = api;
+		this.playbackQueue = playbackQueue;
 	}
 
 	@Override
@@ -65,11 +69,10 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 		View itemQueueStatusView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_item_queued, parent, false);
 		if (viewType == DISC_HEADER.ordinal()) {
 			View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_album_disc, parent, false);
-			return new BrowseItemHolderAlbumDiscHeader(service, this, itemView, itemQueueStatusView);
+			return new BrowseItemHolderAlbumDiscHeader(api, playbackQueue, this, itemView, itemQueueStatusView);
 		} else {
-			Assert.assertEquals(viewType, TRACK.ordinal());
 			View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_browse_album_item, parent, false);
-			return new BrowseItemHolderAlbumTrack(service, this, itemView, itemQueueStatusView);
+			return new BrowseItemHolderAlbumTrack(api, playbackQueue, this, itemView, itemQueueStatusView);
 		}
 	}
 
@@ -94,7 +97,6 @@ class BrowseAdapterAlbum extends BrowseAdapter {
 		} else {
 
 			// Assign disc number
-			Assert.assertTrue(holder instanceof BrowseItemHolderAlbumDiscHeader);
 			BrowseItemHolderAlbumDiscHeader header = (BrowseItemHolderAlbumDiscHeader) holder;
 			int index = 0;
 			for (int discIndex = 0; discIndex < discSizes.size(); discIndex++) {

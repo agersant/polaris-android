@@ -17,9 +17,12 @@ import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisPlayer;
 import agersant.polaris.PolarisService;
+import agersant.polaris.PolarisState;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
 
 public class PlayerActivity extends PolarisActivity {
@@ -33,26 +36,13 @@ public class PlayerActivity extends PolarisActivity {
 	private ImageView skipPrevious;
 	private SeekBar seekBar;
 	private View buffering;
-	private PolarisService service;
+	private API api;
+	private PolarisPlayer player;
+	private PlaybackQueue playbackQueue;
 
 	public PlayerActivity() {
 		super(R.string.now_playing, R.id.nav_now_playing);
 	}
-
-	private final ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			service = null;
-		}
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder iBinder) {
-			service = ((PolarisService.PolarisBinder) iBinder).getService();
-			updateContent();
-			updateControls();
-			updateBuffering();
-		}
-	};
 
 	@Override
 	public void onResume() {
@@ -118,6 +108,12 @@ public class PlayerActivity extends PolarisActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
+		PolarisState state = PolarisApplication.getState();
+		api = state.api;
+		player = state.player;
+		playbackQueue = state.playbackQueue;
+
 		setContentView(R.layout.activity_player);
 		super.onCreate(savedInstanceState);
 		artwork = (ImageView) findViewById(R.id.artwork);
@@ -139,21 +135,19 @@ public class PlayerActivity extends PolarisActivity {
 			}
 
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				if (service != null) {
-					service.seekToRelative((float) newPosition / seekBar.getMax());
-				}
+				player.seekToRelative((float) newPosition / seekBar.getMax());
 				seeking = false;
 				updateControls();
 			}
 		});
+
+		updateContent();
+		updateControls();
+		updateBuffering();
 	}
 
 	@Override
 	public void onStart() {
-		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
-		bindService(intent, serviceConnection, 0);
-
 		subscribeToEvents();
 		scheduleSeekBarUpdates();
 		super.onStart();
@@ -161,10 +155,6 @@ public class PlayerActivity extends PolarisActivity {
 
 	@Override
 	public void onStop() {
-		if (service != null) {
-			unbindService(serviceConnection);
-			service = null;
-		}
 		unregisterReceiver(receiver);
 		receiver = null;
 		timer.cancel();
@@ -174,36 +164,29 @@ public class PlayerActivity extends PolarisActivity {
 
 	@SuppressWarnings("UnusedParameters")
 	public void skipPrevious(View view) {
-		service.skipPrevious();
+		player.skipPrevious(playbackQueue);
 	}
 
 	@SuppressWarnings("UnusedParameters")
 	public void skipNext(View view) {
-		service.skipNext();
+		player.skipNext(playbackQueue);
 	}
 
 	private void updateContent() {
-		if (service == null) {
-			return;
-		}
-		CollectionItem currentItem = service.getCurrentItem();
+		CollectionItem currentItem = player.getCurrentItem();
 		if (currentItem != null) {
 			populateWithTrack(currentItem);
 		}
 	}
 
 	private void updateControls() {
-
-		if (service == null) {
-			return;
-		}
 		final float disabledAlpha = 0.2f;
 
-		int playPauseIcon = service.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
+		int playPauseIcon = player.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 		pauseToggle.setImageResource(playPauseIcon);
-		pauseToggle.setAlpha(service.isIdle() ? disabledAlpha : 1.f);
+		pauseToggle.setAlpha(player.isIdle() ? disabledAlpha : 1.f);
 
-		if (service.hasNextTrack()) {
+		if (playbackQueue.hasNextTrack(player.getCurrentItem())) {
 			skipNext.setClickable(true);
 			skipNext.setAlpha(1.0f);
 		} else {
@@ -211,7 +194,7 @@ public class PlayerActivity extends PolarisActivity {
 			skipNext.setAlpha(disabledAlpha);
 		}
 
-		if (service.hasPreviousTrack()) {
+		if (playbackQueue.hasPreviousTrack(player.getCurrentItem())) {
 			skipPrevious.setClickable(true);
 			skipPrevious.setAlpha(1.0f);
 		} else {
@@ -221,20 +204,14 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void updateSeekBar() {
-		if (service == null) {
-			return;
-		}
 		int precision = 10000;
-		float position = service.getPositionRelative();
+		float position = player.getPositionRelative();
 		seekBar.setMax(precision);
 		seekBar.setProgress((int)(precision * position));
 	}
 
 	private void updateBuffering() {
-		if (service == null) {
-			return;
-		}
-		if (service.isBuffering()) {
+		if (player.isBuffering()) {
 			buffering.setVisibility(View.VISIBLE);
 		} else {
 			buffering.setVisibility(View.INVISIBLE);
@@ -242,10 +219,6 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void populateWithTrack(CollectionItem item) {
-		if (service == null) {
-			return;
-		}
-
 		assert item != null;
 
 		String title = item.getTitle();
@@ -260,19 +233,16 @@ public class PlayerActivity extends PolarisActivity {
 
 		String artworkPath = item.getArtwork();
 		if (artworkPath != null) {
-			service.getAPI().loadImageIntoView(item, artwork);
+			api.loadImageIntoView(item, artwork);
 		}
 	}
 
 	@SuppressWarnings("UnusedParameters")
 	public void togglePause(View view) {
-		if (service == null) {
-			return;
-		}
-		if (service.isPlaying()) {
-			service.pause();
+		if (player.isPlaying()) {
+			player.pause();
 		} else {
-			service.resume();
+			player.resume();
 		}
 	}
 }

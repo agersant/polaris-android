@@ -1,6 +1,7 @@
 package agersant.polaris.api.remote;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -16,7 +17,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
@@ -35,19 +35,22 @@ public class ServerAPI
 	private final SharedPreferences preferences;
 	private final String serverAddressKey;
 	private final Auth auth;
-	private final PolarisService service;
+	private DownloadQueue downloadQueue;
 
-	public ServerAPI(PolarisService service) {
-		this.service = service;
-		this.serverAddressKey = service.getString(R.string.pref_key_server_url);
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(service);
-		this.auth = new Auth(service);
+	public ServerAPI(Context context) {
+		this.serverAddressKey = context.getString(R.string.pref_key_server_url);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		this.auth = new Auth(context);
 		this.requestQueue = new RequestQueue(auth);
 		this.gson = new GsonBuilder()
 				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
 				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
 				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
 				.create();
+	}
+
+	public void initialize(DownloadQueue downloadQueue) {
+		this.downloadQueue = downloadQueue;
 	}
 
 	public String getCookieHeader() {
@@ -75,7 +78,7 @@ public class ServerAPI
 
 	@Override
 	public MediaSource getAudio(CollectionItem item) throws IOException {
-		return service.downloadAudio(item);
+		return downloadQueue.getAudio(item);
 	}
 
 	Uri serveUri(String path) {

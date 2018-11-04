@@ -1,5 +1,6 @@
 package agersant.polaris;
 
+import android.content.Context;
 import android.content.Intent;
 
 import com.google.android.exoplayer2.C;
@@ -13,6 +14,8 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
+import agersant.polaris.api.API;
+
 public class PolarisPlayer implements Player.EventListener {
 
 	public static final String PLAYBACK_ERROR = "PLAYBACK_ERROR";
@@ -23,16 +26,16 @@ public class PolarisPlayer implements Player.EventListener {
 	public static final String BUFFERING = "BUFFERING";
 	public static final String NOT_BUFFERING = "NOT_BUFFERING";
 
-	private final PolarisService service;
+	private final API api;
 	private final ExoPlayer mediaPlayer;
 	private MediaSource mediaSource;
 	private CollectionItem item;
 	private float resumeProgress;
 
-	PolarisPlayer(PolarisService service) {
-		this.service = service;
+	PolarisPlayer(Context context, API api) {
+		this.api = api;
 		resumeProgress = -1.f;
-		mediaPlayer = ExoPlayerFactory.newSimpleInstance(service, new DefaultTrackSelector());
+		mediaPlayer = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector());
 		mediaPlayer.addListener(this);
 	}
 
@@ -51,7 +54,7 @@ public class PolarisPlayer implements Player.EventListener {
 		item = null;
 	}
 
-	void play(CollectionItem item) {
+	public void play(CollectionItem item) {
 
 		resumeProgress = -1.f;
 
@@ -66,7 +69,7 @@ public class PolarisPlayer implements Player.EventListener {
 		stop();
 
 		try {
-			mediaSource = service.getAPI().getAudio(item);
+			mediaSource = api.getAudio(item);
 			mediaPlayer.prepare(mediaSource);
 			mediaPlayer.setPlayWhenReady(true);
 		} catch (Exception e) {
@@ -78,33 +81,58 @@ public class PolarisPlayer implements Player.EventListener {
 		broadcast(PLAYING_TRACK);
 	}
 
-	CollectionItem getCurrentItem() {
+	public CollectionItem getCurrentItem() {
 		return item;
 	}
 
-	boolean isUsing(MediaSource mediaSource) {
+	public boolean isUsing(MediaSource mediaSource) {
 		return this.mediaSource == mediaSource;
 	}
 
-	void resume() {
+	public void resume() {
 		mediaPlayer.setPlayWhenReady(true);
 		broadcast(PolarisPlayer.RESUMED_TRACK);
+		// TODO trigger save and push notification
 	}
 
-	void pause() {
+	public void pause() {
 		mediaPlayer.setPlayWhenReady(false);
 		broadcast(PolarisPlayer.PAUSED_TRACK);
+		// TODO trigger save and push notification
 	}
 
-	boolean isPlaying() {
+	private boolean advance(PlaybackQueue playbackQueue, CollectionItem currentItem, int delta) {
+		CollectionItem newTrack = playbackQueue.getNextTrack(currentItem, delta);
+		if (newTrack != null) {
+			play(newTrack);
+			return true;
+		}
+		return false;
+	}
+
+	public void skipPrevious(PlaybackQueue playbackQueue) {
+		CollectionItem currentItem = getCurrentItem();
+		advance(playbackQueue, currentItem, -1);
+	}
+
+	public boolean skipNext(PlaybackQueue playbackQueue) {
+		CollectionItem currentItem = getCurrentItem();
+		return advance(playbackQueue, currentItem, 1);
+	}
+
+	public boolean isIdle() {
+		return getCurrentItem() == null;
+	}
+
+	public boolean isPlaying() {
 		return mediaPlayer.getPlayWhenReady();
 	}
 
-	boolean isBuffering() {
+	public boolean isBuffering() {
 		return mediaPlayer.getPlaybackState() == ExoPlayer.STATE_BUFFERING;
 	}
 
-	void seekToRelative(float progress) {
+	public void seekToRelative(float progress) {
 		resumeProgress = -1;
 
 		if (progress == 0.f) {
@@ -122,7 +150,7 @@ public class PolarisPlayer implements Player.EventListener {
 		mediaPlayer.seekTo(position);
 	}
 
-	float getPositionRelative() {
+	public float getPositionRelative() {
 		if (resumeProgress >= 0) {
 			return resumeProgress;
 		}

@@ -9,15 +9,18 @@ import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
 
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
+import agersant.polaris.PolarisState;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.features.PolarisActivity;
 
 public class CollectionActivity extends PolarisActivity {
 
-	private PolarisService service;
 	private Button randomAlbums;
 	private Button recentAlbums;
+	private API api;
 
 	public CollectionActivity() {
 		super(R.string.collection, R.id.nav_collection);
@@ -27,6 +30,9 @@ public class CollectionActivity extends PolarisActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_collection);
 		super.onCreate(savedInstanceState);
+
+		PolarisState state = PolarisApplication.getState();
+		this.api = state.api;
 
 		randomAlbums = (Button) findViewById(R.id.random);
 		recentAlbums = (Button) findViewById(R.id.recently_added);
@@ -39,34 +45,11 @@ public class CollectionActivity extends PolarisActivity {
 		}
 	}
 
-	private final ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			service = null;
-		}
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder iBinder) {
-			service = ((PolarisService.PolarisBinder) iBinder).getService();
-			updateButtons();
-		}
-	};
 
 	@Override
 	public void onStart() {
-		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
-		bindService(intent, serviceConnection, 0);
 		super.onStart();
-	}
-
-	@Override
-	public void onStop() {
-		if (service != null) {
-			unbindService(serviceConnection);
-			service = null;
-		}
-		super.onStop();
+		updateButtons();
 	}
 
 	public void browseDirectories(View view) {
@@ -100,7 +83,7 @@ public class CollectionActivity extends PolarisActivity {
 	}
 
 	private void updateButtons() {
-		boolean isOffline = service == null || service.isOffline();
+		boolean isOffline = api.isOffline();
 		randomAlbums.setEnabled(!isOffline);
 		recentAlbums.setEnabled(!isOffline);
 	}

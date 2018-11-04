@@ -6,51 +6,54 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 
-import junit.framework.Assert;
-
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
 import agersant.polaris.api.local.ImageCache;
 import agersant.polaris.api.local.LocalAPI;
+import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.ServerAPI;
 import okhttp3.ResponseBody;
 
 public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	private final CollectionItem item;
-	private final PolarisService service;
+	private final OfflineCache offlineCache;
+	private final API api;
+	private final ServerAPI serverAPI;
+	private final LocalAPI localAPI;
 	private final Callback callback;
 
-	private FetchImageTask(PolarisService service, CollectionItem item, Callback callback) {
-		this.service = service;
+	private FetchImageTask(OfflineCache offlineCache, API api, ServerAPI serverAPI, LocalAPI localAPI, CollectionItem item, Callback callback) {
+		this.offlineCache = offlineCache;
+		this.api = api;
+		this.serverAPI = serverAPI;
+		this.localAPI = localAPI;
 		this.item = item;
 		this.callback = callback;
 	}
 
-	static void load(PolarisService service, CollectionItem item, Callback callback) {
-		FetchImageTask task = new FetchImageTask(service, item, callback);
+	static void load(OfflineCache offlineCache, API api, ServerAPI serverAPI, LocalAPI localAPI, CollectionItem item, Callback callback) {
+		FetchImageTask task = new FetchImageTask(offlineCache, api, serverAPI, localAPI, item, callback);
 		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
 		String artworkPath = item.getArtwork();
-		Assert.assertNotNull(artworkPath);
 
 		Bitmap bitmap = null;
 		boolean fromDiskCache = false;
 
-		LocalAPI localAPI = service.getLocalAPI();
 		if (localAPI.hasImage(item)) {
 			bitmap = localAPI.getImage(item);
 			fromDiskCache = bitmap != null;
 		}
 		if (bitmap == null) {
-			if (!service.isOffline()) {
+			if (!api.isOffline()) {
 				try {
-					ResponseBody responseBody = service.getServerAPI().serve(item.getArtwork());
+					ResponseBody responseBody = serverAPI.serve(item.getArtwork());
 					InputStream stream = new BufferedInputStream(responseBody.byteStream());
 					bitmap = BitmapFactory.decodeStream(stream);
 				} catch (Exception e) {
@@ -63,7 +66,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 			ImageCache cache = ImageCache.getInstance();
 			cache.put(item.getArtwork(), bitmap);
 			if (!fromDiskCache) {
-				service.saveImage(item, bitmap);
+				offlineCache.putImage(item, bitmap);
 			}
 		}
 

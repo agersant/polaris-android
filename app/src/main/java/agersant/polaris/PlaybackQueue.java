@@ -70,16 +70,18 @@ public class PlaybackQueue {
 		content.add(newItem);
 	}
 
-	void addItems(ArrayList<? extends CollectionItem> items) {
+	public void addItems(ArrayList<? extends CollectionItem> items) {
 		for (CollectionItem item : items) {
 			addItemInternal(item);
 		}
 		broadcast(PlaybackQueue.QUEUED_ITEMS);
+		// TODO USE BROADCAST TO TRIGGER AUTOPLAY
 	}
 
-	void addItem(CollectionItem item) {
+	public void addItem(CollectionItem item) {
 		addItemInternal(item);
 		broadcast(PlaybackQueue.QUEUED_ITEM);
+		// TODO USE BROADCAST TO TRIGGER AUTOPLAY
 	}
 
 	public void remove(int position) {
@@ -153,11 +155,11 @@ public class PlaybackQueue {
 		broadcast(CHANGED_ORDERING);
 	}
 
-	boolean hasNextTrack(CollectionItem currentItem) {
+	public boolean hasNextTrack(CollectionItem currentItem) {
 		return getNextTrack(currentItem, 1) != null;
 	}
 
-	boolean hasPreviousTrack(CollectionItem currentItem) {
+	public boolean hasPreviousTrack(CollectionItem currentItem) {
 		return getNextTrack(currentItem, -1) != null;
 	}
 

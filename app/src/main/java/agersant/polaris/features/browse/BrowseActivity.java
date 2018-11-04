@@ -16,9 +16,14 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
+import agersant.polaris.PolarisState;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.api.ItemsCallback;
+import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.PolarisActivity;
 
 public class BrowseActivity extends PolarisActivity {
@@ -32,31 +37,23 @@ public class BrowseActivity extends PolarisActivity {
 	private NavigationMode navigationMode;
 	private SwipyRefreshLayout.OnRefreshListener onRefresh;
 	private ArrayList<? extends CollectionItem> items;
-	private PolarisService service;
+	private API api;
+	private ServerAPI serverAPI;
+	private PlaybackQueue playbackQueue;
 
 	public BrowseActivity() {
 		super(R.string.collection, R.id.nav_collection);
 	}
-	private final ServiceConnection serviceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-			service = null;
-		}
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder iBinder) {
-			service = ((PolarisService.PolarisBinder) iBinder).getService();
-			if (items == null) {
-				loadContent();
-			}
-			displayContent();
-		}
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_browse);
 		super.onCreate(savedInstanceState);
+
+		PolarisState state = PolarisApplication.getState();
+		api = state.api;
+		serverAPI = state.serverAPI;
+		playbackQueue = state.playbackQueue;
 
 		errorMessage = findViewById(R.id.browse_error_message);
 		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -100,29 +97,10 @@ public class BrowseActivity extends PolarisActivity {
 			};
 		}
 
-	}
-
-	@Override
-	public void onStart() {
-		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
-		bindService(intent, serviceConnection, 0);
-		super.onStart();
-	}
-
-	@Override
-	public void onStop() {
-		if (service != null) {
-			unbindService(serviceConnection);
-			service = null;
-		}
-		super.onStop();
+		loadContent();
 	}
 
 	private void loadContent() {
-		if (service == null) {
-			return;
-		}
 		progressBar.setVisibility(View.VISIBLE);
 		errorMessage.setVisibility(View.GONE);
 		Intent intent = getIntent();
@@ -163,15 +141,15 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void loadPath(String path) {
-		service.getAPI().browse(path, fetchCallback);
+		api.browse(path, fetchCallback);
 	}
 
 	private void loadRandom() {
-		service.getServerAPI().getRandomAlbums(fetchCallback);
+		serverAPI.getRandomAlbums(fetchCallback);
 	}
 
 	private void loadRecent() {
-		service.getServerAPI().getRecentAlbums(fetchCallback);
+		serverAPI.getRecentAlbums(fetchCallback);
 	}
 
 	private DisplayMode getDisplayModeForItems(ArrayList<? extends CollectionItem> items) {
@@ -217,9 +195,6 @@ public class BrowseActivity extends PolarisActivity {
 	}
 
 	private void displayContent() {
-		if (service == null) {
-			return;
-		}
 		if (items == null) {
 			return;
 		}
@@ -227,13 +202,13 @@ public class BrowseActivity extends PolarisActivity {
 		BrowseViewContent contentView = null;
 		switch (getDisplayModeForItems(items)) {
 			case EXPLORER:
-				contentView = new BrowseViewExplorer(this, service);
+				contentView = new BrowseViewExplorer(this, api, playbackQueue);
 				break;
 			case ALBUM:
-				contentView = new BrowseViewAlbum(this, service);
+				contentView = new BrowseViewAlbum(this, api, playbackQueue);
 				break;
 			case DISCOGRAPHY:
-				contentView = new BrowseViewDiscography(this, service);
+				contentView = new BrowseViewDiscography(this, api, playbackQueue);
 				break;
 		}
 

@@ -2,9 +2,9 @@ package agersant.polaris.features.browse;
 
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.LayoutInflater;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
@@ -14,8 +14,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 public class BrowseViewExplorer extends BrowseViewContent {
@@ -28,7 +29,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		throw new UnsupportedOperationException();
 	}
 
-	public BrowseViewExplorer(Context context, PolarisService service) {
+	public BrowseViewExplorer(Context context, API api, PlaybackQueue playbackQueue) {
 		super(context);
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -42,7 +43,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-		adapter = new BrowseAdapterExplorer(service);
+		adapter = new BrowseAdapterExplorer(api, playbackQueue);
 		recyclerView.setAdapter(adapter);
 
 		swipeRefresh = (SwipyRefreshLayout) findViewById(R.id.swipe_refresh);

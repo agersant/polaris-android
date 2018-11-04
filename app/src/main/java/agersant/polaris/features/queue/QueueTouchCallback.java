@@ -1,7 +1,7 @@
 package agersant.polaris.features.queue;
 
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 class QueueTouchCallback extends ItemTouchHelper.Callback {
 

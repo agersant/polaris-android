@@ -1,5 +1,6 @@
 package agersant.polaris.api.local;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -12,8 +13,6 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-
-import junit.framework.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,8 +28,9 @@ import java.util.Comparator;
 import java.util.Date;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PolarisPlayer;
 import agersant.polaris.R;
 
 
@@ -45,15 +45,24 @@ public class OfflineCache {
 	private static final int VERSION = 3;
 	private static final int BUFFER_SIZE = 1024 * 64;
 	private final SharedPreferences preferences;
+	private final String cacheSizeKey;
+	private final PlaybackQueue playbackQueue;
+	private final PolarisPlayer player;
+	private final DataSource.Factory dataSourceFactory;
 	private File root;
-	private final PolarisService service;
 
-	public OfflineCache(PolarisService service) {
-		this.service = service;
-		preferences = PreferenceManager.getDefaultSharedPreferences(service);
+	public OfflineCache(Context context, PlaybackQueue playbackQueue, PolarisPlayer player) {
+
+		Resources resources = context.getResources();
+
+		dataSourceFactory = new DefaultDataSourceFactory(context, "Polaris Local");
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		cacheSizeKey = resources.getString(R.string.pref_key_offline_cache_size);
+		this.playbackQueue = playbackQueue;
+		this.player = player;
 
 		for (int i = FIRST_VERSION; i <= VERSION; i++) {
-			root = new File(service.getExternalCacheDir(), "collection");
+			root = new File(context.getExternalCacheDir(), "collection");
 			root = new File(root, "v" + i);
 			if (i != VERSION) {
 				deleteDirectory(root);
@@ -86,7 +95,6 @@ public class OfflineCache {
 	}
 
 	private void listDeletionCandidates(File path, ArrayList<DeletionCandidate> candidates) {
-		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		for (File child : files) {
 			File audio = new File(child, AUDIO_FILENAME);
@@ -107,7 +115,6 @@ public class OfflineCache {
 				CollectionItem item = null;
 				try {
 					item = readItem(child);
-					Assert.assertNotNull(item);
 				} catch (Exception e) {
 					System.out.println("Error reading collection item for " + child + " " + e);
 				}
@@ -125,7 +132,6 @@ public class OfflineCache {
 		if (!file.exists()) {
 			return 0;
 		}
-		Assert.assertTrue(file.isDirectory());
 		File[] files = file.listFiles();
 		if (files != null) {
 			for (File child : files) {
@@ -139,8 +145,6 @@ public class OfflineCache {
 	}
 
 	private long getCacheCapacity() {
-		Resources resources = service.getResources();
-		String cacheSizeKey = resources.getString(R.string.pref_key_offline_cache_size);
 		String cacheSizeString = preferences.getString(cacheSizeKey, "0");
 		long cacheSize = Long.parseLong(cacheSizeString);
 		if (cacheSize < 0) {
@@ -164,7 +168,7 @@ public class OfflineCache {
 				}
 				//noinspection ConstantConditions
 				if (b.item != null && a.item != null) {
-					return -service.comparePriorities(a.item, b.item);
+					return -playbackQueue.comparePriorities(player.getCurrentItem(), a.item, b.item);
 				}
 				return (int) (a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime());
 			}
@@ -173,7 +177,7 @@ public class OfflineCache {
 		long cleared = 0;
 		for (DeletionCandidate candidate : candidates) {
 			if (candidate.item != null) {
-				if (service.comparePriorities(candidate.item, newItem) <= 0) {
+				if (playbackQueue.comparePriorities(player.getCurrentItem(), candidate.item, newItem) <= 0) {
 					continue;
 				}
 			}
@@ -214,7 +218,6 @@ public class OfflineCache {
 		if (!path.exists()) {
 			return;
 		}
-		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		if (files == null) {
 			return;
@@ -231,7 +234,6 @@ public class OfflineCache {
 
 	private void removeEmptyDirectories(File path) {
 		// TODO: Catastrophic complexity
-		Assert.assertTrue(path.isDirectory());
 		File[] files = path.listFiles();
 		for (File child : files) {
 			if (child.isDirectory()) {
@@ -286,7 +288,6 @@ public class OfflineCache {
 
 		if (image != null) {
 			String artworkPath = item.getArtwork();
-			Assert.assertNotNull(artworkPath);
 			try (FileOutputStream itemOut = new FileOutputStream(getCacheFile(artworkPath, CacheDataType.ARTWORK, true))) {
 				write(image, itemOut);
 			} catch (IOException e) {
@@ -362,8 +363,7 @@ public class OfflineCache {
 			saveMetadata(virtualPath, metadata);
 		}
 		Uri uri = Uri.fromFile(getCacheFile(virtualPath, CacheDataType.AUDIO, false));
-		DataSource.Factory factory = new DefaultDataSourceFactory(service, "Polaris Local");
-		return new ExtractorMediaSource.Factory(factory).createMediaSource(uri);
+		return new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
 	}
 
 	Bitmap getImage(String virtualPath) throws IOException {
@@ -427,7 +427,6 @@ public class OfflineCache {
 					continue;
 				}
 				CollectionItem item = readItem(file);
-				Assert.assertNotNull(item);
 				if (item.isDirectory()) {
 					if (!containsAudio(file)) {
 						continue;
@@ -469,7 +468,6 @@ public class OfflineCache {
 	}
 
 	private ArrayList<CollectionItem> flattenDir(File source) {
-		Assert.assertTrue (source.isDirectory());
 		ArrayList<CollectionItem> out = new ArrayList<>();
 		File[] files = source.listFiles();
 		if (files == null) {

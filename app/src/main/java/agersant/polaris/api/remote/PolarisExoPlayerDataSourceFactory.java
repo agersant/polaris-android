@@ -14,23 +14,23 @@ import java.net.HttpURLConnection;
 import java.util.BitSet;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisService;
+import agersant.polaris.api.local.OfflineCache;
 
 
 public final class PolarisExoPlayerDataSourceFactory implements DataSource.Factory {
 
-	private final PolarisService service;
 	private final PolarisExoPlayerHttpDataSource dataSource;
 
-	PolarisExoPlayerDataSourceFactory(PolarisService service, File scratchLocation, CollectionItem item) {
-		this.service = service;
-		PolarisExoPlayerHttpDataSourceFactory dataSourceFactory = new PolarisExoPlayerHttpDataSourceFactory(service, scratchLocation, item);
+	PolarisExoPlayerDataSourceFactory(OfflineCache offlineCache, ServerAPI serverAPI, File scratchLocation, CollectionItem item) {
+		PolarisExoPlayerHttpDataSourceFactory dataSourceFactory = new PolarisExoPlayerHttpDataSourceFactory(offlineCache, serverAPI, scratchLocation, item);
 		dataSource = dataSourceFactory.createDataSource();
 	}
 
 	@Override
 	public DefaultDataSource createDataSource() {
-		return new DefaultDataSource(service, null, dataSource);
+		return new DefaultDataSource(PolarisApplication.getInstance().getApplicationContext(), null, dataSource);
 	}
 
 	private class PolarisExoPlayerTransferListener implements TransferListener{
@@ -59,22 +59,22 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 	private class PolarisExoPlayerHttpDataSource extends DefaultHttpDataSource {
 
 		private final File scratchLocation;
-		private final PolarisService service;
+		private final OfflineCache offlineCache;
 		private final CollectionItem item;
 		private BitSet bytesStreamed;
 		private RandomAccessFile file;
 
-		PolarisExoPlayerHttpDataSource(PolarisService service, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
+		PolarisExoPlayerHttpDataSource(OfflineCache offlineCache, ServerAPI serverAPI, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
 			super("Polaris Android", null, listener);
 			this.scratchLocation = scratchLocation;
-			this.service = service;
+			this.offlineCache = offlineCache;
 			this.item = item;
 
-			String authCookie = service.getAuthCookieHeader();
+			String authCookie = serverAPI.getCookieHeader();
 			if (authCookie != null) {
 				setRequestProperty("Cookie", authCookie);
 			} else {
-				String authRaw = service.getAuthRawHeader();
+				String authRaw = serverAPI.getAuthorizationHeader();
 				setRequestProperty("Authorization", authRaw);
 			}
 		}
@@ -127,7 +127,7 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 			if (bytesStreamed.nextClearBit(0) >= length) {
 				System.out.println("Streaming complete, saving file for local use: " + item.getPath());
 				try {
-					service.saveAudio(item, new FileInputStream(scratchLocation));
+					offlineCache.putAudio(item, new FileInputStream(scratchLocation));
 				} catch (Exception e) {
 					System.out.println("Error while saving stream audio in offline cache: " + e);
 				}
@@ -156,19 +156,21 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 	private class PolarisExoPlayerHttpDataSourceFactory implements DataSource.Factory {
 
-		final PolarisService service;
+		final OfflineCache offlineCache;
+		final ServerAPI serverAPI;
 		final CollectionItem item;
 		final File scratchLocation;
 
-		PolarisExoPlayerHttpDataSourceFactory(PolarisService service, File scratchLocation, CollectionItem item) {
-			this.service = service;
+		PolarisExoPlayerHttpDataSourceFactory(OfflineCache offlineCache, ServerAPI serverAPI, File scratchLocation, CollectionItem item) {
+			this.offlineCache = offlineCache;
+			this.serverAPI = serverAPI;
 			this.scratchLocation = scratchLocation;
 			this.item = item;
 		}
 
 		@Override
 		public PolarisExoPlayerHttpDataSource createDataSource() {
-			return new PolarisExoPlayerHttpDataSource(service, new PolarisExoPlayerTransferListener(), scratchLocation, item);
+			return new PolarisExoPlayerHttpDataSource(offlineCache, serverAPI, new PolarisExoPlayerTransferListener(), scratchLocation, item);
 		}
 	}
 }

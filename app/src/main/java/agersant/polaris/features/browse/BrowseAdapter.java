@@ -1,22 +1,19 @@
 package agersant.polaris.features.browse;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
 
 
 abstract class BrowseAdapter
 		extends RecyclerView.Adapter<BrowseItemHolder> {
 
 	protected ArrayList<? extends CollectionItem> items;
-	final PolarisService service;
 
-	BrowseAdapter(PolarisService service) {
+	BrowseAdapter() {
 		super();
-		this.service = service;
 		setItems(new ArrayList<CollectionItem>());
 	}
 
@@ -33,10 +30,6 @@ abstract class BrowseAdapter
 	@Override
 	public int getItemCount() {
 		return items.size();
-	}
-
-	PolarisService getService() {
-		return service;
 	}
 
 }

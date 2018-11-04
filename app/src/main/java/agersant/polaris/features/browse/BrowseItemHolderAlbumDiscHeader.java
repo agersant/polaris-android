@@ -5,15 +5,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisService;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 class BrowseItemHolderAlbumDiscHeader extends BrowseItemHolder {
 
 	private final TextView textView;
 
-	BrowseItemHolderAlbumDiscHeader(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(service, adapter, itemView, itemQueueStatusView);
+	BrowseItemHolderAlbumDiscHeader(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
 		textView = (TextView) itemView.findViewById(R.id.disc);
 	}
 
