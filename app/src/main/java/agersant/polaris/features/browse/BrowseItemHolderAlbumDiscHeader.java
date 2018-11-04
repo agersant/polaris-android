@@ -16,7 +16,7 @@ class BrowseItemHolderAlbumDiscHeader extends BrowseItemHolder {
 
 	BrowseItemHolderAlbumDiscHeader(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
-		textView = (TextView) itemView.findViewById(R.id.disc);
+		textView = itemView.findViewById(R.id.disc);
 	}
 
 	@Override

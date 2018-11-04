@@ -89,7 +89,7 @@ public class QueueActivity extends PolarisActivity {
 		offlineCache = state.offlineCache;
 		downloadQueue = state.downloadQueue;
 
-		recyclerView = (RecyclerView) findViewById(R.id.queue_recycler_view);
+		recyclerView = findViewById(R.id.queue_recycler_view);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
 		DefaultItemAnimator animator = new DefaultItemAnimator() {

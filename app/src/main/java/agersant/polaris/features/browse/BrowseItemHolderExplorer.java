@@ -16,7 +16,7 @@ class BrowseItemHolderExplorer extends BrowseItemHolder {
 
 	BrowseItemHolderExplorer(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
-		button = (Button) itemView.findViewById(R.id.browse_explorer_button);
+		button = itemView.findViewById(R.id.browse_explorer_button);
 		button.setOnClickListener(this);
 	}
 

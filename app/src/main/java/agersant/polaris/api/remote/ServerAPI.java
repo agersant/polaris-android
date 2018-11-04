@@ -77,7 +77,7 @@ public class ServerAPI
 	}
 
 	@Override
-	public MediaSource getAudio(CollectionItem item) throws IOException {
+	public MediaSource getAudio(CollectionItem item) {
 		return downloadQueue.getAudio(item);
 	}
 
@@ -107,7 +107,7 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
+			public void onResponse(Call call, Response response) {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
 				}.getType();
 				ArrayList<CollectionItem> items;
@@ -138,7 +138,7 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
+			public void onResponse(Call call, Response response) {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
 				}.getType();
 				ArrayList<? extends CollectionItem> items;
@@ -174,7 +174,7 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
+			public void onResponse(Call call, Response response) {
 				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
 				}.getType();
 				ArrayList<? extends CollectionItem> items;

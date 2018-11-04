@@ -36,8 +36,8 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		this.playbackQueue = playbackQueue;
 		this.api = api;
 		queueStatusView = itemQueueStatusView;
-		queueStatusText = (TextView) queueStatusView.findViewById(R.id.status_text);
-		queueStatusIcon = (ImageView) queueStatusView.findViewById(R.id.status_icon);
+		queueStatusText = queueStatusView.findViewById(R.id.status_text);
+		queueStatusIcon = queueStatusView.findViewById(R.id.status_icon);
 	}
 
 	void bindItem(CollectionItem item) {

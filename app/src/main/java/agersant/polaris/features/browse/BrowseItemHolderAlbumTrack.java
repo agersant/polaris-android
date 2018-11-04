@@ -19,8 +19,8 @@ class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 
 	BrowseItemHolderAlbumTrack(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
-		trackNumberText = (TextView) itemView.findViewById(R.id.track_number);
-		titleText = (TextView) itemView.findViewById(R.id.title);
+		trackNumberText = itemView.findViewById(R.id.track_number);
+		titleText = itemView.findViewById(R.id.title);
 	}
 
 	@Override

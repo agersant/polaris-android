@@ -49,7 +49,7 @@ class Auth implements Authenticator {
 	}
 
 	@Override
-	public Request authenticate(Route route, Response response) throws IOException {
+	public Request authenticate(Route route, Response response) {
 		Request.Builder newRequest = response.request().newBuilder();
 
 		String oldCookie = response.request().header("Cookie");

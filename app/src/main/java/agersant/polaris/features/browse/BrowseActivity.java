@@ -56,8 +56,8 @@ public class BrowseActivity extends PolarisActivity {
 		playbackQueue = state.playbackQueue;
 
 		errorMessage = findViewById(R.id.browse_error_message);
-		progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-		contentHolder = (ViewGroup) findViewById(R.id.browse_content_holder);
+		progressBar = findViewById(R.id.progress_bar);
+		contentHolder = findViewById(R.id.browse_content_holder);
 
 		final BrowseActivity that = this;
 		fetchCallback = new ItemsCallback() {

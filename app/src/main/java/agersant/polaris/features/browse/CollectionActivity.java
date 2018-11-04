@@ -34,13 +34,13 @@ public class CollectionActivity extends PolarisActivity {
 		PolarisState state = PolarisApplication.getState();
 		this.api = state.api;
 
-		randomAlbums = (Button) findViewById(R.id.random);
-		recentAlbums = (Button) findViewById(R.id.recently_added);
+		randomAlbums = findViewById(R.id.random);
+		recentAlbums = findViewById(R.id.recently_added);
 
 		// Disable unimplemented features
 		{
 			Button button;
-			button = (Button) findViewById(R.id.playlists);
+			button = findViewById(R.id.playlists);
 			button.setEnabled(false);
 		}
 	}

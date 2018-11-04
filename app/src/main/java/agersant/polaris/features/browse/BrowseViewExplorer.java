@@ -35,7 +35,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_browse_explorer, this, true);
 
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
+		RecyclerView recyclerView = findViewById(R.id.browse_recycler_view);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -46,7 +46,7 @@ public class BrowseViewExplorer extends BrowseViewContent {
 		adapter = new BrowseAdapterExplorer(api, playbackQueue);
 		recyclerView.setAdapter(adapter);
 
-		swipeRefresh = (SwipyRefreshLayout) findViewById(R.id.swipe_refresh);
+		swipeRefresh = findViewById(R.id.swipe_refresh);
 	}
 
 	@Override
