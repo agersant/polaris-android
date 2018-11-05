@@ -127,16 +127,17 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 			if (bytesStreamed.nextClearBit(0) >= length) {
 				System.out.println("Streaming complete, saving file for local use: " + item.getPath());
 				try {
-					offlineCache.putAudio(item, new FileInputStream(scratchLocation));
-				} catch (Exception e) {
-					System.out.println("Error while saving stream audio in offline cache: " + e);
-				}
-				try {
 					file.close();
 				} catch (Exception e) {
 					System.out.println("Error while closing stream audio file: " + e);
 				}
 				file = null;
+
+				try(FileInputStream scratchFile = new FileInputStream(scratchLocation)) {
+					offlineCache.putAudio(item, scratchFile);
+				} catch (Exception e) {
+					System.out.println("Error while saving stream audio in offline cache: " + e);
+				}
 			}
 
 			return out;
