@@ -37,6 +37,7 @@ public class PolarisPlaybackService extends Service {
 	private static final String MEDIA_INTENT_SKIP_NEXT = "MEDIA_INTENT_SKIP_NEXT";
 	private static final String MEDIA_INTENT_SKIP_PREVIOUS = "MEDIA_INTENT_SKIP_PREVIOUS";
 	private static final String MEDIA_INTENT_DISMISS = "MEDIA_INTENT_DISMISS";
+	public static final String APP_INTENT_COLD_BOOT = "POLARIS_PLAYBACK_SERVICE_COLD_BOOT";
 
 	private static final String NOTIFICATION_CHANNEL_ID = "POLARIS_NOTIFICATION_CHANNEL_ID";
 
@@ -57,10 +58,6 @@ public class PolarisPlaybackService extends Service {
 		api = state.api;
 		player = state.player;
 		playbackQueue = state.playbackQueue;
-
-		pushSystemNotification();
-
-		restoreStateFromDisk();
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
@@ -91,6 +88,8 @@ public class PolarisPlaybackService extends Service {
 			}
 		};
 		registerReceiver(receiver, filter);
+
+		pushSystemNotification();
 	}
 
 	@Override
@@ -125,6 +124,9 @@ public class PolarisPlaybackService extends Service {
 		}
 		String action = intent.getAction();
 		switch (action) {
+			case APP_INTENT_COLD_BOOT:
+				restoreStateFromDisk();
+				break;
 			case MEDIA_INTENT_PAUSE:
 				player.pause();
 				break;
@@ -263,11 +265,13 @@ public class PolarisPlaybackService extends Service {
 					PlaybackQueueState state = (PlaybackQueueState) obj;
 					playbackQueue.setContent(state.queueContent);
 					playbackQueue.setOrdering(state.queueOrdering);
-					if (state.queueIndex >= 0 && player.isIdle()) {
+					if (state.queueIndex >= 0) {
 						CollectionItem currentItem = playbackQueue.getItem(state.queueIndex);
-						player.play(currentItem);
-						player.pause();
-						player.seekToRelative(state.trackProgress);
+						if (currentItem != null) {
+							player.play(currentItem);
+							player.pause();
+							player.seekToRelative(state.trackProgress);
+						}
 					}
 				}
 			} catch (ClassNotFoundException e) {

@@ -25,7 +25,10 @@ public class PolarisApplication extends Application {
 		instance = this;
 		state = new PolarisState(this);
 
-		startService(new Intent(this, PolarisPlaybackService.class));
+		Intent playbackServiceIntent = new Intent(this, PolarisPlaybackService.class);
+		playbackServiceIntent.setAction(PolarisPlaybackService.APP_INTENT_COLD_BOOT);
+		startService(playbackServiceIntent);
+
 		startService(new Intent(this, PolarisDownloadService.class));
 	}
 
