@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
+
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisPlayer;
@@ -84,31 +86,46 @@ class QueueAdapter
 			queueItemView.setOnClickListener(this);
 		}
 
+		private static class IconUpdateTask extends AsyncTask<Void, Void, QueueItemState> {
+
+			private final CollectionItem item;
+			private final WeakReference<QueueItemHolder> itemHolderWeakReference;
+			private final OfflineCache offlineCache;
+			private final DownloadQueue downloadQueue;
+
+			IconUpdateTask(QueueItemHolder itemHolder, CollectionItem item, OfflineCache offlineCache, DownloadQueue downloadQueue) {
+				this.itemHolderWeakReference = new WeakReference<>(itemHolder);
+				this.item = item;
+				this.offlineCache = offlineCache;
+				this.downloadQueue = downloadQueue;
+			}
+
+			@Override
+			protected QueueItemState doInBackground(Void... objects) {
+				if (offlineCache.hasAudio(item.getPath())) {
+					return QueueItemState.DOWNLOADED;
+				} else if (downloadQueue.isDownloading(item) || downloadQueue.isStreaming(item)) {
+					return QueueItemState.DOWNLOADING;
+				} else {
+					return QueueItemState.IDLE;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(QueueItemState state) {
+				QueueItemHolder itemHolder = itemHolderWeakReference.get();
+				if (itemHolder == null) {
+					return;
+				}
+				if (itemHolder.item != item) {
+					return;
+				}
+				itemHolder.setState(state);
+			}
+		}
+
 		private void beginIconUpdate() {
-			final QueueItemHolder that = this;
-			final CollectionItem item = this.item;
-
-			updateIconTask = new AsyncTask<Void, Void, QueueItemState>() {
-				@Override
-				protected QueueItemState doInBackground(Void... objects) {
-					if (offlineCache.hasAudio(item.getPath())) {
-						return QueueItemState.DOWNLOADED;
-					} else if (downloadQueue.isDownloading(item) || downloadQueue.isStreaming(item)) {
-						return QueueItemState.DOWNLOADING;
-					} else {
-						return QueueItemState.IDLE;
-					}
-				}
-
-				@Override
-				protected void onPostExecute(QueueItemState state) {
-					if (that.item != item) {
-						return;
-					}
-					setState( state );
-				}
-			};
-
+			updateIconTask = new IconUpdateTask(this, item, offlineCache, downloadQueue);
 			updateIconTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}
 
