@@ -51,7 +51,6 @@ public class PolarisService extends Service {
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
-	private boolean bound;
 
 	private API api;
 	private PolarisPlayer player;
@@ -109,26 +108,10 @@ public class PolarisService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		bound = true;
 		return binder;
 	}
 
-	@Override
-	public void onRebind(Intent intent) {
-		bound = true;
-	}
-
-	@Override
-	public boolean onUnbind(Intent intent) {
-		bound = false;
-		return true;
-	}
-
-	public class PolarisBinder extends Binder {
-		public PolarisService getService() {
-			return PolarisService.this;
-		}
-	}
+	public class PolarisBinder extends Binder {	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -162,9 +145,7 @@ public class PolarisService extends Service {
 				player.skipPrevious();
 				break;
 			case MEDIA_INTENT_DISMISS:
-				if (!bound) {
-					stopSelf();
-				}
+				stopSelf();
 				break;
 		}
 	}
