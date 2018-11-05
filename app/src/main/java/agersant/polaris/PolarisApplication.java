@@ -25,9 +25,7 @@ public class PolarisApplication extends Application {
 		instance = this;
 		state = new PolarisState(this);
 
-
-		Intent intent = new Intent(this, PolarisService.class);
-		startService(intent);
+		startService(new Intent(this, PolarisService.class));
 	}
 
 }

@@ -61,6 +61,12 @@ public class PolarisPlayer implements Player.EventListener {
 		context.registerReceiver(receiver, filter);
 	}
 
+	private void startPlayerService()
+	{
+		Context context = PolarisApplication.getInstance();
+		context.startService(new Intent(context, PolarisService.class));
+	}
+
 	private void broadcast(String event) {
 		PolarisApplication application = PolarisApplication.getInstance();
 		Intent intent = new Intent();
@@ -101,6 +107,7 @@ public class PolarisPlayer implements Player.EventListener {
 		}
 		this.item = item;
 		broadcast(PLAYING_TRACK);
+		startPlayerService();
 	}
 
 	public CollectionItem getCurrentItem() {
@@ -114,6 +121,7 @@ public class PolarisPlayer implements Player.EventListener {
 	public void resume() {
 		mediaPlayer.setPlayWhenReady(true);
 		broadcast(PolarisPlayer.RESUMED_TRACK);
+		startPlayerService();
 	}
 
 	public void pause() {

@@ -289,7 +289,7 @@ public class PolarisService extends Service {
 					PlaybackQueueState state = (PlaybackQueueState) obj;
 					playbackQueue.setContent(state.queueContent);
 					playbackQueue.setOrdering(state.queueOrdering);
-					if (state.queueIndex >= 0) {
+					if (state.queueIndex >= 0 && player.isIdle()) {
 						CollectionItem currentItem = playbackQueue.getItem(state.queueIndex);
 						player.play(currentItem);
 						player.pause();
