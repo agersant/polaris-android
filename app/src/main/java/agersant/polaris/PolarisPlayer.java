@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -64,7 +63,7 @@ public class PolarisPlayer implements Player.EventListener {
 	private void startPlayerService()
 	{
 		Context context = PolarisApplication.getInstance();
-		context.startService(new Intent(context, PolarisService.class));
+		context.startService(new Intent(context, PolarisPlaybackService.class));
 	}
 
 	private void broadcast(String event) {

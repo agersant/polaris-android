@@ -27,7 +27,7 @@
         <activity android:name=".features.player.PlayerActivity" android:parentActivityName=".features.browse.CollectionActivity" />
 
         <service
-            android:name=".PolarisService"
+            android:name=".PolarisPlaybackService"
             android:enabled="true"
             android:description="@string/media_player_service_description"
             android:exported="false" />

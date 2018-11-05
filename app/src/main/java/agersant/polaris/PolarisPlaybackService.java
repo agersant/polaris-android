@@ -17,26 +17,19 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.source.MediaSource;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 
 import agersant.polaris.api.API;
 import agersant.polaris.api.FetchImageTask;
-import agersant.polaris.api.local.LocalAPI;
-import agersant.polaris.api.local.OfflineCache;
-import agersant.polaris.api.remote.DownloadQueue;
-import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.features.player.PlayerActivity;
 
 
-public class PolarisService extends Service {
+public class PolarisPlaybackService extends Service {
 
 	private static final int MEDIA_NOTIFICATION = 1;
 	private static final String MEDIA_INTENT_PAUSE = "MEDIA_INTENT_PAUSE";
@@ -47,7 +40,7 @@ public class PolarisService extends Service {
 
 	private static final String NOTIFICATION_CHANNEL_ID = "POLARIS_NOTIFICATION_CHANNEL_ID";
 
-	private final IBinder binder = new PolarisService.PolarisBinder();
+	private final IBinder binder = new PolarisPlaybackService.PolarisBinder();
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
@@ -165,7 +158,7 @@ public class PolarisService extends Service {
 		PendingIntent tapPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		// On dismiss action
-		Intent dismissIntent = new Intent(this, PolarisService.class);
+		Intent dismissIntent = new Intent(this, PolarisPlaybackService.class);
 		dismissIntent.setAction(MEDIA_INTENT_DISMISS);
 		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
 
@@ -232,7 +225,7 @@ public class PolarisService extends Service {
 	}
 
 	private Notification.Action generateAction(int icon, int text, String intentAction) {
-		Intent intent = new Intent(this, PolarisService.class);
+		Intent intent = new Intent(this, PolarisPlaybackService.class);
 		intent.setAction(intentAction);
 		PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
 		return new Notification.Action.Builder(Icon.createWithResource(this, icon), getResources().getString(text), pendingIntent).build();

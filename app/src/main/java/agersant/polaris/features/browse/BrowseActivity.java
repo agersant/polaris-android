@@ -1,10 +1,7 @@
 package agersant.polaris.features.browse;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +15,6 @@ import java.util.ArrayList;
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
-import agersant.polaris.PolarisService;
 import agersant.polaris.PolarisState;
 import agersant.polaris.R;
 import agersant.polaris.api.API;

@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
-import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
 

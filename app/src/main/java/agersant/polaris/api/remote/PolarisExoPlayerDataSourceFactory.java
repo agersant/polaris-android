@@ -15,7 +15,6 @@ import java.util.BitSet;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PolarisApplication;
-import agersant.polaris.PolarisService;
 import agersant.polaris.api.local.OfflineCache;
 
 
