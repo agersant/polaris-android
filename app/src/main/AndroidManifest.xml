@@ -32,6 +32,12 @@
             android:description="@string/media_player_service_description"
             android:exported="false" />
 
+        <service
+            android:name=".PolarisDownloadService"
+            android:enabled="true"
+            android:description="@string/download_service_description"
+            android:exported="false" />
+
     </application>
 
 </manifest>

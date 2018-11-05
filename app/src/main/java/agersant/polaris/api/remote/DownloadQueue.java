@@ -6,8 +6,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -26,7 +24,6 @@ public class DownloadQueue {
 	private final OfflineCache offlineCache;
 	private final ArrayList<DownloadQueueWorkItem> workers;
 
-	// TODO It isn't super clear what thread this runs on and whether downloads continue after closing app
 	public DownloadQueue(Context context, API api, PlaybackQueue playbackQueue, PolarisPlayer player, OfflineCache offlineCache, ServerAPI serverAPI) {
 
 		this.api  = api;
@@ -40,13 +37,6 @@ public class DownloadQueue {
 			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file, serverAPI, offlineCache, player);
 			workers.add(worker);
 		}
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				downloadNext();
-			}
-		}, 1500, 500);
 	}
 
 	public synchronized MediaSource getAudio(CollectionItem item) {
@@ -110,7 +100,7 @@ public class DownloadQueue {
 		return null;
 	}
 
-	private synchronized void downloadNext() {
+	public synchronized void downloadNext() {
 
 		if (api.isOffline()) {
 			return;
