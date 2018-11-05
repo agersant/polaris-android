@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.ref.WeakReference;
 
 import agersant.polaris.api.API;
 import agersant.polaris.api.FetchImageTask;
@@ -244,9 +246,38 @@ public class PolarisPlaybackService extends Service {
 		return new Notification.Action.Builder(Icon.createWithResource(this, icon), getResources().getString(text), pendingIntent).build();
 	}
 
-	private void saveStateToDisk() {
-		File storage = new File(getCacheDir(), "playlist.v" + PlaybackQueueState.VERSION);
+	private static class StateWriteTask extends AsyncTask<Void, Void, Void> {
 
+		private final PlaybackQueueState state;
+		private final WeakReference<Context> contextWeakReference;
+
+		StateWriteTask(Context context, PlaybackQueueState state) {
+			this.contextWeakReference = new WeakReference<>(context);
+			this.state = state;
+		}
+
+		@Override
+		protected Void doInBackground(Void... objects) {
+			Context context = contextWeakReference.get();
+			if (context == null) {
+				return null;
+			}
+			File storage = new File(context.getCacheDir(), "playlist.v" + PlaybackQueueState.VERSION);
+
+			try (FileOutputStream out = new FileOutputStream(storage)) {
+				try (ObjectOutputStream objOut = new ObjectOutputStream(out)) {
+					objOut.writeObject(state);
+				} catch (IOException e) {
+					System.out.println("Error while saving PlaybackQueueState object: " + e);
+				}
+			} catch (IOException e) {
+				System.out.println("Error while writing PlaybackQueueState file: " + e);
+			}
+			return null;
+		}
+	}
+
+	private void saveStateToDisk() {
 		// Gather state
 		PlaybackQueueState state = new PlaybackQueueState();
 		state.queueContent = playbackQueue.getContent();
@@ -256,15 +287,9 @@ public class PolarisPlaybackService extends Service {
 		state.trackProgress = player.getPositionRelative();
 
 		// Persist
-		try (FileOutputStream out = new FileOutputStream(storage)) {
-			try (ObjectOutputStream objOut = new ObjectOutputStream(out)) {
-				objOut.writeObject(state);
-			} catch (IOException e) {
-				System.out.println("Error while saving PlaybackQueueState object: " + e);
-			}
-		} catch (IOException e) {
-			System.out.println("Error while writing PlaybackQueueState file: " + e);
-		}
+		StateWriteTask writeState = new StateWriteTask(this, state);
+		writeState.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
 	}
 
 	private void restoreStateFromDisk() {
