@@ -29,7 +29,7 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 	@Override
 	public DefaultDataSource createDataSource() {
-		return new DefaultDataSource(PolarisApplication.getInstance().getApplicationContext(), null, dataSource);
+		return new DefaultDataSource(PolarisApplication.getInstance().getApplicationContext(), dataSource);
 	}
 
 	private class PolarisExoPlayerTransferListener implements TransferListener{
@@ -64,7 +64,8 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 		private RandomAccessFile file;
 
 		PolarisExoPlayerHttpDataSource(OfflineCache offlineCache, ServerAPI serverAPI, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
-			super("Polaris Android", null, listener);
+			super("Polaris Android", null);
+			addTransferListener(listener);
 			this.scratchLocation = scratchLocation;
 			this.offlineCache = offlineCache;
 			this.item = item;
