@@ -91,10 +91,10 @@ class QueueAdapter
 			updateIconTask = new AsyncTask<Void, Void, QueueItemState>() {
 				@Override
 				protected QueueItemState doInBackground(Void... objects) {
-					if (downloadQueue.isDownloading(item) || downloadQueue.isStreaming(item)) {
-						return QueueItemState.DOWNLOADING;
-					} else if (offlineCache.hasAudio(item.getPath())) {
+					if (offlineCache.hasAudio(item.getPath())) {
 						return QueueItemState.DOWNLOADED;
+					} else if (downloadQueue.isDownloading(item) || downloadQueue.isStreaming(item)) {
+						return QueueItemState.DOWNLOADING;
 					} else {
 						return QueueItemState.IDLE;
 					}
