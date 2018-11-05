@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 import android.media.AudioManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -45,6 +46,8 @@ public class PolarisPlaybackService extends Service {
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
+	private Handler autosaveHandler;
+	private Runnable autosaveRunnable;
 
 	private API api;
 	private PolarisPlayer player;
@@ -89,12 +92,20 @@ public class PolarisPlaybackService extends Service {
 		};
 		registerReceiver(receiver, filter);
 
+		autosaveRunnable = () -> {
+			saveStateToDisk();
+			autosaveHandler.postDelayed(autosaveRunnable, 5000);
+		};
+		autosaveHandler = new Handler();
+		autosaveHandler.postDelayed(autosaveRunnable, 5000);
+
 		pushSystemNotification();
 	}
 
 	@Override
 	public void onDestroy() {
 		unregisterReceiver(receiver);
+		autosaveHandler.removeCallbacksAndMessages(null);
 		super.onDestroy();
 	}
 
