@@ -8,15 +8,16 @@ import android.content.IntentFilter;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import agersant.polaris.api.API;
+import agersant.polaris.api.FetchAudioTask;
 
 public class PolarisPlayer implements Player.EventListener {
 
@@ -25,6 +26,7 @@ public class PolarisPlayer implements Player.EventListener {
 	public static final String PAUSED_TRACK = "PAUSED_TRACK";
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
+	public static final String OPENING_TRACK = "OPENING_TRACK";
 	public static final String BUFFERING = "BUFFERING";
 	public static final String NOT_BUFFERING = "NOT_BUFFERING";
 
@@ -34,6 +36,7 @@ public class PolarisPlayer implements Player.EventListener {
 	private MediaSource mediaSource;
 	private CollectionItem item;
 	private float resumeProgress;
+	private FetchAudioTask fetchAudioTask;
 
 	PolarisPlayer(Context context, API api, PlaybackQueue playbackQueue) {
 		this.api = api;
@@ -75,6 +78,9 @@ public class PolarisPlayer implements Player.EventListener {
 	}
 
 	private void stop() {
+		if (fetchAudioTask != null) {
+			fetchAudioTask.cancel(true);
+		}
 		mediaPlayer.stop();
 		seekToRelative(0);
 		resumeProgress = -1.f;
@@ -96,17 +102,25 @@ public class PolarisPlayer implements Player.EventListener {
 		System.out.println("Beginning playback for: " + item.getPath());
 		stop();
 
-		try {
-			mediaSource = api.getAudio(item);
-			mediaPlayer.prepare(mediaSource);
-			mediaPlayer.setPlayWhenReady(true);
-		} catch (Exception e) {
-			System.out.println("Error while beginning media playback: " + e);
-			broadcast(PLAYBACK_ERROR);
-			return;
-		}
+		fetchAudioTask = api.loadAudio(item, (MediaSource fetchedMediaSource) -> {
+			fetchAudioTask = null;
+			if (fetchedMediaSource != null) {
+				try {
+					mediaSource = fetchedMediaSource;
+					mediaPlayer.prepare(mediaSource);
+					broadcast(PLAYING_TRACK);
+				} catch (Exception e) {
+					System.out.println("Error while beginning media playback: " + e);
+					broadcast(PLAYBACK_ERROR);
+				}
+			} else {
+				System.out.println("Could not find audio for");
+			}
+		});
+
+		mediaPlayer.setPlayWhenReady(true);
 		this.item = item;
-		broadcast(PLAYING_TRACK);
+		broadcast(OPENING_TRACK);
 		startServices();
 	}
 
@@ -150,6 +164,10 @@ public class PolarisPlayer implements Player.EventListener {
 
 	public boolean isIdle() {
 		return getCurrentItem() == null;
+	}
+
+	public boolean isOpeningSong() {
+		return fetchAudioTask != null;
 	}
 
 	public boolean isPlaying() {

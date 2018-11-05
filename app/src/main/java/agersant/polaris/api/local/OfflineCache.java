@@ -244,7 +244,7 @@ public class OfflineCache {
 
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 
-		makeSpace(item);
+		makeSpace(item); // TODO we dont need this called so often. Every n minutes should do.
 
 		String path = item.getPath();
 

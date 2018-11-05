@@ -46,6 +46,7 @@ public class QueueActivity extends PolarisActivity {
 		filter.addAction(PlaybackQueue.REMOVED_ITEM);
 		filter.addAction(PlaybackQueue.REMOVED_ITEMS);
 		filter.addAction(PlaybackQueue.QUEUED_ITEMS);
+		filter.addAction(PolarisPlayer.OPENING_TRACK);
 		filter.addAction(PolarisPlayer.PLAYING_TRACK);
 		filter.addAction(OfflineCache.AUDIO_CACHED);
 		filter.addAction(DownloadQueue.WORKLOAD_CHANGED);
@@ -64,6 +65,7 @@ public class QueueActivity extends PolarisActivity {
 							adapter.notifyDataSetChanged();
 						}
 						break;
+					case PolarisPlayer.OPENING_TRACK:
 					case PolarisPlayer.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:

@@ -46,11 +46,8 @@ public class API {
 		return preferences.getBoolean(offlineModePreferenceKey, false);
 	}
 
-	public MediaSource getAudio(CollectionItem item) throws IOException {
-		if (localAPI.hasAudio(item)) {
-			return localAPI.getAudio(item);
-		}
-		return getAPI().getAudio(item);
+	public FetchAudioTask loadAudio(CollectionItem item, FetchAudioTask.Callback callback) {
+		return FetchAudioTask.load(this, localAPI, serverAPI, item, callback);
 	}
 
 	public void loadImage(CollectionItem item, FetchImageTask.Callback callback) {

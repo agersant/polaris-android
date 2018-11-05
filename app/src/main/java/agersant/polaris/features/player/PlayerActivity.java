@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -30,7 +31,7 @@ public class PlayerActivity extends PolarisActivity {
 	private SeekBar seekBar;
 	private Handler seekBarUpdateHandler;
 	private Runnable updateSeekBar;
-	private View buffering;
+	private TextView buffering;
 	private API api;
 	private PolarisPlayer player;
 	private PlaybackQueue playbackQueue;
@@ -53,6 +54,7 @@ public class PlayerActivity extends PolarisActivity {
 		filter.addAction(PolarisPlayer.PAUSED_TRACK);
 		filter.addAction(PolarisPlayer.RESUMED_TRACK);
 		filter.addAction(PolarisPlayer.COMPLETED_TRACK);
+		filter.addAction(PolarisPlayer.OPENING_TRACK);
 		filter.addAction(PolarisPlayer.BUFFERING);
 		filter.addAction(PolarisPlayer.NOT_BUFFERING);
 		filter.addAction(PlaybackQueue.CHANGED_ORDERING);
@@ -65,6 +67,7 @@ public class PlayerActivity extends PolarisActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
+					case PolarisPlayer.OPENING_TRACK:
 					case PolarisPlayer.BUFFERING:
 					case PolarisPlayer.NOT_BUFFERING:
 						that.updateBuffering();
@@ -202,11 +205,17 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void updateBuffering() {
-		if (player.isBuffering()) {
+		if (player.isOpeningSong()) {
+			buffering.setText(R.string.player_opening);
+		} else if (player.isBuffering()) {
+			buffering.setText(R.string.player_buffering);
+		}
+		if (player.isOpeningSong() || player.isBuffering()) {
 			buffering.setVisibility(View.VISIBLE);
 		} else {
 			buffering.setVisibility(View.INVISIBLE);
 		}
+
 	}
 
 	private void populateWithTrack(CollectionItem item) {
