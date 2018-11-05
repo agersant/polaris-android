@@ -157,21 +157,18 @@ public class OfflineCache {
 		ArrayList<DeletionCandidate> candidates = new ArrayList<>();
 		listDeletionCandidates(path, candidates);
 
-		Collections.sort(candidates, new Comparator<DeletionCandidate>() {
-			@Override
-			public int compare(DeletionCandidate a, DeletionCandidate b) {
-				if (a.item == null && b.item != null) {
-					return -1;
-				}
-				if (b.item == null && a.item != null) {
-					return 1;
-				}
-				//noinspection ConstantConditions
-				if (b.item != null && a.item != null) {
-					return -playbackQueue.comparePriorities(player.getCurrentItem(), a.item, b.item);
-				}
-				return (int) (a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime());
+		candidates.sort((DeletionCandidate a, DeletionCandidate b) -> {
+			if (a.item == null && b.item != null) {
+				return -1;
 			}
+			if (b.item == null && a.item != null) {
+				return 1;
+			}
+			//noinspection ConstantConditions
+			if (b.item != null && a.item != null) {
+				return -playbackQueue.comparePriorities(player.getCurrentItem(), a.item, b.item);
+			}
+			return (int) (a.metadata.lastUse.getTime() - b.metadata.lastUse.getTime());
 		});
 
 		long cleared = 0;
