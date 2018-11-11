@@ -10,11 +10,11 @@ import agersant.polaris.CollectionItem;
 abstract class BrowseAdapter
 		extends RecyclerView.Adapter<BrowseItemHolder> {
 
-	protected ArrayList<? extends CollectionItem> items;
+	ArrayList<? extends CollectionItem> items;
 
 	BrowseAdapter() {
 		super();
-		setItems(new ArrayList<CollectionItem>());
+		setItems(new ArrayList<>());
 	}
 
 	void setItems(ArrayList<? extends CollectionItem> items) {

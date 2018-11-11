@@ -27,8 +27,8 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 	private final View queueStatusView;
 	private final TextView queueStatusText;
 	private final ImageView queueStatusIcon;
-	protected final PlaybackQueue playbackQueue;
-	protected final API api;
+	private final PlaybackQueue playbackQueue;
+	final API api;
 
 	BrowseItemHolder(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(itemView);
@@ -73,25 +73,19 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		ItemsCallback handlers = new ItemsCallback() {
 			@Override
 			public void onSuccess(final ArrayList<? extends CollectionItem> items) {
-				new Handler(Looper.getMainLooper()).post(new Runnable() {
-					@Override
-					public void run() {
-						playbackQueue.addItems(items);
-						if (item == fetchingItem) {
-							setStatusToQueued();
-						}
+				new Handler(Looper.getMainLooper()).post(() -> {
+					playbackQueue.addItems(items);
+					if (item == fetchingItem) {
+						setStatusToQueued();
 					}
 				});
 			}
 
 			@Override
 			public void onError() {
-				new Handler(Looper.getMainLooper()).post(new Runnable() {
-					@Override
-					public void run() {
-						if (item == fetchingItem) {
-							setStatusToQueueError();
-						}
+				new Handler(Looper.getMainLooper()).post(() -> {
+					if (item == fetchingItem) {
+						setStatusToQueueError();
 					}
 				});
 			}
@@ -129,13 +123,10 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 	private void waitAndSwipeBack() {
 		final CollectionItem oldItem = item;
 		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if (item == oldItem) {
-					int position = getAdapterPosition();
-					adapter.notifyItemChanged(position);
-				}
+		handler.postDelayed(() -> {
+			if (item == oldItem) {
+				int position = getAdapterPosition();
+				adapter.notifyItemChanged(position);
 			}
 		}, 1000);
 	}

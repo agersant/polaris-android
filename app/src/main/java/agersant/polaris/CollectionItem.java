@@ -27,7 +27,7 @@ public class CollectionItem
 	}
 
 	private static String getNameFromPath(String path) {
-		String[] chunks = path.split("/|\\\\");
+		String[] chunks = path.split("[/\\\\]");
 		return chunks[chunks.length - 1];
 	}
 
@@ -62,11 +62,11 @@ public class CollectionItem
 
 	private int getOptionalInt(JsonObject fields, @SuppressWarnings("SameParameterValue") String key) {
 		if (!fields.has(key)) {
-			return 0;
+			return -1;
 		}
 		JsonElement element = fields.get(key);
 		if (element.isJsonNull()) {
-			return 0;
+			return -1;
 		}
 		return element.getAsInt();
 	}

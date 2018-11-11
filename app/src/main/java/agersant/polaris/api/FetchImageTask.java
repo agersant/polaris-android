@@ -41,7 +41,6 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
-		String artworkPath = item.getArtwork();
 
 		Bitmap bitmap = null;
 		boolean fromDiskCache = false;

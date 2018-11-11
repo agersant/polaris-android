@@ -10,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -26,7 +24,6 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	private final TextView artist;
 	private final TextView title;
 	private final API api;
-	private final PlaybackQueue playbackQueue;
 
 	public BrowseViewAlbum(Context context) {
 		super(context);
@@ -36,7 +33,6 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	public BrowseViewAlbum(Context context, API api, PlaybackQueue playbackQueue) {
 		super(context);
 		this.api = api;
-		this.playbackQueue = playbackQueue;
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_browse_album, this, true);
@@ -60,15 +56,12 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	@Override
 	void setItems(ArrayList<? extends CollectionItem> items) {
 
-		Collections.sort(items, new Comparator<CollectionItem>() {
-			@Override
-			public int compare(CollectionItem a, CollectionItem b) {
-				int discDifference = a.getDiscNumber() - b.getDiscNumber();
-				if (discDifference != 0) {
-					return discDifference;
-				}
-				return a.getTrackNumber() - b.getTrackNumber();
+		items.sort((CollectionItem a, CollectionItem b) -> {
+			int discDifference = a.getDiscNumber() - b.getDiscNumber();
+			if (discDifference != 0) {
+				return discDifference;
 			}
+			return a.getTrackNumber() - b.getTrackNumber();
 		});
 		adapter.setItems(items);
 

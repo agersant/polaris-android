@@ -48,8 +48,8 @@ public class PolarisPlaybackService extends Service {
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
-	private Handler autosaveHandler;
-	private Runnable autosaveRunnable;
+	private Handler autoSaveHandler;
+	private Runnable autoSaveRunnable;
 
 	private API api;
 	private PolarisPlayer player;
@@ -94,12 +94,12 @@ public class PolarisPlaybackService extends Service {
 		};
 		registerReceiver(receiver, filter);
 
-		autosaveRunnable = () -> {
+		autoSaveRunnable = () -> {
 			saveStateToDisk();
-			autosaveHandler.postDelayed(autosaveRunnable, 5000);
+			autoSaveHandler.postDelayed(autoSaveRunnable, 5000);
 		};
-		autosaveHandler = new Handler();
-		autosaveHandler.postDelayed(autosaveRunnable, 5000);
+		autoSaveHandler = new Handler();
+		autoSaveHandler.postDelayed(autoSaveRunnable, 5000);
 
 		pushSystemNotification();
 	}
@@ -107,7 +107,7 @@ public class PolarisPlaybackService extends Service {
 	@Override
 	public void onDestroy() {
 		unregisterReceiver(receiver);
-		autosaveHandler.removeCallbacksAndMessages(null);
+		autoSaveHandler.removeCallbacksAndMessages(null);
 		super.onDestroy();
 	}
 

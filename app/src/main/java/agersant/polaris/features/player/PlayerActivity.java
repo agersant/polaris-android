@@ -93,17 +93,14 @@ public class PlayerActivity extends PolarisActivity {
 	}
 
 	private void scheduleSeekBarUpdates() {
-		updateSeekBar = new Runnable() {
-			@Override
-			public void run() {
-				if (!seeking) {
-					int precision = 10000;
-					float position = player.getPositionRelative();
-					seekBar.setMax(precision);
-					seekBar.setProgress((int)(precision * position));
-				}
-				seekBarUpdateHandler.postDelayed(updateSeekBar, 20/*ms*/);
+		updateSeekBar = () -> {
+			if (!seeking) {
+				int precision = 10000;
+				float position = player.getPositionRelative();
+				seekBar.setMax(precision);
+				seekBar.setProgress((int)(precision * position));
 			}
+			seekBarUpdateHandler.postDelayed(updateSeekBar, 20/*ms*/);
 		};
 		seekBarUpdateHandler.post(updateSeekBar);
 	}

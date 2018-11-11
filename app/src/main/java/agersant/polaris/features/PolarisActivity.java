@@ -3,7 +3,6 @@ package agersant.polaris.features;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -39,12 +38,7 @@ public abstract class PolarisActivity extends AppCompatActivity {
 
 		final PolarisActivity that = this;
 		navigationView = findViewById(R.id.navigation);
-		navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-			@Override
-			public boolean onNavigationItemSelected(final @NonNull MenuItem menuItem) {
-				return that.onNavigationItemSelected(menuItem);
-			}
-		});
+		navigationView.setOnNavigationItemSelectedListener(that::onNavigationItemSelected);
 	}
 
 	@Override

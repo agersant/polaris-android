@@ -59,24 +59,18 @@ public class BrowseActivity extends PolarisActivity {
 		fetchCallback = new ItemsCallback() {
 			@Override
 			public void onSuccess(final ArrayList<? extends CollectionItem> items) {
-				that.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						that.progressBar.setVisibility(View.GONE);
-						that.items = items;
-						that.displayContent();
-					}
+				that.runOnUiThread(() -> {
+					that.progressBar.setVisibility(View.GONE);
+					that.items = items;
+					that.displayContent();
 				});
 			}
 
 			@Override
 			public void onError() {
-				that.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						progressBar.setVisibility(View.GONE);
-						errorMessage.setVisibility(View.VISIBLE);
-					}
+				that.runOnUiThread(() -> {
+					progressBar.setVisibility(View.GONE);
+					errorMessage.setVisibility(View.VISIBLE);
 				});
 			}
 		};
@@ -85,12 +79,7 @@ public class BrowseActivity extends PolarisActivity {
 		navigationMode = (NavigationMode) intent.getSerializableExtra(BrowseActivity.NAVIGATION_MODE);
 
 		if (navigationMode == NavigationMode.RANDOM) {
-			onRefresh = new SwipyRefreshLayout.OnRefreshListener() {
-				@Override
-				public void onRefresh(SwipyRefreshLayoutDirection direction) {
-					loadContent();
-				}
-			};
+			onRefresh = (SwipyRefreshLayoutDirection direction) -> loadContent();
 		}
 
 		loadContent();

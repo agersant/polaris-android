@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.widget.ImageView;
 
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
@@ -76,7 +75,6 @@ public class ServerAPI
 		return serverAddress + "/serve/" + path;
 	}
 
-	@Override
 	public MediaSource getAudio(CollectionItem item) {
 		return downloadQueue.getAudio(item);
 	}
@@ -108,12 +106,16 @@ public class ServerAPI
 
 			@Override
 			public void onResponse(Call call, Response response) {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
-				}.getType();
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {}.getType();
 				ArrayList<CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}
@@ -139,12 +141,16 @@ public class ServerAPI
 
 			@Override
 			public void onResponse(Call call, Response response) {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
-				}.getType();
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {}.getType();
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}
@@ -175,12 +181,16 @@ public class ServerAPI
 
 			@Override
 			public void onResponse(Call call, Response response) {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
-				}.getType();
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {}.getType();
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}

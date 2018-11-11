@@ -175,7 +175,7 @@ public class PolarisPlayer implements Player.EventListener {
 	}
 
 	public boolean isBuffering() {
-		return mediaPlayer.getPlaybackState() == ExoPlayer.STATE_BUFFERING;
+		return mediaPlayer.getPlaybackState() == Player.STATE_BUFFERING;
 	}
 
 	public void seekToRelative(float progress) {

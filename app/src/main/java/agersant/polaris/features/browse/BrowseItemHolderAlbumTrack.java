@@ -34,7 +34,7 @@ class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 		}
 
 		Integer trackNumber = item.getTrackNumber();
-		if (trackNumber != null) {
+		if (trackNumber >= 0) {
 			trackNumberText.setText(String.format((Locale) null, "%1$02d.", trackNumber));
 		} else {
 			trackNumberText.setText("");

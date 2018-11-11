@@ -15,13 +15,12 @@ public class PolarisState {
 	public final PlaybackQueue playbackQueue;
 	public final PolarisPlayer player;
 	public final ServerAPI serverAPI;
-	public final LocalAPI localAPI;
 	public final API api;
 
 
-	public PolarisState(Context context) {
+	PolarisState(Context context) {
 		serverAPI = new ServerAPI(context);
-		localAPI = new LocalAPI();
+		LocalAPI localAPI = new LocalAPI();
 		api = new API(context);
 		playbackQueue = new PlaybackQueue();
 		player = new PolarisPlayer(context, api, playbackQueue);

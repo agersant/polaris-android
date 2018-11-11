@@ -244,7 +244,7 @@ public class OfflineCache {
 
 	public synchronized void putAudio(CollectionItem item, FileInputStream audio) {
 
-		makeSpace(item); // TODO we dont need this called so often. Every n minutes should do.
+		makeSpace(item); // TODO we don't need this called so often. Every n minutes should do.
 
 		String path = item.getPath();
 
@@ -422,12 +422,14 @@ public class OfflineCache {
 					continue;
 				}
 				CollectionItem item = readItem(file);
-				if (item.isDirectory()) {
-					if (!containsAudio(file)) {
-						continue;
+				if (item != null) {
+					if (item.isDirectory()) {
+						if (!containsAudio(file)) {
+							continue;
+						}
 					}
+					out.add(item);
 				}
-				out.add(item);
 			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("Error while reading offline cache: " + e);
 			}

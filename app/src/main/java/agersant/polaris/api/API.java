@@ -8,9 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
-import com.google.android.exoplayer2.source.MediaSource;
-
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import agersant.polaris.CollectionItem;
@@ -69,21 +66,17 @@ public class API {
 		view.setImageDrawable(asyncDrawable);
 
 		final WeakReference<ImageView> imageViewReference = new WeakReference<>(view);
-		loadImage(item, new FetchImageTask.Callback() {
-			@Override
-			public void onSuccess(Bitmap bitmap) {
-				ImageView imageView = imageViewReference.get();
-				if (imageView == null) {
-					return;
-				}
-				Drawable drawable = imageView.getDrawable();
-				if (!(drawable instanceof FetchImageTask.AsyncDrawable)) {
-					return;
-				}
-				FetchImageTask.AsyncDrawable asyncDrawable = (FetchImageTask.AsyncDrawable) drawable;
-				if (asyncDrawable.getItem() == item) {
-					imageView.setImageBitmap(bitmap);
-				}
+		loadImage(item, (Bitmap bitmap) -> {
+			ImageView imageView = imageViewReference.get();
+			if (imageView == null) {
+				return;
+			}
+			Drawable drawable = imageView.getDrawable();
+			if (drawable != asyncDrawable) {
+				return;
+			}
+			if (asyncDrawable.getItem() == item) {
+				imageView.setImageBitmap(bitmap);
 			}
 		});
 	}

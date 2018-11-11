@@ -39,7 +39,7 @@ public class DownloadQueue {
 		}
 	}
 
-	public synchronized MediaSource getAudio(CollectionItem item) {
+	synchronized MediaSource getAudio(CollectionItem item) {
 		DownloadQueueWorkItem existingWorker = findWorkerWithAudioForItem(item);
 		if (existingWorker != null) {
 			existingWorker.stopBackgroundDownload();
@@ -49,6 +49,10 @@ public class DownloadQueue {
 		DownloadQueueWorkItem newWorker = findIdleWorker();
 		if (newWorker == null) {
 			newWorker = findWorkerToInterrupt();
+		}
+		if (newWorker == null) {
+			System.out.println("ERROR: Could not find a worker for download queue.");
+			return null;
 		}
 
 		newWorker.assignItem(item);

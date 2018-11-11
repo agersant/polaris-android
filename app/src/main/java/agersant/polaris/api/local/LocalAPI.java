@@ -28,7 +28,6 @@ public class LocalAPI implements IPolarisAPI {
 		return offlineCache.hasAudio(path);
 	}
 
-	@Override
 	public MediaSource getAudio(CollectionItem item) throws IOException {
 		String path = item.getPath();
 		return offlineCache.getAudio(path);
