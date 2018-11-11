@@ -15,6 +15,7 @@ import android.graphics.drawable.Icon;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
@@ -28,7 +29,6 @@ import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 
 import agersant.polaris.api.API;
-import agersant.polaris.api.FetchImageTask;
 import agersant.polaris.features.player.PlayerActivity;
 
 
@@ -116,7 +116,7 @@ public class PolarisPlaybackService extends Service {
 		return binder;
 	}
 
-	public class PolarisBinder extends Binder {	}
+	private class PolarisBinder extends Binder {	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -178,32 +178,36 @@ public class PolarisPlaybackService extends Service {
 		PendingIntent dismissPendingIntent = PendingIntent.getService(this, 0, dismissIntent, 0);
 
 		// Create notification
-		final Notification.Builder notificationBuilder = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
-				.setShowWhen(false)
-				.setSmallIcon(R.drawable.notification_icon)
-				.setContentTitle(item.getTitle())
-				.setContentText(item.getArtist())
-				.setVisibility(Notification.VISIBILITY_PUBLIC)
-				.setContentIntent(tapPendingIntent)
-				.setDeleteIntent(dismissPendingIntent)
-				.setStyle(new Notification.MediaStyle()
-						.setShowActionsInCompactView()
-				);
+		final Notification.Builder notificationBuilder;
+		if (Build.VERSION.SDK_INT > 25 ) {
+			notificationBuilder = new Notification.Builder(this, NOTIFICATION_CHANNEL_ID);
+		}
+		else
+		{
+			notificationBuilder = new Notification.Builder(this);
+		}
+		notificationBuilder.setShowWhen(false)
+			.setSmallIcon(R.drawable.notification_icon)
+			.setContentTitle(item.getTitle())
+			.setContentText(item.getArtist())
+			.setVisibility(Notification.VISIBILITY_PUBLIC)
+			.setContentIntent(tapPendingIntent)
+			.setDeleteIntent(dismissPendingIntent)
+			.setStyle(new Notification.MediaStyle()
+					.setShowActionsInCompactView()
+			);
 
 		// Add album art
 		if (item == notificationItem && notification != null && notification.getLargeIcon() != null) {
 			notificationBuilder.setLargeIcon(notification.getLargeIcon());
 		}
 		if (item.getArtwork() != null) {
-			api.loadImage(item, new FetchImageTask.Callback() {
-				@Override
-				public void onSuccess(Bitmap bitmap) {
-					if (item != player.getCurrentItem()) {
-						return;
-					}
-					notificationBuilder.setLargeIcon(bitmap);
-					emitNotification(notificationBuilder, item);
+			api.loadImage(item, (Bitmap bitmap) -> {
+				if (item != player.getCurrentItem()) {
+					return;
 				}
+				notificationBuilder.setLargeIcon(bitmap);
+				emitNotification(notificationBuilder, item);
 			});
 		}
 
@@ -230,12 +234,14 @@ public class PolarisPlaybackService extends Service {
 		notificationItem = item;
 		notification = notificationBuilder.build();
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris", NotificationManager.IMPORTANCE_DEFAULT);
-		mChannel.setDescription("Notifications for current song playing in Polaris.");
-		mChannel.enableLights(false);
-		mChannel.enableVibration(false);
-		mChannel.setShowBadge(false);
-		notificationManager.createNotificationChannel(mChannel);
+		if (Build.VERSION.SDK_INT > 25 ) {
+			NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris", NotificationManager.IMPORTANCE_DEFAULT);
+			mChannel.setDescription("Notifications for current song playing in Polaris.");
+			mChannel.enableLights(false);
+			mChannel.enableVibration(false);
+			mChannel.setShowBadge(false);
+			notificationManager.createNotificationChannel(mChannel);
+		}
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 	}
 

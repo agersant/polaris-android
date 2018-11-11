@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "agersant.polaris"
-        minSdkVersion 26
+        minSdkVersion 25
         targetSdkVersion 28
         versionCode 27
         versionName "0.6.0"
@@ -24,7 +24,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
