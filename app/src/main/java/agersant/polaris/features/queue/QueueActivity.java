@@ -60,19 +60,16 @@ public class QueueActivity extends PolarisActivity {
 						updateTutorial();
 						break;
 					case PlaybackQueue.QUEUED_ITEMS:
+					case PlaybackQueue.OVERWROTE_QUEUE:
 						updateTutorial();
-						if (adapter != null) {
-							adapter.notifyDataSetChanged();
-						}
+						adapter.notifyDataSetChanged();
 						break;
 					case PolarisPlayer.OPENING_TRACK:
 					case PolarisPlayer.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
 					case DownloadQueue.WORKLOAD_CHANGED:
-						if (adapter != null) {
-							adapter.notifyItemRangeChanged( 0, adapter.getItemCount() );
-						}
+						adapter.notifyItemRangeChanged( 0, adapter.getItemCount() );
 						break;
 				}
 			}
@@ -109,16 +106,10 @@ public class QueueActivity extends PolarisActivity {
 
 		tutorial = findViewById(R.id.queue_tutorial);
 
-		updateTutorial();
 		populate();
-		updateOrderingIcon();
-		updateTutorial();
 	}
 
 	private void updateTutorial() {
-		if (adapter == null) {
-			return;
-		}
 		boolean empty = adapter.getItemCount() == 0;
 		if (empty) {
 			tutorial.setVisibility(View.VISIBLE);
@@ -131,6 +122,10 @@ public class QueueActivity extends PolarisActivity {
 	public void onStart() {
 		super.onStart();
 		subscribeToEvents();
+
+		adapter.notifyDataSetChanged();
+		updateOrderingIcon();
+		updateTutorial();
 	}
 
 	@Override
@@ -146,14 +141,6 @@ public class QueueActivity extends PolarisActivity {
 		inflater.inflate(R.menu.menu_queue, menu);
 		updateOrderingIcon();
 		return true;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (adapter != null) {
-			adapter.notifyDataSetChanged();
-		}
 	}
 
 	@Override
@@ -176,9 +163,6 @@ public class QueueActivity extends PolarisActivity {
 	}
 
 	private void populate() {
-		if (adapter != null) {
-			return;
-		}
 		adapter = new QueueAdapter(playbackQueue, player, offlineCache, downloadQueue);
 		ItemTouchHelper.Callback callback = new QueueTouchCallback(adapter);
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);

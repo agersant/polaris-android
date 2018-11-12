@@ -84,6 +84,7 @@ public class PlayerActivity extends PolarisActivity {
 					case PlaybackQueue.REORDERED_ITEMS:
 					case PlaybackQueue.QUEUED_ITEM:
 					case PlaybackQueue.QUEUED_ITEMS:
+					case PlaybackQueue.OVERWROTE_QUEUE:
 						that.updateControls();
 						break;
 				}

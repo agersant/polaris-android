@@ -16,6 +16,7 @@ public class PlaybackQueue {
 	public static final String CHANGED_ORDERING = "CHANGED_ORDERING";
 	public static final String QUEUED_ITEM = "QUEUED_ITEM";
 	public static final String QUEUED_ITEMS = "QUEUED_ITEMS";
+	public static final String OVERWROTE_QUEUE = "OVERWROTE_QUEUE";
 	public static final String NO_LONGER_EMPTY = "NO_LONGER_EMPTY";
 	public static final String REMOVED_ITEM = "REMOVED_ITEM";
 	public static final String REMOVED_ITEMS = "REMOVED_ITEMS";
@@ -35,6 +36,7 @@ public class PlaybackQueue {
 
 	void setContent(ArrayList<CollectionItem> content) {
 		this.content = content;
+		broadcast(PlaybackQueue.OVERWROTE_QUEUE);
 	}
 
 	// Return negative value if a is going to play before b, positive if a is going to play after b
