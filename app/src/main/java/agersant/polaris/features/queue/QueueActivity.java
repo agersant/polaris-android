@@ -122,10 +122,6 @@ public class QueueActivity extends PolarisActivity {
 	public void onStart() {
 		super.onStart();
 		subscribeToEvents();
-
-		adapter.notifyDataSetChanged();
-		updateOrderingIcon();
-		updateTutorial();
 	}
 
 	@Override
@@ -133,6 +129,14 @@ public class QueueActivity extends PolarisActivity {
 		super.onStop();
 		unregisterReceiver(receiver);
 		receiver = null;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		adapter.notifyDataSetChanged();
+		updateOrderingIcon();
+		updateTutorial();
 	}
 
 	@Override
