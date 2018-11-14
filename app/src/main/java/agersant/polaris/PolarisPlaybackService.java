@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import agersant.polaris.api.API;
 import agersant.polaris.features.player.PlayerActivity;
@@ -286,7 +287,15 @@ public class PolarisPlaybackService extends Service {
 	private void saveStateToDisk() {
 		// Gather state
 		PlaybackQueueState state = new PlaybackQueueState();
-		state.queueContent = playbackQueue.getContent();
+		state.queueContent = new ArrayList<>();
+		for (CollectionItem item : playbackQueue.getContent())
+		{
+			try {
+				state.queueContent.add(item.clone());
+			} catch(CloneNotSupportedException e) {
+				System.out.println("Error gathering PlaybackQueueState content: " + e);
+			}
+		}
 		state.queueOrdering = playbackQueue.getOrdering();
 		CollectionItem currentItem = player.getCurrentItem();
 		state.queueIndex = state.queueContent.indexOf(currentItem);
@@ -295,7 +304,6 @@ public class PolarisPlaybackService extends Service {
 		// Persist
 		StateWriteTask writeState = new StateWriteTask(this, state);
 		writeState.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-
 	}
 
 	private void restoreStateFromDisk() {
