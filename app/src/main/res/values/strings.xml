@@ -58,4 +58,7 @@
 
 	<string name="media_player_service_description">Audio playback service for Polaris</string>
 	<string name="download_service_description">Music download service for Polaris</string>
+	<string name="scrobble_service_description">Last.fm scrobbling service for Polaris</string>
+
+	<string name="media_notifications_channel_description">Polaris audio playback controls</string>
 </resources>
