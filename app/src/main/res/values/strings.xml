@@ -23,6 +23,7 @@
 	<string name="player_play_pause">Play/Pause</string>
 	<string name="player_play">Play</string>
 	<string name="player_pause">Pause</string>
+	<string name="player_opening">Opening…</string>
 	<string name="player_buffering">Buffering…</string>
 
 	<string name="pref_server_url">Server address</string>
@@ -56,4 +57,8 @@
 	<string name="pref_offline_cache_size">Offline cache size</string>
 
 	<string name="media_player_service_description">Audio playback service for Polaris</string>
+	<string name="download_service_description">Music download service for Polaris</string>
+	<string name="scrobble_service_description">Last.fm scrobbling service for Polaris</string>
+
+	<string name="media_notifications_channel_description">Polaris audio playback controls</string>
 </resources>

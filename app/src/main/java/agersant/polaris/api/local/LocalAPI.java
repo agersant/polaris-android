@@ -1,11 +1,8 @@
 package agersant.polaris.api.local;
 
 import android.graphics.Bitmap;
-import android.widget.ImageView;
 
 import com.google.android.exoplayer2.source.MediaSource;
-
-import junit.framework.Assert;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,9 +14,12 @@ import agersant.polaris.api.ItemsCallback;
 
 public class LocalAPI implements IPolarisAPI {
 
-	private final OfflineCache offlineCache;
+	private OfflineCache offlineCache;
 
-	public LocalAPI(OfflineCache offlineCache) {
+	public LocalAPI() {
+	}
+
+	public void initialize(OfflineCache offlineCache) {
 		this.offlineCache = offlineCache;
 	}
 
@@ -28,7 +28,6 @@ public class LocalAPI implements IPolarisAPI {
 		return offlineCache.hasAudio(path);
 	}
 
-	@Override
 	public MediaSource getAudio(CollectionItem item) throws IOException {
 		String path = item.getPath();
 		return offlineCache.getAudio(path);
@@ -41,7 +40,6 @@ public class LocalAPI implements IPolarisAPI {
 
 	public Bitmap getImage(CollectionItem item) {
 		String artworkPath = item.getArtwork();
-		Assert.assertNotNull(artworkPath);
 		try {
 			return offlineCache.getImage(artworkPath);
 		} catch (IOException e) {

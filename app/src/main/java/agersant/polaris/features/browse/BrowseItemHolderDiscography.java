@@ -4,11 +4,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import junit.framework.Assert;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 class BrowseItemHolderDiscography extends BrowseItemHolder {
@@ -16,14 +16,12 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 	private final ImageView artwork;
 	private final TextView artist;
 	private final TextView album;
-	private final PolarisService service;
 
-	BrowseItemHolderDiscography(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(service, adapter, itemView, itemQueueStatusView);
-		this.service = service;
-		artwork = (ImageView) itemView.findViewById(R.id.artwork);
-		artist = (TextView) itemView.findViewById(R.id.artist);
-		album = (TextView) itemView.findViewById(R.id.album);
+	BrowseItemHolderDiscography(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
+		artwork = itemView.findViewById(R.id.artwork);
+		artist = itemView.findViewById(R.id.artist);
+		album = itemView.findViewById(R.id.album);
 		itemView.setOnClickListener(this);
 	}
 
@@ -41,7 +39,6 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
 			album.setText(albumValue);
 		}
 
-		Assert.assertNotNull(item.getArtwork());
-		service.getAPI().loadImageIntoView(item, artwork);
+		api.loadImageIntoView(item, artwork);
 	}
 }

@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,8 +14,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 import agersant.polaris.api.ItemsCallback;
 
 
@@ -26,15 +27,17 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 	private final View queueStatusView;
 	private final TextView queueStatusText;
 	private final ImageView queueStatusIcon;
-	private final PolarisService service;
+	private final PlaybackQueue playbackQueue;
+	final API api;
 
-	BrowseItemHolder(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+	BrowseItemHolder(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(itemView);
 		this.adapter = adapter;
-		this.service = service;
+		this.playbackQueue = playbackQueue;
+		this.api = api;
 		queueStatusView = itemQueueStatusView;
-		queueStatusText = (TextView) queueStatusView.findViewById(R.id.status_text);
-		queueStatusIcon = (ImageView) queueStatusView.findViewById(R.id.status_icon);
+		queueStatusText = queueStatusView.findViewById(R.id.status_text);
+		queueStatusIcon = queueStatusView.findViewById(R.id.status_icon);
 	}
 
 	void bindItem(CollectionItem item) {
@@ -60,7 +63,7 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 			queueDirectory();
 			setStatusToFetching();
 		} else {
-			adapter.getService().addItem(item);
+			playbackQueue.addItem(item);
 			setStatusToQueued();
 		}
 	}
@@ -70,31 +73,25 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 		ItemsCallback handlers = new ItemsCallback() {
 			@Override
 			public void onSuccess(final ArrayList<? extends CollectionItem> items) {
-				new Handler(Looper.getMainLooper()).post(new Runnable() {
-					@Override
-					public void run() {
-						adapter.getService().addItems(items);
-						if (item == fetchingItem) {
-							setStatusToQueued();
-						}
+				new Handler(Looper.getMainLooper()).post(() -> {
+					playbackQueue.addItems(items);
+					if (item == fetchingItem) {
+						setStatusToQueued();
 					}
 				});
 			}
 
 			@Override
 			public void onError() {
-				new Handler(Looper.getMainLooper()).post(new Runnable() {
-					@Override
-					public void run() {
-						if (item == fetchingItem) {
-							setStatusToQueueError();
-						}
+				new Handler(Looper.getMainLooper()).post(() -> {
+					if (item == fetchingItem) {
+						setStatusToQueueError();
 					}
 				});
 			}
 		};
 
-		service.getAPI().flatten(item.getPath(), handlers);
+		api.flatten(item.getPath(), handlers);
 	}
 
 	private void setStatusToIdle() {
@@ -126,13 +123,10 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 	private void waitAndSwipeBack() {
 		final CollectionItem oldItem = item;
 		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if (item == oldItem) {
-					int position = getAdapterPosition();
-					adapter.notifyItemChanged(position);
-				}
+		handler.postDelayed(() -> {
+			if (item == oldItem) {
+				int position = getAdapterPosition();
+				adapter.notifyItemChanged(position);
 			}
 		}, 1000);
 	}

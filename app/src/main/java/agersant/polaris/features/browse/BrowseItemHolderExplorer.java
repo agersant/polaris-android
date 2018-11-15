@@ -4,17 +4,18 @@ import android.view.View;
 import android.widget.Button;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 class BrowseItemHolderExplorer extends BrowseItemHolder {
 
 	private final Button button;
 
-	BrowseItemHolderExplorer(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(service, adapter, itemView, itemQueueStatusView);
-		button = (Button) itemView.findViewById(R.id.browse_explorer_button);
+	BrowseItemHolderExplorer(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
+		button = itemView.findViewById(R.id.browse_explorer_button);
 		button.setOnClickListener(this);
 	}
 

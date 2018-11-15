@@ -31,12 +31,6 @@ public class QueueItemView extends FrameLayout {
 		fill();
 	}
 
-	public QueueItemView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		super(context, attrs, defStyleAttr, defStyleRes);
-		readAttributes(context, attrs);
-		fill();
-	}
-
 	private void fill() {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_queue_item, this, true);

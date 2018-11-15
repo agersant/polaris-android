@@ -1,13 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         applicationId "agersant.polaris"
-        minSdkVersion 23
-        targetSdkVersion 26
-        versionCode 26
-        versionName "0.5.14"
+        minSdkVersion 25
+        targetSdkVersion 28
+        versionCode 30
+        versionName "0.6.3"
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
     }
     buildTypes {
         release {
@@ -21,21 +25,14 @@ android {
     }
 }
 
-
 dependencies {
-    repositories {
-        jcenter()
-    }
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile "com.android.support:design:26.1.0"
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.github.orangegangsters:swipy:1.2.3@aar'
-    compile 'com.squareup.okhttp3:okhttp:3.7.0'
-    compile 'com.google.code.gson:gson:2.8.5'
-    compile 'com.google.android.exoplayer:exoplayer-core:r2.4.1'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "com.google.android.material:material:1.1.0-alpha01"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.github.orangegangsters:swipy:1.2.3@aar'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.0'
 }
+

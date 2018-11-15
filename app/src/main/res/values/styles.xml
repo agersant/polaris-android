@@ -39,9 +39,4 @@
 		<item name="android:paddingRight">20dp</item>
 	</style>
 
-	<style name="AlbumButton" parent="@style/PolarisButton">
-		<item name="android:paddingLeft">20dp</item>
-		<item name="android:paddingRight">20dp</item>
-	</style>
-
 </resources>

@@ -2,22 +2,19 @@ package agersant.polaris.features.browse;
 
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import junit.framework.Assert;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 public class BrowseViewAlbum extends BrowseViewContent {
@@ -26,25 +23,25 @@ public class BrowseViewAlbum extends BrowseViewContent {
 	private final ImageView artwork;
 	private final TextView artist;
 	private final TextView title;
-	private final PolarisService service;
+	private final API api;
 
 	public BrowseViewAlbum(Context context) {
 		super(context);
 		throw new UnsupportedOperationException();
 	}
 
-	public BrowseViewAlbum(Context context, PolarisService service) {
+	public BrowseViewAlbum(Context context, API api, PlaybackQueue playbackQueue) {
 		super(context);
-		this.service = service;
+		this.api = api;
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.view_browse_album, this, true);
 
-		artwork = (ImageView) findViewById(R.id.album_artwork);
-		artist = (TextView) findViewById(R.id.album_artist);
-		title = (TextView) findViewById(R.id.album_title);
+		artwork = findViewById(R.id.album_artwork);
+		artist = findViewById(R.id.album_artist);
+		title = findViewById(R.id.album_title);
 
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.browse_recycler_view);
+		RecyclerView recyclerView = findViewById(R.id.browse_recycler_view);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -52,23 +49,19 @@ public class BrowseViewAlbum extends BrowseViewContent {
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
 		itemTouchHelper.attachToRecyclerView(recyclerView);
 
-		adapter = new BrowseAdapterAlbum(service);
+		adapter = new BrowseAdapterAlbum(api, playbackQueue);
 		recyclerView.setAdapter(adapter);
 	}
 
 	@Override
 	void setItems(ArrayList<? extends CollectionItem> items) {
-		Assert.assertFalse(items.isEmpty());
 
-		Collections.sort(items, new Comparator<CollectionItem>() {
-			@Override
-			public int compare(CollectionItem a, CollectionItem b) {
-				int discDifference = a.getDiscNumber() - b.getDiscNumber();
-				if (discDifference != 0) {
-					return discDifference;
-				}
-				return a.getTrackNumber() - b.getTrackNumber();
+		items.sort((CollectionItem a, CollectionItem b) -> {
+			int discDifference = a.getDiscNumber() - b.getDiscNumber();
+			if (discDifference != 0) {
+				return discDifference;
 			}
+			return a.getTrackNumber() - b.getTrackNumber();
 		});
 		adapter.setItems(items);
 
@@ -76,7 +69,7 @@ public class BrowseViewAlbum extends BrowseViewContent {
 
 		String artworkPath = item.getArtwork();
 		if (artworkPath != null) {
-			service.getAPI().loadImageIntoView(item, artwork);
+			api.loadImageIntoView(item, artwork);
 		}
 
 		String titleString = item.getAlbum();

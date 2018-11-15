@@ -1,8 +1,8 @@
 package agersant.polaris.features.browse;
 
 import android.graphics.Canvas;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 
 class BrowseTouchCallback extends ItemTouchHelper.SimpleCallback {

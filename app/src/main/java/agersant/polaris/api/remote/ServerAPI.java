@@ -1,10 +1,10 @@
 package agersant.polaris.api.remote;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.widget.ImageView;
 
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
@@ -16,16 +16,18 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
 import agersant.polaris.R;
 import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.BufferedSink;
 
 public class ServerAPI
 		implements IPolarisAPI {
@@ -35,19 +37,22 @@ public class ServerAPI
 	private final SharedPreferences preferences;
 	private final String serverAddressKey;
 	private final Auth auth;
-	private final PolarisService service;
+	private DownloadQueue downloadQueue;
 
-	public ServerAPI(PolarisService service) {
-		this.service = service;
-		this.serverAddressKey = service.getString(R.string.pref_key_server_url);
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(service);
-		this.auth = new Auth(service);
+	public ServerAPI(Context context) {
+		this.serverAddressKey = context.getString(R.string.pref_key_server_url);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		this.auth = new Auth(context);
 		this.requestQueue = new RequestQueue(auth);
 		this.gson = new GsonBuilder()
 				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
 				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
 				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
 				.create();
+	}
+
+	public void initialize(DownloadQueue downloadQueue) {
+		this.downloadQueue = downloadQueue;
 	}
 
 	public String getCookieHeader() {
@@ -73,9 +78,8 @@ public class ServerAPI
 		return serverAddress + "/serve/" + Uri.encode(path);
 	}
 
-	@Override
-	public MediaSource getAudio(CollectionItem item) throws IOException {
-		return service.downloadAudio(item);
+	public MediaSource getAudio(CollectionItem item) {
+		return downloadQueue.getAudio(item);
 	}
 
 	Uri serveUri(String path) {
@@ -104,13 +108,17 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
-				}.getType();
+			public void onResponse(Call call, Response response) {
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {}.getType();
 				ArrayList<CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}
@@ -135,13 +143,17 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
-				}.getType();
+			public void onResponse(Call call, Response response) {
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {}.getType();
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}
@@ -171,13 +183,17 @@ public class ServerAPI
 			}
 
 			@Override
-			public void onResponse(Call call, Response response) throws IOException {
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
-				}.getType();
+			public void onResponse(Call call, Response response) {
+				if (response.body() == null) {
+					handlers.onError();
+					return;
+				}
+
+				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {}.getType();
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (Exception e) {
+				} catch (IOException e) {
 					handlers.onError();
 					return;
 				}
@@ -185,6 +201,54 @@ public class ServerAPI
 			}
 		};
 		requestQueue.requestAsync(request, callback);
+	}
+
+	public void setLastFMNowPlaying(String path) {
+		String requestURL = this.getURL() + "/lastfm/now_playing/" + path;
+		Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
+			@Override
+			public MediaType contentType() {
+				return null;
+			}
+			@Override
+			public void writeTo(BufferedSink sink) {
+
+			}
+		}).build();
+
+		requestQueue.requestAsync(request, new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+			}
+			@Override
+			public void onResponse(Call call, Response response) {
+			}
+		});
+	}
+
+	public void scrobbleOnLastFM(String path) {
+
+		String requestURL = this.getURL() + "/lastfm/scrobble/" + path;
+
+		Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
+			@Override
+			public MediaType contentType() {
+				return null;
+			}
+			@Override
+			public void writeTo(BufferedSink sink) {
+
+			}
+		}).build();
+
+		requestQueue.requestAsync(request, new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+			}
+			@Override
+			public void onResponse(Call call, Response response) {
+			}
+		});
 	}
 }
 

@@ -6,8 +6,9 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
 import agersant.polaris.R;
+import agersant.polaris.api.API;
 
 
 class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
@@ -15,10 +16,10 @@ class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 	private final TextView trackNumberText;
 	private final TextView titleText;
 
-	BrowseItemHolderAlbumTrack(PolarisService service, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
-		super(service, adapter, itemView, itemQueueStatusView);
-		trackNumberText = (TextView) itemView.findViewById(R.id.track_number);
-		titleText = (TextView) itemView.findViewById(R.id.title);
+	BrowseItemHolderAlbumTrack(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
+		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
+		trackNumberText = itemView.findViewById(R.id.track_number);
+		titleText = itemView.findViewById(R.id.title);
 	}
 
 	@Override
@@ -33,7 +34,7 @@ class BrowseItemHolderAlbumTrack extends BrowseItemHolder {
 		}
 
 		Integer trackNumber = item.getTrackNumber();
-		if (trackNumber != null) {
+		if (trackNumber >= 0) {
 			trackNumberText.setText(String.format((Locale) null, "%1$02d.", trackNumber));
 		} else {
 			trackNumberText.setText("");

@@ -1,52 +1,61 @@
 package agersant.polaris.features.queue;
 
 import android.os.AsyncTask;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import junit.framework.Assert;
+import java.lang.ref.WeakReference;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.PolarisService;
+import agersant.polaris.PlaybackQueue;
+import agersant.polaris.PolarisPlayer;
 import agersant.polaris.R;
+import agersant.polaris.api.local.OfflineCache;
+import agersant.polaris.api.remote.DownloadQueue;
 
 
 class QueueAdapter
 		extends RecyclerView.Adapter<QueueAdapter.QueueItemHolder> {
 
-	private final PolarisService service;
+	private final PlaybackQueue playbackQueue;
+	private final PolarisPlayer player;
+	private final OfflineCache offlineCache;
+	private final DownloadQueue downloadQueue;
 
-	QueueAdapter(PolarisService service) {
+	QueueAdapter(PlaybackQueue playbackQueue, PolarisPlayer player, OfflineCache offlineCache, DownloadQueue downloadQueue) {
 		super();
-		this.service = service;
+		this.playbackQueue = playbackQueue;
+		this.player = player;
+		this.offlineCache = offlineCache;
+		this.downloadQueue = downloadQueue;
 	}
 
 	@Override
 	public QueueAdapter.QueueItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		QueueItemView queueItemView = new QueueItemView(parent.getContext());
-		return new QueueAdapter.QueueItemHolder(queueItemView, service);
+		return new QueueAdapter.QueueItemHolder(queueItemView, player, offlineCache, downloadQueue);
 	}
 
 	@Override
 	public void onBindViewHolder(QueueAdapter.QueueItemHolder holder, int position) {
-		holder.bindItem(service.getItem(position));
+		holder.bindItem(playbackQueue.getItem(position));
 	}
 
 	@Override
 	public int getItemCount() {
-		return service.size();
+		return playbackQueue.size();
 	}
 
 	void onItemMove(int fromPosition, int toPosition) {
-		service.swap(fromPosition, toPosition);
+		playbackQueue.swap(fromPosition, toPosition);
 		notifyItemMoved(fromPosition, toPosition);
 	}
 
 	void onItemDismiss(int position) {
-		service.remove(position);
+		playbackQueue.remove(position);
 		notifyItemRemoved(position);
 	}
 
@@ -57,48 +66,66 @@ class QueueAdapter
 		private final TextView artistText;
 		private final ImageView cacheIcon;
 		private final ImageView downloadIcon;
-		private final PolarisService service;
+		private final PolarisPlayer player;
+		private final OfflineCache offlineCache;
+		private final DownloadQueue downloadQueue;
 		private CollectionItem item;
 		private QueueItemState state;
 		private AsyncTask<Void, Void, QueueItemState> updateIconTask;
 
-		QueueItemHolder(QueueItemView queueItemView, PolarisService service) {
+		QueueItemHolder(QueueItemView queueItemView, PolarisPlayer player, OfflineCache offlineCache, DownloadQueue downloadQueue) {
 			super(queueItemView);
 			this.queueItemView = queueItemView;
-			this.service = service;
-			titleText = (TextView) queueItemView.findViewById(R.id.title);
-			artistText = (TextView) queueItemView.findViewById(R.id.artist);
-			cacheIcon = (ImageView) queueItemView.findViewById(R.id.cache_icon);
-			downloadIcon = (ImageView) queueItemView.findViewById(R.id.download_icon);
+			this.player = player;
+			this.offlineCache = offlineCache;
+			this.downloadQueue = downloadQueue;
+			titleText = queueItemView.findViewById(R.id.title);
+			artistText = queueItemView.findViewById(R.id.artist);
+			cacheIcon = queueItemView.findViewById(R.id.cache_icon);
+			downloadIcon = queueItemView.findViewById(R.id.download_icon);
 			queueItemView.setOnClickListener(this);
 		}
 
+		private static class IconUpdateTask extends AsyncTask<Void, Void, QueueItemState> {
+
+			private final CollectionItem item;
+			private final WeakReference<QueueItemHolder> itemHolderWeakReference;
+			private final OfflineCache offlineCache;
+			private final DownloadQueue downloadQueue;
+
+			IconUpdateTask(QueueItemHolder itemHolder, CollectionItem item, OfflineCache offlineCache, DownloadQueue downloadQueue) {
+				this.itemHolderWeakReference = new WeakReference<>(itemHolder);
+				this.item = item;
+				this.offlineCache = offlineCache;
+				this.downloadQueue = downloadQueue;
+			}
+
+			@Override
+			protected QueueItemState doInBackground(Void... objects) {
+				if (offlineCache.hasAudio(item.getPath())) {
+					return QueueItemState.DOWNLOADED;
+				} else if (downloadQueue.isDownloading(item) || downloadQueue.isStreaming(item)) {
+					return QueueItemState.DOWNLOADING;
+				} else {
+					return QueueItemState.IDLE;
+				}
+			}
+
+			@Override
+			protected void onPostExecute(QueueItemState state) {
+				QueueItemHolder itemHolder = itemHolderWeakReference.get();
+				if (itemHolder == null) {
+					return;
+				}
+				if (itemHolder.item != item) {
+					return;
+				}
+				itemHolder.setState(state);
+			}
+		}
+
 		private void beginIconUpdate() {
-			Assert.assertNull(updateIconTask);
-			final QueueItemHolder that = this;
-			final CollectionItem item = this.item;
-
-			updateIconTask = new AsyncTask<Void, Void, QueueItemState>() {
-				@Override
-				protected QueueItemState doInBackground(Void... objects) {
-					if (service.isDownloading(item) || service.isStreaming(item)) {
-						return QueueItemState.DOWNLOADING;
-					} else if (service.hasLocalAudio(item)) {
-						return QueueItemState.DOWNLOADED;
-					} else {
-						return QueueItemState.IDLE;
-					}
-				}
-
-				@Override
-				protected void onPostExecute(QueueItemState state) {
-					if (that.item != item) {
-						return;
-					}
-					setState( state );
-				}
-			};
-
+			updateIconTask = new IconUpdateTask(this, item, offlineCache, downloadQueue);
 			updateIconTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}
 
@@ -113,7 +140,7 @@ class QueueAdapter
 				setState( QueueItemState.IDLE );
 			}
 
-			boolean isPlaying = service.getCurrentItem() == item;
+			boolean isPlaying = player.getCurrentItem() == item;
 			queueItemView.setIsPlaying(isPlaying);
 
 			if (updateIconTask != null) {
@@ -144,7 +171,7 @@ class QueueAdapter
 
 		@Override
 		public void onClick(View view) {
-			service.play(item);
+			player.play(item);
 		}
 	}
 

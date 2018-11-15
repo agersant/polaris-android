@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,11 +48,11 @@ class Auth implements Authenticator {
 	}
 
 	@Override
-	public Request authenticate(Route route, Response response) throws IOException {
+	public Request authenticate(Route route, Response response) {
 		Request.Builder newRequest = response.request().newBuilder();
 
 		String oldCookie = response.request().header("Cookie");
-		boolean newCookie = cookie != null && (oldCookie == null || !cookie.equals(oldCookie));
+		boolean newCookie = cookie != null && !cookie.equals(oldCookie);
 		if (newCookie) {
 			newRequest.header("Cookie", cookie);
 			return newRequest.build();
@@ -61,7 +60,7 @@ class Auth implements Authenticator {
 
 		String authorization = getAuthorizationHeader();
 		String oldAuthorization = response.request().header("Authorization");
-		boolean newAuthorization = oldAuthorization == null || !authorization.equals(oldAuthorization);
+		boolean newAuthorization = !authorization.equals(oldAuthorization);
 		if (newAuthorization) {
 			newRequest.header("Authorization", authorization);
 			return newRequest.build();
