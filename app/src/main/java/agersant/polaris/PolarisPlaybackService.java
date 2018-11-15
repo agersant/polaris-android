@@ -35,7 +35,7 @@ import agersant.polaris.features.player.PlayerActivity;
 
 public class PolarisPlaybackService extends Service {
 
-	private static final int MEDIA_NOTIFICATION = 1;
+	private static final int MEDIA_NOTIFICATION = 100;
 	private static final String MEDIA_INTENT_PAUSE = "MEDIA_INTENT_PAUSE";
 	private static final String MEDIA_INTENT_PLAY = "MEDIA_INTENT_PLAY";
 	private static final String MEDIA_INTENT_SKIP_NEXT = "MEDIA_INTENT_SKIP_NEXT";
@@ -49,6 +49,7 @@ public class PolarisPlaybackService extends Service {
 	private BroadcastReceiver receiver;
 	private Notification notification;
 	private CollectionItem notificationItem;
+	private NotificationManager notificationManager;
 	private Handler autoSaveHandler;
 	private Runnable autoSaveRunnable;
 
@@ -64,6 +65,18 @@ public class PolarisPlaybackService extends Service {
 		api = state.api;
 		player = state.player;
 		playbackQueue = state.playbackQueue;
+
+		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		if (Build.VERSION.SDK_INT > 25 ) {
+			NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris Playback Controls", NotificationManager.IMPORTANCE_LOW);
+			notificationChannel.setDescription("Notifications for current song playing in Polaris.");
+			notificationChannel.enableLights(false);
+			notificationChannel.enableVibration(false);
+			notificationChannel.setShowBadge(false);
+			notificationManager.createNotificationChannel(notificationChannel);
+			notificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL_ID);
+			notificationManager.createNotificationChannel(notificationChannel);
+		}
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
@@ -234,15 +247,6 @@ public class PolarisPlaybackService extends Service {
 	private void emitNotification(Notification.Builder notificationBuilder, CollectionItem item) {
 		notificationItem = item;
 		notification = notificationBuilder.build();
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		if (Build.VERSION.SDK_INT > 25 ) {
-			NotificationChannel mChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris", NotificationManager.IMPORTANCE_DEFAULT);
-			mChannel.setDescription("Notifications for current song playing in Polaris.");
-			mChannel.enableLights(false);
-			mChannel.enableVibration(false);
-			mChannel.setShowBadge(false);
-			notificationManager.createNotificationChannel(mChannel);
-		}
 		notificationManager.notify(MEDIA_NOTIFICATION, notification);
 	}
 
