@@ -204,7 +204,7 @@ public class ServerAPI
 	}
 
 	public void setLastFMNowPlaying(String path) {
-		String requestURL = this.getURL() + "/lastfm/now_playing/" + path;
+		String requestURL = this.getURL() + "/lastfm/now_playing/" + Uri.encode(path);
 		Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
 			@Override
 			public MediaType contentType() {
@@ -228,7 +228,7 @@ public class ServerAPI
 
 	public void scrobbleOnLastFM(String path) {
 
-		String requestURL = this.getURL() + "/lastfm/scrobble/" + path;
+		String requestURL = this.getURL() + "/lastfm/scrobble/" + Uri.encode(path);
 
 		Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
 			@Override
