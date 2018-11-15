@@ -22,9 +22,12 @@ import agersant.polaris.api.ItemsCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.BufferedSink;
 
 public class ServerAPI
 		implements IPolarisAPI {
@@ -198,6 +201,54 @@ public class ServerAPI
 			}
 		};
 		requestQueue.requestAsync(request, callback);
+	}
+
+	public void setLastFMNowPlaying(String path) {
+		String requestURL = this.getURL() + "/lastfm/now_playing/" + path;
+		Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
+			@Override
+			public MediaType contentType() {
+				return null;
+			}
+			@Override
+			public void writeTo(BufferedSink sink) {
+
+			}
+		}).build();
+
+		requestQueue.requestAsync(request, new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+			}
+			@Override
+			public void onResponse(Call call, Response response) {
+			}
+		});
+	}
+
+	public void scrobbleOnLastFM(String path) {
+
+		String requestURL = this.getURL() + "/lastfm/scrobble/" + path;
+
+		Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
+			@Override
+			public MediaType contentType() {
+				return null;
+			}
+			@Override
+			public void writeTo(BufferedSink sink) {
+
+			}
+		}).build();
+
+		requestQueue.requestAsync(request, new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+			}
+			@Override
+			public void onResponse(Call call, Response response) {
+			}
+		});
 	}
 }
 

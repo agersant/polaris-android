@@ -43,6 +43,12 @@
             android:description="@string/download_service_description"
             android:exported="false" />
 
+        <service
+            android:name=".PolarisScrobbleService"
+            android:enabled="true"
+            android:description="@string/scrobble_service_description"
+            android:exported="false" />
+
     </application>
 
 </manifest>

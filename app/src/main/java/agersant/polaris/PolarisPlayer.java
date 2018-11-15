@@ -27,6 +27,7 @@ public class PolarisPlayer implements Player.EventListener {
 	public static final String RESUMED_TRACK = "RESUMED_TRACK";
 	public static final String COMPLETED_TRACK = "COMPLETED_TRACK";
 	public static final String OPENING_TRACK = "OPENING_TRACK";
+	public static final String SEEKING_WITHIN_TRACK = "SEEKING_WITHIN_TRACK";
 	public static final String BUFFERING = "BUFFERING";
 	public static final String NOT_BUFFERING = "NOT_BUFFERING";
 
@@ -68,6 +69,7 @@ public class PolarisPlayer implements Player.EventListener {
 		Context context = PolarisApplication.getInstance();
 		context.startService(new Intent(context, PolarisPlaybackService.class));
 		context.startService(new Intent(context, PolarisDownloadService.class));
+		context.startService(new Intent(context, PolarisScrobbleService.class));
 	}
 
 	private void broadcast(String event) {
@@ -82,19 +84,20 @@ public class PolarisPlayer implements Player.EventListener {
 			fetchAudioTask.cancel(true);
 		}
 		mediaPlayer.stop();
-		seekToRelative(0);
-		resumeProgress = -1.f;
+		seekToStart();
 		mediaSource = null;
 		item = null;
 	}
 
 	public void play(CollectionItem item) {
 
+		startServices();
+
 		resumeProgress = -1.f;
 
 		if (this.item != null && item.getPath().equals(this.item.getPath())) {
 			System.out.println("Restarting playback for: " + item.getPath());
-			seekToRelative(0);
+			seekToStart();
 			resume();
 			return;
 		}
@@ -121,7 +124,6 @@ public class PolarisPlayer implements Player.EventListener {
 		mediaPlayer.setPlayWhenReady(true);
 		this.item = item;
 		broadcast(OPENING_TRACK);
-		startServices();
 	}
 
 	public CollectionItem getCurrentItem() {
@@ -133,9 +135,9 @@ public class PolarisPlayer implements Player.EventListener {
 	}
 
 	public void resume() {
+		startServices();
 		mediaPlayer.setPlayWhenReady(true);
 		broadcast(PolarisPlayer.RESUMED_TRACK);
-		startServices();
 	}
 
 	public void pause() {
@@ -178,7 +180,13 @@ public class PolarisPlayer implements Player.EventListener {
 		return mediaPlayer.getPlaybackState() == Player.STATE_BUFFERING;
 	}
 
+	private void seekToStart() {
+		resumeProgress = -1.f;
+		mediaPlayer.seekTo(0);
+	}
+
 	public void seekToRelative(float progress) {
+		broadcast(SEEKING_WITHIN_TRACK);
 		resumeProgress = -1;
 
 		if (progress == 0.f) {
@@ -200,15 +208,25 @@ public class PolarisPlayer implements Player.EventListener {
 		if (resumeProgress >= 0) {
 			return resumeProgress;
 		}
+		float position = getCurrentPosition();
+		float duration = getDuration();
+		return position / duration;
+	}
+
+	public float getCurrentPosition() {
 		long position = mediaPlayer.getCurrentPosition();
 		if (position == C.TIME_UNSET) {
 			return 0.f;
 		}
+		return (float) position;
+	}
+
+	public float getDuration() {
 		long duration = mediaPlayer.getDuration();
 		if (duration == C.TIME_UNSET) {
 			return 0.f;
 		}
-		return (float) position / duration;
+		return (float) duration;
 	}
 
 	@Override
@@ -237,7 +255,7 @@ public class PolarisPlayer implements Player.EventListener {
 				broadcast(COMPLETED_TRACK);
 				if (!skipNext()) {
 					pause();
-					seekToRelative(0);
+					seekToStart();
 				}
 				break;
 		}
