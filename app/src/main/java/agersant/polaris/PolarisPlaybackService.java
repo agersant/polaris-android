@@ -68,7 +68,7 @@ public class PolarisPlaybackService extends Service {
 
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		if (Build.VERSION.SDK_INT > 25 ) {
-			NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Polaris Playback Controls", NotificationManager.IMPORTANCE_LOW);
+			NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, getResources().getString(R.string.media_notifications_channel_description), NotificationManager.IMPORTANCE_LOW);
 			notificationChannel.setDescription("Notifications for current song playing in Polaris.");
 			notificationChannel.enableLights(false);
 			notificationChannel.enableVibration(false);
