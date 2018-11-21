@@ -302,7 +302,7 @@ public class PolarisPlaybackService extends Service {
 		}
 		state.queueOrdering = playbackQueue.getOrdering();
 		CollectionItem currentItem = player.getCurrentItem();
-		state.queueIndex = state.queueContent.indexOf(currentItem);
+		state.queueIndex = playbackQueue.getContent().indexOf(currentItem);
 		state.trackProgress = player.getPositionRelative();
 
 		// Persist
