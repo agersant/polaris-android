@@ -40,13 +40,6 @@ public class PlayerActivity extends PolarisActivity {
 		super(R.string.now_playing, R.id.nav_now_playing);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		updateContent();
-		updateControls();
-	}
-
 	private void subscribeToEvents() {
 		final PlayerActivity that = this;
 		IntentFilter filter = new IntentFilter();
@@ -142,6 +135,10 @@ public class PlayerActivity extends PolarisActivity {
 			}
 		});
 
+		refresh();
+	}
+
+	private void refresh() {
 		updateContent();
 		updateControls();
 		updateBuffering();
@@ -159,6 +156,12 @@ public class PlayerActivity extends PolarisActivity {
 		unregisterReceiver(receiver);
 		receiver = null;
 		super.onStop();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
 	}
 
 	@SuppressWarnings("UnusedParameters")
