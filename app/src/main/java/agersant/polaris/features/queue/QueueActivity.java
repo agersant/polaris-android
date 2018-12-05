@@ -107,6 +107,7 @@ public class QueueActivity extends PolarisActivity {
 		tutorial = findViewById(R.id.queue_tutorial);
 
 		populate();
+		updateTutorial();
 	}
 
 	private void updateTutorial() {
