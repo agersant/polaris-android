@@ -211,7 +211,7 @@ public class PlayerActivity extends PolarisActivity {
 		} else if (player.isBuffering()) {
 			buffering.setText(R.string.player_buffering);
 		}
-		if (player.isOpeningSong() || player.isBuffering()) {
+		if (player.isPlaying() && (player.isOpeningSong() || player.isBuffering())) {
 			buffering.setVisibility(View.VISIBLE);
 		} else {
 			buffering.setVisibility(View.INVISIBLE);
