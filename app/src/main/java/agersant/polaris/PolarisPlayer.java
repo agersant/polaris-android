@@ -105,6 +105,10 @@ public class PolarisPlayer implements Player.EventListener {
 		System.out.println("Beginning playback for: " + item.getPath());
 		stop();
 
+		mediaPlayer.setPlayWhenReady(true);
+		this.item = item;
+		broadcast(OPENING_TRACK);
+
 		fetchAudioTask = api.loadAudio(item, (MediaSource fetchedMediaSource) -> {
 			fetchAudioTask = null;
 			if (fetchedMediaSource != null) {
@@ -117,13 +121,9 @@ public class PolarisPlayer implements Player.EventListener {
 					broadcast(PLAYBACK_ERROR);
 				}
 			} else {
-				System.out.println("Could not find audio for");
+				System.out.println("Could not find audio" );
 			}
 		});
-
-		mediaPlayer.setPlayWhenReady(true);
-		this.item = item;
-		broadcast(OPENING_TRACK);
 	}
 
 	public CollectionItem getCurrentItem() {
