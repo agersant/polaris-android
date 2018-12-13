@@ -5,8 +5,8 @@ android {
     defaultConfig {
         applicationId "agersant.polaris"
         minSdkVersion 25
-        targetSdkVersion 29
-        versionCode 34
+        targetSdkVersion 28
+        versionCode 35
         versionName "0.7.4"
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
