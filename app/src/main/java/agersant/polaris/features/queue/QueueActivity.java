@@ -123,6 +123,7 @@ public class QueueActivity extends PolarisActivity {
 	public void onStart() {
 		super.onStart();
 		subscribeToEvents();
+		updateTutorial();
 	}
 
 	@Override
