@@ -100,7 +100,7 @@ public class PolarisScrobbleService extends Service {
 		return START_NOT_STICKY;
 	}
 
-	void nowPlaying() {
+	private void nowPlaying() {
 		if (api.isOffline()) {
 			return;
 		}
@@ -111,7 +111,7 @@ public class PolarisScrobbleService extends Service {
 		serverAPI.setLastFMNowPlaying(currentItem.getPath());
 	}
 
-	public void tick() {
+	private void tick() {
 		if (api.isOffline()) {
 			return;
 		}
