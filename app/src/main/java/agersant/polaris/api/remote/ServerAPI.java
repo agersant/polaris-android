@@ -66,7 +66,7 @@ public class ServerAPI
 	private String getURL() {
 		String address = this.preferences.getString(serverAddressKey, "");
 		address = address.trim();
-		if (!address.startsWith("http://")) {
+		if (!(address.startsWith("http://") || address.startsWith("https://"))) {
 			address = "http://" + address;
 		}
 		address = address.replaceAll("/$", "");
