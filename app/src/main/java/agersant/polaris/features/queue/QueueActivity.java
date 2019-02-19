@@ -54,6 +54,9 @@ public class QueueActivity extends PolarisActivity {
 		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
+				if (intent == null || intent.getAction() == null) {
+					return;
+				}
 				switch (intent.getAction()) {
 					case PlaybackQueue.REMOVED_ITEM:
 					case PlaybackQueue.REMOVED_ITEMS:
@@ -61,15 +64,15 @@ public class QueueActivity extends PolarisActivity {
 						break;
 					case PlaybackQueue.QUEUED_ITEMS:
 					case PlaybackQueue.OVERWROTE_QUEUE:
-						updateTutorial();
 						adapter.notifyDataSetChanged();
+						updateTutorial();
 						break;
 					case PolarisPlayer.OPENING_TRACK:
 					case PolarisPlayer.PLAYING_TRACK:
 					case OfflineCache.AUDIO_CACHED:
 					case OfflineCache.AUDIO_REMOVED_FROM_CACHE:
 					case DownloadQueue.WORKLOAD_CHANGED:
-						adapter.notifyItemRangeChanged( 0, adapter.getItemCount() );
+						adapter.notifyItemRangeChanged(0, adapter.getItemCount());
 						break;
 				}
 			}
