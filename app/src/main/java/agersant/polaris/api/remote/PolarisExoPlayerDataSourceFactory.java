@@ -4,6 +4,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
 
 import java.io.File;
@@ -63,20 +64,12 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 		private BitSet bytesStreamed;
 		private RandomAccessFile file;
 
-		PolarisExoPlayerHttpDataSource(OfflineCache offlineCache, ServerAPI serverAPI, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
-			super("Polaris Android", null);
+		PolarisExoPlayerHttpDataSource(OfflineCache offlineCache, RequestProperties requestProperties, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
+			super("Polaris Android", null, DEFAULT_CONNECT_TIMEOUT_MILLIS, DEFAULT_READ_TIMEOUT_MILLIS, true, requestProperties);
 			addTransferListener(listener);
 			this.scratchLocation = scratchLocation;
 			this.offlineCache = offlineCache;
 			this.item = item;
-
-			String authCookie = serverAPI.getCookieHeader();
-			if (authCookie != null) {
-				setRequestProperty("Cookie", authCookie);
-			} else {
-				String authRaw = serverAPI.getAuthorizationHeader();
-				setRequestProperty("Authorization", authRaw);
-			}
 		}
 
 		@Override
@@ -171,7 +164,17 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 		@Override
 		public PolarisExoPlayerHttpDataSource createDataSource() {
-			return new PolarisExoPlayerHttpDataSource(offlineCache, serverAPI, new PolarisExoPlayerTransferListener(), scratchLocation, item);
+
+			HttpDataSource.RequestProperties requestProperties = new HttpDataSource.RequestProperties();
+			String authCookie = serverAPI.getCookieHeader();
+			if (authCookie != null) {
+				requestProperties.set("Cookie", authCookie);
+			} else {
+				String authRaw = serverAPI.getAuthorizationHeader();
+				requestProperties.set("Authorization", authRaw);
+			}
+
+			return new PolarisExoPlayerHttpDataSource(offlineCache, requestProperties, new PolarisExoPlayerTransferListener(), scratchLocation, item);
 		}
 	}
 }
