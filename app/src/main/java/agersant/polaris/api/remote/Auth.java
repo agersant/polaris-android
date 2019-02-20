@@ -5,67 +5,74 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import agersant.polaris.R;
-import okhttp3.Authenticator;
+import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 
-class Auth implements Authenticator {
+class Auth implements Interceptor {
 
 	private static final Pattern setCookiePattern = Pattern.compile("^(.*);");
+	private final AtomicReference<String> syncCookie;
 	private final SharedPreferences preferences;
 	private final String usernameKey;
 	private final String passwordKey;
-	private String cookie;
 
 	Auth(Context context) {
+		syncCookie = new AtomicReference<>(null);
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		usernameKey = context.getString(R.string.pref_key_username);
 		passwordKey = context.getString(R.string.pref_key_password);
-		cookie = null;
 	}
 
-	public String getCookieHeader() {
-		return cookie;
+	String getCookieHeader() {
+		return syncCookie.get();
 	}
 
-	public String getAuthorizationHeader() {
+	String getAuthorizationHeader() {
 		String username = preferences.getString(usernameKey, "");
 		String password = preferences.getString(passwordKey, "");
 		String credentials = username + ":" + password;
 		return "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
 	}
 
-	void parseCookie(String header) {
+	private void parseCookie(String header) {
 		Matcher matcher = setCookiePattern.matcher(header);
 		if (matcher.find()) {
-			this.cookie = matcher.group(1);
+			syncCookie.set(matcher.group(1));
 		}
 	}
 
-	@Override
-	public Request authenticate(Route route, Response response) {
-		Request.Builder newRequest = response.request().newBuilder();
+	@Override public Response intercept(Interceptor.Chain chain) throws IOException {
 
-		String oldCookie = response.request().header("Cookie");
-		boolean newCookie = cookie != null && !cookie.equals(oldCookie);
-		if (newCookie) {
-			newRequest.header("Cookie", cookie);
-			return newRequest.build();
+		Request request = chain.request();
+
+		String cookie = syncCookie.get();
+		if (cookie != null) {
+			request = request.newBuilder().header("Cookie", cookie).build();
+		} else {
+			request = request.newBuilder().header("Authorization", getAuthorizationHeader()).build();
 		}
 
-		String authorization = getAuthorizationHeader();
-		String oldAuthorization = response.request().header("Authorization");
-		boolean newAuthorization = !authorization.equals(oldAuthorization);
-		if (newAuthorization) {
-			newRequest.header("Authorization", authorization);
-			return newRequest.build();
+		Response response = chain.proceed(request);
+
+		// Clear rejected cookie and retry
+		if (response.code() == 401 && cookie != null) {
+			syncCookie.compareAndSet(cookie, null);
+			return chain.proceed(response.request());
 		}
 
-		return null;
+		// Store new cookie
+		String setCookie = response.header("Set-Cookie", null);
+		if (setCookie != null) {
+			parseCookie(setCookie);
+		}
+
+		return response;
 	}
 }
