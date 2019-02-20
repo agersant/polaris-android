@@ -55,11 +55,11 @@ public class ServerAPI
 		this.downloadQueue = downloadQueue;
 	}
 
-	public String getCookieHeader() {
+	String getCookieHeader() {
 		return auth.getCookieHeader();
 	}
 
-	public String getAuthorizationHeader() {
+	String getAuthorizationHeader() {
 		return auth.getAuthorizationHeader();
 	}
 

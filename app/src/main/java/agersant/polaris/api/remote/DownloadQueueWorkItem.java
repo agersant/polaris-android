@@ -91,9 +91,11 @@ class DownloadQueueWorkItem {
 	}
 
 	void stopBackgroundDownload() {
-		job.cancel(false);
-		job = null;
-		broadcast(DownloadQueue.WORKLOAD_CHANGED);
+		if (job != null) {
+			job.cancel(false);
+			job = null;
+			broadcast(DownloadQueue.WORKLOAD_CHANGED);
+		}
 	}
 
 	private void reset() {
