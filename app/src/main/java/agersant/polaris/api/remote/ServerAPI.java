@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -118,7 +119,7 @@ public class ServerAPI
 				ArrayList<CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException e) {
+				} catch (IOException | JsonSyntaxException e) {
 					handlers.onError();
 					return;
 				}
@@ -153,7 +154,7 @@ public class ServerAPI
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException e) {
+				} catch (IOException | JsonSyntaxException e) {
 					handlers.onError();
 					return;
 				}
@@ -193,7 +194,7 @@ public class ServerAPI
 				ArrayList<? extends CollectionItem> items;
 				try {
 					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException e) {
+				} catch (IOException | JsonSyntaxException e) {
 					handlers.onError();
 					return;
 				}
