@@ -24,10 +24,10 @@ class Auth implements Interceptor {
 	private final String passwordKey;
 
 	Auth(Context context) {
-		syncCookie = new AtomicReference<>(null);
-		preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		usernameKey = context.getString(R.string.pref_key_username);
-		passwordKey = context.getString(R.string.pref_key_password);
+		this.syncCookie = new AtomicReference<>(null);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		this.usernameKey = context.getString(R.string.pref_key_username);
+		this.passwordKey = context.getString(R.string.pref_key_password);
 	}
 
 	String getCookieHeader() {
@@ -48,23 +48,30 @@ class Auth implements Interceptor {
 		}
 	}
 
+	private Request addAuthHeader(Request request) {
+		String cookie = syncCookie.get();
+		Request.Builder builder = request.newBuilder();
+		builder.removeHeader("Cookie");
+		builder.removeHeader("Authorization");
+		if (cookie != null) {
+			builder.header("Cookie", cookie);
+		} else {
+			builder.header("Authorization", getAuthorizationHeader());
+		}
+		return builder.build();
+	}
+
 	@Override public Response intercept(Interceptor.Chain chain) throws IOException {
 
-		Request request = chain.request();
-
-		String cookie = syncCookie.get();
-		if (cookie != null) {
-			request = request.newBuilder().header("Cookie", cookie).build();
-		} else {
-			request = request.newBuilder().header("Authorization", getAuthorizationHeader()).build();
-		}
-
-		Response response = chain.proceed(request);
+		Request authRequest = addAuthHeader(chain.request());
+		Response response = chain.proceed(authRequest);
 
 		// Clear rejected cookie and retry
-		if (response.code() == 401 && cookie != null) {
+		String cookie = authRequest.header("Cookie");
+		boolean hadCookie = cookie != null && !cookie.isEmpty();
+		if (response.code() == 401 && hadCookie) {
 			syncCookie.compareAndSet(cookie, null);
-			return chain.proceed(response.request());
+			return chain.proceed(addAuthHeader(chain.request()));
 		}
 
 		// Store new cookie

@@ -1,6 +1,5 @@
 package agersant.polaris.api.remote;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,58 +13,41 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.R;
-import agersant.polaris.api.IPolarisAPI;
 import agersant.polaris.api.ItemsCallback;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okio.BufferedSink;
 
-public class ServerAPI
-		implements IPolarisAPI {
+public class ServerAPI implements IRemoteAPI {
 
-	private final RequestQueue requestQueue;
-	private final Gson gson;
-	private final SharedPreferences preferences;
-	private final String serverAddressKey;
-	private final Auth auth;
+	static private String serverAddressKey;
+	static private SharedPreferences preferences;
+	private final OkHttpClient client;
 	private DownloadQueue downloadQueue;
+	private IRemoteAPI currentVersion;
+	private final Auth auth;
 
 	public ServerAPI(Context context) {
-		this.serverAddressKey = context.getString(R.string.pref_key_server_url);
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		final ServerAPI that = this;
+		serverAddressKey = context.getString(R.string.pref_key_server_url);
+		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		preferences.registerOnSharedPreferenceChangeListener((SharedPreferences sharedPreferences, String key) -> that.currentVersion = null);
+		client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build();
 		this.auth = new Auth(context);
-		this.requestQueue = new RequestQueue(auth);
-		this.gson = new GsonBuilder()
-				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
-				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
-				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
-				.create();
 	}
 
 	public void initialize(DownloadQueue downloadQueue) {
 		this.downloadQueue = downloadQueue;
 	}
 
-	String getCookieHeader() {
-		return auth.getCookieHeader();
-	}
-
-	String getAuthorizationHeader() {
-		return auth.getAuthorizationHeader();
-	}
-
-	private String getURL() {
-		String address = this.preferences.getString(serverAddressKey, "");
+	static String getAPIRootURL() {
+		String address = preferences.getString(serverAddressKey, "");
 		address = address.trim();
 		if (!(address.startsWith("http://") || address.startsWith("https://"))) {
 			address = "http://" + address;
@@ -74,182 +56,196 @@ public class ServerAPI
 		return address + "/api";
 	}
 
-	private String getMediaURL(String path) {
-		String serverAddress = this.getURL();
-		return serverAddress + "/serve/" + Uri.encode(path);
-	}
-
-	public MediaSource getAudio(CollectionItem item) {
-		return downloadQueue.getAudio(item);
-	}
-
-	Uri serveUri(String path) {
-		String url = getMediaURL(path);
-		return Uri.parse(url);
-	}
-
-	public ResponseBody serve(String path) throws IOException {
-		Request request = new Request.Builder().url(serveUri(path).toString()).build();
-		return requestQueue.requestSync(request);
-	}
-
-	public void browse(String path, final ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/browse/" + Uri.encode(path);
-		HttpUrl parsedURL = HttpUrl.parse(requestURL);
-		if (parsedURL == null) {
-			handlers.onError();
+	private void handleAPIVersionResponse(Response response) {
+		if (!response.isSuccessful()) {
 			return;
 		}
 
-		Request request = new Request.Builder().url(parsedURL).build();
-		Callback callback = new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-				handlers.onError();
-			}
-
-			@Override
-			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
-				}
-
-				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {}.getType();
-				ArrayList<CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException | JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
-			}
-		};
-		requestQueue.requestAsync(request, callback);
-	}
-
-	private void getAlbums(String url, final ItemsCallback handlers) {
-		HttpUrl parsedURL = HttpUrl.parse(url);
-		if (parsedURL == null) {
-			handlers.onError();
+		if (response.body() == null) {
 			return;
 		}
 
-		Request request = new Request.Builder().url(parsedURL).build();
-		Callback callback = new Callback() {
+		Type versionType = new TypeToken<APIVersion>() {}.getType();
+		APIVersion version;
+		try {
+			Gson gson = new GsonBuilder().create();
+			version = gson.fromJson(response.body().charStream(), versionType);
+		} catch (JsonSyntaxException e) {
+			System.out.println("Error parsing API version " + e);
+			return;
+		}
+
+		currentVersion = selectImplementation(version);
+	}
+
+	private Request getVersionRequest() {
+		return new Request.Builder().url(getAPIRootURL() + "/version").build();
+	}
+
+	private void fetchAPIVersion() {
+		if (currentVersion != null) {
+			return;
+		}
+		try {
+			Response response = client.newCall(getVersionRequest()).execute();
+			handleAPIVersionResponse(response);
+		} catch (IOException e) {
+			System.out.println("Error fetching API version " + e);
+		}
+	}
+
+	private void fetchAPIVersionAsync(VersionCallback callback) {
+		if (currentVersion != null) {
+			callback.onSuccess();
+			return;
+		}
+
+		final ServerAPI that = this;
+
+		client.newCall(getVersionRequest()).enqueue(new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {
-				handlers.onError();
+				System.out.println("Error fetching API version " + e);
+				callback.onError();
 			}
-
 			@Override
 			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
+				that.handleAPIVersionResponse(response);
+				if (currentVersion != null) {
+					callback.onError();
+				} else {
+					callback.onSuccess();
 				}
-
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {}.getType();
-				ArrayList<? extends CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException | JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
 			}
-		};
-		requestQueue.requestAsync(request, callback);
+		});
+	}
+
+	Auth getAuth() {
+		return auth;
+	}
+
+	private IRemoteAPI selectImplementation(APIVersion version) {
+		RequestQueue requestQueue = new RequestQueue(auth);
+		if (version.major < 3) {
+			return new APIVersion2(downloadQueue, requestQueue);
+		}
+		return new APIVersion3(downloadQueue, requestQueue);
 	}
 
 	public void getRandomAlbums(ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/random/";
-		getAlbums(requestURL, handlers);
+		fetchAPIVersionAsync(new VersionCallback() {
+			@Override
+			public void onSuccess() {
+				currentVersion.getRandomAlbums(handlers);
+			}
+
+			@Override
+			public void onError() {
+				handlers.onError();
+			}
+		});
 	}
 
 	public void getRecentAlbums(ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/recent/";
-		getAlbums(requestURL, handlers);
-	}
-
-	public void flatten(String path, final ItemsCallback handlers) {
-		String requestURL = this.getURL() + "/flatten/" + Uri.encode(path);
-		Request request = new Request.Builder().url(requestURL).build();
-		Callback callback = new Callback() {
+		fetchAPIVersionAsync(new VersionCallback() {
 			@Override
-			public void onFailure(Call call, IOException e) {
+			public void onSuccess() {
+				currentVersion.getRecentAlbums(handlers);
+			}
+
+			@Override
+			public void onError() {
 				handlers.onError();
 			}
-
-			@Override
-			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
-				}
-
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {}.getType();
-				ArrayList<? extends CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().string(), collectionType);
-				} catch (IOException | JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
-			}
-		};
-		requestQueue.requestAsync(request, callback);
+		});
 	}
 
 	public void setLastFMNowPlaying(String path) {
-		String requestURL = this.getURL() + "/lastfm/now_playing/" + Uri.encode(path);
-		Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
+		fetchAPIVersionAsync(new VersionCallback() {
 			@Override
-			public MediaType contentType() {
-				return null;
+			public void onSuccess() {
+				currentVersion.setLastFMNowPlaying(path);
 			}
-			@Override
-			public void writeTo(BufferedSink sink) {
 
-			}
-		}).build();
-
-		requestQueue.requestAsync(request, new Callback() {
 			@Override
-			public void onFailure(Call call, IOException e) {
-			}
-			@Override
-			public void onResponse(Call call, Response response) {
+			public void onError() {
 			}
 		});
 	}
 
 	public void scrobbleOnLastFM(String path) {
-
-		String requestURL = this.getURL() + "/lastfm/scrobble/" + Uri.encode(path);
-
-		Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
+		fetchAPIVersionAsync(new VersionCallback() {
 			@Override
-			public MediaType contentType() {
-				return null;
+			public void onSuccess() {
+				currentVersion.scrobbleOnLastFM(path);
 			}
-			@Override
-			public void writeTo(BufferedSink sink) {
 
-			}
-		}).build();
-
-		requestQueue.requestAsync(request, new Callback() {
 			@Override
-			public void onFailure(Call call, IOException e) {
-			}
-			@Override
-			public void onResponse(Call call, Response response) {
+			public void onError() {
 			}
 		});
 	}
-}
 
+	public MediaSource getAudio(CollectionItem item) throws IOException {
+		fetchAPIVersion();
+		if (currentVersion != null) {
+			return currentVersion.getAudio(item);
+		}
+		return null;
+	}
+
+	public ResponseBody serve(String path) throws IOException {
+		fetchAPIVersion();
+		if (currentVersion != null) {
+			return currentVersion.serve(path);
+		}
+		return null;
+	}
+
+	public Uri getContentUri(String path) {
+		fetchAPIVersion();
+		if (currentVersion != null) {
+			return currentVersion.getContentUri(path);
+		}
+		return null;
+	}
+
+	public void browse(String path, ItemsCallback handlers) {
+		fetchAPIVersionAsync(new VersionCallback() {
+			@Override
+			public void onSuccess() {
+				currentVersion.browse(path, handlers);
+			}
+
+			@Override
+			public void onError() {
+				handlers.onError();
+			}
+		});
+	}
+
+	public void flatten(String path, ItemsCallback handlers) {
+		fetchAPIVersionAsync(new VersionCallback() {
+			@Override
+			public void onSuccess() {
+				currentVersion.flatten(path, handlers);
+			}
+
+			@Override
+			public void onError() {
+				handlers.onError();
+			}
+		});
+	}
+
+	class APIVersion {
+		int major;
+		int minor;
+	}
+
+	interface VersionCallback {
+		void onSuccess();
+		void onError();
+	}
+
+}

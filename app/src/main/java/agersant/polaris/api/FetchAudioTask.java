@@ -42,7 +42,12 @@ public class FetchAudioTask extends AsyncTask<Void, Void, MediaSource> {
 				return null;
 			}
 		} else if (!api.isOffline()) {
-			return serverAPI.getAudio(item);
+			try {
+				return serverAPI.getAudio(item);
+			} catch (IOException e) {
+				System.out.println("IO error while querying server API for " + item.getPath());
+				return null;
+			}
 		}
 		return null;
 	}

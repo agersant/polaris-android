@@ -28,7 +28,6 @@ public class API {
 	private final String offlineModePreferenceKey;
 
 	public API(Context context) {
-
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		offlineModePreferenceKey = context.getString(R.string.pref_key_offline);
 	}
