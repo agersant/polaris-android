@@ -23,8 +23,8 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 
 	private final PolarisExoPlayerHttpDataSource dataSource;
 
-	PolarisExoPlayerDataSourceFactory(OfflineCache offlineCache, ServerAPI serverAPI, File scratchLocation, CollectionItem item) {
-		PolarisExoPlayerHttpDataSourceFactory dataSourceFactory = new PolarisExoPlayerHttpDataSourceFactory(offlineCache, serverAPI, scratchLocation, item);
+	PolarisExoPlayerDataSourceFactory(OfflineCache offlineCache, Auth auth, File scratchLocation, CollectionItem item) {
+		PolarisExoPlayerHttpDataSourceFactory dataSourceFactory = new PolarisExoPlayerHttpDataSourceFactory(offlineCache, auth, scratchLocation, item);
 		dataSource = dataSourceFactory.createDataSource();
 	}
 
@@ -151,13 +151,13 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 	private class PolarisExoPlayerHttpDataSourceFactory implements DataSource.Factory {
 
 		final OfflineCache offlineCache;
-		final ServerAPI serverAPI;
+		final Auth auth;
 		final CollectionItem item;
 		final File scratchLocation;
 
-		PolarisExoPlayerHttpDataSourceFactory(OfflineCache offlineCache, ServerAPI serverAPI, File scratchLocation, CollectionItem item) {
+		PolarisExoPlayerHttpDataSourceFactory(OfflineCache offlineCache, Auth auth, File scratchLocation, CollectionItem item) {
 			this.offlineCache = offlineCache;
-			this.serverAPI = serverAPI;
+			this.auth = auth;
 			this.scratchLocation = scratchLocation;
 			this.item = item;
 		}
@@ -166,11 +166,11 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
 		public PolarisExoPlayerHttpDataSource createDataSource() {
 
 			HttpDataSource.RequestProperties requestProperties = new HttpDataSource.RequestProperties();
-			String authCookie = serverAPI.getCookieHeader();
+			String authCookie = auth.getCookieHeader();
 			if (authCookie != null) {
 				requestProperties.set("Cookie", authCookie);
 			} else {
-				String authRaw = serverAPI.getAuthorizationHeader();
+				String authRaw = auth.getAuthorizationHeader();
 				requestProperties.set("Authorization", authRaw);
 			}
 
