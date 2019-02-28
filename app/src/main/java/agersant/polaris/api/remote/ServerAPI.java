@@ -111,7 +111,7 @@ public class ServerAPI implements IRemoteAPI {
 			@Override
 			public void onResponse(Call call, Response response) {
 				that.handleAPIVersionResponse(response);
-				if (currentVersion != null) {
+				if (currentVersion == null) {
 					callback.onError();
 				} else {
 					callback.onSuccess();
