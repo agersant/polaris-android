@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.github.orangegangsters:swipy:1.2.3@aar'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.5'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
+    implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
 
