@@ -18,6 +18,9 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.Toast;
 
 import java.io.File;
@@ -53,9 +56,42 @@ public class PolarisPlaybackService extends Service {
 	private Handler autoSaveHandler;
 	private Runnable autoSaveRunnable;
 
+	private Runnable dataUpdateRunnable;
+	private Handler dataUpdateHandler;
+
 	private API api;
 	private PolarisPlayer player;
 	private PlaybackQueue playbackQueue;
+
+	private MediaSessionCompat mediaSession;
+
+	private class Callback extends MediaSessionCompat.Callback {
+	    private final PolarisPlayer player;
+
+	    Callback(PolarisPlayer player) {
+	        this.player = player;
+        }
+
+	    @Override
+        public void onPause() {
+	        player.pause();
+        }
+
+        @Override
+        public void onPlay() {
+	        player.resume();
+        }
+
+        @Override
+        public void onSkipToNext() {
+	        player.skipNext();
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+	        player.skipPrevious();
+        }
+    }
 
 	@Override
 	public void onCreate() {
@@ -90,18 +126,25 @@ public class PolarisPlaybackService extends Service {
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
 					case PolarisPlayer.PLAYBACK_ERROR:
+						stopDataUpdates();
 						displayError();
 						break;
 					case PolarisPlayer.PLAYING_TRACK:
 					case PolarisPlayer.RESUMED_TRACK:
+						startDataUpdates();
+						updateMediaSessionState(PlaybackStateCompat.STATE_PLAYING);
 						pushSystemNotification();
 						break;
 					case PolarisPlayer.PAUSED_TRACK:
+						stopDataUpdates();
+						updateMediaSessionState(PlaybackStateCompat.STATE_PAUSED);
 						pushSystemNotification();
 						saveStateToDisk();
 						break;
 					case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
+						stopDataUpdates();
 						player.pause();
+						updateMediaSessionState(PlaybackStateCompat.STATE_PAUSED);
 						break;
 				}
 			}
@@ -116,13 +159,57 @@ public class PolarisPlaybackService extends Service {
 		autoSaveHandler.postDelayed(autoSaveRunnable, 5000);
 
 		pushSystemNotification();
+
+		mediaSession = new MediaSessionCompat(this, getPackageName());
+		mediaSession.setCallback(new Callback(player));
+        mediaSession.setActive(true);
+
+		updateMediaSessionState(PlaybackStateCompat.STATE_NONE);
+
+		dataUpdateRunnable = () -> {
+			updateMediaSessionState(player.isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED);
+			dataUpdateHandler.postDelayed(dataUpdateRunnable, 5000);
+		};
+		dataUpdateHandler = new Handler();
+		startDataUpdates();
+
+	}
+
+	private void updateMediaSessionState(int state) {
+		PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
+		builder.setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+		builder.setState(state, (long)player.getCurrentPosition(), 1);
+		mediaSession.setPlaybackState(builder.build());
+
+		MediaMetadataCompat.Builder metadataBuilder = new MediaMetadataCompat.Builder();
+		if(player.getCurrentItem() != null) {
+			metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, player.getCurrentItem().getTitle());
+			metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player.getCurrentItem().getArtist());
+			metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, player.getCurrentItem().getAlbum());
+			metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, player.getCurrentItem().getAlbumArtist());
+			metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, player.getCurrentItem().getTrackNumber());
+			metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DISC_NUMBER, player.getCurrentItem().getDiscNumber());
+		}
+		metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (long)player.getDuration());
+		mediaSession.setMetadata(metadataBuilder.build());
 	}
 
 	@Override
 	public void onDestroy() {
+	    mediaSession.release();
 		unregisterReceiver(receiver);
 		autoSaveHandler.removeCallbacksAndMessages(null);
+		stopDataUpdates();
 		super.onDestroy();
+	}
+
+	private void startDataUpdates() {
+		stopDataUpdates();
+		dataUpdateHandler.postDelayed(dataUpdateRunnable, 5000);
+	}
+
+	private void stopDataUpdates() {
+		dataUpdateHandler.removeCallbacksAndMessages(null);
 	}
 
 	@Override
