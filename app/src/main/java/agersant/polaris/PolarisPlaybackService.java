@@ -200,7 +200,7 @@ public class PolarisPlaybackService extends Service {
 
 	@Override
 	public void onDestroy() {
-	    mediaSession.release();
+		mediaSession.release();
 		unregisterReceiver(receiver);
 		autoSaveHandler.removeCallbacksAndMessages(null);
 		stopMediaSessionUpdates();
