@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "agersant.polaris"
         minSdkVersion 23
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 42
         versionName "0.8.0"
         compileOptions {
@@ -27,8 +27,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.google.android.material:material:1.1.0-alpha06"
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha05'
+    implementation "com.google.android.material:material:1.2.0-alpha03"
+    implementation 'androidx.appcompat:appcompat:1.2.0-alpha01'
     implementation 'com.github.orangegangsters:swipy:1.2.3@aar'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.google.code.gson:gson:2.8.5'
