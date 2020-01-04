@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -47,6 +49,8 @@ public class PolarisPlaybackService extends Service {
 
 	private final IBinder binder = new PolarisPlaybackService.PolarisBinder();
 	private BroadcastReceiver receiver;
+	private AudioFocusRequest audioFocusRequest;
+	private AudioManager audioManager;
 	private Notification notification;
 	private CollectionItem notificationItem;
 	private NotificationManager notificationManager;
@@ -65,6 +69,17 @@ public class PolarisPlaybackService extends Service {
 		api = state.api;
 		player = state.player;
 		playbackQueue = state.playbackQueue;
+
+		audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		if (Build.VERSION.SDK_INT >= 26 ) {
+			AudioAttributes playbackAttributes = new AudioAttributes.Builder()
+					.setUsage(AudioAttributes.USAGE_MEDIA)
+					.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+					.build();
+			audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+					.setAudioAttributes(playbackAttributes)
+					.build();
+		}
 
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		if (Build.VERSION.SDK_INT > 25 ) {
@@ -94,11 +109,16 @@ public class PolarisPlaybackService extends Service {
 						break;
 					case PolarisPlayer.PLAYING_TRACK:
 					case PolarisPlayer.RESUMED_TRACK:
+						requestAudioFocus();
 						pushSystemNotification();
 						break;
 					case PolarisPlayer.PAUSED_TRACK:
+						abandonAudioFocus();
 						pushSystemNotification();
 						saveStateToDisk();
+						break;
+					case PolarisPlayer.COMPLETED_TRACK:
+						abandonAudioFocus();
 						break;
 					case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
 						player.pause();
@@ -169,6 +189,18 @@ public class PolarisPlaybackService extends Service {
 			case MEDIA_INTENT_DISMISS:
 				stopSelf();
 				break;
+		}
+	}
+
+	private void requestAudioFocus() {
+		if (Build.VERSION.SDK_INT >= 26 ) {
+			audioManager.requestAudioFocus(audioFocusRequest);
+		}
+	}
+
+	private void abandonAudioFocus() {
+		if (Build.VERSION.SDK_INT >= 26 ) {
+			audioManager.abandonAudioFocusRequest(audioFocusRequest);
 		}
 	}
 
