@@ -164,11 +164,11 @@ public class PolarisPlaybackService extends Service {
 						break;
 					case PolarisPlayer.COMPLETED_TRACK:
 						abandonAudioFocus();
+						stopMediaSessionUpdates();
+						updateMediaSessionState(PlaybackStateCompat.STATE_STOPPED);
 						break;
 					case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
-						stopMediaSessionUpdates();
 						player.pause();
-						updateMediaSessionState(PlaybackStateCompat.STATE_PAUSED);
 						break;
 				}
 			}
