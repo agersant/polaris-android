@@ -12,7 +12,7 @@
         android:allowBackup="true"
         android:fullBackupOnly="false"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/launcher_icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Polaris"
