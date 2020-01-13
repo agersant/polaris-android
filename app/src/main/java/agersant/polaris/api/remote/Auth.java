@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +18,7 @@ import okhttp3.Response;
 
 class Auth implements Interceptor {
 
-	private static final Pattern setCookiePattern = Pattern.compile("^(.*);");
+	private static final Pattern setCookiePattern = Pattern.compile("^(session=.*);");
 	private final AtomicReference<String> syncCookie;
 	private final SharedPreferences preferences;
 	private final String usernameKey;
@@ -39,13 +40,6 @@ class Auth implements Interceptor {
 		String password = preferences.getString(passwordKey, "");
 		String credentials = username + ":" + password;
 		return "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-	}
-
-	private void parseCookie(String header) {
-		Matcher matcher = setCookiePattern.matcher(header);
-		if (matcher.find()) {
-			syncCookie.set(matcher.group(1));
-		}
 	}
 
 	private Request addAuthHeader(Request request) {
@@ -75,9 +69,13 @@ class Auth implements Interceptor {
 		}
 
 		// Store new cookie
-		String setCookie = response.header("Set-Cookie", null);
-		if (setCookie != null) {
-			parseCookie(setCookie);
+		List<String> setCookies = response.headers("Set-Cookie");
+		for (String setCookie : setCookies) {
+			Matcher matcher = setCookiePattern.matcher(setCookie);
+			if (matcher.find()) {
+				syncCookie.set(matcher.group(1));
+				break;
+			}
 		}
 
 		return response;

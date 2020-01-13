@@ -129,7 +129,10 @@ public class ServerAPI implements IRemoteAPI {
 		if (version.major < 3) {
 			return new APIVersion2(downloadQueue, requestQueue);
 		}
-		return new APIVersion3(downloadQueue, requestQueue);
+		if (version.major < 4) {
+			return new APIVersion3(downloadQueue, requestQueue);
+		}
+		return new APIVersion4(downloadQueue, requestQueue);
 	}
 
 	public void getRandomAlbums(ItemsCallback handlers) {
