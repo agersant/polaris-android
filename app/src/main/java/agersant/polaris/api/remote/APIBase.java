@@ -21,15 +21,27 @@ abstract class APIBase {
 		this.requestQueue = requestQueue;
 	}
 
-	abstract String getMediaURL(String path);
+	abstract String getAudioURL(String path);
 
-	public Uri getContentUri(String path) {
-		String url = getMediaURL(path);
+	abstract String getThumbnailURL(String path);
+
+	public Uri getAudioUri(String path) {
+		String url = getAudioURL(path);
 		return Uri.parse(url);
 	}
 
-	public ResponseBody serve(String path) throws IOException {
-		Request request = new Request.Builder().url(getContentUri(path).toString()).build();
+	public Uri getThumbnailUri(String path) {
+		String url = getThumbnailURL(path);
+		return Uri.parse(url);
+	}
+
+	public ResponseBody getAudio(String path) throws IOException {
+		Request request = new Request.Builder().url(getAudioUri(path).toString()).build();
+		return requestQueue.requestSync(request);
+	}
+
+	public ResponseBody getThumbnail(String path) throws IOException {
+		Request request = new Request.Builder().url(getThumbnailUri(path).toString()).build();
 		return requestQueue.requestSync(request);
 	}
 

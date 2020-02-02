@@ -52,7 +52,7 @@ public class FetchImageTask extends AsyncTask<Void, Void, Bitmap> {
 		if (bitmap == null) {
 			if (!api.isOffline()) {
 				try {
-					ResponseBody responseBody = serverAPI.serve(item.getArtwork());
+					ResponseBody responseBody = serverAPI.getThumbnail(item.getArtwork());
 					InputStream stream = new BufferedInputStream(responseBody.byteStream());
 					bitmap = BitmapFactory.decodeStream(stream);
 				} catch (Exception e) {

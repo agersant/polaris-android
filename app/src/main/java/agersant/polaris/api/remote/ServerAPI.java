@@ -132,7 +132,10 @@ public class ServerAPI implements IRemoteAPI {
 		if (version.major < 4) {
 			return new APIVersion3(downloadQueue, requestQueue);
 		}
-		return new APIVersion4(downloadQueue, requestQueue);
+		if (version.major < 5) {
+			return new APIVersion4(downloadQueue, requestQueue);
+		}
+		return new APIVersion5(downloadQueue, requestQueue);
 	}
 
 	public void getRandomAlbums(ItemsCallback handlers) {
@@ -197,18 +200,34 @@ public class ServerAPI implements IRemoteAPI {
 		return null;
 	}
 
-	public ResponseBody serve(String path) throws IOException {
+	public ResponseBody getAudio(String path) throws IOException {
 		fetchAPIVersion();
 		if (currentVersion != null) {
-			return currentVersion.serve(path);
+			return currentVersion.getAudio(path);
 		}
 		return null;
 	}
 
-	public Uri getContentUri(String path) {
+	public ResponseBody getThumbnail(String path) throws IOException {
 		fetchAPIVersion();
 		if (currentVersion != null) {
-			return currentVersion.getContentUri(path);
+			return currentVersion.getThumbnail(path);
+		}
+		return null;
+	}
+
+	public Uri getAudioUri(String path) {
+		fetchAPIVersion();
+		if (currentVersion != null) {
+			return currentVersion.getAudioUri(path);
+		}
+		return null;
+	}
+
+	public Uri getThumbnailUri(String path) {
+		fetchAPIVersion();
+		if (currentVersion != null) {
+			return currentVersion.getThumbnailUri(path);
 		}
 		return null;
 	}

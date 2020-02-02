@@ -18,7 +18,11 @@ public interface IRemoteAPI extends IPolarisAPI {
 
 	void scrobbleOnLastFM(String path);
 
-	Uri getContentUri(String path);
+	Uri getAudioUri(String path);
 
-	ResponseBody serve(String path) throws IOException;
+	Uri getThumbnailUri(String path);
+
+	ResponseBody getAudio(String path) throws IOException;
+
+	ResponseBody getThumbnail(String path) throws IOException;
 }

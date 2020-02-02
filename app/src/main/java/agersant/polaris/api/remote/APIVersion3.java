@@ -37,7 +37,12 @@ public class APIVersion3 extends APIBase
 				.create();
 	}
 
-	String getMediaURL(String path) {
+	String getAudioURL(String path) {
+		String serverAddress = ServerAPI.getAPIRootURL();
+		return serverAddress + "/serve/" + Uri.encode(path);
+	}
+
+	String getThumbnailURL(String path) {
 		String serverAddress = ServerAPI.getAPIRootURL();
 		return serverAddress + "/serve/" + Uri.encode(path);
 	}
