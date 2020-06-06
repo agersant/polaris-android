@@ -11,6 +11,7 @@ jobs:
     name: Build Debug
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
     - uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'build_debug'
