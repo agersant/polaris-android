@@ -1,0 +1,6 @@
+Connect to your Polaris server and listen to music on the go!
+
+Key features:
+- Shuffle mode
+- Songs preloading
+- Offline mode
