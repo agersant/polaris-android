@@ -6,11 +6,19 @@ android {
         applicationId "agersant.polaris"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 48
-        versionName "0.8.4"
+        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 0)
+        versionName "0.8.4-${System.env.VERSION_SHA}"
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile file("../android-signing-keystore.jks")
+            storePassword "${secretProperties['signing_keystore_password']}"
+            keyAlias "${secretProperties['signing_key_alias']}"
+            keyPassword "${secretProperties['signing_key_password']}"
         }
     }
     buildTypes {
@@ -18,6 +26,7 @@ android {
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             debuggable true
@@ -38,3 +47,10 @@ dependencies {
     implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
 
+secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
+secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
+secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
+secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
+secretProperties.setProperty("signing_keystore_password", "${System.getenv('signing_keystore_password')}")
+secretProperties.setProperty("signing_key_password", "${System.getenv('signing_key_password')}")
+secretProperties.setProperty("signing_key_alias", "${System.getenv('signing_key_alias')}")

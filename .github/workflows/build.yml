@@ -1,0 +1,17 @@
+name: Build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  debug:
+    name: Build Debug
+    runs-on: ubuntu-latest
+    steps:
+    - uses: maierj/fastlane-action@v1.4.0
+      with:
+        lane: 'build_debug'
+        skip-tracking: 'true'
