@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  build:
+  publish:
     name: Build Release
     runs-on: ubuntu-latest
     steps:
@@ -30,19 +30,6 @@ jobs:
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-    - name: Store APK Artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: build-output
-        path: app/build/outputs/apk/release/app-release.apk
-
-  publish:
-    name: Publish to Google Play
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Checkout Source
-      uses: actions/checkout@master
     - name: Copy Release Notes
       run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
     - name: Commit Release Notes
@@ -55,16 +42,12 @@ jobs:
         ref: 'refs/heads/master'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Retrieve APK
-      uses: actions/download-artifact@v1
-      with:
-        name: build-output
     - name: Upload release
       uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'publish_to_beta'
         skip-tracking: 'true'
-        options: '{ "apk_path": "build-output/app-release.apk" }'
+        options: '{ "apk_path": "app/build/outputs/apk/release/app-release.apk" }'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Update Beta Git Tag
