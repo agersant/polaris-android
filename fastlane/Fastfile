@@ -10,9 +10,9 @@ lane :build_release do
 end
 
 lane :publish_to_beta do
-  upload_to_play_store(track: 'beta', apk: 'app/build/outputs/apk/release/app-release.apk')
+  upload_to_play_store(track: 'beta', apk: options[:apk_path], json_key_data: options[:google_play_service_account_api_key_json])
 end
 
 lane :promote_beta_to_production do
-  upload_to_play_store(track: 'beta', track_promote_to: 'production')
+  upload_to_play_store(track: 'beta', track_promote_to: 'production', json_key_data: options[:google_play_service_account_api_key_json])
 end

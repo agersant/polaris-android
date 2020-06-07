@@ -1,0 +1,62 @@
+on:
+  push:
+    tags:
+    - 'release-candidate'
+
+jobs:
+
+  build:
+    name: Build Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Retrieve Encryption Keys
+      id: decode_keystore
+      uses: timheuer/base64-to-file@v1.0.3
+      with:
+        fileName: 'android-signing-keystore.jks'
+        encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+    - name: Checkout Source
+      uses: actions/checkout@master
+    - name: Build APK
+      uses: maierj/fastlane-action@v1.4.0
+      with:
+        lane: 'build_release'
+        skip-tracking: 'true'
+      env:
+        VERSION_CODE: ${{ github.run_id }}
+        SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
+        SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+    - name: Store APK Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-output
+          path: app/build/outputs/apk/release/app-release.apk
+
+  publish:
+    name: Publish to Google Play
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Freeze Release Notes
+      run: |
+        cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
+        git add *.txt
+        git commit -m "Updated release notes"
+    - name: Retrieve APK
+      uses: actions/download-artifact@v1
+      with:
+        name: build-output
+    - name: Upload release
+      uses: maierj/fastlane-action@v1.4.0
+      with:
+        lane: 'publish_to_beta'
+        skip-tracking: 'true'
+        options: '{ "apk_path": "build-output/app-release.apk", "google_play_service_account_api_key_json": ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }} }'
+    - name: Update Beta Git Tag
+      uses: richardsimko/update-tag@master
+      with:
+        tag_name: beta
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
