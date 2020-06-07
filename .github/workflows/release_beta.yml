@@ -59,6 +59,8 @@ jobs:
         author_email: antoine.gersant@lesforges.org
         message: "Updated release notes"
         add: "*.txt"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Retrieve APK
       uses: actions/download-artifact@v1
       with:
