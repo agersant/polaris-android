@@ -41,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - name: Checkout Source
+      uses: actions/checkout@master
     - name: Freeze Release Notes
       run: |
         cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
