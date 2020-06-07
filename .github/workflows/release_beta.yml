@@ -19,18 +19,11 @@ jobs:
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
     - name: Checkout Source
       uses: actions/checkout@master
-    - name: Cache Fastlane
-      id: cache-fastlane
-      uses: actions/cache@v1
-      with:
-        path: 'vendor/bundle'
-        key: ${{ runner.os }}-fastlane
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'build_release'
         skip-tracking: 'true'
-        bundle-install-path: 'vendor/bundle'
       env:
         VERSION_CODE: ${{ github.run_id }}
         SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
@@ -66,19 +59,12 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: build-output
-    - name: Cache Fastlane
-      id: cache-fastlane
-      uses: actions/cache@v1
-      with:
-        path: 'vendor/bundle'
-        key: ${{ runner.os }}-fastlane
     - name: Upload release
       uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'publish_to_beta'
         skip-tracking: 'true'
         options: '{ "apk_path": "build-output/app-release.apk" }'
-        bundle-install-path: 'vendor/bundle'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Update Beta Git Tag
