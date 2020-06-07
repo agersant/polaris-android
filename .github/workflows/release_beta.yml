@@ -3,7 +3,7 @@ name: Release To Beta
 on:
   push:
     tags:
-    - 'release-candidate'
+    - 'beta-release-candidate'
 
 jobs:
 
