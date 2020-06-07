@@ -76,8 +76,10 @@ jobs:
       with:
         lane: 'publish_to_beta'
         skip-tracking: 'true'
-        options: '{ "apk_path": "build-output/app-release.apk", "google_play_service_account_api_key_json": ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }} }'
+        options: '{ "apk_path": "build-output/app-release.apk" }'
         bundle-install-path: 'vendor/bundle'
+      env:
+        GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Update Beta Git Tag
       uses: richardsimko/update-tag@master
       with:
