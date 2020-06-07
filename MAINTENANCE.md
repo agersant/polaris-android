@@ -5,3 +5,4 @@ How to make a release:
 	- Write changelog in `fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt`
 	- Run `make_release.ps1`
 	- After the 'Release Beta' CI job completes, the new version is pushed to beta users
+	- When ready to push to production, run `promote_release.ps1`
