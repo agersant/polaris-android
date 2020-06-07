@@ -57,8 +57,9 @@ jobs:
       with:
         author_name: Polaris Android CI
         author_email: antoine.gersant@lesforges.org
-        message: "Updated release notes"
-        add: "*.txt"
+        message: 'Updated release notes'
+        add: '*.txt'
+        ref: 'refs/heads/master'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Retrieve APK
