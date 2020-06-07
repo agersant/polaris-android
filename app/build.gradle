@@ -13,7 +13,7 @@ android {
         applicationId "agersant.polaris"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 0)
+        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 1)
         versionName "0.8.4"
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
@@ -52,4 +52,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
     implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
+}
+
+task printVersionName {
+    doLast {
+        println android.defaultConfig.versionName
+    }
 }
