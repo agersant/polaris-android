@@ -44,10 +44,12 @@ jobs:
     - name: Checkout Source
       uses: actions/checkout@master
     - name: Freeze Release Notes
-      run: |
-        cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
-        git add *.txt
-        git commit -m "Updated release notes"
+      uses: EndBug/add-and-commit@v4
+      with:
+        author_name: Polaris Android CI
+        author_email: antoine.gersant@lesforges.org
+        message: "Updated release notes"
+        add: "*.txt"
     - name: Retrieve APK
       uses: actions/download-artifact@v1
       with:
