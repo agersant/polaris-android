@@ -50,7 +50,9 @@ jobs:
     steps:
     - name: Checkout Source
       uses: actions/checkout@master
-    - name: Freeze Release Notes
+    - name: Copy Release Notes
+      run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
+    - name: Commit Release Notes
       uses: EndBug/add-and-commit@v4
       with:
         author_name: Polaris Android CI
