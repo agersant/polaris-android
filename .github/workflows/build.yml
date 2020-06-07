@@ -16,3 +16,6 @@ jobs:
       with:
         lane: 'build_debug'
         skip-tracking: 'true'
+      env:
+        VERSION_CODE: ${{ github.run_id }}
+        VERSION_SHA: ${{ github.sha }}
