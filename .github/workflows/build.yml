@@ -19,7 +19,6 @@ jobs:
         skip-tracking: 'true'
       env:
         VERSION_CODE: ${{ github.run_id }}
-        VERSION_SHA: ${{ github.sha }}
 
   release:
     name: Build Release
@@ -37,7 +36,6 @@ jobs:
         skip-tracking: 'true'
       env:
         VERSION_CODE: ${{ github.run_id }}
-        VERSION_SHA: ${{ github.sha }}
         SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
