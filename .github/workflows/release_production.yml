@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Read Version Name
-      run: echo ::set-env name=VERSION_NAME::v$(gradle -q printVersionName)
+      run: echo ::set-env name=VERSION_NAME::v$(gradle -q app:printVersionName)
     # - name: Upload release
     #   uses: maierj/fastlane-action@v1.4.0
     #   with:
