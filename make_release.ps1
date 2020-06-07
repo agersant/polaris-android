@@ -1,4 +1,4 @@
-git fetch origin --tags --prune-tags
+git fetch origin --tags --prune-tags --force
 
 git tag -d beta-release-candidate
 git push --delete origin beta-release-candidate
