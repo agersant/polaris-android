@@ -25,7 +25,8 @@ jobs:
     name: Build Release
     runs-on: ubuntu-latest
     steps:
-    - uses: timheuer/base64-to-file@v1.0.3
+    - id: decode_keystore
+      uses: timheuer/base64-to-file@v1.0.3
       with:
         fileName: 'android-signing-keystore.jks'
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
@@ -37,6 +38,7 @@ jobs:
       env:
         VERSION_CODE: ${{ github.run_id }}
         VERSION_SHA: ${{ github.sha }}
+        SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}

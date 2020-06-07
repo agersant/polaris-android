@@ -6,6 +6,7 @@ secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client
 secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
 secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
 secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
+secretProperties.setProperty("SIGNING_KEYSTORE_PATH", "${System.getenv('SIGNING_KEYSTORE_PATH')}")
 secretProperties.setProperty("SIGNING_KEYSTORE_PASSWORD", "${System.getenv('SIGNING_KEYSTORE_PASSWORD')}")
 secretProperties.setProperty("SIGNING_KEY_ALIAS", "${System.getenv('SIGNING_KEY_ALIAS')}")
 secretProperties.setProperty("SIGNING_KEY_PASSWORD", "${System.getenv('SIGNING_KEY_PASSWORD')}")
@@ -25,7 +26,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("../android-signing-keystore.jks")
+            storeFile file("${secretProperties['SIGNING_KEYSTORE_PATH']}")
             storePassword "${secretProperties['SIGNING_KEYSTORE_PASSWORD']}"
             keyAlias "${secretProperties['SIGNING_KEY_ALIAS']}"
             keyPassword "${secretProperties['SIGNING_KEY_PASSWORD']}"
