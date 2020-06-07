@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+
+def secretProperties = new Properties()
+secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
+secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
+secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
+secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
+secretProperties.setProperty("signing_keystore_password", "${System.getenv('signing_keystore_password')}")
+secretProperties.setProperty("signing_key_password", "${System.getenv('signing_key_password')}")
+secretProperties.setProperty("signing_key_alias", "${System.getenv('signing_key_alias')}")
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -46,12 +56,3 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
     implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
-
-def secretProperties = new Properties()
-secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
-secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
-secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
-secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
-secretProperties.setProperty("signing_keystore_password", "${System.getenv('signing_keystore_password')}")
-secretProperties.setProperty("signing_key_password", "${System.getenv('signing_key_password')}")
-secretProperties.setProperty("signing_key_alias", "${System.getenv('signing_key_alias')}")
