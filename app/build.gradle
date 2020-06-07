@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
 
+def secretProperties = new Properties()
 secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
 secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
 secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
