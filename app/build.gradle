@@ -9,6 +9,7 @@ secretProperties.setProperty("SIGNING_KEY_PASSWORD", "${System.getenv('SIGNING_K
 
 android {
     compileSdkVersion 29
+    ndkVersion "21.1.6352462"
     defaultConfig {
         applicationId "agersant.polaris"
         minSdkVersion 23
