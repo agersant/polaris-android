@@ -38,5 +38,5 @@ jobs:
         VERSION_CODE: ${{ github.run_id }}
         SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
-        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
