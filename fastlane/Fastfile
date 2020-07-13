@@ -14,5 +14,5 @@ lane :publish_to_beta do |options|
 end
 
 lane :promote_beta_to_production do |options|
-  upload_to_play_store(track: 'beta', track_promote_to: 'production', json_key_data: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON'])
+  upload_to_play_store(track: 'beta', track_promote_to: 'production', skip_upload_changelogs: true, json_key_data: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON'])
 end

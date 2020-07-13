@@ -21,7 +21,6 @@ jobs:
         lane: 'promote_beta_to_production'
         skip-tracking: 'true'
       env:
-        VERSION_CODE: ${{ github.run_id }}
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Update Production Git Tag
       uses: richardsimko/update-tag@master
