@@ -18,7 +18,7 @@ jobs:
     - name: Upload release
       uses: maierj/fastlane-action@v1.4.0
       with:
-        lane: 'publish_to_production'
+        lane: 'promote_beta_to_production'
         skip-tracking: 'true'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
