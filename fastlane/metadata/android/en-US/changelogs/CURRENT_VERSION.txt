@@ -1,1 +1,1 @@
-- Setting up CI
+- Added app icon for F-Droid
