@@ -15,7 +15,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29
         versionCode Integer.valueOf(System.env.VERSION_CODE ?: 1)
-        versionName "0.8.5"
+        versionName "0.8.6"
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
