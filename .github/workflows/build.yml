@@ -10,12 +10,9 @@ jobs:
 
   debug:
     name: Build Debug
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
-    - uses: actions/setup-ruby@v1
-      with:
-        ruby-version: '2.7'
     - uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'build_debug'
@@ -25,7 +22,7 @@ jobs:
 
   release:
     name: Build Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - id: decode_keystore
       uses: timheuer/base64-to-file@v1.0.3
@@ -33,9 +30,6 @@ jobs:
         fileName: 'android-signing-keystore.jks'
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
     - uses: actions/checkout@master
-    - uses: actions/setup-ruby@v1
-      with:
-        ruby-version: '2.7'
     - uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'build_release'

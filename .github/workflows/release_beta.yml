@@ -9,7 +9,7 @@ jobs:
 
   publish:
     name: Publish
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Retrieve Encryption Keys
       id: decode_keystore
@@ -19,9 +19,6 @@ jobs:
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
     - name: Checkout Source
       uses: actions/checkout@master
-    - uses: actions/setup-ruby@v1
-      with:
-        ruby-version: '2.7'
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
       with:
