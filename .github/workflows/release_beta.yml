@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@master
     - uses: actions/setup-ruby@v1
       with:
-        ruby-version: '2.7.1'
+        ruby-version: '2.7'
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
       with:
