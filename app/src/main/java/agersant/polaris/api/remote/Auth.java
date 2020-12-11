@@ -18,7 +18,7 @@ import okhttp3.Response;
 
 class Auth implements Interceptor {
 
-	private static final Pattern setCookiePattern = Pattern.compile("^(session=.*);");
+	private static final Pattern setCookiePattern = Pattern.compile("^(session=[^;]+)");
 	private final AtomicReference<String> syncCookie;
 	private final SharedPreferences preferences;
 	private final String usernameKey;
