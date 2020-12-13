@@ -28,15 +28,17 @@ jobs:
         skip-tracking: 'true'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
-    - name: Add 'production' git tag
-      uses: richardsimko/update-tag@v1
+    - name: Add 'google-play-production' git tag
+      uses: EndBug/add-and-commit@v5
       with:
-        tag_name: google-play-production
+        branch: production
+        tag: 'google-play-production --force'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Add <version number> git tag
-      uses: richardsimko/update-tag@v1
+      uses: EndBug/add-and-commit@v5
       with:
-        tag_name: ${{ env.VERSION_NAME }}
+        branch: production
+        tag: '${{ env.VERSION_NAME }} --force'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
