@@ -20,7 +20,7 @@ jobs:
     - name: Checkout Source
       uses: actions/checkout@master
     - name: Bump app versionCode
-      run: gawk -i inplace '/^[[:space:]]*versionCode[[:space:]]+[[:digit:]]+/ { $1 = "        "$1; $2 = $2 + 1; } 1' app/build.gradle
+      run: gawk -i inplace '/^[[:space:]]*versionCode[[:space:]]+[[:digit:]]+/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' app/build.gradle
     - name: Read Version Code
       run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
     - name: Build APK

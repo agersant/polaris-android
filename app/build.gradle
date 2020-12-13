@@ -8,61 +8,61 @@ secretProperties.setProperty("SIGNING_KEY_ALIAS", "${System.getenv('SIGNING_KEY_
 secretProperties.setProperty("SIGNING_KEY_PASSWORD", "${System.getenv('SIGNING_KEY_PASSWORD')}")
 
 android {
-    compileSdkVersion 29
-    ndkVersion "21.3.6528147"
-    defaultConfig {
-        applicationId "agersant.polaris"
-        minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 1
-        versionName "0.8.6"
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
-    }
-    signingConfigs {
-        release {
-            storeFile file("${secretProperties['SIGNING_KEYSTORE_PATH']}")
-            storePassword "${secretProperties['SIGNING_KEYSTORE_PASSWORD']}"
-            keyAlias "${secretProperties['SIGNING_KEY_ALIAS']}"
-            keyPassword "${secretProperties['SIGNING_KEY_PASSWORD']}"
-        }
-    }
-    buildTypes {
-        release {
-            debuggable false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-        debug {
-            debuggable true
-        }
-    }
+	compileSdkVersion 29
+	ndkVersion "21.3.6528147"
+	defaultConfig {
+		applicationId "agersant.polaris"
+		minSdkVersion 23
+		targetSdkVersion 29
+		versionCode 1
+		versionName "0.8.6"
+		compileOptions {
+			sourceCompatibility JavaVersion.VERSION_1_8
+			targetCompatibility JavaVersion.VERSION_1_8
+		}
+	}
+	signingConfigs {
+		release {
+			storeFile file("${secretProperties['SIGNING_KEYSTORE_PATH']}")
+			storePassword "${secretProperties['SIGNING_KEYSTORE_PASSWORD']}"
+			keyAlias "${secretProperties['SIGNING_KEY_ALIAS']}"
+			keyPassword "${secretProperties['SIGNING_KEY_PASSWORD']}"
+		}
+	}
+	buildTypes {
+		release {
+			debuggable false
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.release
+		}
+		debug {
+			debuggable true
+		}
+	}
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.google.android.material:material:1.3.0-alpha01"
-    implementation 'androidx.core:core:1.3.0'
-    implementation 'androidx.media:media:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.3.0-alpha01'
-    implementation 'com.github.orangegangsters:swipy:1.2.3@aar'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
-    implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	implementation "com.google.android.material:material:1.3.0-alpha01"
+	implementation 'androidx.core:core:1.3.0'
+	implementation 'androidx.media:media:1.1.0'
+	implementation 'androidx.appcompat:appcompat:1.3.0-alpha01'
+	implementation 'com.github.orangegangsters:swipy:1.2.3@aar'
+	implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+	implementation 'com.google.code.gson:gson:2.8.5'
+	implementation 'com.google.android.exoplayer:exoplayer-core:2.9.6'
+	implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
 
 task printVersionCode {
-    doLast {
-        println android.defaultConfig.versionCode
-    }
+	doLast {
+		println android.defaultConfig.versionCode
+	}
 }
 
 task printVersionName {
-    doLast {
-        println android.defaultConfig.versionName
-    }
+	doLast {
+		println android.defaultConfig.versionName
+	}
 }
