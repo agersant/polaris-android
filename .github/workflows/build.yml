@@ -17,8 +17,6 @@ jobs:
       with:
         lane: 'build_debug'
         skip-tracking: 'true'
-      env:
-        VERSION_CODE: ${{ github.run_id }}
 
   release:
     name: Build Release
@@ -35,7 +33,6 @@ jobs:
         lane: 'build_release'
         skip-tracking: 'true'
       env:
-        VERSION_CODE: ${{ github.run_id }}
         SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
