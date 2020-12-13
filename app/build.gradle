@@ -14,7 +14,7 @@ android {
 		applicationId "agersant.polaris"
 		minSdkVersion 23
 		targetSdkVersion 29
-		versionCode 415293107
+		versionCode 415293108
 		versionName "0.8.6"
 		compileOptions {
 			sourceCompatibility JavaVersion.VERSION_1_8
