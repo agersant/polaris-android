@@ -60,6 +60,7 @@ jobs:
     - name: Commit Release Notes
       uses: EndBug/add-and-commit@v5
       with:
+        branch: beta
         author_name: Polaris Android CI
         author_email: antoine.gersant@lesforges.org
         message: 'Updated release notes and versionCode'
