@@ -50,7 +50,7 @@ jobs:
         author_name: Polaris Android CI
         author_email: antoine.gersant@lesforges.org
         message: 'Updated release notes and versionCode'
-        add: '*.txt'
+        add: '*.txt *.gradle'
         tag: 'google-play-beta --force'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
