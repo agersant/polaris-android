@@ -4,6 +4,8 @@ How to make a release:
 	- Update the user-facing version number in `app/build.gradle` (the field is called versionName)
 	- Write changelog in `fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt`
 	- Commit and push changes
-	- Run `make_release.ps1`
-	- After the 'Release Beta' CI job completes, the new version is pushed to beta users
+	- Run `git checkout beta`
+	- Run `git merge master` (there should be no conflicts)
+	- Run `git push`
+	- The 'Release Beta' job in CI will deploy on Google Play, update changelog files, bump the versionCode, and move `google-play-beta` tag
 	- When ready to push to production, run `promote_release.ps1`

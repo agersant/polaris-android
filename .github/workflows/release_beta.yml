@@ -2,8 +2,8 @@ name: Release To Beta
 
 on:
   push:
-    tags:
-    - 'beta-release-candidate'
+    branches:
+    - beta
 
 jobs:
 
@@ -19,6 +19,10 @@ jobs:
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
     - name: Checkout Source
       uses: actions/checkout@master
+    - name: Bump app versionCode
+      run: gawk -i inplace '/versionCode/{$1 = "\t"$1;$2=$2+1}1' app/build.gradle
+    - name: Read Version Code
+      run: echo "VERSION_CODE=v$(gradle -q printVersionName)" >> $GITHUB_ENV
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
       with:
@@ -31,7 +35,7 @@ jobs:
         SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
     - name: Copy Release Notes
-      run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ github.run_id }}.txt"
+      run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
     - name: Upload release
       uses: maierj/fastlane-action@v1.4.0
       with:
@@ -41,18 +45,12 @@ jobs:
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Commit Release Notes
-      uses: EndBug/add-and-commit@v4
+      uses: EndBug/add-and-commit@v5
       with:
         author_name: Polaris Android CI
         author_email: antoine.gersant@lesforges.org
-        message: 'Updated release notes'
+        message: 'Updated release notes and versionCode'
         add: '*.txt'
-        ref: 'master'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Update Beta Git Tag
-      uses: richardsimko/update-tag@master
-      with:
-        tag_name: beta
+        tag: 'google-play-beta --force'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
