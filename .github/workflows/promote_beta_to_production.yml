@@ -1,9 +1,6 @@
-name: Release To Production
+name: Promote Beta To Production
 
-on:
-  push:
-    tags:
-    - 'production-release-candidate'
+on: workflow_dispatch
 
 jobs:
 
@@ -11,8 +8,17 @@ jobs:
     name: Publish
     runs-on: ubuntu-20.04
     steps:
+    - name: Merge beta branch to production branch
+      uses: devmasx/merge-branch@v1.3.1
+      with:
+        type: now
+        from_branch: beta
+        target_branch: production
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout Source
       uses: actions/checkout@master
+      with:
+        ref: production
     - name: Read Version Name
       run: echo "VERSION_NAME=v$(gradle -q printVersionName)" >> $GITHUB_ENV
     - name: Upload release
