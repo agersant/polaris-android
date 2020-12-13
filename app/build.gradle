@@ -55,6 +55,12 @@ dependencies {
     implementation 'com.github.PaulWoitaschek.ExoPlayer-Extensions-Autobuild:flac:2.9.6'
 }
 
+task printVersionCode {
+    doLast {
+        println android.defaultConfig.versionCode
+    }
+}
+
 task printVersionName {
     doLast {
         println android.defaultConfig.versionName
