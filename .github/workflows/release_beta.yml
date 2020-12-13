@@ -20,12 +20,12 @@ jobs:
         fileName: 'android-signing-keystore.jks'
         encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
     - name: Merge master -> beta
-        uses: devmasx/merge-branch@v1.3.1
-        with:
-          type: now
-          from_branch: master
-          target_branch: beta
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      uses: devmasx/merge-branch@v1.3.1
+      with:
+        type: now
+        from_branch: master
+        target_branch: beta
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout Source
       uses: actions/checkout@master
       with:
