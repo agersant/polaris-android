@@ -10,10 +10,10 @@ on:
 jobs:
 
   publish:
-    name: Publish
+    name: Release
     runs-on: ubuntu-20.04
     steps:
-    - name: Retrieve Encryption Keys
+    - name: Retrieve encryption keys
       id: decode_keystore
       uses: timheuer/base64-to-file@v1.0.3
       with:
@@ -25,15 +25,15 @@ jobs:
         type: now
         target_branch: beta
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Checkout Source
+    - name: Checkout source
       uses: actions/checkout@master
       with:
         ref: beta
-    - name: Update Version Name in gradle build file
-      run: gawk -i inplace '/^[[:space:]]*versionName[[:space:]]+[[:digit:]]+/ { $1 = "\t\t"$1; $2 = ${{ github.event.inputs.versionName }}; } 1' app/build.gradle
-    - name: Increment app Version Code in gradle build file
-      run: gawk -i inplace '/^[[:space:]]*versionCode[[:space:]]+[[:digit:]]+/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' app/build.gradle
-    - name: Read Version Code from gradle build file
+    - name: Update version name in gradle build file
+      run: gawk -i inplace '/^[[:space:]]*versionName/ { $1 = "\t\t"$1; $2 = ${{ github.event.inputs.versionName }}; } 1' app/build.gradle
+    - name: Increment version code in gradle build file
+      run: gawk -i inplace '/^[[:space:]]*versionCode/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' app/build.gradle
+    - name: Read version code from gradle build file
       run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
@@ -46,7 +46,7 @@ jobs:
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
-    - name: Copy Release Notes
+    - name: Copy release notes
       run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
     - name: Upload release
       uses: maierj/fastlane-action@v1.4.0

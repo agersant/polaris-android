@@ -9,7 +9,7 @@ on:
 jobs:
 
   debug:
-    name: Build Debug
+    name: Build (debug)
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
@@ -19,7 +19,7 @@ jobs:
         skip-tracking: 'true'
 
   release:
-    name: Build Release
+    name: Build (release)
     runs-on: ubuntu-20.04
     steps:
     - id: decode_keystore
