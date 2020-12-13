@@ -31,7 +31,7 @@ jobs:
         ref: beta
     - name: Update Version Name in gradle build file
       run: gawk -i inplace '/^[[:space:]]*versionName[[:space:]]+[[:digit:]]+/ { $1 = "\t\t"$1; $2 = ${{ github.event.inputs.versionName }}; } 1' app/build.gradle
-    - name: Increment app Version Code in gradle build file
+    - name: Increment Version Code in gradle build file
       run: gawk -i inplace '/^[[:space:]]*versionCode[[:space:]]+[[:digit:]]+/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' app/build.gradle
     - name: Read Version Code from gradle build file
       run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
