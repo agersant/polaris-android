@@ -33,9 +33,3 @@ jobs:
         git tag -f -a google-play-production -m "Deployed to Google play"
         git tag -f -a ${{ env.VERSION_NAME }} -m "Version number"
         git push -f --tags
-      uses: EndBug/add-and-commit@v5
-      with:
-        branch: production
-        tag: '${{ env.VERSION_NAME }} --force'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
