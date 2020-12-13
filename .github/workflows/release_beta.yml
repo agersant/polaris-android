@@ -56,7 +56,7 @@ jobs:
         options: '{ "apk_path": "app/build/outputs/apk/release/app-release.apk" }'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
-    - name: Commit Release Notes
+    - name: Commit changes to beta branch
       uses: EndBug/add-and-commit@v5
       with:
         branch: beta
