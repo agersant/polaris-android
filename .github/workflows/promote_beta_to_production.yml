@@ -30,6 +30,9 @@ jobs:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Tag production branch
       run: |
+        git config --global user.name ${{ GITHUB_ACTOR }}
+        git config --global user.email "<>"
         git tag -f -a google-play-production -m "Deployed to Google play"
         git tag -f -a ${{ env.VERSION_NAME }} -m "Version number"
         git push -f --tags
+
