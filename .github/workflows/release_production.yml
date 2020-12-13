@@ -23,13 +23,13 @@ jobs:
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
     - name: Update Production Git Tag
-      uses: richardsimko/update-tag@master
+      uses: richardsimko/update-tag@v1
       with:
-        tag_name: production
+        tag_name: google-play-production
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Add Version Git Tag
-      uses: richardsimko/update-tag@master
+      uses: richardsimko/update-tag@v1
       with:
         tag_name: ${{ env.VERSION_NAME }}
       env:
