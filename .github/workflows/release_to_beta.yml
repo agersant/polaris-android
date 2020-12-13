@@ -62,6 +62,6 @@ jobs:
         branch: beta
         message: 'Updated release notes, versionCode and versionName'
         add: '*.txt *.gradle'
-        tag: 'google-play-beta --force'
+        tag: 'beta --force'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
