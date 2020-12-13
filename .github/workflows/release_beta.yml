@@ -22,14 +22,14 @@ jobs:
     - name: Bump app versionCode
       run: gawk -i inplace '/versionCode/{$1 = "\t"$1;$2=$2+1}1' app/build.gradle
     - name: Read Version Code
-      run: echo "VERSION_CODE=v$(gradle -q printVersionName)" >> $GITHUB_ENV
+      run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
     - name: Build APK
       uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'build_release'
         skip-tracking: 'true'
       env:
-        VERSION_CODE: ${{ github.run_id }}
+        VERSION_CODE: ${{ env.VERSION_CODE }}
         SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
