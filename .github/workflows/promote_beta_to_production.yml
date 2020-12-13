@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
 
   publish:
-    name: Publish
+    name: Promote
     runs-on: ubuntu-20.04
     steps:
     - name: Merge beta branch to production branch
@@ -15,26 +15,26 @@ jobs:
         from_branch: beta
         target_branch: production
         github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Checkout Source
+    - name: Checkout source
       uses: actions/checkout@master
       with:
         ref: production
-    - name: Read Version Name
+    - name: Read version name
       run: echo "VERSION_NAME=v$(gradle -q printVersionName)" >> $GITHUB_ENV
-    - name: Upload release
+    - name: Promote release
       uses: maierj/fastlane-action@v1.4.0
       with:
         lane: 'promote_beta_to_production'
         skip-tracking: 'true'
       env:
         GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
-    - name: Update Production Git Tag
+    - name: Add 'production' git tag
       uses: richardsimko/update-tag@v1
       with:
         tag_name: google-play-production
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Add Version Git Tag
+    - name: Add <version number> git tag
       uses: richardsimko/update-tag@v1
       with:
         tag_name: ${{ env.VERSION_NAME }}
