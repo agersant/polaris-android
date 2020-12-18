@@ -20,7 +20,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="48dp"
 		android:layout_centerVertical="true"
-		android:indeterminateTint="@color/lightBlue600"
+		android:indeterminateTint="@color/primary"
 		tools:visibility="gone"/>
 
 	<LinearLayout

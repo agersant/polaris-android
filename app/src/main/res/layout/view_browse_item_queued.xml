@@ -20,7 +20,7 @@
 		android:layout_centerVertical="true"
 		android:layout_marginEnd="12dp"
 		android:layout_marginStart="20dp"
-		android:tint="@color/white"
+		android:tint="@color/background"
 		android:contentDescription="@string/add_to_queue"
 		tools:background="@drawable/ic_playlist_play_black_24dp"/>
 
@@ -31,7 +31,7 @@
 		android:layout_centerVertical="true"
 		android:layout_toEndOf="@+id/status_icon"
 		android:fontFamily="sans-serif"
-		android:textColor="@color/white"
+		android:textColor="@color/background"
 		android:textSize="18sp"
 		tools:text="Add to queue"/>
 

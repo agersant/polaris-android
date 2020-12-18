@@ -6,7 +6,7 @@
         android:defaultValue=""
         android:key="@string/pref_key_server_url"
         android:title="@string/pref_server_url"
-        app:useSimpleSummaryProvider="true" />
+        app:useSimpleSummaryProvider="true"/>
     <!--suppress AndroidDomInspection -->
     <EditTextPreference
         android:defaultValue=""
@@ -37,5 +37,12 @@
         android:entryValues="@array/pref_offline_cache_size_entry_values"
         android:key="@string/pref_key_offline_cache_size"
         android:title="@string/pref_offline_cache_size"
+        app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:defaultValue="System"
+        android:entries="@array/pref_theme_entries"
+        android:entryValues="@array/pref_theme_entry_values"
+        android:key="@string/pref_key_theme"
+        android:title="@string/pref_theme"
         app:useSimpleSummaryProvider="true" />
 </PreferenceScreen>
