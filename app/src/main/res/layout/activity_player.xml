@@ -53,7 +53,8 @@
 				android:adjustViewBounds="true"
 				android:contentDescription="@string/player_previous_track"
 				android:onClick="skipPrevious"
-				android:src="@drawable/ic_skip_previous_black_24dp"/>
+				android:src="@drawable/ic_skip_previous_black_24dp"
+				android:tint="@color/icon"/>
 
 			<ImageView
 				android:id="@+id/pause_toggle"
@@ -64,7 +65,8 @@
 				android:adjustViewBounds="true"
 				android:contentDescription="@string/player_play_pause"
 				android:onClick="togglePause"
-				android:src="@drawable/ic_play_arrow_black_24dp"/>
+				android:src="@drawable/ic_play_arrow_black_24dp"
+				android:tint="@color/icon"/>
 
 			<ImageView
 				android:id="@+id/skip_next"
@@ -73,7 +75,8 @@
 				android:adjustViewBounds="true"
 				android:contentDescription="@string/player_next_track"
 				android:onClick="skipNext"
-				android:src="@drawable/ic_skip_next_black_24dp"/>
+				android:src="@drawable/ic_skip_next_black_24dp"
+				android:tint="@color/icon"/>
 		</LinearLayout>
 
 		<TextView

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="primary">#039be5</color>
-	<color name="primaryVariant">#0277bd</color>
+	<color name="primary">#1C93CD</color>
+	<color name="primaryVariant">#14699C</color>
 
-	<color name="grey400">#bdbdbd</color>
+	<color name="grey400">#7A7A7A</color>
 	<color name="grey500">#9E9E9E</color>
 
 	<color name="blueGrey100">#CFD8DC</color>
@@ -16,7 +16,8 @@
 
 	<color name="red500">#F44336</color>
 
-	<color name="background">#FFFFFF</color>
+	<color name="background">#DDDDDD</color>
+	<color name="icon">#121212</color>
 
 	<color name="aquamarine">#58F5D1</color>
 </resources>
