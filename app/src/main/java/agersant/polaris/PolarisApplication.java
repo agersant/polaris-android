@@ -43,10 +43,10 @@ public class PolarisApplication extends Application {
         setTheme(preferences.getString(themeKey, ""));
     }
 
-    public void setTheme(Object value) {
+    public void setTheme(String value) {
         Theme theme;
         try {
-            theme = Theme.valueOf(value.toString());
+            theme = Theme.valueOf(value);
         } catch (IllegalArgumentException e) {
             theme = Theme.System;
         }

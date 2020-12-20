@@ -24,7 +24,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         String themeKey = getResources().getString(R.string.pref_key_theme);
         ListPreference themePreference = findPreference(themeKey);
         themePreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            PolarisApplication.getInstance().setTheme(newValue);
+            if (newValue != null) {
+                PolarisApplication.getInstance().setTheme(newValue.toString());
+            }
             return true;
         });
     }
