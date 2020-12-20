@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="grey400">#6F6F6F</color>
-    <color name="grey500">#9E9E9E</color>
+    <color name="onAccent">#5A0933</color> <!--Pink1000-->
+    <color name="accent">#F06292</color> <!--Pink400-->
 
-    <color name="blueGrey100">#CFD8DC</color>
-    <color name="blueGrey400">#C6DAE4</color>
-    <color name="blueGrey700">#749AAC</color>
+    <color name="textPrimary">@android:color/primary_text_dark</color>
+    <color name="textSecondary">@android:color/secondary_text_dark</color>
 
-    <color name="pink100">#42081C</color>
-    <color name="pink400">#D94779</color>
-
-    <color name="background">#121212</color>
-    <color name="icon">#DDDDDD</color>
+    <color name="background">#212121</color> <!--Grey900-->
 </resources>

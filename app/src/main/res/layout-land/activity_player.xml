@@ -61,7 +61,7 @@
 					android:contentDescription="@string/player_previous_track"
 					android:onClick="skipPrevious"
 					android:src="@drawable/ic_skip_previous_black_24dp"
-					android:tint="@color/icon"/>
+					android:tint="?android:textColorPrimary"/>
 
 				<ImageView
 					android:id="@+id/pause_toggle"
@@ -73,7 +73,7 @@
 					android:contentDescription="@string/player_play_pause"
 					android:onClick="togglePause"
 					android:src="@drawable/ic_play_arrow_black_24dp"
-					android:tint="@color/icon"/>
+					android:tint="?android:textColorPrimary"/>
 
 				<ImageView
 					android:id="@+id/skip_next"
@@ -83,7 +83,7 @@
 					android:contentDescription="@string/player_next_track"
 					android:onClick="skipNext"
 					android:src="@drawable/ic_skip_next_black_24dp"
-					android:tint="@color/icon"/>
+					android:tint="?android:textColorPrimary"/>
 			</LinearLayout>
 
 			<TextView
@@ -115,8 +115,8 @@
 		android:id="@+id/navigation"
 		android:layout_width="match_parent"
 		android:layout_height="56dp"
-		app:itemBackground="@color/blueGrey900"
-		android:background="@color/blueGrey900"
+		app:itemBackground="?colorHeaderBackground"
+		android:background="?colorHeaderBackground"
 		app:itemIconTint="@drawable/bottom_navigation_item"
 		app:itemTextColor="@drawable/bottom_navigation_item"
 		app:menu="@menu/menu_navigation"

@@ -41,13 +41,13 @@
 			android:contentDescription="@string/queue_empty"
 			android:background="@drawable/ic_queue_black_24dp"
 			android:layout_marginBottom="8dp"
-			android:backgroundTint="@color/grey500"
+			android:backgroundTint="@color/playlistInstructions"
 			/>
 
 		<TextView
 			android:gravity="center"
 			android:textSize="16sp"
-			android:textColor="@color/grey500"
+			android:textColor="@color/playlistInstructions"
 			android:lineSpacingMultiplier="1.2"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -60,8 +60,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="56dp"
 		android:layout_alignParentBottom="true"
-		android:background="@color/blueGrey900"
-		app:itemBackground="@color/blueGrey900"
+		android:background="?colorHeaderBackground"
+		app:itemBackground="?colorHeaderBackground"
 		app:itemIconTint="@drawable/bottom_navigation_item"
 		app:itemTextColor="@drawable/bottom_navigation_item"
 		app:menu="@menu/menu_navigation"/>

@@ -20,7 +20,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="48dp"
 		android:layout_centerVertical="true"
-		android:indeterminateTint="@color/primary"
+		android:indeterminateTint="?colorPrimary"
 		tools:visibility="gone"/>
 
 	<LinearLayout
@@ -40,13 +40,13 @@
 			android:textSize="16sp"
 			android:text="@string/browse_error"
 			android:drawableStart="@drawable/ic_error_black_24dp"
-			android:drawableTint="@color/red500"
+			android:drawableTint="?colorError"
 			android:drawablePadding="8dp"/>
 		<Button
 			android:id="@+id/browse_error_retry"
 			android:layout_width="80dp"
 			android:layout_height="40dp"
-			android:textColor="@color/blueGrey900"
+			android:textColor="?android:textColorPrimary"
 			android:onClick="retry"
 			android:text="@string/browse_error_retry"/>
 	</LinearLayout>
@@ -63,8 +63,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="56dp"
 		android:layout_alignParentBottom="true"
-		android:background="@color/blueGrey900"
-		app:itemBackground="@color/blueGrey900"
+		android:background="?colorHeaderBackground"
+		app:itemBackground="?colorHeaderBackground"
 		app:itemIconTint="@drawable/bottom_navigation_item"
 		app:itemTextColor="@drawable/bottom_navigation_item"
 		app:menu="@menu/menu_navigation"/>
