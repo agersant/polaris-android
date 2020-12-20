@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
+import agersant.polaris.ui.Theme;
+
 
 public class PolarisApplication extends Application {
 

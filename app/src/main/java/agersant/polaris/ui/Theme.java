@@ -1,4 +1,4 @@
-package agersant.polaris;
+package agersant.polaris.ui;
 
 public enum Theme {
     System,
