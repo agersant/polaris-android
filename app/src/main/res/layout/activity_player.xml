@@ -8,12 +8,16 @@
     android:orientation="vertical"
     tools:context="agersant.polaris.features.player.PlayerActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:theme="@style/PolarisToolbar"
-        app:popupTheme="@style/PolarisToolbarMenu" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <agersant.polaris.ui.SquareLayout
         android:id="@+id/viewGroup"

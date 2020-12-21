@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#1C93CD</color> <!--LightBlue600-->
-    <color name="primaryVariant">#14699C</color> <!--LightBlue800-->
+    <color name="primary">#039BE5</color> <!--LightBlue600-->
+    <color name="primaryVariant">#0277BD</color> <!--LightBlue800-->
     <color name="accent">#EC407A</color> <!--Pink400-->
     <color name="onAccent">#F8BBD0</color> <!--Pink100-->
     <color name="error">#F44336</color> <!--Red500-->
@@ -17,6 +17,9 @@
     <color name="textSecondary">@color/text_secondary_light</color>
     <color name="background">#FFFFFF</color> <!--White-->
 
+    <color name="grey50">#FAFAFA</color>
+    <color name="grey500">#9E9E9E</color>
+    <color name="grey700">#616161</color>
     <color name="blueGrey800">#37474f</color>
     <color name="blueGrey600">#546e7a</color>
     <color name="blueGrey400">#78909C</color>

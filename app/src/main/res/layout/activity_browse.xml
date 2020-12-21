@@ -7,13 +7,17 @@
                 android:layout_height="match_parent"
                 tools:context="agersant.polaris.features.browse.BrowseActivity">
 
-	<androidx.appcompat.widget.Toolbar
-		android:id="@+id/toolbar"
+	<com.google.android.material.appbar.AppBarLayout
+		android:id="@+id/appbar_layout"
 		android:layout_width="match_parent"
-		android:layout_height="?attr/actionBarSize"
-		android:theme="@style/PolarisToolbar"
-		app:popupTheme="@style/PolarisToolbarMenu"
-		/>
+		android:layout_height="wrap_content">
+
+		<com.google.android.material.appbar.MaterialToolbar
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="?attr/actionBarSize" />
+
+	</com.google.android.material.appbar.AppBarLayout>
 
 	<ProgressBar
 		android:id="@+id/progress_bar"
@@ -56,7 +60,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_above="@+id/navigation"
-		android:layout_below="@+id/toolbar"/>
+		android:layout_below="@+id/appbar_layout"/>
 
 	<com.google.android.material.bottomnavigation.BottomNavigationView
 		android:id="@+id/navigation"
