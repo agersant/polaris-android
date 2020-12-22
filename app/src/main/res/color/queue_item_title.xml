@@ -3,6 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	>
-	<item android:color="@color/blueGrey700" app:state_is_playing="false"/>
-	<item android:color="@color/white" app:state_is_playing="true"/>
+	<item android:color="?android:textColorPrimary" app:state_is_playing="false"/>
+	<item android:color="@color/background" app:state_is_playing="true"/>
 </selector>

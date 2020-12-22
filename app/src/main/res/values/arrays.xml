@@ -32,7 +32,21 @@
         <item>10000</item>
         <item>-1</item>
     </string-array>
+    <string-array name="pref_theme_entries">
+        <item>@string/pref_theme_system</item>
+        <item>@string/pref_theme_light</item>
+        <item>@string/pref_theme_dark</item>
+    </string-array>
+    <string-array name="pref_theme_entry_values">
+        <item>System</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
     <string name="pref_num_songs_preload_unlimited">Unlimited</string>
     <string name="pref_num_songs_preload_none">None</string>
     <string name="pref_offline_cache_size_unlimited">Unlimited</string>
+    <string name="pref_theme_system">System</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
 </resources>

@@ -1,42 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<!-- Base application theme. -->
-	<style name="Polaris" parent="Theme.AppCompat.Light.NoActionBar">
-		<item name="android:windowBackground">@color/white</item>
-		<item name="colorPrimary">@color/lightBlue600</item> <!--Task manager toolbar-->
-		<item name="colorPrimaryDark">@color/lightBlue800</item> <!--Status bar background-->
-		<item name="colorAccent">@color/lightBlue600</item> <!--Media player seek bar-->
-	</style>
+    <!-- Base application theme. -->
+    <style name="Polaris" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/background</item>
+        <item name="colorPrimary">@color/primary</item> <!--Task manager toolbar-->
+        <item name="colorPrimaryDark">@color/primaryVariant</item> <!--Status bar background-->
+        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+        <item name="colorAccent">@color/primary</item> <!--Media player seek bar-->
+        <item name="colorSecondary">@color/primary</item>
+        <item name="colorSecondaryVariant">@color/primaryVariant</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
 
-	<style name="Divider">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">1dp</item>
-		<item name="android:layout_marginLeft">8dp</item>
-		<item name="android:layout_marginRight">8dp</item>
-		<item name="android:background">@android:drawable/divider_horizontal_bright</item>
-	</style>
+        <item name="colorHeaderBackground">@color/headerBackground</item>
+        <item name="colorHeaderTextPrimary">@color/headerTextPrimary</item>
+        <item name="colorHeaderTextSecondary">@color/headerTextSecondary</item>
 
-	<style name="PolarisToolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-		<item name="android:background">@color/lightBlue600</item>
-	</style>
+        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Primary</item>
+        <item name="toolbarStyle">@style/PolarisToolbar</item>
+    </style>
 
-	<style name="PolarisToolbarMenu" parent="@style/ThemeOverlay.AppCompat.Light">
-		<item name="android:background">@color/white</item>
-	</style>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:background">?android:dividerHorizontal</item>
+    </style>
 
-	<style name="PolarisButton">
-		<item name="android:background">@color/white</item>
-		<item name="android:textAllCaps">false</item>
-		<item name="android:textColor">@color/blueGrey700</item>
-		<item name="android:layout_height">48dp</item>
-		<item name="android:textSize">18sp</item>
-		<item name="android:fontFamily">sans-serif</item>
-	</style>
+    <style name="PolarisToolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="titleTextColor">@color/headerTextPrimary</item>
+    </style>
 
-	<style name="ExplorerButton" parent="@style/PolarisButton">
-		<item name="android:paddingLeft">20dp</item>
-		<item name="android:paddingRight">20dp</item>
-	</style>
+    <style name="PolarisButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="background">@color/background</item>
+        <item name="android:background">@color/background</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:textAppearance">?textAppearanceBody1</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:drawableTint">?android:textColorPrimary</item>
+    </style>
+
+    <style name="ExplorerButton" parent="@style/PolarisButton">
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+    </style>
+
+    <style name="CollectionButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAppearance">?textAppearanceBody1</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:drawableTint">?android:textColorPrimary</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
 
 </resources>

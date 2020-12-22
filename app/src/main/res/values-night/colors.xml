@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="onAccent">#880E4F</color> <!--Pink900-->
+    <color name="accent">#F06292</color> <!--Pink300-->
+
+    <color name="headerBackground">#263238</color> <!--BlueGrey900-->
+
+    <color name="textPrimary">@color/text_primary_dark</color>
+    <color name="textSecondary">@color/text_secondary_dark</color>
+    <color name="background">#212121</color> <!--Grey900-->
+</resources>
