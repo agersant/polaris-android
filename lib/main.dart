@@ -7,13 +7,23 @@ import 'package:polaris/ui/startup.dart';
 
 final getIt = GetIt.instance;
 
-void setup() {
+final lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: Colors.blue,
+);
+
+final darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.blue,
+);
+
+void _setup() {
   getIt.registerSingleton<API>(API());
   getIt.registerSingleton<ConnectionStore>(ConnectionStore());
 }
 
 void main() {
-  setup();
+  _setup();
   runApp(PolarisApp());
 }
 
@@ -22,18 +32,12 @@ class PolarisApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => getIt<ConnectionStore>())
+        ChangeNotifierProvider.value(value: getIt<ConnectionStore>())
       ],
       child: MaterialApp(
         title: 'Polaris',
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primarySwatch: Colors.blue,
-        ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          primarySwatch: Colors.blue,
-        ),
+        theme: lightTheme,
+        darkTheme: darkTheme,
         home: StartupPage(),
       ),
     );
