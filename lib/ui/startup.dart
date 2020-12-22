@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide ConnectionState;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/store/connection.dart';
 import 'package:provider/provider.dart';
@@ -8,11 +9,10 @@ final getIt = GetIt.instance;
 class StartupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Widget logo = Align(
-      alignment: Alignment.bottomCenter,
-      child: FractionallySizedBox(
-          widthFactor: 0.5,
-          child: Image(image: AssetImage('assets/images/logo.png'))),
+    Widget logo = FractionallySizedBox(
+      widthFactor: 0.5,
+      child: SvgPicture.asset('assets/images/logo.svg',
+          alignment: Alignment.bottomCenter, semanticsLabel: 'Polaris logo'),
     );
 
     Widget serverForm = Form(
