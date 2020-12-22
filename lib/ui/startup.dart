@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
 import 'package:polaris/store/connection.dart';
 import 'package:provider/provider.dart';
@@ -63,16 +63,25 @@ class StartupPage extends StatelessWidget {
           flex: 50,
           child: logo,
         ),
-        Consumer<ConnectionStore>(
-          builder: (context, connection, child) {
-            return Text(connection.state.toString());
-          },
-        ),
         Expanded(
           flex: 75,
           child: Padding(
             padding: const EdgeInsets.all(48),
-            child: serverForm,
+            child: Consumer<ConnectionStore>(
+              builder: (context, connection, child) {
+                switch (connection.state) {
+                  case ConnectionState.disconnected:
+                    return serverForm;
+                  case ConnectionState.connecting:
+                    return Align(
+                        alignment: Alignment.topCenter,
+                        child: CircularProgressIndicator());
+                  case ConnectionState.connected:
+                  default:
+                    return Text("we gucci");
+                }
+              },
+            ),
           ),
         ),
       ],
