@@ -12,6 +12,12 @@ class PolarisApp extends StatelessWidget {
     return MaterialApp(
       title: 'Polaris',
       theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
