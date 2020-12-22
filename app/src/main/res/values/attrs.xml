@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<declare-styleable name="SquareLayout">
-		<attr name="preserveWidth" format="boolean"/>
-	</declare-styleable>
-	<declare-styleable name="QueueItemView">
-		<attr name="state_is_playing" format="boolean"/>
-	</declare-styleable>
-</resources>
