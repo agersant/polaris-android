@@ -1,81 +1,33 @@
 package agersant.polaris.features.settings;
 
 
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 
-import java.util.Arrays;
-import java.util.Map;
+import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.PreferenceFragmentCompat;
 
+import agersant.polaris.PolarisApplication;
 import agersant.polaris.R;
 
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-	private Resources resources;
+public class SettingsFragment extends PreferenceFragmentCompat {
 
-	public SettingsFragment() {
-	}
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.preferences, rootKey);
 
-	private SharedPreferences getSharedPreferences() {
-		return getPreferenceManager().getSharedPreferences();
-	}
+        String passwordKey = getResources().getString(R.string.pref_key_password);
+        EditTextPreference passwordPreference = findPreference(passwordKey);
+        passwordPreference.setSummaryProvider(new PasswordSummaryProvider());
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		resources = getResources();
-		addPreferencesFromResource(R.xml.preferences);
-		getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		for (String key : getSharedPreferences().getAll().keySet()) {
-			Preference preference = this.findPreference(key);
-			updatePreferenceSummary(preference, key);
-		}
-	}
-
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		updatePreferenceSummary(findPreference(key), key);
-	}
-
-	private void updatePreferenceSummary(Preference preference, String key) {
-		if (preference == null) {
-			return;
-		}
-		Map<String, ?> all = getSharedPreferences().getAll();
-		if (key.equals(resources.getString(R.string.pref_key_num_songs_preload))) {
-			String[] entryValues = resources.getStringArray(R.array.pref_num_songs_preload_entry_values);
-			String[] entries = resources.getStringArray(R.array.pref_num_songs_preload_entries);
-			String entryValue = getSharedPreferences().getString(key, "");
-			int selectedIndex = Arrays.asList(entryValues).indexOf(entryValue);
-			String display = "";
-			if (selectedIndex >= 0) {
-				display = entries[selectedIndex];
-			}
-			preference.setSummary(display);
-		} else if (key.equals(resources.getString(R.string.pref_key_offline_cache_size))) {
-			String[] entryValues = resources.getStringArray(R.array.pref_offline_cache_size_entry_values);
-			String[] entries = resources.getStringArray(R.array.pref_offline_cache_size_entries);
-			String entryValue = getSharedPreferences().getString(key, "");
-			int selectedIndex = Arrays.asList(entryValues).indexOf(entryValue);
-			String display = "";
-			if (selectedIndex >= 0) {
-				display = entries[selectedIndex];
-			}
-			preference.setSummary(display);
-		} else if (key.equals(resources.getString(R.string.pref_key_password))) {
-			String password = getSharedPreferences().getString(key, "");
-			@SuppressWarnings("ReplaceAllDot") String stars = password.replaceAll(".", "*");
-			preference.setSummary(stars);
-		} else if (all.get(key) instanceof String) {
-			preference.setSummary(getSharedPreferences().getString(key, ""));
-		}
-	}
+        String themeKey = getResources().getString(R.string.pref_key_theme);
+        ListPreference themePreference = findPreference(themeKey);
+        themePreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (newValue != null) {
+                PolarisApplication.getInstance().setTheme(newValue.toString());
+            }
+            return true;
+        });
+    }
 }
