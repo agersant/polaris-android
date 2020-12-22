@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto">
-	<item
-		android:id="@+id/action_ordering"
-		android:icon="@drawable/ic_reorder_white_24dp"
-		android:title="@string/ordering"
-		app:showAsAction="ifRoom">
-		<menu>
-			<item
-				android:id="@+id/action_ordering_sequence"
-				android:icon="@drawable/ic_reorder_black_24dp"
-				android:title="@string/ordering_sequence"
-				app:showAsAction="never|withText"/>
-			<item
-				android:id="@+id/action_ordering_repeat_one"
-				android:icon="@drawable/ic_repeat_one_black_24dp"
-				android:title="@string/ordering_repeat_one"
-				app:showAsAction="never|withText"/>
-			<item
-				android:id="@+id/action_ordering_repeat_all"
-				android:icon="@drawable/ic_repeat_black_24dp"
-				android:title="@string/ordering_repeat_all"
-				app:showAsAction="never|withText"/>
-		</menu>
-	</item>
-	<item
-		android:id="@+id/action_shuffle"
-		android:icon="@drawable/ic_shuffle_white_24dp"
-		android:title="@string/shuffle"
-		app:showAsAction="ifRoom"/>
-	<item
-		android:id="@+id/action_clear"
-		android:icon="@drawable/ic_delete_white_24dp"
-		android:title="@string/clear"
-		app:showAsAction="ifRoom"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_ordering"
+        android:icon="@drawable/ic_reorder_white_24dp"
+        android:title="@string/ordering"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_ordering_sequence"
+                android:icon="@drawable/ic_reorder_24"
+                android:title="@string/ordering_sequence"
+                app:showAsAction="never|withText" />
+            <item
+                android:id="@+id/action_ordering_repeat_one"
+                android:icon="@drawable/ic_repeat_one_24"
+                android:title="@string/ordering_repeat_one"
+                app:showAsAction="never|withText" />
+            <item
+                android:id="@+id/action_ordering_repeat_all"
+                android:icon="@drawable/ic_repeat_24"
+                android:title="@string/ordering_repeat_all"
+                app:showAsAction="never|withText" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/action_shuffle"
+        android:icon="@drawable/ic_shuffle_white_24dp"
+        android:title="@string/shuffle"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_clear"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="@string/clear"
+        app:showAsAction="ifRoom" />
 </menu>
