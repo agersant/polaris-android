@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:polaris/store/connection.dart';
+import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+final getIt = GetIt.instance;
+
+class StartupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Widget logo = Align(
+      alignment: Alignment.bottomCenter,
+      child: FractionallySizedBox(
+          widthFactor: 0.5,
+          child: Image(image: AssetImage('assets/images/logo.png'))),
+    );
+
     Widget serverForm = Form(
       child: Column(
         children: [
@@ -14,7 +26,8 @@ class LoginPage extends StatelessWidget {
           ),
           Padding(
               padding: EdgeInsets.only(top: 16),
-              child: ElevatedButton(onPressed: example, child: Text("CONNECT")))
+              child: ElevatedButton(
+                  onPressed: onConnectPressed, child: Text("CONNECT")))
         ],
       ),
     );
@@ -36,7 +49,8 @@ class LoginPage extends StatelessWidget {
           ),
           Padding(
               padding: EdgeInsets.only(top: 24),
-              child: ElevatedButton(onPressed: example, child: Text("LOGIN")))
+              child: ElevatedButton(
+                  onPressed: onLoginPressed, child: Text("LOGIN")))
         ],
       ),
     );
@@ -47,23 +61,27 @@ class LoginPage extends StatelessWidget {
       children: [
         Expanded(
           flex: 50,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: FractionallySizedBox(
-                widthFactor: 0.5,
-                child: Image(image: AssetImage('assets/images/logo.png'))),
-          ),
+          child: logo,
+        ),
+        Consumer<ConnectionStore>(
+          builder: (context, connection, child) {
+            return Text(connection.state.toString());
+          },
         ),
         Expanded(
           flex: 75,
           child: Padding(
             padding: const EdgeInsets.all(48),
-            child: loginForm,
+            child: serverForm,
           ),
         ),
       ],
     ));
   }
 
-  example() {}
+  onConnectPressed() {
+    getIt<ConnectionStore>().connect("http://example.com");
+  }
+
+  onLoginPressed() {}
 }
