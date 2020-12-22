@@ -1,6 +1,6 @@
 # Maintenance Guide
 
-## Deplopying a branch to Beta
+## Deploying a branch to Beta
 - Write the user-facing changelog in `fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt`
 - Commit and push changes to the branch you want to deploy (usually **master**)
 - On Github, go to **Actions**, select the **Release To Beta** workflow and click **Run workflow**

@@ -30,11 +30,17 @@
 	<string name="pref_username">Username</string>
 	<string name="pref_password">Password</string>
 	<string name="pref_offline">Offline Mode</string>
+	<string name="pref_num_songs_preload">Songs to preload</string>
+	<string name="pref_offline_cache_size">Offline cache size</string>
+	<string name="pref_theme">Theme</string>
 
 	<string name="pref_key_server_url">server</string>
 	<string name="pref_key_username">username</string>
 	<string name="pref_key_password">password</string>
 	<string name="pref_key_offline">offline</string>
+	<string name="pref_key_num_songs_preload">num_songs_preload</string>
+	<string name="pref_key_offline_cache_size">offline_cache_size</string>
+	<string name="pref_key_theme">theme</string>
 
 	<string name="settings">Settings</string>
 	<string name="clear">Clear</string>
@@ -51,10 +57,6 @@
 	<string name="queuing_error">Something went wrong</string>
 	<string name="album_artwork">Album Artwork</string>
 	<string name="playback_error">A media playback error occurred</string>
-	<string name="pref_key_num_songs_preload">num_songs_preload</string>
-	<string name="pref_num_songs_preload">Songs to preload</string>
-	<string name="pref_key_offline_cache_size">offline_cache_size</string>
-	<string name="pref_offline_cache_size">Offline cache size</string>
 
 	<string name="media_player_service_description">Audio playback service for Polaris</string>
 	<string name="download_service_description">Music download service for Polaris</string>

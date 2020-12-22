@@ -1,58 +1,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:context="agersant.polaris.features.browse.BrowseViewExplorer">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="agersant.polaris.features.browse.BrowseViewExplorer">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="100dp"
-		android:background="@color/blueGrey900"
-		>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="?colorHeaderBackground">
 
-		<ImageView
-			android:id="@+id/album_artwork"
-			android:layout_width="100dp"
-			android:layout_height="100dp"
-			android:contentDescription="@string/album_artwork"
-			tools:src="@drawable/artwork"
-			/>
+        <ImageView
+            android:id="@+id/album_artwork"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="@string/album_artwork"
+            tools:src="@drawable/artwork" />
 
-		<RelativeLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:orientation="vertical"
-			android:padding="15dp"
-			>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="15dp">
 
-			<TextView
-				android:id="@+id/album_title"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:ellipsize="end"
-				android:maxLines="2"
-				android:textColor="@color/white"
-				android:textSize="20sp"
-				tools:text="Calcium Engine"/>
+            <TextView
+                android:id="@+id/album_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="?colorHeaderTextPrimary"
+                android:textSize="20sp"
+                tools:text="Calcium Engine" />
 
-			<TextView
-				android:id="@+id/album_artist"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/album_title"
-				android:textColor="@color/blueGrey400"
-				android:textSize="16sp"
-				tools:text="Botanical"/>
-		</RelativeLayout>
-	</LinearLayout>
+            <TextView
+                android:id="@+id/album_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/album_title"
+                android:textColor="?colorHeaderTextSecondary"
+                android:textSize="16sp"
+                tools:text="Botanical" />
+        </RelativeLayout>
+    </LinearLayout>
 
-	<androidx.recyclerview.widget.RecyclerView
-		android:id="@+id/browse_recycler_view"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:scrollbars="vertical"
-		tools:listitem="@layout/view_browse_explorer_item"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/browse_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/view_browse_explorer_item" />
 
 </LinearLayout>
