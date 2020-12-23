@@ -18,8 +18,10 @@ final darkTheme = ThemeData(
 );
 
 void _setup() {
+  WidgetsFlutterBinding.ensureInitialized();
   getIt.registerSingleton<API>(API());
   getIt.registerSingleton<ConnectionStore>(ConnectionStore());
+  getIt<ConnectionStore>().reconnect();
 }
 
 void main() {

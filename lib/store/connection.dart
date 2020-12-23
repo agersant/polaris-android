@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/api/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
+
+const String serverURLKey = "polaris_server_url";
 
 enum ConnectionStoreError {
   connectionAlreadyInProgress,
@@ -16,6 +19,7 @@ enum ConnectionStoreError {
 enum ConnectionState {
   disconnected,
   connecting,
+  reconnecting,
   connected,
 }
 
@@ -24,12 +28,32 @@ class ConnectionStore extends ChangeNotifier {
 
   get state => _state;
 
-  set state(ConnectionState state) {
-    if (_state == state) {
+  Future reconnect() async {
+    if (_state != ConnectionState.disconnected) {
+      throw ConnectionStoreError.connectionAlreadyInProgress;
+    }
+    _setState(ConnectionState.reconnecting);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String host = prefs.getString(serverURLKey);
+
+    if (host.isEmpty) {
+      _setState(ConnectionState.disconnected);
       return;
     }
-    _state = state;
-    notifyListeners();
+
+    try {
+      // TODO find a way for UI to react to errors coming out of this
+      await _tryConnect(host);
+    } catch (e) {}
+  }
+
+  Future connect(String host) async {
+    if (_state != ConnectionState.disconnected) {
+      throw ConnectionStoreError.connectionAlreadyInProgress;
+    }
+    _setState(ConnectionState.connecting);
+    return _tryConnect(host);
   }
 
   disconnect() {
@@ -38,12 +62,9 @@ class ConnectionStore extends ChangeNotifier {
     _setState(ConnectionState.disconnected);
   }
 
-  Future connect(String host) async {
-    if (_state == ConnectionState.connecting) {
-      throw ConnectionStoreError.connectionAlreadyInProgress;
-    }
-    _setState(ConnectionState.connecting);
-
+  Future _tryConnect(String host) async {
+    assert(state == ConnectionState.connecting ||
+        state == ConnectionState.reconnecting);
     var api = getIt<API>();
     api.host = host;
 
@@ -68,6 +89,8 @@ class ConnectionStore extends ChangeNotifier {
       throw ConnectionStoreError.unknownError;
     }
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(serverURLKey, host);
     _setState(ConnectionState.connected);
   }
 

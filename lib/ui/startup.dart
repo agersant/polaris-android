@@ -157,13 +157,15 @@ class StartupPage extends StatelessWidget {
                 child: Consumer<ConnectionStore>(
                   builder: (context, connection, child) {
                     switch (connection.state) {
+                      case ConnectionState.reconnecting:
+                        return Container();
                       case ConnectionState.disconnected:
                       case ConnectionState.connecting:
                         return ConnectForm();
                       case ConnectionState.connected:
-                      default:
                         return LoginForm();
                     }
+                    return Container();
                   },
                 ),
               ),
