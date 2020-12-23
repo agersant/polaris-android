@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 
 enum APIError {
   unspecifiedHost,
+  networkError,
+  requestFailed,
 }
 
 class API {
@@ -28,10 +30,15 @@ class API {
 
   Future<APIVersion> getAPIVersion() async {
     var url = _makeURL('/api/version');
-    var response = await http.get(url);
+    var response;
+    try {
+      response = await http.get(url);
+    } catch (e) {
+      throw APIError.networkError;
+    }
     if (response.statusCode == 200) {
       return APIVersion.fromJson(jsonDecode(response.body));
     }
-    throw response.statusCode;
+    throw APIError.requestFailed;
   }
 }

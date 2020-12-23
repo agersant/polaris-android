@@ -43,7 +43,34 @@ class _ConnectFormState extends State<ConnectForm> {
   _onConnectPressed() async {
     try {
       await getIt<ConnectionStore>().connect(_textEditingController.text);
-    } catch (e) {}
+    } on ConnectionStoreError catch (e) {
+      Scaffold.of(context).removeCurrentSnackBar();
+      switch (e) {
+        case ConnectionStoreError.unsupportedAPIVersion:
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  "The Polaris server responded but uses an incompatible API version.")));
+          break;
+        case ConnectionStoreError.connectionAlreadyInProgress:
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  "Please wait while the connection is being established.")));
+          break;
+        case ConnectionStoreError.networkError:
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text("The Polaris server could not be reached.")));
+          break;
+        case ConnectionStoreError.requestFailed:
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content:
+                  Text("The Polaris server sent an unexpected response.")));
+          break;
+        case ConnectionStoreError.unknownError:
+          Scaffold.of(context).showSnackBar(
+              SnackBar(content: Text("An unknown error occured.")));
+          break;
+      }
+    }
   }
 
   @override

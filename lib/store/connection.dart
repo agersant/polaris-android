@@ -8,6 +8,9 @@ final getIt = GetIt.instance;
 enum ConnectionStoreError {
   connectionAlreadyInProgress,
   unsupportedAPIVersion,
+  networkError,
+  requestFailed,
+  unknownError,
 }
 
 enum ConnectionState {
@@ -49,9 +52,20 @@ class ConnectionStore extends ChangeNotifier {
       if (apiVersion.major != 6) {
         throw ConnectionStoreError.unsupportedAPIVersion;
       }
+    } on APIError catch (e) {
+      _setState(ConnectionState.disconnected);
+      switch (e) {
+        case APIError.requestFailed:
+          throw ConnectionStoreError.requestFailed;
+          break;
+        case APIError.networkError:
+        case APIError.unspecifiedHost:
+          throw ConnectionStoreError.networkError;
+          break;
+      }
     } catch (e) {
       _setState(ConnectionState.disconnected);
-      throw e;
+      throw ConnectionStoreError.unknownError;
     }
 
     _setState(ConnectionState.connected);
