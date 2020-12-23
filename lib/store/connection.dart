@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
@@ -25,12 +26,15 @@ enum ConnectionState {
 
 class ConnectionStore extends ChangeNotifier {
   ConnectionState _state = ConnectionState.disconnected;
-
   get state => _state;
+
+  final _errorStreamController = StreamController<ConnectionStoreError>();
+  get errorStream => _errorStreamController.stream.asBroadcastStream();
 
   Future reconnect() async {
     if (_state != ConnectionState.disconnected) {
-      throw ConnectionStoreError.connectionAlreadyInProgress;
+      _emitError(ConnectionStoreError.connectionAlreadyInProgress);
+      return;
     }
     _setState(ConnectionState.reconnecting);
 
@@ -43,14 +47,14 @@ class ConnectionStore extends ChangeNotifier {
     }
 
     try {
-      // TODO find a way for UI to react to errors coming out of this
       await _tryConnect(host);
     } catch (e) {}
   }
 
   Future connect(String host) async {
     if (_state != ConnectionState.disconnected) {
-      throw ConnectionStoreError.connectionAlreadyInProgress;
+      _emitError(ConnectionStoreError.connectionAlreadyInProgress);
+      return;
     }
     _setState(ConnectionState.connecting);
     return await _tryConnect(host);
@@ -71,27 +75,32 @@ class ConnectionStore extends ChangeNotifier {
     try {
       var apiVersion = await api.getAPIVersion();
       if (apiVersion.major != 6) {
-        throw ConnectionStoreError.unsupportedAPIVersion;
+        _emitError(ConnectionStoreError.unsupportedAPIVersion);
       }
     } on APIError catch (e) {
       _setState(ConnectionState.disconnected);
       switch (e) {
         case APIError.requestFailed:
-          throw ConnectionStoreError.requestFailed;
+          _emitError(ConnectionStoreError.requestFailed);
           break;
         case APIError.networkError:
         case APIError.unspecifiedHost:
-          throw ConnectionStoreError.networkError;
+          _emitError(ConnectionStoreError.networkError);
           break;
       }
     } catch (e) {
       _setState(ConnectionState.disconnected);
-      throw ConnectionStoreError.unknownError;
+      _emitError(ConnectionStoreError.unknownError);
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(serverURLKey, host);
     _setState(ConnectionState.connected);
+  }
+
+  _emitError(ConnectionStoreError error) {
+    _errorStreamController.add(error);
+    throw error;
   }
 
   _setState(ConnectionState newState) {
