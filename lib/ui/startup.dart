@@ -12,7 +12,7 @@ class ConnectForm extends StatefulWidget {
 }
 
 class _ConnectFormState extends State<ConnectForm> {
-  final textEditingController = TextEditingController();
+  final _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class _ConnectFormState extends State<ConnectForm> {
       child: Column(
         children: [
           TextFormField(
-            controller: textEditingController,
+            controller: _textEditingController,
             decoration: const InputDecoration(
                 icon: Icon(Icons.desktop_windows),
                 labelText: "Server URL",
@@ -33,22 +33,22 @@ class _ConnectFormState extends State<ConnectForm> {
                 return connection.state == ConnectionState.connecting
                     ? CircularProgressIndicator()
                     : ElevatedButton(
-                        child: Text("CONNECT"), onPressed: onConnectPressed);
+                        child: Text("CONNECT"), onPressed: _onConnectPressed);
               })),
         ],
       ),
     );
   }
 
-  onConnectPressed() async {
+  _onConnectPressed() async {
     try {
-      await getIt<ConnectionStore>().connect(textEditingController.text);
+      await getIt<ConnectionStore>().connect(_textEditingController.text);
     } catch (e) {}
   }
 
   @override
   void dispose() {
-    textEditingController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 }
