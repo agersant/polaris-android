@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
-class StartupPage extends StatelessWidget {
-  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
-      semanticsLabel: 'Polaris logo');
+class ConnectForm extends StatelessWidget {
+  final ConnectionState state;
 
-  Widget get _connectForm {
+  const ConnectForm(this.state);
+
+  @override
+  Widget build(BuildContext context) {
     return Form(
       child: Column(
         children: [
@@ -21,13 +23,26 @@ class StartupPage extends StatelessWidget {
                 hintText: "Polaris server address"),
           ),
           Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: ElevatedButton(
-                  onPressed: onConnectPressed, child: Text("CONNECT")))
+              padding: EdgeInsets.only(top: 32),
+              child: state == ConnectionState.connecting
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                      child: Text("CONNECT"), onPressed: onConnectPressed)),
         ],
       ),
     );
   }
+
+  onConnectPressed() async {
+    try {
+      await getIt<ConnectionStore>().connect("http://example.com");
+    } catch (e) {}
+  }
+}
+
+class StartupPage extends StatelessWidget {
+  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
+      semanticsLabel: 'Polaris logo');
 
   Widget get _loginForm {
     return Form(
@@ -79,11 +94,8 @@ class StartupPage extends StatelessWidget {
                   builder: (context, connection, child) {
                     switch (connection.state) {
                       case ConnectionState.disconnected:
-                        return _connectForm;
                       case ConnectionState.connecting:
-                        return Align(
-                            alignment: Alignment.topCenter,
-                            child: CircularProgressIndicator());
+                        return ConnectForm(connection.state);
                       case ConnectionState.connected:
                       default:
                         return Text("we gucci");
@@ -97,10 +109,6 @@ class StartupPage extends StatelessWidget {
         ),
       );
     }));
-  }
-
-  onConnectPressed() {
-    getIt<ConnectionStore>().connect("http://example.com");
   }
 
   onLoginPressed() {}
