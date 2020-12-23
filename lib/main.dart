@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 import 'package:polaris/api/api.dart';
-import 'package:polaris/store/connection.dart';
+import 'package:polaris/api/http_api.dart';
+import 'package:polaris/api/host.dart';
 import 'package:polaris/ui/startup/page.dart';
+import 'package:polaris/store/connection.dart';
+import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -19,7 +21,8 @@ final darkTheme = ThemeData(
 
 void _setup() {
   WidgetsFlutterBinding.ensureInitialized();
-  getIt.registerSingleton<API>(API());
+  getIt.registerSingleton<Host>(Host());
+  getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<ConnectionStore>(ConnectionStore());
   getIt<ConnectionStore>().reconnect();
 }

@@ -30,8 +30,8 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
           Padding(
               padding: EdgeInsets.only(top: 32),
               child: Consumer<ConnectionStore>(
-                  builder: (context, connection, child) {
-                return connection.state == ConnectionState.connecting
+                  builder: (context, connectionStore, child) {
+                return connectionStore.state == ConnectionState.connecting
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         child: Text("CONNECT"), onPressed: _onConnectPressed);

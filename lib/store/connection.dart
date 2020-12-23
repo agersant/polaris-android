@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/api/api.dart';
+import 'package:polaris/api/host.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
@@ -25,6 +26,8 @@ enum ConnectionState {
 }
 
 class ConnectionStore extends ChangeNotifier {
+  API _api = getIt<API>();
+  Host _host = getIt<Host>();
   ConnectionState _state = ConnectionState.disconnected;
   get state => _state;
 
@@ -68,19 +71,17 @@ class ConnectionStore extends ChangeNotifier {
   }
 
   disconnect() {
-    var api = getIt<API>();
-    api.host = null;
+    _host.url = null;
     _setState(ConnectionState.disconnected);
   }
 
-  Future _tryConnect(String host) async {
+  Future _tryConnect(String url) async {
     assert(state == ConnectionState.connecting ||
         state == ConnectionState.reconnecting);
-    var api = getIt<API>();
-    api.host = host;
+    _host.url = url;
 
     try {
-      var apiVersion = await api.getAPIVersion();
+      var apiVersion = await _api.getAPIVersion();
       if (apiVersion.major != 6) {
         _emitError(ConnectionStoreError.unsupportedAPIVersion);
       }
@@ -101,7 +102,7 @@ class ConnectionStore extends ChangeNotifier {
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(serverURLKey, host);
+    prefs.setString(serverURLKey, url);
     _setState(ConnectionState.connected);
   }
 
