@@ -4,11 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/api/api.dart';
 import 'package:polaris/api/host.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
-
-const String serverURLKey = "polaris_server_url";
 
 enum ConnectionStoreError {
   connectionAlreadyInProgress,
@@ -39,35 +36,29 @@ class ConnectionStore extends ChangeNotifier {
 
   ConnectionStore() {
     _errorStream = _errorStreamController.stream.asBroadcastStream();
+    reconnect();
   }
 
   Future reconnect() async {
-    if (_state != ConnectionState.disconnected) {
-      _emitError(ConnectionStoreError.connectionAlreadyInProgress);
+    assert(_state == ConnectionState.disconnected);
+    if (_host.url == null || _host.url.isEmpty) {
       return;
     }
+
     _setState(ConnectionState.reconnecting);
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String host = prefs.getString(serverURLKey);
-
-    if (host.isEmpty) {
-      _setState(ConnectionState.disconnected);
-      return;
-    }
-
     try {
-      await _tryConnect(host);
+      await _tryConnect();
     } catch (e) {}
   }
 
-  Future connect(String host) async {
+  Future connect(String url) async {
     if (_state != ConnectionState.disconnected) {
       _emitError(ConnectionStoreError.connectionAlreadyInProgress);
       return;
     }
+    _host.url = url;
     _setState(ConnectionState.connecting);
-    return await _tryConnect(host);
+    return await _tryConnect();
   }
 
   disconnect() {
@@ -75,10 +66,9 @@ class ConnectionStore extends ChangeNotifier {
     _setState(ConnectionState.disconnected);
   }
 
-  Future _tryConnect(String url) async {
+  Future _tryConnect() async {
     assert(state == ConnectionState.connecting ||
         state == ConnectionState.reconnecting);
-    _host.url = url;
 
     try {
       var apiVersion = await _api.getAPIVersion();
@@ -96,13 +86,14 @@ class ConnectionStore extends ChangeNotifier {
           _emitError(ConnectionStoreError.networkError);
           break;
       }
+      return;
     } catch (e) {
       _setState(ConnectionState.disconnected);
       _emitError(ConnectionStoreError.unknownError);
+      return;
     }
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(serverURLKey, url);
+    _host.persist();
     _setState(ConnectionState.connected);
   }
 

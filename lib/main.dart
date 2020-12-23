@@ -19,16 +19,16 @@ final darkTheme = ThemeData(
   primarySwatch: Colors.blue,
 );
 
-void _setup() {
-  WidgetsFlutterBinding.ensureInitialized();
-  getIt.registerSingleton<Host>(Host());
+Future _registerSingletons() async {
+  var host = await Host.create();
+  getIt.registerSingleton<Host>(host);
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<ConnectionStore>(ConnectionStore());
-  getIt<ConnectionStore>().reconnect();
 }
 
-void main() {
-  _setup();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _registerSingletons();
   runApp(PolarisApp());
 }
 
