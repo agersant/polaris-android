@@ -113,11 +113,23 @@ class _LoginFormState extends State<LoginForm> {
           ),
           Padding(
               padding: EdgeInsets.only(top: 24),
-              child: ElevatedButton(
-                  onPressed: _onLoginPressed, child: Text("LOGIN")))
+              child: Row(
+                children: [
+                  FlatButton(
+                      onPressed: _onDisconnectPressed,
+                      child: Text("DISCONNECT")),
+                  Spacer(),
+                  ElevatedButton(
+                      onPressed: _onLoginPressed, child: Text("LOGIN")),
+                ],
+              ))
         ],
       ),
     );
+  }
+
+  _onDisconnectPressed() async {
+    getIt<ConnectionStore>().disconnect();
   }
 
   _onLoginPressed() async {}
