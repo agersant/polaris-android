@@ -9,7 +9,10 @@ class Host {
 
   set url(String newURL) {
     //  remove trailing slash, prepend http:// if needed
-    _url = newURL.trim();
+    if (newURL != null) {
+      newURL = newURL.trim();
+    }
+    _url = newURL;
   }
 
   void persist() async {
