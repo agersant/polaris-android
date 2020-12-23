@@ -8,8 +8,8 @@ class Host {
   get url => _url;
 
   set url(String newURL) {
-    // TODO trim, remove trailing slash, prepend http:// if needed
-    _url = newURL;
+    //  remove trailing slash, prepend http:// if needed
+    _url = newURL.trim();
   }
 
   void persist() async {
