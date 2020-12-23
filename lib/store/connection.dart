@@ -28,8 +28,15 @@ class ConnectionStore extends ChangeNotifier {
   ConnectionState _state = ConnectionState.disconnected;
   get state => _state;
 
-  final _errorStreamController = StreamController<ConnectionStoreError>();
-  get errorStream => _errorStreamController.stream.asBroadcastStream();
+  final StreamController<ConnectionStoreError> _errorStreamController =
+      StreamController<ConnectionStoreError>();
+
+  Stream<ConnectionStoreError> _errorStream;
+  get errorStream => _errorStream;
+
+  ConnectionStore() {
+    _errorStream = _errorStreamController.stream.asBroadcastStream();
+  }
 
   Future reconnect() async {
     if (_state != ConnectionState.disconnected) {
