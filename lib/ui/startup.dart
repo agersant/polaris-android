@@ -80,21 +80,32 @@ class _ConnectFormState extends State<ConnectForm> {
   }
 }
 
-class StartupPage extends StatelessWidget {
-  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
-      semanticsLabel: 'Polaris logo');
+class LoginForm extends StatefulWidget {
+  @override
+  _LoginFormState createState() => _LoginFormState();
+}
 
-  Widget get _loginForm {
+class _LoginFormState extends State<LoginForm> {
+  final _usernameEditingController = TextEditingController();
+  final _passwordEditingController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     return Form(
       child: Column(
         children: [
           TextFormField(
+            controller: _usernameEditingController,
             decoration: const InputDecoration(
               icon: Icon(Icons.person),
               labelText: "Username",
             ),
           ),
           TextFormField(
+            controller: _passwordEditingController,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
             decoration: const InputDecoration(
               icon: Icon(Icons.lock),
               labelText: "Password",
@@ -103,11 +114,24 @@ class StartupPage extends StatelessWidget {
           Padding(
               padding: EdgeInsets.only(top: 24),
               child: ElevatedButton(
-                  onPressed: onLoginPressed, child: Text("LOGIN")))
+                  onPressed: _onLoginPressed, child: Text("LOGIN")))
         ],
       ),
     );
   }
+
+  _onLoginPressed() async {}
+
+  @override
+  void dispose() {
+    _usernameEditingController.dispose();
+    super.dispose();
+  }
+}
+
+class StartupPage extends StatelessWidget {
+  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
+      semanticsLabel: 'Polaris logo');
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +162,7 @@ class StartupPage extends StatelessWidget {
                         return ConnectForm();
                       case ConnectionState.connected:
                       default:
-                        return Text("we gucci");
+                        return LoginForm();
                     }
                   },
                 ),
@@ -150,6 +174,4 @@ class StartupPage extends StatelessWidget {
       );
     }));
   }
-
-  onLoginPressed() {}
 }
