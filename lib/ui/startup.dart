@@ -7,12 +7,11 @@ import 'package:provider/provider.dart';
 final getIt = GetIt.instance;
 
 class StartupPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    Widget logo = SvgPicture.asset('assets/images/logo.svg',
-        semanticsLabel: 'Polaris logo');
+  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
+      semanticsLabel: 'Polaris logo');
 
-    Widget serverForm = Form(
+  Widget get _connectForm {
+    return Form(
       child: Column(
         children: [
           TextFormField(
@@ -28,8 +27,10 @@ class StartupPage extends StatelessWidget {
         ],
       ),
     );
+  }
 
-    Widget loginForm = Form(
+  Widget get _loginForm {
+    return Form(
       child: Column(
         children: [
           TextFormField(
@@ -51,7 +52,10 @@ class StartupPage extends StatelessWidget {
         ],
       ),
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(body: OrientationBuilder(builder: (context, orientation) {
       EdgeInsets padding = orientation == Orientation.portrait
           ? const EdgeInsets.symmetric(horizontal: 48.0)
@@ -65,13 +69,9 @@ class StartupPage extends StatelessWidget {
           direction: direction,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Spacer(
-              flex: 40,
-            ),
-            Expanded(flex: 50, child: logo),
-            Spacer(
-              flex: 20,
-            ),
+            Spacer(flex: 40),
+            Expanded(flex: 50, child: _logo),
+            Spacer(flex: 20),
             Expanded(
               flex: 100,
               child: IntrinsicHeight(
@@ -79,7 +79,7 @@ class StartupPage extends StatelessWidget {
                   builder: (context, connection, child) {
                     switch (connection.state) {
                       case ConnectionState.disconnected:
-                        return serverForm;
+                        return _connectForm;
                       case ConnectionState.connecting:
                         return Align(
                             alignment: Alignment.topCenter,
@@ -92,9 +92,7 @@ class StartupPage extends StatelessWidget {
                 ),
               ),
             ),
-            Spacer(
-              flex: 40,
-            ),
+            Spacer(flex: 40),
           ],
         ),
       );
