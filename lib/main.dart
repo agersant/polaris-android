@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:polaris/api/api.dart';
 import 'package:polaris/store/connection.dart';
-import 'package:polaris/ui/startup.dart';
+import 'package:polaris/ui/startup/page.dart';
 
 final getIt = GetIt.instance;
 
