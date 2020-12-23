@@ -53,7 +53,7 @@ class ConnectionStore extends ChangeNotifier {
       throw ConnectionStoreError.connectionAlreadyInProgress;
     }
     _setState(ConnectionState.connecting);
-    return _tryConnect(host);
+    return await _tryConnect(host);
   }
 
   disconnect() {
