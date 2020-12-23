@@ -6,10 +6,13 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
-class ConnectForm extends StatelessWidget {
-  final ConnectionState state;
+class ConnectForm extends StatefulWidget {
+  @override
+  _ConnectFormState createState() => _ConnectFormState();
+}
 
-  const ConnectForm(this.state);
+class _ConnectFormState extends State<ConnectForm> {
+  final textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +20,7 @@ class ConnectForm extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
+            controller: textEditingController,
             decoration: const InputDecoration(
                 icon: Icon(Icons.desktop_windows),
                 labelText: "Server URL",
@@ -24,10 +28,13 @@ class ConnectForm extends StatelessWidget {
           ),
           Padding(
               padding: EdgeInsets.only(top: 32),
-              child: state == ConnectionState.connecting
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      child: Text("CONNECT"), onPressed: onConnectPressed)),
+              child: Consumer<ConnectionStore>(
+                  builder: (context, connection, child) {
+                return connection.state == ConnectionState.connecting
+                    ? CircularProgressIndicator()
+                    : ElevatedButton(
+                        child: Text("CONNECT"), onPressed: onConnectPressed);
+              })),
         ],
       ),
     );
@@ -35,8 +42,14 @@ class ConnectForm extends StatelessWidget {
 
   onConnectPressed() async {
     try {
-      await getIt<ConnectionStore>().connect("http://example.com");
+      await getIt<ConnectionStore>().connect(textEditingController.text);
     } catch (e) {}
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
   }
 }
 
@@ -95,7 +108,7 @@ class StartupPage extends StatelessWidget {
                     switch (connection.state) {
                       case ConnectionState.disconnected:
                       case ConnectionState.connecting:
-                        return ConnectForm(connection.state);
+                        return ConnectForm();
                       case ConnectionState.connected:
                       default:
                         return Text("we gucci");
