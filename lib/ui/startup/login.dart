@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:polaris/store/connection.dart';
 
+final usernameFieldLabel = 'Username';
+final passwordFieldLabel = 'Password';
+final disconnectButtonLabel = 'DISCONNECT';
+final loginButtonLabel = 'LOGIN';
+
 class LoginForm extends StatefulWidget {
   @override
   _LoginFormState createState() => _LoginFormState();
@@ -17,9 +22,9 @@ class _LoginFormState extends State<LoginForm> {
         children: [
           TextFormField(
             controller: _usernameEditingController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               icon: Icon(Icons.person),
-              labelText: "Username",
+              labelText: usernameFieldLabel,
             ),
           ),
           TextFormField(
@@ -27,9 +32,9 @@ class _LoginFormState extends State<LoginForm> {
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               icon: Icon(Icons.lock),
-              labelText: "Password",
+              labelText: passwordFieldLabel,
             ),
           ),
           Padding(
@@ -38,10 +43,11 @@ class _LoginFormState extends State<LoginForm> {
                 children: [
                   FlatButton(
                       onPressed: _onDisconnectPressed,
-                      child: Text("DISCONNECT")),
+                      child: Text(disconnectButtonLabel)),
                   Spacer(),
                   ElevatedButton(
-                      onPressed: _onLoginPressed, child: Text("LOGIN")),
+                      onPressed: _onLoginPressed,
+                      child: Text(loginButtonLabel)),
                 ],
               ))
         ],
