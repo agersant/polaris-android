@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:polaris/api/api.dart';
 import 'package:polaris/api/http_api.dart';
 import 'package:polaris/api/host.dart';
@@ -22,6 +23,7 @@ final darkTheme = ThemeData(
 Future _registerSingletons() async {
   var host = await Host.create();
   getIt.registerSingleton<Host>(host);
+  getIt.registerSingleton<Client>(Client());
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<ConnectionStore>(ConnectionStore());
 }

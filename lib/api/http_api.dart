@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:polaris/api/api.dart';
 import 'package:polaris/api/dto.dart';
 import 'package:polaris/api/host.dart';
-import 'package:http/http.dart' as http;
 
 final getIt = GetIt.instance;
 
 class HttpAPI implements API {
   final _host = getIt<Host>();
+  final _client = getIt<Client>();
 
   String _makeURL(String endpoint) {
     if (_host.url == null) {
@@ -22,8 +23,7 @@ class HttpAPI implements API {
     var url = _makeURL('/api/version');
     var response;
     try {
-      // TODO re-use client between calls
-      response = await http.get(url);
+      response = await _client.get(url);
     } catch (e) {
       throw APIError.networkError;
     }
