@@ -16,18 +16,28 @@ final getIt = GetIt.instance;
 
 class MockClient extends Mock implements Client {}
 
-final host = 'my-polaris-server';
-final apiVersionEndpoint = host + '/api/version';
+final hostURL = 'my-polaris-server';
+final apiVersionEndpoint = hostURL + '/api/version';
 final compatibleAPIVersion = '{"major": 6, "minor": 0}';
 final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
 
-Future _setup() async {
-  SharedPreferences.setMockInitialValues(Map<String, dynamic>());
+Future _setup({bool connect = false}) async {
+  var preferences = Map<String, dynamic>();
+  if (connect) {
+    preferences[serverURLKey] = hostURL;
+  }
+  SharedPreferences.setMockInitialValues(preferences);
 
   var host = await Host.create();
   getIt.allowReassignment = true;
   getIt.registerSingleton<Host>(host);
   getIt.registerSingleton<Client>(MockClient());
+  if (connect) {
+    final client = getIt<Client>();
+    when(client.get(apiVersionEndpoint))
+        .thenAnswer((_) async => Response(compatibleAPIVersion, 200));
+  }
+
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
 }
@@ -47,7 +57,7 @@ void main() {
     final client = getIt<Client>();
     when(client.get(apiVersionEndpoint)).thenThrow('bad host');
 
-    await tester.enterText(urlInputField, host);
+    await tester.enterText(urlInputField, hostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorNetwork), findsOneWidget);
@@ -69,7 +79,7 @@ void main() {
     when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response(incompatibleAPIVersion, 200));
 
-    await tester.enterText(urlInputField, host);
+    await tester.enterText(urlInputField, hostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorAPIVersion), findsOneWidget);
@@ -89,10 +99,24 @@ void main() {
     when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response(compatibleAPIVersion, 200));
 
-    await tester.enterText(urlInputField, host);
+    await tester.enterText(urlInputField, hostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(urlInputField, findsNothing);
+  });
+
+  testWidgets('Reconnects on startup', (WidgetTester tester) async {
+    await _setup(connect: true);
+
+    await tester.pumpWidget(PolarisApp());
+
+    final Finder connectButton =
+        find.widgetWithText(ElevatedButton, connectButtonLabel);
+    final Finder disconnectButton =
+        find.widgetWithText(FlatButton, disconnectButtonLabel);
+
+    expect(connectButton, findsNothing);
+    expect(disconnectButton, findsOneWidget);
   });
 
   testWidgets('Disconnect returns to connect screen',
@@ -112,7 +136,7 @@ void main() {
     when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response(compatibleAPIVersion, 200));
 
-    await tester.enterText(urlInputField, host);
+    await tester.enterText(urlInputField, hostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(urlInputField, findsNothing);
