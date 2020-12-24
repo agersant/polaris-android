@@ -18,6 +18,7 @@ final getIt = GetIt.instance;
 class MockClient extends Mock implements Client {}
 
 final host = 'my-polaris-server';
+final apiVersionEndpoint = host + '/api/version';
 
 Future _setup() async {
   SharedPreferences.setMockInitialValues(Map<String, dynamic>());
@@ -38,11 +39,12 @@ void main() {
     await tester.pumpWidget(PolarisApp());
 
     final Finder urlInputField =
-        find.widgetWithText(TextFormField, 'Server URL');
-    final Finder connectButton = find.widgetWithText(ElevatedButton, 'CONNECT');
+        find.widgetWithText(TextFormField, serverURLFieldLabel);
+    final Finder connectButton =
+        find.widgetWithText(ElevatedButton, connectButtonLabel);
 
     final client = getIt<Client>();
-    when(client.get(host + '/api/version')).thenThrow('bad host');
+    when(client.get(apiVersionEndpoint)).thenThrow('bad host');
 
     await tester.enterText(urlInputField, host);
     await tester.tap(connectButton);
@@ -58,11 +60,12 @@ void main() {
     await tester.pumpWidget(PolarisApp());
 
     final Finder urlInputField =
-        find.widgetWithText(TextFormField, 'Server URL');
-    final Finder connectButton = find.widgetWithText(ElevatedButton, 'CONNECT');
+        find.widgetWithText(TextFormField, serverURLFieldLabel);
+    final Finder connectButton =
+        find.widgetWithText(ElevatedButton, connectButtonLabel);
 
     final client = getIt<Client>();
-    when(client.get(host + '/api/version'))
+    when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response('{"major": 5, "minor": 0}', 200));
 
     await tester.enterText(urlInputField, host);
@@ -77,11 +80,12 @@ void main() {
     await tester.pumpWidget(PolarisApp());
 
     final Finder urlInputField =
-        find.widgetWithText(TextFormField, 'Server URL');
-    final Finder connectButton = find.widgetWithText(ElevatedButton, 'CONNECT');
+        find.widgetWithText(TextFormField, serverURLFieldLabel);
+    final Finder connectButton =
+        find.widgetWithText(ElevatedButton, connectButtonLabel);
 
     final client = getIt<Client>();
-    when(client.get(host + '/api/version'))
+    when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response('{"major": 6, "minor": 0}', 200));
 
     await tester.enterText(urlInputField, host);

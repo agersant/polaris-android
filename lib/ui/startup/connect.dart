@@ -15,6 +15,9 @@ final errorNetwork = 'The Polaris server could not be reached.';
 final errorRequestFailed = 'The Polaris server sent an unexpected response.';
 final errorUnknown = 'An unknown error occured.';
 
+final serverURLFieldLabel = 'Server URL';
+final connectButtonLabel = 'CONNECT';
+
 class ConnectForm extends StatefulWidget {
   @override
   _ConnectFormState createState() => _ConnectFormState();
@@ -30,9 +33,9 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
         children: [
           TextFormField(
             controller: _textEditingController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
                 icon: Icon(Icons.desktop_windows),
-                labelText: "Server URL",
+                labelText: serverURLFieldLabel,
                 hintText: "Polaris server address"),
           ),
           Padding(
@@ -42,7 +45,8 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
                 return connectionStore.state == ConnectionState.connecting
                     ? CircularProgressIndicator()
                     : ElevatedButton(
-                        child: Text("CONNECT"), onPressed: _onConnectPressed);
+                        child: Text(connectButtonLabel),
+                        onPressed: _onConnectPressed);
               })),
         ],
       ),
