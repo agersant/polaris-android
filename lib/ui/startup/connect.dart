@@ -7,6 +7,14 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
+final errorAPIVersion =
+    'The Polaris server responded but uses an incompatible API version.';
+final errorAlreadyConnecting =
+    'Please wait while the connection is being established.';
+final errorNetwork = 'The Polaris server could not be reached.';
+final errorRequestFailed = 'The Polaris server sent an unexpected response.';
+final errorUnknown = 'An unknown error occured.';
+
 class ConnectForm extends StatefulWidget {
   @override
   _ConnectFormState createState() => _ConnectFormState();
@@ -68,26 +76,24 @@ mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
     Scaffold.of(context).removeCurrentSnackBar();
     switch (error) {
       case ConnectionStoreError.unsupportedAPIVersion:
-        Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text(
-                "The Polaris server responded but uses an incompatible API version.")));
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(errorAPIVersion)));
         break;
       case ConnectionStoreError.connectionAlreadyInProgress:
-        Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text(
-                "Please wait while the connection is being established.")));
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
         break;
       case ConnectionStoreError.networkError:
-        Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("The Polaris server could not be reached.")));
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(errorNetwork)));
         break;
       case ConnectionStoreError.requestFailed:
-        Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("The Polaris server sent an unexpected response.")));
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text(errorRequestFailed)));
         break;
       case ConnectionStoreError.unknownError:
         Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text("An unknown error occured.")));
+            .showSnackBar(SnackBar(content: Text(errorUnknown)));
         break;
     }
   }

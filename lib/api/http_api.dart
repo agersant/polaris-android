@@ -22,6 +22,7 @@ class HttpAPI implements API {
     var url = _makeURL('/api/version');
     var response;
     try {
+      // TODO re-use client between calls
       response = await http.get(url);
     } catch (e) {
       throw APIError.networkError;
