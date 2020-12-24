@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:polaris/store/connection.dart';
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
+
+final getIt = GetIt.instance;
 
 class StartupPage extends StatelessWidget {
   final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
@@ -30,19 +33,25 @@ class StartupPage extends StatelessWidget {
             Expanded(
               flex: 100,
               child: IntrinsicHeight(
-                child: Consumer<ConnectionStore>(
-                  builder: (context, connection, child) {
-                    switch (connection.state) {
-                      case ConnectionState.reconnecting:
-                        return Container();
-                      case ConnectionState.disconnected:
-                      case ConnectionState.connecting:
-                        return ConnectForm();
-                      case ConnectionState.connected:
-                        return LoginForm();
-                    }
-                    return Container();
-                  },
+                child: MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(
+                        value: getIt<ConnectionStore>())
+                  ],
+                  child: Consumer<ConnectionStore>(
+                    builder: (context, connection, child) {
+                      switch (connection.state) {
+                        case ConnectionState.reconnecting:
+                          return Container();
+                        case ConnectionState.disconnected:
+                        case ConnectionState.connecting:
+                          return ConnectForm();
+                        case ConnectionState.connected:
+                          return LoginForm();
+                      }
+                      return Container();
+                    },
+                  ),
                 ),
               ),
             ),

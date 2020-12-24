@@ -6,7 +6,6 @@ import 'package:polaris/api/http_api.dart';
 import 'package:polaris/api/host.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/store/connection.dart';
-import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -37,16 +36,11 @@ void main() async {
 class PolarisApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: getIt<ConnectionStore>())
-      ],
-      child: MaterialApp(
-        title: 'Polaris',
-        theme: lightTheme,
-        darkTheme: darkTheme,
-        home: StartupPage(),
-      ),
+    return MaterialApp(
+      title: 'Polaris',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      home: StartupPage(),
     );
   }
 }
