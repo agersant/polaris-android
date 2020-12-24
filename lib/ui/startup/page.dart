@@ -9,17 +9,14 @@ import 'package:provider/provider.dart';
 final getIt = GetIt.instance;
 
 class StartupPage extends StatelessWidget {
-  final Widget _logo = SvgPicture.asset('assets/images/logo.svg',
-      semanticsLabel: 'Polaris logo');
+  final Widget _logo = SvgPicture.asset('assets/images/logo.svg', semanticsLabel: 'Polaris logo');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: OrientationBuilder(builder: (context, orientation) {
-      EdgeInsets padding = orientation == Orientation.portrait
-          ? const EdgeInsets.symmetric(horizontal: 48.0)
-          : const EdgeInsets.all(0);
-      Axis direction =
-          orientation == Orientation.portrait ? Axis.vertical : Axis.horizontal;
+      EdgeInsets padding =
+          orientation == Orientation.portrait ? const EdgeInsets.symmetric(horizontal: 48.0) : const EdgeInsets.all(0);
+      Axis direction = orientation == Orientation.portrait ? Axis.vertical : Axis.horizontal;
 
       return Padding(
         padding: padding,
@@ -34,10 +31,7 @@ class StartupPage extends StatelessWidget {
               flex: 100,
               child: IntrinsicHeight(
                 child: MultiProvider(
-                  providers: [
-                    ChangeNotifierProvider.value(
-                        value: getIt<connection.Manager>())
-                  ],
+                  providers: [ChangeNotifierProvider.value(value: getIt<connection.Manager>())],
                   child: Consumer<connection.Manager>(
                     builder: (context, manager, child) {
                       switch (manager.state) {

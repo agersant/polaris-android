@@ -28,8 +28,7 @@ class Manager extends ChangeNotifier {
   State _state = State.disconnected;
   get state => _state;
 
-  final StreamController<Error> _errorStreamController =
-      StreamController<Error>();
+  final StreamController<Error> _errorStreamController = StreamController<Error>();
 
   Stream<Error> _errorStream;
   get errorStream => _errorStream;

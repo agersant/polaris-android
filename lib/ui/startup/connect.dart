@@ -7,10 +7,8 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
-final errorAPIVersion =
-    'The Polaris server responded but uses an incompatible API version.';
-final errorAlreadyConnecting =
-    'Please wait while the connection is being established.';
+final errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
+final errorAlreadyConnecting = 'Please wait while the connection is being established.';
 final errorNetwork = 'The Polaris server could not be reached.';
 final errorRequestFailed = 'The Polaris server sent an unexpected response.';
 final errorUnknown = 'An unknown error occured.';
@@ -34,19 +32,14 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
           TextFormField(
             controller: _textEditingController,
             decoration: InputDecoration(
-                icon: Icon(Icons.desktop_windows),
-                labelText: serverURLFieldLabel,
-                hintText: "Polaris server address"),
+                icon: Icon(Icons.desktop_windows), labelText: serverURLFieldLabel, hintText: "Polaris server address"),
           ),
           Padding(
               padding: EdgeInsets.only(top: 32),
-              child: Consumer<connection.Manager>(
-                  builder: (context, connectionStore, child) {
+              child: Consumer<connection.Manager>(builder: (context, connectionStore, child) {
                 return connectionStore.state == connection.State.connecting
                     ? CircularProgressIndicator()
-                    : ElevatedButton(
-                        child: Text(connectButtonLabel),
-                        onPressed: _onConnectPressed);
+                    : ElevatedButton(child: Text(connectButtonLabel), onPressed: _onConnectPressed);
               })),
         ],
       ),
@@ -72,32 +65,26 @@ mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     super.initState();
-    _connectionErrorStream =
-        getIt<connection.Manager>().errorStream.listen((e) => handleError(e));
+    _connectionErrorStream = getIt<connection.Manager>().errorStream.listen((e) => handleError(e));
   }
 
   void handleError(connection.Error error) {
     Scaffold.of(context).removeCurrentSnackBar();
     switch (error) {
       case connection.Error.unsupportedAPIVersion:
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(errorAPIVersion)));
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorAPIVersion)));
         break;
       case connection.Error.connectionAlreadyInProgress:
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
         break;
       case connection.Error.networkError:
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(errorNetwork)));
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorNetwork)));
         break;
       case connection.Error.requestFailed:
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(errorRequestFailed)));
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
         break;
       case connection.Error.unknownError:
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(errorUnknown)));
+        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
         break;
     }
   }

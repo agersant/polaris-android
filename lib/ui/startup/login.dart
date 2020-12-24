@@ -44,13 +44,9 @@ class _LoginFormState extends State<LoginForm> {
               padding: EdgeInsets.only(top: 24),
               child: Row(
                 children: [
-                  FlatButton(
-                      onPressed: _onDisconnectPressed,
-                      child: Text(disconnectButtonLabel)),
+                  FlatButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
                   Spacer(),
-                  ElevatedButton(
-                      onPressed: _onLoginPressed,
-                      child: Text(loginButtonLabel)),
+                  ElevatedButton(onPressed: _onLoginPressed, child: Text(loginButtonLabel)),
                 ],
               ))
         ],
