@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/store/connection.dart';
+import 'package:polaris/manager/connection.dart' as connection;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
@@ -36,17 +36,17 @@ class StartupPage extends StatelessWidget {
                 child: MultiProvider(
                   providers: [
                     ChangeNotifierProvider.value(
-                        value: getIt<ConnectionStore>())
+                        value: getIt<connection.Manager>())
                   ],
-                  child: Consumer<ConnectionStore>(
-                    builder: (context, connection, child) {
-                      switch (connection.state) {
-                        case ConnectionState.reconnecting:
+                  child: Consumer<connection.Manager>(
+                    builder: (context, manager, child) {
+                      switch (manager.state) {
+                        case connection.State.reconnecting:
                           return Container();
-                        case ConnectionState.disconnected:
-                        case ConnectionState.connecting:
+                        case connection.State.disconnected:
+                        case connection.State.connecting:
                           return ConnectForm();
-                        case ConnectionState.connected:
+                        case connection.State.connected:
                           return LoginForm();
                       }
                       return Container();

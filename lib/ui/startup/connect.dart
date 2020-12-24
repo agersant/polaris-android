@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart' hide ConnectionState;
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/store/connection.dart';
+import 'package:polaris/manager/connection.dart' as connection;
 import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
@@ -40,9 +40,9 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
           ),
           Padding(
               padding: EdgeInsets.only(top: 32),
-              child: Consumer<ConnectionStore>(
+              child: Consumer<connection.Manager>(
                   builder: (context, connectionStore, child) {
-                return connectionStore.state == ConnectionState.connecting
+                return connectionStore.state == connection.State.connecting
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         child: Text(connectButtonLabel),
@@ -55,7 +55,7 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
 
   _onConnectPressed() async {
     try {
-      await getIt<ConnectionStore>().connect(_textEditingController.text);
+      await getIt<connection.Manager>().connect(_textEditingController.text);
     } catch (e) {}
   }
 
@@ -67,35 +67,35 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
 }
 
 mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
-  StreamSubscription<ConnectionStoreError> _connectionErrorStream;
+  StreamSubscription<connection.Error> _connectionErrorStream;
 
   @override
   void initState() {
     super.initState();
     _connectionErrorStream =
-        getIt<ConnectionStore>().errorStream.listen((e) => handleError(e));
+        getIt<connection.Manager>().errorStream.listen((e) => handleError(e));
   }
 
-  void handleError(ConnectionStoreError error) {
+  void handleError(connection.Error error) {
     Scaffold.of(context).removeCurrentSnackBar();
     switch (error) {
-      case ConnectionStoreError.unsupportedAPIVersion:
+      case connection.Error.unsupportedAPIVersion:
         Scaffold.of(context)
             .showSnackBar(SnackBar(content: Text(errorAPIVersion)));
         break;
-      case ConnectionStoreError.connectionAlreadyInProgress:
+      case connection.Error.connectionAlreadyInProgress:
         Scaffold.of(context)
             .showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
         break;
-      case ConnectionStoreError.networkError:
+      case connection.Error.networkError:
         Scaffold.of(context)
             .showSnackBar(SnackBar(content: Text(errorNetwork)));
         break;
-      case ConnectionStoreError.requestFailed:
+      case connection.Error.requestFailed:
         Scaffold.of(context)
             .showSnackBar(SnackBar(content: Text(errorRequestFailed)));
         break;
-      case ConnectionStoreError.unknownError:
+      case connection.Error.unknownError:
         Scaffold.of(context)
             .showSnackBar(SnackBar(content: Text(errorUnknown)));
         break;

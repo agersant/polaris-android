@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:polaris/api/api.dart';
-import 'package:polaris/api/dto.dart';
-import 'package:polaris/api/host.dart';
+import 'package:polaris/service/api.dart';
+import 'package:polaris/service/dto.dart';
+import 'package:polaris/service/host.dart';
 
 final getIt = GetIt.instance;
 

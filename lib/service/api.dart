@@ -1,4 +1,4 @@
-import 'package:polaris/api/dto.dart';
+import 'package:polaris/service/dto.dart';
 
 enum APIError {
   unspecifiedHost,

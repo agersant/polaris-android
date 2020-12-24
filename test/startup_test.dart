@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
-import 'package:polaris/api/api.dart';
-import 'package:polaris/api/host.dart';
-import 'package:polaris/api/http_api.dart';
 import 'package:polaris/main.dart';
-import 'package:polaris/store/connection.dart';
+import 'package:polaris/manager/connection.dart' as connection;
+import 'package:polaris/service/api.dart';
+import 'package:polaris/service/host.dart';
+import 'package:polaris/service/http_api.dart';
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +29,7 @@ Future _setup() async {
   getIt.registerSingleton<Host>(host);
   getIt.registerSingleton<Client>(MockClient());
   getIt.registerSingleton<API>(HttpAPI());
-  getIt.registerSingleton<ConnectionStore>(ConnectionStore());
+  getIt.registerSingleton<connection.Manager>(connection.Manager());
 }
 
 void main() {

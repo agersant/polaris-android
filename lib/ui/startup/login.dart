@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart' hide ConnectionState;
-import 'package:polaris/store/connection.dart';
+import 'package:get_it/get_it.dart';
+import 'package:polaris/manager/connection.dart' as connection;
 
 final usernameFieldLabel = 'Username';
 final passwordFieldLabel = 'Password';
 final disconnectButtonLabel = 'DISCONNECT';
 final loginButtonLabel = 'LOGIN';
+
+final getIt = GetIt.instance;
 
 class LoginForm extends StatefulWidget {
   @override
@@ -56,7 +59,7 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   _onDisconnectPressed() async {
-    getIt<ConnectionStore>().disconnect();
+    getIt<connection.Manager>().disconnect();
   }
 
   _onLoginPressed() async {}
