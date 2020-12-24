@@ -70,11 +70,9 @@ class ConnectionStore extends ChangeNotifier {
     assert(state == ConnectionState.connecting ||
         state == ConnectionState.reconnecting);
 
+    var apiVersion;
     try {
-      var apiVersion = await _api.getAPIVersion();
-      if (apiVersion.major != 6) {
-        _emitError(ConnectionStoreError.unsupportedAPIVersion);
-      }
+      apiVersion = await _api.getAPIVersion();
     } on APIError catch (e) {
       _setState(ConnectionState.disconnected);
       switch (e) {
@@ -90,6 +88,12 @@ class ConnectionStore extends ChangeNotifier {
     } catch (e) {
       _setState(ConnectionState.disconnected);
       _emitError(ConnectionStoreError.unknownError);
+      return;
+    }
+
+    if (apiVersion.major != 6) {
+      _setState(ConnectionState.disconnected);
+      _emitError(ConnectionStoreError.unsupportedAPIVersion);
       return;
     }
 
