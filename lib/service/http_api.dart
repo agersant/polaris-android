@@ -7,6 +7,8 @@ import 'package:polaris/service/host.dart';
 
 final getIt = GetIt.instance;
 
+final apiVersionEndpoint = '/api/version';
+
 class HttpAPI implements API {
   final _host = getIt<Host>();
   final _client = getIt<Client>();
@@ -20,7 +22,7 @@ class HttpAPI implements API {
 
   @override
   Future<APIVersion> getAPIVersion() async {
-    var url = _makeURL('/api/version');
+    var url = _makeURL(apiVersionEndpoint);
     var response;
     try {
       response = await _client.get(url);

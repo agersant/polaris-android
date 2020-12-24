@@ -1,8 +1,8 @@
+import 'mock/client.dart' as client;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:mockito/mockito.dart';
 import 'package:polaris/main.dart';
 import 'package:polaris/manager/connection.dart' as connection;
 import 'package:polaris/service/api.dart';
@@ -14,17 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
 
-class MockClient extends Mock implements Client {}
-
-final goodhostURL = 'my-polaris-server';
-final badHostURL = 'not-a-polaris-server';
-final incompatibleHostURL = 'incompatible-polaris-server';
-
-final apiVersionEndpoint = '/api/version';
-
-final compatibleAPIVersion = '{"major": 6, "minor": 0}';
-final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
-
 final urlInputField = find.widgetWithText(TextFormField, serverURLFieldLabel);
 final connectButton = find.widgetWithText(ElevatedButton, connectButtonLabel);
 final disconnectButton = find.widgetWithText(FlatButton, disconnectButtonLabel);
@@ -35,12 +24,7 @@ Future _setup({Map<String, dynamic> preferences}) async {
   getIt.allowReassignment = true;
 
   getIt.registerSingleton<Host>(await Host.create());
-  getIt.registerSingleton<Client>(MockClient());
-  final client = getIt<Client>();
-  when(client.get(goodhostURL + apiVersionEndpoint)).thenAnswer((_) async => Response(compatibleAPIVersion, 200));
-  when(client.get(incompatibleHostURL + apiVersionEndpoint))
-      .thenAnswer((_) async => Response(incompatibleAPIVersion, 200));
-  when(client.get(badHostURL + apiVersionEndpoint)).thenThrow('borked internet');
+  getIt.registerSingleton<Client>(client.Mock());
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
 }
@@ -51,7 +35,7 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    await tester.enterText(urlInputField, badHostURL);
+    await tester.enterText(urlInputField, client.badHostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorNetwork), findsOneWidget);
@@ -62,10 +46,7 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    final client = getIt<Client>();
-    when(client.get(apiVersionEndpoint)).thenAnswer((_) async => Response(incompatibleAPIVersion, 200));
-
-    await tester.enterText(urlInputField, incompatibleHostURL);
+    await tester.enterText(urlInputField, client.incompatibleHostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorAPIVersion), findsOneWidget);
@@ -76,17 +57,14 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    final client = getIt<Client>();
-    when(client.get(apiVersionEndpoint)).thenAnswer((_) async => Response(compatibleAPIVersion, 200));
-
-    await tester.enterText(urlInputField, goodhostURL);
+    await tester.enterText(urlInputField, client.goodhostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(urlInputField, findsNothing);
   });
 
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
-    await _setup(preferences: {serverURLKey: goodhostURL});
+    await _setup(preferences: {serverURLKey: client.goodhostURL});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -95,7 +73,7 @@ void main() {
   });
 
   testWidgets('Failed reconnect shows connect screen', (WidgetTester tester) async {
-    await _setup(preferences: {serverURLKey: badHostURL});
+    await _setup(preferences: {serverURLKey: client.badHostURL});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -108,10 +86,7 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    final client = getIt<Client>();
-    when(client.get(apiVersionEndpoint)).thenAnswer((_) async => Response(compatibleAPIVersion, 200));
-
-    await tester.enterText(urlInputField, goodhostURL);
+    await tester.enterText(urlInputField, client.goodhostURL);
     await tester.tap(connectButton);
     await tester.pump();
     expect(urlInputField, findsNothing);
