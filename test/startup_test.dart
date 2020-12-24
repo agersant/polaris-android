@@ -21,6 +21,13 @@ final apiVersionEndpoint = hostURL + '/api/version';
 final compatibleAPIVersion = '{"major": 6, "minor": 0}';
 final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
 
+final Finder urlInputField =
+    find.widgetWithText(TextFormField, serverURLFieldLabel);
+final Finder connectButton =
+    find.widgetWithText(ElevatedButton, connectButtonLabel);
+final Finder disconnectButton =
+    find.widgetWithText(FlatButton, disconnectButtonLabel);
+
 Future _setup({bool connect = false}) async {
   var preferences = Map<String, dynamic>();
   if (connect) {
@@ -28,16 +35,13 @@ Future _setup({bool connect = false}) async {
   }
   SharedPreferences.setMockInitialValues(preferences);
 
-  var host = await Host.create();
   getIt.allowReassignment = true;
-  getIt.registerSingleton<Host>(host);
-  getIt.registerSingleton<Client>(MockClient());
-  if (connect) {
-    final client = getIt<Client>();
-    when(client.get(apiVersionEndpoint))
-        .thenAnswer((_) async => Response(compatibleAPIVersion, 200));
-  }
 
+  getIt.registerSingleton<Host>(await Host.create());
+  getIt.registerSingleton<Client>(MockClient());
+  final client = getIt<Client>();
+  when(client.get(apiVersionEndpoint))
+      .thenAnswer((_) async => Response(compatibleAPIVersion, 200));
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
 }
@@ -48,11 +52,6 @@ void main() {
     await _setup();
 
     await tester.pumpWidget(PolarisApp());
-
-    final Finder urlInputField =
-        find.widgetWithText(TextFormField, serverURLFieldLabel);
-    final Finder connectButton =
-        find.widgetWithText(ElevatedButton, connectButtonLabel);
 
     final client = getIt<Client>();
     when(client.get(apiVersionEndpoint)).thenThrow('bad host');
@@ -70,11 +69,6 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    final Finder urlInputField =
-        find.widgetWithText(TextFormField, serverURLFieldLabel);
-    final Finder connectButton =
-        find.widgetWithText(ElevatedButton, connectButtonLabel);
-
     final client = getIt<Client>();
     when(client.get(apiVersionEndpoint))
         .thenAnswer((_) async => Response(incompatibleAPIVersion, 200));
@@ -89,11 +83,6 @@ void main() {
     await _setup();
 
     await tester.pumpWidget(PolarisApp());
-
-    final Finder urlInputField =
-        find.widgetWithText(TextFormField, serverURLFieldLabel);
-    final Finder connectButton =
-        find.widgetWithText(ElevatedButton, connectButtonLabel);
 
     final client = getIt<Client>();
     when(client.get(apiVersionEndpoint))
@@ -110,11 +99,6 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    final Finder connectButton =
-        find.widgetWithText(ElevatedButton, connectButtonLabel);
-    final Finder disconnectButton =
-        find.widgetWithText(FlatButton, disconnectButtonLabel);
-
     expect(connectButton, findsNothing);
     expect(disconnectButton, findsOneWidget);
   });
@@ -124,13 +108,6 @@ void main() {
     await _setup();
 
     await tester.pumpWidget(PolarisApp());
-
-    final Finder urlInputField =
-        find.widgetWithText(TextFormField, serverURLFieldLabel);
-    final Finder connectButton =
-        find.widgetWithText(ElevatedButton, connectButtonLabel);
-    final Finder disconnectButton =
-        find.widgetWithText(FlatButton, disconnectButtonLabel);
 
     final client = getIt<Client>();
     when(client.get(apiVersionEndpoint))
