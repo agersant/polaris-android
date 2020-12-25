@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:polaris/platform/api.dart';
@@ -35,7 +36,9 @@ class HttpAPI implements API {
           response = await _client.get(url);
           break;
         case _Method.post:
-          response = await _client.post(url, body: body);
+          Map<String, String> headers = Map();
+          headers[HttpHeaders.contentTypeHeader] = 'application/json';
+          response = await _client.post(url, headers: headers, body: body);
           break;
       }
     } catch (e) {

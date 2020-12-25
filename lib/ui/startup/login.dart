@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/authentication.dart' as authentication;
 import 'package:polaris/platform/connection.dart' as connection;
+import 'package:provider/provider.dart';
 
 final usernameFieldLabel = 'Username';
 final passwordFieldLabel = 'Password';
@@ -50,14 +51,19 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
             ),
           ),
           Padding(
-              padding: EdgeInsets.only(top: 24),
-              child: Row(
-                children: [
-                  FlatButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
-                  Spacer(),
-                  ElevatedButton(onPressed: _onLoginPressed, child: Text(loginButtonLabel)),
-                ],
-              ))
+              padding: EdgeInsets.only(top: 32),
+              child: Consumer<authentication.Manager>(builder: (context, authenticationManager, child) {
+                if (authenticationManager.state != authentication.State.unauthenticated) {
+                  return CircularProgressIndicator();
+                }
+                return Row(
+                  children: [
+                    FlatButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
+                    Spacer(),
+                    ElevatedButton(onPressed: _onLoginPressed, child: Text(loginButtonLabel)),
+                  ],
+                );
+              })),
         ],
       ),
     );

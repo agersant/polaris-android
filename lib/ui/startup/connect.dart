@@ -45,10 +45,11 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
           ),
           Padding(
               padding: EdgeInsets.only(top: 32),
-              child: Consumer<connection.Manager>(builder: (context, connectionStore, child) {
-                return connectionStore.state != connection.State.disconnected
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(child: Text(connectButtonLabel), onPressed: _onConnectPressed);
+              child: Consumer<connection.Manager>(builder: (context, connectionManager, child) {
+                if (connectionManager.state != connection.State.disconnected) {
+                  return CircularProgressIndicator();
+                }
+                return ElevatedButton(child: Text(connectButtonLabel), onPressed: _onConnectPressed);
               })),
         ],
       ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class APIVersion {
   int major, minor;
   APIVersion({this.major, this.minor});
@@ -25,8 +27,8 @@ class Authorization {
 class Credentials {
   String username, password;
   Credentials({this.username, this.password});
-  Map<String, dynamic> toJson() => {
+  String toJson() => json.encode({
         'username': username,
         'password': password,
-      };
+      });
 }
