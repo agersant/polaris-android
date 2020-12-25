@@ -27,11 +27,11 @@ class Manager extends ChangeNotifier {
   host.Manager _hostManager = getIt<host.Manager>();
 
   State _state = State.disconnected;
-  get state => _state;
+  State get state => _state;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
   Stream<Error> _errorStream;
-  get errorStream => _errorStream;
+  Stream<Error> get errorStream => _errorStream;
 
   Manager() {
     _errorStream = _errorStreamController.stream.asBroadcastStream();

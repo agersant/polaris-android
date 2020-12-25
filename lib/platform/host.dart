@@ -5,7 +5,7 @@ const String preferenceKey = "polaris_server_url";
 class Manager {
   String _url;
 
-  get url => _url;
+  String get url => _url;
 
   set url(String newURL) {
     //  remove trailing slash, prepend http:// if needed

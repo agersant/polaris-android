@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
@@ -8,8 +9,68 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
+enum StartupState {
+  reconnecting,
+  connect,
+  login,
+}
+
 class StartupPage extends StatelessWidget {
   final Widget _logo = SvgPicture.asset('assets/images/logo.svg', semanticsLabel: 'Polaris logo');
+
+  StartupState _computeState(connection.State connectionState) {
+    switch (connectionState) {
+      case connection.State.reconnecting:
+        return StartupState.reconnecting;
+      case connection.State.disconnected:
+      case connection.State.connecting:
+        return StartupState.connect;
+      case connection.State.connected:
+        return StartupState.login;
+    }
+    return null;
+  }
+
+  Widget _buildWidgetForState(StartupState state) {
+    switch (state) {
+      case StartupState.reconnecting:
+        return CircularProgressIndicator();
+      case StartupState.connect:
+        return ConnectForm();
+      case StartupState.login:
+        return LoginForm();
+    }
+    return null;
+  }
+
+  Widget _buildContent() {
+    return MultiProvider(
+      providers: [ChangeNotifierProvider.value(value: getIt<connection.Manager>())],
+      child: Consumer<connection.Manager>(
+        builder: (context, connectionManager, child) {
+          final state = _computeState(connectionManager.state);
+          final widget = _buildWidgetForState(state);
+          return PageTransitionSwitcher(
+              reverse: state != StartupState.login,
+              transitionBuilder: (
+                Widget child,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+              ) {
+                return SharedAxisTransition(
+                  child: child,
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.horizontal,
+                );
+              },
+              child: widget);
+
+          // return Container();
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,25 +90,7 @@ class StartupPage extends StatelessWidget {
             Spacer(flex: 20),
             Expanded(
               flex: 100,
-              child: IntrinsicHeight(
-                child: MultiProvider(
-                  providers: [ChangeNotifierProvider.value(value: getIt<connection.Manager>())],
-                  child: Consumer<connection.Manager>(
-                    builder: (context, manager, child) {
-                      switch (manager.state) {
-                        case connection.State.reconnecting:
-                          return Container();
-                        case connection.State.disconnected:
-                        case connection.State.connecting:
-                          return ConnectForm();
-                        case connection.State.connected:
-                          return LoginForm();
-                      }
-                      return Container();
-                    },
-                  ),
-                ),
-              ),
+              child: IntrinsicHeight(child: _buildContent()),
             ),
             Spacer(flex: 40),
           ],

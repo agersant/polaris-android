@@ -59,7 +59,7 @@ void main() {
 
     await tester.enterText(urlInputField, client.goodhostURL);
     await tester.tap(connectButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);
   });
 
@@ -97,11 +97,11 @@ void main() {
 
     await tester.enterText(urlInputField, client.goodhostURL);
     await tester.tap(connectButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);
 
     await tester.tap(disconnectButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(urlInputField, findsOneWidget);
   });
 }
