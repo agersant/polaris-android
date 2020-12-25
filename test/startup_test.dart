@@ -68,6 +68,8 @@ void main() {
     await tester.tap(connectButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorAPIVersion), findsOneWidget);
+    expect(urlInputField, findsOneWidget);
+    expect(connectButton, findsOneWidget);
   });
 
   testWidgets('Connect screen golden path', (WidgetTester tester) async {
@@ -79,6 +81,7 @@ void main() {
     await tester.tap(connectButton);
     await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);
+    expect(connectButton, findsNothing);
   });
 
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
@@ -120,7 +123,7 @@ void main() {
 
     await tester.tap(disconnectButton);
     await tester.pumpAndSettle();
-    expect(urlInputField, findsOneWidget);
+    expect(connectButton, findsOneWidget);
   });
 
   testWidgets('Login screen rejects bad credentials', (WidgetTester tester) async {
@@ -134,5 +137,28 @@ void main() {
     await tester.tap(loginButton);
     await tester.pump();
     expect(find.widgetWithText(SnackBar, errorIncorrectCredentials), findsOneWidget);
+    expect(loginButton, findsOneWidget);
+  });
+
+  testWidgets('Login screen golden path', (WidgetTester tester) async {
+    await _setup(preferences: {host.preferenceKey: client.goodhostURL});
+
+    await tester.pumpWidget(PolarisApp());
+
+    await tester.enterText(usernameInputField, 'good-username');
+    await tester.enterText(passwordInputField, 'good-password');
+    await tester.tap(loginButton);
+    await tester.pump();
+    expect(loginButton, findsNothing);
+    // TODO validate landing on home screen
+  });
+
+  testWidgets('Re-logins on startup', (WidgetTester tester) async {
+    await _setup(preferences: {host.preferenceKey: client.goodhostURL, token.preferenceKey: 'auth-token'});
+
+    await tester.pumpWidget(PolarisApp());
+    expect(connectButton, findsNothing);
+    expect(loginButton, findsNothing);
+    // TODO validate landing on home screen
   });
 }

@@ -22,6 +22,9 @@ class Mock extends mockito.Mock implements http.Client {
     // Login
     when(this.post(goodhostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(authorization, 200));
+
+    // Browse
+    when(this.get(goodhostURL + browseEndpoint)).thenAnswer((_) async => http.Response('', 200));
   }
 
   mockBadLogin() {
