@@ -61,7 +61,6 @@ class Manager extends ChangeNotifier {
   }
 
   disconnect() {
-    _hostManager.url = null;
     _setState(State.disconnected);
   }
 

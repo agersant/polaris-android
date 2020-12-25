@@ -81,6 +81,15 @@ void main() {
     expect(disconnectButton, findsNothing);
   });
 
+  testWidgets('Failed reconnect shows attempted URL screen', (WidgetTester tester) async {
+    await _setup(preferences: {host.preferenceKey: client.badHostURL});
+
+    await tester.pumpWidget(PolarisApp());
+
+    final inputField = urlInputField.evaluate().single.widget as TextFormField;
+    expect(inputField.controller.text, equals(client.badHostURL));
+  });
+
   testWidgets('Disconnect returns to connect screen', (WidgetTester tester) async {
     await _setup();
 
