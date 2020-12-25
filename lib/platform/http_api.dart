@@ -8,6 +8,7 @@ import 'package:polaris/platform/host.dart' as host;
 final getIt = GetIt.instance;
 
 final apiVersionEndpoint = '/api/version';
+final browseEndpoint = '/api/browse';
 final loginEndpoint = '/api/auth';
 
 enum _Method {
@@ -62,5 +63,11 @@ class HttpAPI implements API {
     final credentials = Credentials(username: username, password: password).toJson();
     final response = await _makeRequest(_Method.post, url, body: credentials);
     return Authorization.fromJson(jsonDecode(response.body));
+  }
+
+  @override
+  Future browse(String path) async {
+    final url = _makeURL(browseEndpoint);
+    await _makeRequest(_Method.get, url);
   }
 }

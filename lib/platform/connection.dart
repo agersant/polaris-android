@@ -15,6 +15,20 @@ enum Error {
   unknownError,
 }
 
+extension _ToConnectionError on APIError {
+  Error toConnectionError() {
+    switch (this) {
+      case APIError.unauthorized:
+      case APIError.requestFailed:
+        return Error.requestFailed;
+      case APIError.networkError:
+      case APIError.unspecifiedHost:
+        return Error.networkError;
+    }
+    return Error.unknownError;
+  }
+}
+
 enum State {
   disconnected,
   connecting,
@@ -28,6 +42,9 @@ class Manager extends ChangeNotifier {
 
   State _state = State.disconnected;
   State get state => _state;
+
+  State _previousState;
+  State get previousState => _previousState;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
   Stream<Error> _errorStream;
@@ -55,6 +72,7 @@ class Manager extends ChangeNotifier {
       _emitError(Error.connectionAlreadyInProgress);
       return;
     }
+
     _hostManager.url = url;
     _setState(State.connecting);
     return await _tryConnect();
@@ -72,16 +90,7 @@ class Manager extends ChangeNotifier {
       apiVersion = await _api.getAPIVersion();
     } on APIError catch (e) {
       _setState(State.disconnected);
-      switch (e) {
-        case APIError.unauthorized:
-        case APIError.requestFailed:
-          _emitError(Error.requestFailed);
-          break;
-        case APIError.networkError:
-        case APIError.unspecifiedHost:
-          _emitError(Error.networkError);
-          break;
-      }
+      _emitError(e.toConnectionError());
       return;
     } catch (e) {
       _setState(State.disconnected);
@@ -108,6 +117,7 @@ class Manager extends ChangeNotifier {
     if (_state == newState) {
       return;
     }
+    _previousState = state;
     _state = newState;
     notifyListeners();
   }
