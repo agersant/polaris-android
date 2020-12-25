@@ -1,3 +1,4 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart' as mockito;
 import 'package:mockito/mockito.dart';
@@ -24,7 +25,7 @@ class Mock extends mockito.Mock implements http.Client {
         .thenAnswer((_) async => http.Response(authorization, 200));
 
     // Browse
-    when(this.get(goodhostURL + browseEndpoint)).thenAnswer((_) async => http.Response('', 200));
+    when(this.get(argThat(startsWith(goodhostURL + browseEndpoint)))).thenAnswer((_) async => http.Response('', 200));
   }
 
   mockBadLogin() {
