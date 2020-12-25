@@ -8,7 +8,7 @@ class Manager {
   String get url => _url;
 
   set url(String newURL) {
-    //  remove trailing slash, prepend http:// if needed
+    // TODO remove trailing slash, prepend http:// if needed
     if (newURL != null) {
       newURL = newURL.trim();
     }
