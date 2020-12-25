@@ -19,7 +19,7 @@ enum StartupState {
 class StartupPage extends StatelessWidget {
   final Widget _logo = SvgPicture.asset('assets/images/logo.svg', semanticsLabel: 'Polaris logo');
 
-  StartupState _computeState(connection.State connectionState) {
+  StartupState _computeState(connection.State connectionState, authentication.State authenticationState) {
     switch (connectionState) {
       case connection.State.reconnecting:
         return StartupState.reconnecting;
@@ -27,7 +27,14 @@ class StartupPage extends StatelessWidget {
       case connection.State.connecting:
         return StartupState.connect;
       case connection.State.connected:
-        return StartupState.login;
+        switch (authenticationState) {
+          case authentication.State.reauthenticating:
+            return StartupState.reconnecting;
+          case authentication.State.authenticating:
+          case authentication.State.unauthenticated:
+          case authentication.State.authenticated:
+            return StartupState.login;
+        }
     }
     return null;
   }
@@ -47,12 +54,12 @@ class StartupPage extends StatelessWidget {
   Widget _buildContent() {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<connection.Manager>())
       ],
-      child: Consumer<connection.Manager>(
-        builder: (context, connectionManager, child) {
-          final state = _computeState(connectionManager.state);
+      child: Consumer2<connection.Manager, authentication.Manager>(
+        builder: (context, connectionManager, authenticationManager, child) {
+          final state = _computeState(connectionManager.state, authenticationManager.state);
           final widget = _buildWidgetForState(state);
           return PageTransitionSwitcher(
               reverse: state != StartupState.login,
