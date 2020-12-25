@@ -129,7 +129,7 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    await tester.enterText(usernameInputField, client.badUsername);
+    await tester.enterText(usernameInputField, 'bad-username');
     await tester.enterText(passwordInputField, 'bad-password');
     await tester.tap(loginButton);
     await tester.pump();
