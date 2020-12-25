@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
-import 'package:polaris/manager/connection.dart' as connection;
+import 'package:polaris/platform/connection.dart' as connection;
 
 final usernameFieldLabel = 'Username';
 final passwordFieldLabel = 'Password';

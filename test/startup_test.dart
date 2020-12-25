@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:polaris/main.dart';
-import 'package:polaris/manager/connection.dart' as connection;
-import 'package:polaris/service/api.dart';
-import 'package:polaris/service/host.dart';
-import 'package:polaris/service/http_api.dart';
+import 'package:polaris/platform/api.dart';
+import 'package:polaris/platform/connection.dart' as connection;
+import 'package:polaris/platform/http_api.dart';
+import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +23,7 @@ Future _setup({Map<String, dynamic> preferences}) async {
 
   getIt.allowReassignment = true;
 
-  getIt.registerSingleton<Host>(await Host.create());
+  getIt.registerSingleton<host.Manager>(await host.Manager.create());
   getIt.registerSingleton<Client>(client.Mock());
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
@@ -64,7 +64,7 @@ void main() {
   });
 
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
-    await _setup(preferences: {serverURLKey: client.goodhostURL});
+    await _setup(preferences: {host.preferenceKey: client.goodhostURL});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -73,7 +73,7 @@ void main() {
   });
 
   testWidgets('Failed reconnect shows connect screen', (WidgetTester tester) async {
-    await _setup(preferences: {serverURLKey: client.badHostURL});
+    await _setup(preferences: {host.preferenceKey: client.badHostURL});
 
     await tester.pumpWidget(PolarisApp());
 

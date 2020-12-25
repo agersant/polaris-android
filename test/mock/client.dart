@@ -1,6 +1,6 @@
 import 'package:mockito/mockito.dart' as mockito;
 import 'package:http/http.dart' as http;
-import 'package:polaris/service/http_api.dart';
+import 'package:polaris/platform/http_api.dart';
 
 final goodhostURL = 'my-polaris-server';
 final badHostURL = 'not-a-polaris-server';

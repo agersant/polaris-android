@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/manager/connection.dart' as connection;
+import 'package:polaris/platform/connection.dart' as connection;
 import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;

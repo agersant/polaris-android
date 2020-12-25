@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/service/api.dart';
-import 'package:polaris/service/host.dart';
+import 'package:polaris/platform/api.dart';
+import 'package:polaris/platform/host.dart' as host;
 
 final getIt = GetIt.instance;
 
@@ -24,7 +24,7 @@ enum State {
 
 class Manager extends ChangeNotifier {
   API _api = getIt<API>();
-  Host _host = getIt<Host>();
+  host.Manager _hostManager = getIt<host.Manager>();
   State _state = State.disconnected;
   get state => _state;
 
@@ -40,7 +40,7 @@ class Manager extends ChangeNotifier {
 
   Future reconnect() async {
     assert(_state == State.disconnected);
-    if (_host.url == null || _host.url.isEmpty) {
+    if (_hostManager.url == null || _hostManager.url.isEmpty) {
       return;
     }
 
@@ -55,13 +55,13 @@ class Manager extends ChangeNotifier {
       _emitError(Error.connectionAlreadyInProgress);
       return;
     }
-    _host.url = url;
+    _hostManager.url = url;
     _setState(State.connecting);
     return await _tryConnect();
   }
 
   disconnect() {
-    _host.url = null;
+    _hostManager.url = null;
     _setState(State.disconnected);
   }
 
@@ -95,7 +95,7 @@ class Manager extends ChangeNotifier {
       return;
     }
 
-    _host.persist();
+    _hostManager.persist();
     _setState(State.connected);
   }
 
