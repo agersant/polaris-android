@@ -25,11 +25,11 @@ enum State {
 class Manager extends ChangeNotifier {
   API _api = getIt<API>();
   host.Manager _hostManager = getIt<host.Manager>();
+
   State _state = State.disconnected;
   get state => _state;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
-
   Stream<Error> _errorStream;
   get errorStream => _errorStream;
 
@@ -74,6 +74,7 @@ class Manager extends ChangeNotifier {
     } on APIError catch (e) {
       _setState(State.disconnected);
       switch (e) {
+        case APIError.unauthorized:
         case APIError.requestFailed:
           _emitError(Error.requestFailed);
           break;

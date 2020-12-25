@@ -29,6 +29,9 @@ class HttpAPI implements API {
     } catch (e) {
       throw APIError.networkError;
     }
+    if (response.statusCode == 401) {
+      throw APIError.unauthorized;
+    }
     if (response.statusCode == 200) {
       return APIVersion.fromJson(jsonDecode(response.body));
     }

@@ -3,6 +3,7 @@ import 'package:polaris/platform/dto.dart';
 enum APIError {
   unspecifiedHost,
   networkError,
+  unauthorized,
   requestFailed,
 }
 
