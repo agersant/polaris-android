@@ -1,21 +1,12 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/host.dart' as host;
+import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
-
-final errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
-final errorAlreadyConnecting = 'Please wait while the connection is being established.';
-final errorNetwork = 'The Polaris server could not be reached.';
-final errorRequestFailed = 'The Polaris server sent an unexpected response.';
-final errorUnknown = 'An unknown error occured.';
-
-final serverURLFieldLabel = 'Server URL';
-final connectButtonLabel = 'CONNECT';
 
 class ConnectForm extends StatefulWidget {
   @override

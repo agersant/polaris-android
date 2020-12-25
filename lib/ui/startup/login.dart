@@ -1,22 +1,12 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/authentication.dart' as authentication;
 import 'package:polaris/platform/connection.dart' as connection;
+import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
 
-final usernameFieldLabel = 'Username';
-final passwordFieldLabel = 'Password';
-final disconnectButtonLabel = 'DISCONNECT';
-final loginButtonLabel = 'LOGIN';
-
 final getIt = GetIt.instance;
-
-final errorAlreadyAuthenticating = 'Please wait while the authentication is in progress.';
-final errorIncorrectCredentials = 'Incorrect username or password.';
-final errorRequestFailed = 'The Polaris server sent an unexpected response.';
-final errorUnknown = 'An unknown error occured.';
 
 class LoginForm extends StatefulWidget {
   @override

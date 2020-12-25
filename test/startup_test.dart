@@ -10,8 +10,7 @@ import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
-import 'package:polaris/ui/startup/connect.dart';
-import 'package:polaris/ui/startup/login.dart';
+import 'package:polaris/ui/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
