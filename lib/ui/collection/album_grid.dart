@@ -5,6 +5,8 @@ import 'package:polaris/platform/dto.dart';
 
 class GridMetrics {}
 
+const double _detailsSpacing = 4.0;
+
 class AlbumGrid extends StatelessWidget {
   final List<Directory> _albums;
 
@@ -16,11 +18,14 @@ class AlbumGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AspectRatio(
-            aspectRatio: 1.0,
-            child: Image.network(
-              'https://f4.bcbits.com/img/a0959935152_16.jpg', // TMP
-              fit: BoxFit.cover,
+          Padding(
+            padding: const EdgeInsets.only(bottom: _detailsSpacing),
+            child: AspectRatio(
+              aspectRatio: 1.0,
+              child: Image.network(
+                'https://f4.bcbits.com/img/a0959935152_16.jpg', // TMP
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           DefaultTextStyle(
@@ -52,9 +57,10 @@ class AlbumGrid extends StatelessWidget {
             final artistStyle = Theme.of(context).textTheme.subtitle2;
 
             final screenWidth = constraints.maxWidth;
-            final crossAxisCount = 2; // TODO landscape mode
-            final crossAxisSpacing = 16.0; // TODO landscape mode
-            final padding = 16.0; // TODO landscape mode
+            final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
+            final mainAxisSpacing = 24.0;
+            final crossAxisSpacing = 16.0;
+            final padding = 24.0;
 
             final TextPainter titlePainter =
                 TextPainter(text: TextSpan(text: '', style: titleStyle), maxLines: 1, textDirection: TextDirection.ltr)
@@ -68,13 +74,13 @@ class AlbumGrid extends StatelessWidget {
 
             final childWidth =
                 ((screenWidth - 2 * padding) - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
-            final childHeight = childWidth + titleHeight + artistHeight;
+            final childHeight = childWidth + _detailsSpacing + titleHeight + artistHeight;
             final childAspectRatio = childWidth / childHeight;
 
             return GridView.count(
               crossAxisCount: crossAxisCount,
               padding: EdgeInsets.all(padding),
-              mainAxisSpacing: 24.0,
+              mainAxisSpacing: mainAxisSpacing,
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
               children: _albums.map((album) => _buildAlbumTile(album, titleStyle, artistStyle)).toList(),
