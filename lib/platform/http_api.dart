@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart';
 import 'package:polaris/platform/host.dart' as host;
+import 'package:polaris/platform/token.dart' as token;
 
 final getIt = GetIt.instance;
 
@@ -19,6 +20,7 @@ enum _Method {
 
 class HttpAPI implements API {
   final _hostManager = getIt<host.Manager>();
+  final _tokenManager = getIt<token.Manager>();
   final _client = getIt<Client>();
 
   String _makeURL(String endpoint) {
@@ -30,13 +32,18 @@ class HttpAPI implements API {
 
   Future<Response> _makeRequest(_Method method, String url, {dynamic body}) async {
     var response;
+
+    Map<String, String> headers = Map();
+    if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
+      headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
+    }
+
     try {
       switch (method) {
         case _Method.get:
-          response = await _client.get(url);
+          response = await _client.get(url, headers: headers);
           break;
         case _Method.post:
-          Map<String, String> headers = Map();
           headers[HttpHeaders.contentTypeHeader] = 'application/json';
           response = await _client.post(url, headers: headers, body: body);
           break;
@@ -44,12 +51,15 @@ class HttpAPI implements API {
     } catch (e) {
       throw APIError.networkError;
     }
+
     if (response.statusCode == 401) {
       throw APIError.unauthorized;
     }
+
     if (response.statusCode == 200) {
       return response;
     }
+
     throw APIError.requestFailed;
   }
 
