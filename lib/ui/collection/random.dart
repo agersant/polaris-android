@@ -22,6 +22,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return FutureBuilder<List<Directory>>(
       future: futureContent,
       builder: (context, snapshot) {
