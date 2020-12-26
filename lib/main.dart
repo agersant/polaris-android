@@ -7,7 +7,9 @@ import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/startup/page.dart';
+import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -43,7 +45,30 @@ class PolarisApp extends StatelessWidget {
       title: 'Polaris',
       theme: lightTheme,
       darkTheme: darkTheme,
-      home: StartupPage(),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
+          ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
+        ],
+        child: Consumer2<connection.Manager, authentication.Manager>(
+          builder: (context, connectionManager, authenticationManager, child) {
+            final isStartupComplete = connectionManager.state == connection.State.connected &&
+                authenticationManager.state == authentication.State.authenticated;
+
+            return Navigator(
+              pages: [
+                if (!isStartupComplete) MaterialPage(child: StartupPage()) else MaterialPage(child: CollectionPage())
+              ],
+              onPopPage: (route, result) {
+                if (!route.didPop(result)) {
+                  return false;
+                }
+                return true;
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }

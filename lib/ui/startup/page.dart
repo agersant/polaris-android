@@ -52,34 +52,28 @@ class StartupPage extends StatelessWidget {
   }
 
   Widget _buildContent() {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-      ],
-      child: Consumer2<connection.Manager, authentication.Manager>(
-        builder: (context, connectionManager, authenticationManager, child) {
-          final state = _computeState(connectionManager.state, authenticationManager.state);
-          final widget = _buildWidgetForState(state);
-          return PageTransitionSwitcher(
-              reverse: state != StartupState.login,
-              transitionBuilder: (
-                Widget child,
-                Animation<double> animation,
-                Animation<double> secondaryAnimation,
-              ) {
-                return SharedAxisTransition(
-                  child: child,
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.horizontal,
-                );
-              },
-              child: widget);
+    return Consumer2<connection.Manager, authentication.Manager>(
+      builder: (context, connectionManager, authenticationManager, child) {
+        final state = _computeState(connectionManager.state, authenticationManager.state);
+        final widget = _buildWidgetForState(state);
+        return PageTransitionSwitcher(
+            reverse: state != StartupState.login,
+            transitionBuilder: (
+              Widget child,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+            ) {
+              return SharedAxisTransition(
+                child: child,
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+              );
+            },
+            child: widget);
 
-          // return Container();
-        },
-      ),
+        // return Container();
+      },
     );
   }
 

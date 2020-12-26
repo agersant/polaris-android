@@ -14,3 +14,6 @@ final passwordFieldLabel = 'Password';
 final connectButtonLabel = 'CONNECT';
 final disconnectButtonLabel = 'DISCONNECT';
 final loginButtonLabel = 'LOGIN';
+
+// Collection
+final collectionTitle = 'Collection';
