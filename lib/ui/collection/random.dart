@@ -11,7 +11,7 @@ class RandomAlbums extends StatefulWidget {
   _RandomAlbumsState createState() => _RandomAlbumsState();
 }
 
-class _RandomAlbumsState extends State<RandomAlbums> {
+class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClientMixin {
   Future<List<Directory>> futureContent;
 
   @override
@@ -41,4 +41,7 @@ class _RandomAlbumsState extends State<RandomAlbums> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
