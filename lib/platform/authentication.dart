@@ -24,6 +24,7 @@ extension _ToAuthenticationError on APIError {
       case APIError.requestFailed:
       case APIError.networkError:
       case APIError.unspecifiedHost:
+      case APIError.responseParseError:
         return Error.requestFailed;
     }
     return Error.unknownError;

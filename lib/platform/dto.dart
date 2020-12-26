@@ -32,3 +32,24 @@ class Credentials {
         'password': password,
       });
 }
+
+class Directory {
+  String path;
+  String artist;
+  int year;
+  String album;
+  String artwork;
+  int dateAdded;
+
+  Directory({this.path, this.artist, this.year, this.album, this.artwork, this.dateAdded});
+  factory Directory.fromJson(Map<String, dynamic> json) {
+    return Directory(
+      path: json['path'],
+      artist: json['artist'],
+      year: json['year'],
+      album: json['album'],
+      artwork: json['artwork'],
+      dateAdded: json['date_added'],
+    );
+  }
+}

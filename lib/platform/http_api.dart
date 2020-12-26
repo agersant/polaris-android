@@ -11,6 +11,7 @@ final getIt = GetIt.instance;
 
 final apiVersionEndpoint = '/api/version';
 final browseEndpoint = '/api/browse';
+final randomEndpoint = '/api/browse';
 final loginEndpoint = '/api/auth';
 
 enum _Method {
@@ -69,7 +70,11 @@ class HttpAPI implements API {
   Future<APIVersion> getAPIVersion() async {
     final url = _makeURL(apiVersionEndpoint);
     final response = await _makeRequest(_Method.get, url);
-    return APIVersion.fromJson(jsonDecode(response.body));
+    try {
+      return APIVersion.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
   }
 
   @override
@@ -77,12 +82,27 @@ class HttpAPI implements API {
     final url = _makeURL(loginEndpoint);
     final credentials = Credentials(username: username, password: password).toJson();
     final response = await _makeRequest(_Method.post, url, body: credentials);
-    return Authorization.fromJson(jsonDecode(response.body));
+    try {
+      return Authorization.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
   }
 
   @override
   Future browse(String path) async {
     final url = _makeURL(browseEndpoint);
     await _makeRequest(_Method.get, url, authenticate: true);
+  }
+
+  @override
+  Future<List<Directory>> random() async {
+    final url = _makeURL(randomEndpoint);
+    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    try {
+      return (json.decode(response.body) as List).map((d) => Directory.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
   }
 }

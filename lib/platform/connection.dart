@@ -20,6 +20,7 @@ extension _ToConnectionError on APIError {
     switch (this) {
       case APIError.unauthorized:
       case APIError.requestFailed:
+      case APIError.responseParseError:
         return Error.requestFailed;
       case APIError.networkError:
       case APIError.unspecifiedHost:
