@@ -10,10 +10,13 @@ import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
+
+final startupPage = find.byType(StartupPage);
 
 final urlInputField = find.widgetWithText(TextFormField, serverURLFieldLabel);
 final connectButton = find.widgetWithText(ElevatedButton, connectButtonLabel);
@@ -148,16 +151,13 @@ void main() {
     await tester.enterText(passwordInputField, 'good-password');
     await tester.tap(loginButton);
     await tester.pump();
-    expect(loginButton, findsNothing);
-    // TODO validate landing on home screen
+    expect(startupPage, findsNothing);
   });
 
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
     await _setup(preferences: {host.preferenceKey: client.goodhostURL, token.preferenceKey: 'auth-token'});
 
     await tester.pumpWidget(PolarisApp());
-    expect(connectButton, findsNothing);
-    expect(loginButton, findsNothing);
-    // TODO validate landing on home screen
+    expect(startupPage, findsNothing);
   });
 }
