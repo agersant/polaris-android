@@ -72,7 +72,7 @@ class HttpAPI implements API {
     final url = _makeURL(apiVersionEndpoint);
     final response = await _makeRequest(_Method.get, url);
     try {
-      return APIVersion.fromJson(jsonDecode(response.body));
+      return APIVersion.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -84,7 +84,7 @@ class HttpAPI implements API {
     final credentials = Credentials(username: username, password: password).toJson();
     final response = await _makeRequest(_Method.post, url, body: credentials);
     try {
-      return Authorization.fromJson(jsonDecode(response.body));
+      return Authorization.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -101,7 +101,7 @@ class HttpAPI implements API {
     final url = _makeURL(randomEndpoint);
     final response = await _makeRequest(_Method.get, url, authenticate: true);
     try {
-      return (json.decode(response.body) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -112,7 +112,7 @@ class HttpAPI implements API {
     final url = _makeURL(recentEndpoint);
     final response = await _makeRequest(_Method.get, url, authenticate: true);
     try {
-      return (json.decode(response.body) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
