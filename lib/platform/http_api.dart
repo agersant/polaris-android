@@ -30,12 +30,14 @@ class HttpAPI implements API {
     return _hostManager.url + endpoint;
   }
 
-  Future<Response> _makeRequest(_Method method, String url, {dynamic body}) async {
+  Future<Response> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
     var response;
 
     Map<String, String> headers = Map();
-    if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
-      headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
+    if (authenticate) {
+      if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
+        headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
+      }
     }
 
     try {
@@ -81,6 +83,6 @@ class HttpAPI implements API {
   @override
   Future browse(String path) async {
     final url = _makeURL(browseEndpoint);
-    await _makeRequest(_Method.get, url);
+    await _makeRequest(_Method.get, url, authenticate: true);
   }
 }

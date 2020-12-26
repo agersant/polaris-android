@@ -15,17 +15,19 @@ final authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admi
 class Mock extends mockito.Mock implements http.Client {
   Mock() {
     // API version
-    when(this.get(goodhostURL + apiVersionEndpoint)).thenAnswer((_) async => http.Response(compatibleAPIVersion, 200));
-    when(this.get(incompatibleHostURL + apiVersionEndpoint))
+    when(this.get(goodhostURL + apiVersionEndpoint, headers: anyNamed('headers')))
+        .thenAnswer((_) async => http.Response(compatibleAPIVersion, 200));
+    when(this.get(incompatibleHostURL + apiVersionEndpoint, headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(incompatibleAPIVersion, 200));
-    when(this.get(badHostURL + apiVersionEndpoint)).thenThrow('borked internet');
+    when(this.get(badHostURL + apiVersionEndpoint, headers: anyNamed('headers'))).thenThrow('borked internet');
 
     // Login
     when(this.post(goodhostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(authorization, 200));
 
     // Browse
-    when(this.get(argThat(startsWith(goodhostURL + browseEndpoint)))).thenAnswer((_) async => http.Response('', 200));
+    when(this.get(argThat(startsWith(goodhostURL + browseEndpoint)), headers: anyNamed('headers')))
+        .thenAnswer((_) async => http.Response('', 200));
   }
 
   mockBadLogin() {
