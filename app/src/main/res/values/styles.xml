@@ -33,7 +33,8 @@
     </style>
 
     <style name="PolarisToolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="titleTextColor">@color/headerTextPrimary</item>
+        <item name="titleTextColor">@color/toolbarTitle</item>
+        <item name="subtitleTextColor">@color/toolbarSubtitle</item>
     </style>
 
     <style name="PolarisButton" parent="Widget.MaterialComponents.Button.TextButton">
