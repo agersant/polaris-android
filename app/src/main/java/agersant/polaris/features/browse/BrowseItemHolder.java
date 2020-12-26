@@ -3,8 +3,11 @@ package agersant.polaris.features.browse;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.View;
@@ -47,13 +50,11 @@ abstract class BrowseItemHolder extends RecyclerView.ViewHolder implements View.
 
 	@Override
 	public void onClick(View view) {
-		Context context = view.getContext();
 		if (item.isDirectory()) {
-			Intent intent = new Intent(context, BrowseActivity.class);
-			intent.putExtra(BrowseActivity.NAVIGATION_MODE, BrowseActivity.NavigationMode.PATH);
-			intent.putExtra(BrowseActivity.PATH, item.getPath());
-			intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-			context.startActivity(intent);
+			Bundle args = new Bundle();
+			args.putSerializable(BrowseFragment.NAVIGATION_MODE, BrowseFragment.NavigationMode.PATH);
+			args.putString(BrowseFragment.PATH, item.getPath());
+			Navigation.findNavController(view).navigate(R.id.nav_browse, args);
 		}
 	}
 

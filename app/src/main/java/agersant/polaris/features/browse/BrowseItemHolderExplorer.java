@@ -1,7 +1,8 @@
 package agersant.polaris.features.browse;
 
 import android.view.View;
-import android.widget.Button;
+
+import com.google.android.material.button.MaterialButton;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -11,7 +12,7 @@ import agersant.polaris.api.API;
 
 class BrowseItemHolderExplorer extends BrowseItemHolder {
 
-	private final Button button;
+	private final MaterialButton button;
 
 	BrowseItemHolderExplorer(API api, PlaybackQueue playbackQueue, BrowseAdapter adapter, View itemView, View itemQueueStatusView) {
 		super(api, playbackQueue, adapter, itemView, itemQueueStatusView);
@@ -31,8 +32,7 @@ class BrowseItemHolderExplorer extends BrowseItemHolder {
 			icon = R.drawable.ic_audiotrack_black_24dp;
 		}
 
-		button.setCompoundDrawablesWithIntrinsicBounds(icon, 0, 0, 0);
-		button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, 0, 0, 0);
+		button.setIconResource(icon);
 	}
 
 }
