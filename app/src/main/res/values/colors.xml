@@ -10,14 +10,17 @@
     <color name="discSeparator">#CFD8DC</color> <!--BlueGrey100-->
     <color name="navItemUnchecked">#607D8B</color> <!--BlueGrey500-->
     <color name="headerBackground">#263238</color> <!--BlueGrey900-->
-    <color name="headerTextPrimary">@android:color/primary_text_dark</color>
-    <color name="headerTextSecondary">@android:color/secondary_text_dark</color>
+    <color name="headerTextPrimary">@color/text_primary_dark</color>
+    <color name="headerTextSecondary">@color/text_secondary_dark</color>
+    <color name="toolbarTitle">@color/grey50</color>
+    <color name="toolbarSubtitle">@color/grey300</color>
 
     <color name="textPrimary">@color/text_primary_light</color>
     <color name="textSecondary">@color/text_secondary_light</color>
     <color name="background">#FFFFFF</color> <!--White-->
 
     <color name="grey50">#FAFAFA</color>
+    <color name="grey300">#E0E0E0</color>
     <color name="grey500">#9E9E9E</color>
     <color name="grey700">#616161</color>
     <color name="blueGrey800">#37474f</color>
