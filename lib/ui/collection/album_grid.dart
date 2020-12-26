@@ -20,11 +20,14 @@ class AlbumGrid extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: _detailsSpacing),
-            child: AspectRatio(
-              aspectRatio: 1.0,
-              child: Image.network(
-                'https://f4.bcbits.com/img/a0959935152_16.jpg', // TMP
-                fit: BoxFit.cover,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: Image.network(
+                  'https://f4.bcbits.com/img/a0959935152_16.jpg', // TMP
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
