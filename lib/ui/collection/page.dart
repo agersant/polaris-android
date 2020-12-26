@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:polaris/ui/collection/random.dart';
 
 import '../strings.dart';
 
@@ -22,7 +23,7 @@ class CollectionPage extends StatelessWidget {
         body: TabBarView(
           children: [
             Icon(Icons.folder),
-            Icon(Icons.shuffle),
+            RandomAlbums(),
             Icon(Icons.new_releases),
           ],
         ),
