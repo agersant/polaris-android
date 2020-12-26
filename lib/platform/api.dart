@@ -13,4 +13,5 @@ abstract class API {
   Future<Authorization> login(String username, String password);
   Future browse(String path);
   Future<List<Directory>> random();
+  Future<List<Directory>> recent();
 }

@@ -11,7 +11,8 @@ final getIt = GetIt.instance;
 
 final apiVersionEndpoint = '/api/version';
 final browseEndpoint = '/api/browse';
-final randomEndpoint = '/api/browse';
+final randomEndpoint = '/api/random';
+final recentEndpoint = '/api/recent';
 final loginEndpoint = '/api/auth';
 
 enum _Method {
@@ -98,6 +99,17 @@ class HttpAPI implements API {
   @override
   Future<List<Directory>> random() async {
     final url = _makeURL(randomEndpoint);
+    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    try {
+      return (json.decode(response.body) as List).map((d) => Directory.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<Directory>> recent() async {
+    final url = _makeURL(recentEndpoint);
     final response = await _makeRequest(_Method.get, url, authenticate: true);
     try {
       return (json.decode(response.body) as List).map((d) => Directory.fromJson(d)).toList();
