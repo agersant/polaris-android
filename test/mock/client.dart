@@ -4,9 +4,10 @@ import 'package:mockito/mockito.dart' as mockito;
 import 'package:mockito/mockito.dart';
 import 'package:polaris/platform/http_api.dart';
 
-final goodhostURL = 'my-polaris-server';
-final badHostURL = 'not-a-polaris-server';
-final incompatibleHostURL = 'incompatible-polaris-server';
+final missingProtocolHostURL = 'my-polaris-server';
+final goodHostURL = 'http://' + missingProtocolHostURL;
+final badHostURL = 'http://not-a-polaris-server';
+final incompatibleHostURL = 'http://incompatible-polaris-server';
 
 final compatibleAPIVersion = '{"major": 6, "minor": 0}';
 final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
@@ -15,23 +16,23 @@ final authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admi
 class Mock extends mockito.Mock implements http.Client {
   Mock() {
     // API version
-    when(this.get(goodhostURL + apiVersionEndpoint, headers: anyNamed('headers')))
+    when(this.get(goodHostURL + apiVersionEndpoint, headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(compatibleAPIVersion, 200));
     when(this.get(incompatibleHostURL + apiVersionEndpoint, headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(incompatibleAPIVersion, 200));
     when(this.get(badHostURL + apiVersionEndpoint, headers: anyNamed('headers'))).thenThrow('borked internet');
 
     // Login
-    when(this.post(goodhostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
+    when(this.post(goodHostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response(authorization, 200));
 
     // Browse
-    when(this.get(argThat(startsWith(goodhostURL + browseEndpoint)), headers: anyNamed('headers')))
+    when(this.get(argThat(startsWith(goodHostURL + browseEndpoint)), headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response('', 200));
   }
 
   mockBadLogin() {
-    when(this.post(goodhostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
+    when(this.post(goodHostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
         .thenAnswer((_) async => http.Response('', 401));
   }
 }

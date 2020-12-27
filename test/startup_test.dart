@@ -79,7 +79,19 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    await tester.enterText(urlInputField, client.goodhostURL);
+    await tester.enterText(urlInputField, client.goodHostURL);
+    await tester.tap(connectButton);
+    await tester.pumpAndSettle();
+    expect(urlInputField, findsNothing);
+    expect(connectButton, findsNothing);
+  });
+
+  testWidgets('Connect screens works without HTTP prefix', (WidgetTester tester) async {
+    await _setup();
+
+    await tester.pumpWidget(PolarisApp());
+
+    await tester.enterText(urlInputField, client.missingProtocolHostURL);
     await tester.tap(connectButton);
     await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);
@@ -87,7 +99,7 @@ void main() {
   });
 
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
-    await _setup(preferences: {host.preferenceKey: client.goodhostURL});
+    await _setup(preferences: {host.preferenceKey: client.goodHostURL});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -118,7 +130,7 @@ void main() {
 
     await tester.pumpWidget(PolarisApp());
 
-    await tester.enterText(urlInputField, client.goodhostURL);
+    await tester.enterText(urlInputField, client.goodHostURL);
     await tester.tap(connectButton);
     await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);
@@ -129,7 +141,7 @@ void main() {
   });
 
   testWidgets('Login screen rejects bad credentials', (WidgetTester tester) async {
-    Context context = await _setup(preferences: {host.preferenceKey: client.goodhostURL});
+    Context context = await _setup(preferences: {host.preferenceKey: client.goodHostURL});
     context.mockClient.mockBadLogin();
 
     await tester.pumpWidget(PolarisApp());
@@ -143,7 +155,7 @@ void main() {
   });
 
   testWidgets('Login screen golden path', (WidgetTester tester) async {
-    await _setup(preferences: {host.preferenceKey: client.goodhostURL});
+    await _setup(preferences: {host.preferenceKey: client.goodHostURL});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -155,7 +167,7 @@ void main() {
   });
 
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
-    await _setup(preferences: {host.preferenceKey: client.goodhostURL, token.preferenceKey: 'auth-token'});
+    await _setup(preferences: {host.preferenceKey: client.goodHostURL, token.preferenceKey: 'auth-token'});
 
     await tester.pumpWidget(PolarisApp());
     expect(startupPage, findsNothing);
