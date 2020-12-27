@@ -30,12 +30,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
           // TODO better error messages
           return Text("error ${snapshot.error}");
         } else if (snapshot.hasData) {
-          final directories = snapshot.data;
-          if (directories.length == 0) {
-            // TODO empty results, handle within Album Grid
-            return Text('no albums');
-          }
-          return AlbumGrid(directories);
+          return AlbumGrid(snapshot.data);
         }
 
         return Center(child: CircularProgressIndicator());
