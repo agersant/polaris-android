@@ -122,7 +122,7 @@ class HttpAPI implements API {
 
   @override
   Future<Uint8List> downloadImage(String path) async {
-    final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path));
+    final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     final response = await _makeRequest(_Method.get, url, authenticate: true);
     return response.bodyBytes;
   }
