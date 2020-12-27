@@ -32,7 +32,7 @@ class _ThumbnailState extends State<Thumbnail> {
       future: _imageProvider,
       builder: (context, snapshot) {
         if (snapshot.hasError || _imageProvider == null) {
-          return Container(); // TODO stripes
+          return Container(); // TODO stripes https://medium.com/@baobao1996mn/flutter-draw-striped-objects-with-custompainter-4955f5014706
         }
         if (!snapshot.hasData) {
           return Container();

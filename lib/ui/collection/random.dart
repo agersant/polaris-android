@@ -27,7 +27,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
       future: futureContent,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          // TODO better error messages
+          // TODO better looking error messages
           return Text("error ${snapshot.error}");
         } else if (snapshot.hasData) {
           return AlbumGrid(snapshot.data);

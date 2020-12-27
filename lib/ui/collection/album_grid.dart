@@ -48,7 +48,7 @@ class AlbumGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(_albums.length > 0); // TODO handle
+    assert(_albums.length > 0); // TODO handle empty album list
 
     return OrientationBuilder(
       builder: (context, orientation) {
