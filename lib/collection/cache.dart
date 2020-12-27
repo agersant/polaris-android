@@ -6,7 +6,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 final _slashRegExp = RegExp(r'[:/\.\\]');
-final _version = 4;
+final _firstVersion = 1;
+final _currentVersion = 4;
 
 class Manager {
   Directory _root;
@@ -14,9 +15,19 @@ class Manager {
   Manager(this._root);
 
   static Future<Manager> create() async {
-    // TODO delete previous directories for previous versions
     final temporaryDirectory = await getTemporaryDirectory();
-    final root = new Directory(p.join(temporaryDirectory.path, 'collection', 'v$_version'));
+    final makeRoot = (int version) => new Directory(p.join(temporaryDirectory.path, 'collection', 'v$version'));
+
+    for (int version = _firstVersion; version < _currentVersion; version++) {
+      final oldRoot = makeRoot(version);
+      oldRoot.exists().then((exists) {
+        if (exists) {
+          oldRoot.delete(recursive: true);
+        }
+      });
+    }
+
+    final root = makeRoot(_currentVersion);
     await root.create(recursive: true);
     return Manager(root);
   }
