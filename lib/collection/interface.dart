@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:flutter/painting.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/media/cache.dart' as cache;
+import 'package:polaris/collection/cache.dart' as cache;
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/host.dart' as host;
 
