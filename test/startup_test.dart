@@ -86,12 +86,24 @@ void main() {
     expect(connectButton, findsNothing);
   });
 
-  testWidgets('Connect screens works without HTTP prefix', (WidgetTester tester) async {
+  testWidgets('Connect screens works without HTTP prefix in host URL', (WidgetTester tester) async {
     await _setup();
 
     await tester.pumpWidget(PolarisApp());
 
     await tester.enterText(urlInputField, client.missingProtocolHostURL);
+    await tester.tap(connectButton);
+    await tester.pumpAndSettle();
+    expect(urlInputField, findsNothing);
+    expect(connectButton, findsNothing);
+  });
+
+  testWidgets('Connect screens works with trailing slash in host URL', (WidgetTester tester) async {
+    await _setup();
+
+    await tester.pumpWidget(PolarisApp());
+
+    await tester.enterText(urlInputField, client.trailingSlashHostURL);
     await tester.tap(connectButton);
     await tester.pumpAndSettle();
     expect(urlInputField, findsNothing);

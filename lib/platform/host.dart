@@ -8,12 +8,14 @@ class Manager {
   String get url => _url;
 
   set url(String newURL) {
-    // TODO remove trailing slash if needed
     if (newURL != null) {
       newURL = newURL.trim();
     }
     if (!newURL.startsWith('http')) {
       newURL = 'http://' + newURL;
+    }
+    while (newURL.endsWith('/')) {
+      newURL = newURL.substring(0, newURL.length - 1);
     }
     _url = newURL;
   }

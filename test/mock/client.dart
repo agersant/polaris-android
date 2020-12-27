@@ -7,6 +7,7 @@ import 'package:polaris/platform/http_api.dart';
 final missingProtocolHostURL = 'my-polaris-server';
 final goodHostURL = 'http://' + missingProtocolHostURL;
 final badHostURL = 'http://not-a-polaris-server';
+final trailingSlashHostURL = goodHostURL + '/';
 final incompatibleHostURL = 'http://incompatible-polaris-server';
 
 final compatibleAPIVersion = '{"major": 6, "minor": 0}';
