@@ -17,10 +17,6 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "0.0"
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
-        }
     }
     signingConfigs {
         release {
@@ -48,8 +44,8 @@ android {
         jvmTarget = "1.8"
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -69,7 +65,7 @@ dependencies {
     // Preference
     implementation "androidx.preference:preference-ktx:1.1.1"
 
-    // Media Notification
+    // Media notification
     implementation "androidx.media:media:1.2.1"
 
     // Media player
