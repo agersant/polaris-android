@@ -1,0 +1,51 @@
+import 'dart:async';
+import 'dart:developer' as developer;
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+final _slashRegExp = RegExp(r'[:/\.\\]');
+final _version = 4;
+
+class Manager {
+  Directory _root;
+
+  Manager(this._root);
+
+  static Future<Manager> create() async {
+    // TODO delete previous directories for previous versions
+    final temporaryDirectory = await getTemporaryDirectory();
+    final collection = new Directory(p.join(temporaryDirectory.path, 'collection'));
+    await collection.create();
+    final versioned = new Directory(p.join(collection.path, 'v$_version'));
+    await versioned.create();
+    return Manager(versioned);
+  }
+
+  Future<File> getImage(String host, String path) async {
+    final fullPath = _generateImagePath(host, path);
+    final file = new File(fullPath);
+    if (await file.exists()) {
+      return file;
+    }
+    return null;
+  }
+
+  putImage(String host, String path, Uint8List bytes) async {
+    developer.log('Adding image to disk cache: $path');
+    final fullPath = _generateImagePath(host, path);
+    final file = new File(fullPath);
+    await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
+  }
+
+  String _generateImageKey(String host, String path) {
+    host = path.replaceAll(_slashRegExp, '-');
+    path = path.replaceAll(_slashRegExp, '-');
+    return host + '__polaris__image__' + path;
+  }
+
+  String _generateImagePath(String host, String path) {
+    return p.join(_root.path, _generateImageKey(host, path));
+  }
+}

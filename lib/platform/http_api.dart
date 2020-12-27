@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:polaris/platform/api.dart';
@@ -9,11 +10,12 @@ import 'package:polaris/platform/token.dart' as token;
 
 final getIt = GetIt.instance;
 
-final apiVersionEndpoint = '/api/version';
-final browseEndpoint = '/api/browse';
-final randomEndpoint = '/api/random';
-final recentEndpoint = '/api/recent';
-final loginEndpoint = '/api/auth';
+final apiVersionEndpoint = '/api/version/';
+final browseEndpoint = '/api/browse/';
+final randomEndpoint = '/api/random/';
+final recentEndpoint = '/api/recent/';
+final loginEndpoint = '/api/auth/';
+final thumbnailEndpoint = '/api/thubmnail/';
 
 enum _Method {
   get,
@@ -116,5 +118,12 @@ class HttpAPI implements API {
     } catch (e) {
       throw APIError.responseParseError;
     }
+  }
+
+  @override
+  Future<Uint8List> downloadImage(String path) async {
+    final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path));
+    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    return response.bodyBytes;
   }
 }

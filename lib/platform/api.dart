@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:polaris/platform/dto.dart';
 
 enum APIError {
@@ -14,4 +15,5 @@ abstract class API {
   Future browse(String path);
   Future<List<Directory>> random();
   Future<List<Directory>> recent();
+  Future<Uint8List> downloadImage(String path);
 }
