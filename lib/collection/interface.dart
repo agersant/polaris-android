@@ -31,7 +31,11 @@ class Interface {
       return FileImage(cacheFile);
     }
     final job = _imageJobs[path] ?? _downloadImage(host, path);
-    return MemoryImage(await job.result);
+    try {
+      return MemoryImage(await job.result);
+    } catch (e) {
+      return null;
+    }
   }
 
   downloadImage(String path) {
@@ -46,7 +50,7 @@ class Interface {
     _imageJobs[path] = job;
     job.result.then((bytes) async {
       await _cacheManager.putImage(host, path, bytes);
-    });
+    }).catchError((e) => developer.log('Error downloading image: $path', error: e));
     return job;
   }
 }

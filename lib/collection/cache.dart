@@ -35,8 +35,12 @@ class Manager {
   Future<File> getImage(String host, String path) async {
     final fullPath = _generateImagePath(host, path);
     final file = new File(fullPath);
-    if (await file.exists()) {
-      return file;
+    try {
+      if (await file.exists()) {
+        return file;
+      }
+    } catch (e) {
+      developer.log('Error accessing image from cache: $path', error: e);
     }
     return null;
   }
@@ -48,7 +52,7 @@ class Manager {
     try {
       await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
     } catch (e) {
-      developer.log('Error saving image $path', error: e);
+      developer.log('Error saving image: $path', error: e);
     }
   }
 
