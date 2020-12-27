@@ -29,7 +29,7 @@ class Mock extends mockito.Mock implements http.Client {
 
     // Browse
     when(this.get(argThat(startsWith(goodHostURL + browseEndpoint)), headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response('', 200));
+        .thenAnswer((_) async => http.Response('[]', 200));
   }
 
   mockBadLogin() {

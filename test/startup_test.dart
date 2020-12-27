@@ -11,6 +11,7 @@ import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
 import 'package:polaris/ui/startup/page.dart';
+import 'package:polaris/ui/model.dart' as ui;
 import 'package:polaris/ui/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,6 +46,8 @@ Future<Context> _setup({Map<String, dynamic> preferences}) async {
 
   getIt.registerSingleton<connection.Manager>(connection.Manager());
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
+
+  getIt.registerSingleton<ui.Model>(ui.Model());
 
   return Context(mockClient);
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart';
 
 class APIVersion {
   int major, minor;
@@ -41,15 +42,76 @@ class Directory {
   String artwork;
   int dateAdded;
 
-  Directory({this.path, this.artist, this.year, this.album, this.artwork, this.dateAdded});
+  Directory();
+
   factory Directory.fromJson(Map<String, dynamic> json) {
-    return Directory(
-      path: json['path'],
-      artist: json['artist'],
-      year: json['year'],
-      album: json['album'],
-      artwork: json['artwork'],
-      dateAdded: json['date_added'],
-    );
+    return Directory()
+      ..path = json['path']
+      ..artist = json['artist']
+      ..year = json['year']
+      ..album = json['album']
+      ..artwork = json['artwork']
+      ..dateAdded = json['date_added'];
+  }
+}
+
+class Song {
+  String path;
+  int trackNumber;
+  int discNumber;
+  String title;
+  String artist;
+  String albumArtist;
+  int year;
+  String album;
+  String artwork;
+  int duration;
+
+  Song();
+
+  factory Song.fromJson(Map<String, dynamic> json) {
+    return Song()
+      ..path = json['path']
+      ..trackNumber = json['track_number']
+      ..discNumber = json['disc_number']
+      ..title = json['title']
+      ..artist = json['artist']
+      ..albumArtist = json['album_artist']
+      ..year = json['year']
+      ..album = json['album']
+      ..artwork = json['artwork']
+      ..duration = json['duration'];
+  }
+}
+
+class CollectionFile {
+  Either<Song, Directory> content;
+
+  CollectionFile(this.content);
+
+  bool isSong() {
+    return content.isLeft();
+  }
+
+  bool isDirectory() {
+    return content.isRight();
+  }
+
+  Song asSong() {
+    return content.fold((song) => song, (directory) => null);
+  }
+
+  Directory asDirectory() {
+    return content.fold((song) => null, (directory) => directory);
+  }
+
+  factory CollectionFile.fromJson(Map<String, dynamic> json) {
+    if (json['Directory'] != null) {
+      return CollectionFile(Right(Directory.fromJson(json['Directory'])));
+    }
+    if (json['Song'] != null) {
+      return CollectionFile(Left(Song.fromJson(json['Song'])));
+    }
+    return null;
   }
 }

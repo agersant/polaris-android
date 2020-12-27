@@ -92,9 +92,14 @@ class HttpAPI implements API {
   }
 
   @override
-  Future browse(String path) async {
-    final url = _makeURL(browseEndpoint);
-    await _makeRequest(_Method.get, url, authenticate: true);
+  Future<List<CollectionFile>> browse(String path) async {
+    final url = _makeURL(browseEndpoint + Uri.encodeComponent(path));
+    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    try {
+      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((c) => CollectionFile.fromJson(c)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
   }
 
   @override

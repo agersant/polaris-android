@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart';
+import 'package:polaris/ui/model.dart' as ui;
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -14,39 +16,6 @@ class AlbumGrid extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   AlbumGrid(this.albums, {this.onRefresh, Key key}) : super(key: key);
-
-  Widget _buildAlbumTile(Directory album, titleStyle, artistStyle) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: _detailsSpacing),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: Thumbnail(album.artwork),
-              ),
-            ),
-          ),
-          DefaultTextStyle(
-            style: titleStyle,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            child: Text(album.album ?? unknownAlbum),
-          ),
-          DefaultTextStyle(
-            style: artistStyle,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            child: Text(album.artist ?? unknownArtist),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +58,17 @@ class AlbumGrid extends StatelessWidget {
               mainAxisSpacing: mainAxisSpacing,
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
-              children: albums.map((album) => _buildAlbumTile(album, titleStyle, artistStyle)).toList(),
+              children: albums.map((album) {
+                final onTap = () async {
+                  final uiModel = getIt<ui.Model>();
+                  final api = getIt<API>();
+                  // TODO error handling
+                  final content = await api.browse(album.path);
+                  final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
+                  uiModel.openAlbumDetails(songs);
+                };
+                return Album(album, onTap: onTap, titleStyle: titleStyle, artistStyle: artistStyle);
+              }).toList(),
             );
 
             if (onRefresh == null) {
@@ -104,6 +83,52 @@ class AlbumGrid extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class Album extends StatelessWidget {
+  final Directory album;
+  final TextStyle titleStyle;
+  final TextStyle artistStyle;
+  final void Function() onTap;
+
+  Album(this.album, {this.titleStyle, this.artistStyle, this.onTap, Key key})
+      : assert(titleStyle != null),
+        assert(artistStyle != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: _detailsSpacing),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: GestureDetector(onTap: onTap, child: Thumbnail(album.artwork)),
+              ),
+            ),
+          ),
+          DefaultTextStyle(
+            style: titleStyle,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            child: Text(album.album ?? unknownAlbum),
+          ),
+          DefaultTextStyle(
+            style: artistStyle,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            child: Text(album.artist ?? unknownArtist),
+          ),
+        ],
+      ),
     );
   }
 }
