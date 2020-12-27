@@ -43,6 +43,8 @@ public class QueueFragment extends Fragment {
     private OfflineCache offlineCache;
     private DownloadQueue downloadQueue;
 
+    private Boolean initialCreation = true;
+
     private void subscribeToEvents() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(PlaybackQueue.REMOVED_ITEM);
@@ -133,6 +135,12 @@ public class QueueFragment extends Fragment {
         super.onStart();
         subscribeToEvents();
         updateTutorial();
+
+        if (!initialCreation) {
+            adapter.notifyDataSetChanged();
+        } else {
+            initialCreation = false;
+        }
     }
 
     @Override
@@ -140,14 +148,6 @@ public class QueueFragment extends Fragment {
         super.onStop();
         requireActivity().unregisterReceiver(receiver);
         receiver = null;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        adapter.notifyDataSetChanged();
-        updateOrderingIcon();
-        updateTutorial();
     }
 
     @Override
