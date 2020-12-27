@@ -95,6 +95,7 @@ class Album extends StatelessWidget {
       closedElevation: 0,
       transitionType: ContainerTransitionType.fade,
       closedColor: Theme.of(context).scaffoldBackgroundColor,
+      openColor: Theme.of(context).scaffoldBackgroundColor,
       openBuilder: (context, action) {
         return AlbumDetails(album.path);
       },
