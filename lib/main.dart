@@ -9,8 +9,6 @@ import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
-import 'package:polaris/ui/model.dart' as ui;
-import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +34,6 @@ Future _registerSingletons() async {
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
   getIt.registerSingleton<cache.Manager>(await cache.Manager.create());
   getIt.registerSingleton<collection.Interface>(collection.Interface());
-  getIt.registerSingleton<ui.Model>(ui.Model());
 }
 
 void main() async {
@@ -56,10 +53,9 @@ class PolarisApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
           ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-          ChangeNotifierProvider.value(value: getIt<ui.Model>()),
         ],
-        child: Consumer3<connection.Manager, authentication.Manager, ui.Model>(
-          builder: (context, connectionManager, authenticationManager, uiModel, child) {
+        child: Consumer2<connection.Manager, authentication.Manager>(
+          builder: (context, connectionManager, authenticationManager, child) {
             final isStartupComplete = connectionManager.state == connection.State.connected &&
                 authenticationManager.state == authentication.State.authenticated;
 
@@ -69,7 +65,6 @@ class PolarisApp extends StatelessWidget {
             } else {
               pages = [
                 MaterialPage(child: CollectionPage()),
-                if (uiModel.currentAlbum != null) MaterialPage(child: AlbumDetails(uiModel.currentAlbum))
               ];
             }
 

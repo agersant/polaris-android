@@ -1,9 +1,9 @@
 import 'dart:math';
+import 'package:animations/animations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart';
-import 'package:polaris/ui/model.dart' as ui;
+import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -59,15 +59,7 @@ class AlbumGrid extends StatelessWidget {
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
               children: albums.map((album) {
-                final onTap = () async {
-                  final uiModel = getIt<ui.Model>();
-                  final api = getIt<API>();
-                  // TODO error handling
-                  final content = await api.browse(album.path);
-                  final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
-                  uiModel.openAlbumDetails(songs);
-                };
-                return Album(album, onTap: onTap, titleStyle: titleStyle, artistStyle: artistStyle);
+                return Album(album, titleStyle: titleStyle, artistStyle: artistStyle);
               }).toList(),
             );
 
@@ -91,44 +83,53 @@ class Album extends StatelessWidget {
   final Directory album;
   final TextStyle titleStyle;
   final TextStyle artistStyle;
-  final void Function() onTap;
 
-  Album(this.album, {this.titleStyle, this.artistStyle, this.onTap, Key key})
+  Album(this.album, {this.titleStyle, this.artistStyle, Key key})
       : assert(titleStyle != null),
         assert(artistStyle != null),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: _detailsSpacing),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: GestureDetector(onTap: onTap, child: Thumbnail(album.artwork)),
+    return OpenContainer(
+      closedElevation: 0,
+      transitionType: ContainerTransitionType.fade,
+      closedColor: Theme.of(context).scaffoldBackgroundColor,
+      openBuilder: (context, action) {
+        return AlbumDetails(album.path);
+      },
+      closedBuilder: (context, action) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: _detailsSpacing),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: GestureDetector(child: Thumbnail(album.artwork)),
+                  ),
+                ),
               ),
-            ),
+              DefaultTextStyle(
+                style: titleStyle,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                child: Text(album.album ?? unknownAlbum),
+              ),
+              DefaultTextStyle(
+                style: artistStyle,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                child: Text(album.artist ?? unknownArtist),
+              ),
+            ],
           ),
-          DefaultTextStyle(
-            style: titleStyle,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            child: Text(album.album ?? unknownAlbum),
-          ),
-          DefaultTextStyle(
-            style: artistStyle,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            child: Text(album.artist ?? unknownArtist),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
