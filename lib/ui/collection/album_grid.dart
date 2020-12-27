@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:polaris/platform/dto.dart';
+import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 class GridMetrics {}
@@ -9,9 +10,10 @@ class GridMetrics {}
 const double _detailsSpacing = 4.0;
 
 class AlbumGrid extends StatelessWidget {
-  final List<Directory> _albums;
+  final List<Directory> albums;
+  final Future<void> Function() onRefresh;
 
-  AlbumGrid(this._albums);
+  AlbumGrid(this.albums, {this.onRefresh, Key key}) : super(key: key);
 
   Widget _buildAlbumTile(Directory album, titleStyle, artistStyle) {
     return Align(
@@ -33,13 +35,13 @@ class AlbumGrid extends StatelessWidget {
             style: titleStyle,
             softWrap: false,
             overflow: TextOverflow.ellipsis,
-            child: Text(album.album),
+            child: Text(album.album ?? unknownAlbum),
           ),
           DefaultTextStyle(
             style: artistStyle,
             softWrap: false,
             overflow: TextOverflow.ellipsis,
-            child: Text(album.artist),
+            child: Text(album.artist ?? unknownArtist),
           ),
         ],
       ),
@@ -48,7 +50,7 @@ class AlbumGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(_albums.length > 0); // TODO handle empty album list
+    assert(albums.length > 0); // TODO handle empty album list
 
     return OrientationBuilder(
       builder: (context, orientation) {
@@ -80,14 +82,24 @@ class AlbumGrid extends StatelessWidget {
             final childHeight = childWidth + _detailsSpacing + titleHeight + artistHeight;
             final childAspectRatio = childWidth / childHeight;
 
-            return GridView.count(
+            final gridView = GridView.count(
+              physics: const AlwaysScrollableScrollPhysics(),
               crossAxisCount: crossAxisCount,
               padding: EdgeInsets.all(padding),
               mainAxisSpacing: mainAxisSpacing,
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
-              children: _albums.map((album) => _buildAlbumTile(album, titleStyle, artistStyle)).toList(),
+              children: albums.map((album) => _buildAlbumTile(album, titleStyle, artistStyle)).toList(),
             );
+
+            if (onRefresh == null) {
+              return gridView;
+            } else {
+              return RefreshIndicator(
+                onRefresh: onRefresh,
+                child: gridView,
+              );
+            }
           },
         );
       },

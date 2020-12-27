@@ -4,39 +4,26 @@ import 'package:polaris/collection/interface.dart' as collection;
 
 final getIt = GetIt.instance;
 
-class Thumbnail extends StatefulWidget {
-  final String _path;
+class Thumbnail extends StatelessWidget {
+  final String path;
 
-  Thumbnail(this._path);
-
-  @override
-  _ThumbnailState createState() => _ThumbnailState(this._path);
-}
-
-class _ThumbnailState extends State<Thumbnail> {
-  final String _path;
-  Future<ImageProvider> _imageProvider;
-
-  _ThumbnailState(this._path);
-
-  @override
-  void initState() {
-    super.initState();
-    final interface = getIt<collection.Interface>();
-    _imageProvider = interface.getImage(_path);
-  }
+  Thumbnail(this.path, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final interface = getIt<collection.Interface>();
+    final imageProvider = interface.getImage(path);
+
     return FutureBuilder(
-      future: _imageProvider,
+      future: imageProvider,
       builder: (context, snapshot) {
-        if (snapshot.hasError || _imageProvider == null) {
-          return Container(); // TODO stripes https://medium.com/@baobao1996mn/flutter-draw-striped-objects-with-custompainter-4955f5014706
-        }
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return Container();
         }
+        if (imageProvider == null || snapshot.hasError || snapshot.data == null) {
+          return Container(); // TODO stripes https://medium.com/@baobao1996mn/flutter-draw-striped-objects-with-custompainter-4955f5014706
+        }
+        assert(snapshot.hasData);
         return Image(
           image: snapshot.data,
           fit: BoxFit.cover,

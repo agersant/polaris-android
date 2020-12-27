@@ -20,3 +20,5 @@ final collectionTitle = 'Collection';
 final collectionTabBrowseTitle = 'BROWSE';
 final collectionTabRandomTitle = 'RANDOM';
 final collectionTabRecentTitle = 'RECENT';
+final unknownAlbum = 'Unknown Album';
+final unknownArtist = 'Unknown Artist';

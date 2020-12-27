@@ -12,30 +12,29 @@ class RandomAlbums extends StatefulWidget {
 }
 
 class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClientMixin {
-  Future<List<Directory>> futureContent;
+  List<Directory> _albums;
 
   @override
   void initState() {
     super.initState();
-    futureContent = getIt<API>().random();
+    _onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return FutureBuilder<List<Directory>>(
-      future: futureContent,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          // TODO better looking error messages
-          return Text("error ${snapshot.error}");
-        } else if (snapshot.hasData) {
-          return AlbumGrid(snapshot.data);
-        }
+    if (_albums == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return AlbumGrid(_albums, onRefresh: _onRefresh);
+  }
 
-        return Center(child: CircularProgressIndicator());
-      },
-    );
+  Future _onRefresh() async {
+    // TODO handle errors!
+    final newAlbums = await getIt<API>().random();
+    setState(() {
+      _albums = newAlbums;
+    });
   }
 
   @override
