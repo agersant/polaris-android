@@ -35,8 +35,6 @@ class HttpAPI implements API {
   }
 
   Future<Response> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
-    var response;
-
     Map<String, String> headers = Map();
     if (authenticate) {
       if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
@@ -44,29 +42,30 @@ class HttpAPI implements API {
       }
     }
 
+    Future<Response> response;
     try {
       switch (method) {
         case _Method.get:
-          response = await _client.get(url, headers: headers);
+          response = _client.get(url, headers: headers);
           break;
         case _Method.post:
           headers[HttpHeaders.contentTypeHeader] = 'application/json';
-          response = await _client.post(url, headers: headers, body: body);
+          response = _client.post(url, headers: headers, body: body);
           break;
       }
     } catch (e) {
       throw APIError.networkError;
     }
 
-    if (response.statusCode == 401) {
-      throw APIError.unauthorized;
-    }
-
-    if (response.statusCode == 200) {
-      return response;
-    }
-
-    throw APIError.requestFailed;
+    return response.catchError((e) => throw APIError.networkError).then((r) {
+      if (r.statusCode == 401) {
+        throw APIError.unauthorized;
+      }
+      if (r.statusCode != 200) {
+        throw APIError.requestFailed;
+      }
+      return r;
+    });
   }
 
   @override
@@ -123,7 +122,6 @@ class HttpAPI implements API {
   @override
   Future<Uint8List> downloadImage(String path) async {
     final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
-    final response = await _makeRequest(_Method.get, url, authenticate: true);
-    return response.bodyBytes;
+    return _makeRequest(_Method.get, url, authenticate: true).then((r) => r.bodyBytes);
   }
 }
