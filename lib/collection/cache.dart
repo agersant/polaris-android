@@ -16,11 +16,9 @@ class Manager {
   static Future<Manager> create() async {
     // TODO delete previous directories for previous versions
     final temporaryDirectory = await getTemporaryDirectory();
-    final collection = new Directory(p.join(temporaryDirectory.path, 'collection'));
-    await collection.create();
-    final versioned = new Directory(p.join(collection.path, 'v$_version'));
-    await versioned.create();
-    return Manager(versioned);
+    final root = new Directory(p.join(temporaryDirectory.path, 'collection', 'v$_version'));
+    await root.create(recursive: true);
+    return Manager(root);
   }
 
   Future<File> getImage(String host, String path) async {
@@ -36,11 +34,15 @@ class Manager {
     developer.log('Adding image to disk cache: $path');
     final fullPath = _generateImagePath(host, path);
     final file = new File(fullPath);
-    await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
+    try {
+      await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
+    } catch (e) {
+      developer.log('Error saving image $path', error: e);
+    }
   }
 
   String _generateImageKey(String host, String path) {
-    host = path.replaceAll(_slashRegExp, '-');
+    host = host.replaceAll(_slashRegExp, '-');
     path = path.replaceAll(_slashRegExp, '-');
     return host + '__polaris__image__' + path;
   }

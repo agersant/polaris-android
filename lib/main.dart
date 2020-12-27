@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
+import 'package:polaris/collection/cache.dart' as cache;
+import 'package:polaris/collection/interface.dart' as collection;
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/authentication.dart' as authentication;
 import 'package:polaris/platform/connection.dart' as connection;
@@ -30,6 +32,8 @@ Future _registerSingletons() async {
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
+  getIt.registerSingleton<cache.Manager>(await cache.Manager.create());
+  getIt.registerSingleton<collection.Interface>(collection.Interface());
 }
 
 void main() async {

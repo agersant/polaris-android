@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:polaris/platform/dto.dart';
+import 'package:polaris/ui/utils/thumbnail.dart';
 
 class GridMetrics {}
 
@@ -24,10 +25,7 @@ class AlbumGrid extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
               child: AspectRatio(
                 aspectRatio: 1.0,
-                child: Image.network(
-                  'https://f4.bcbits.com/img/a0959935152_16.jpg', // TMP
-                  fit: BoxFit.cover,
-                ),
+                child: Thumbnail(album.artwork),
               ),
             ),
           ),
@@ -74,6 +72,8 @@ class AlbumGrid extends StatelessWidget {
 
             final titleHeight = titlePainter.size.height;
             final artistHeight = artistPainter.size.height;
+            // TODO the heights above are incorrect for some items
+            // eg. KI SE KI by Be For U
 
             final childWidth =
                 ((screenWidth - 2 * padding) - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;

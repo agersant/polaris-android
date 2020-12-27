@@ -22,6 +22,9 @@ class Interface {
   final _imageJobs = Map<String, _Job>();
 
   Future<ImageProvider> getImage(String path) async {
+    if (path == null || path.isEmpty) {
+      return null;
+    }
     final host = _host.url;
     final cacheFile = await _cacheManager.getImage(host, path);
     if (cacheFile != null) {

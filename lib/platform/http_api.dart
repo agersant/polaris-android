@@ -15,7 +15,7 @@ final browseEndpoint = '/api/browse/';
 final randomEndpoint = '/api/random/';
 final recentEndpoint = '/api/recent/';
 final loginEndpoint = '/api/auth/';
-final thumbnailEndpoint = '/api/thubmnail/';
+final thumbnailEndpoint = '/api/thumbnail/';
 
 enum _Method {
   get,
