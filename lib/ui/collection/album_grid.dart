@@ -95,6 +95,7 @@ class AlbumGrid extends StatelessWidget {
             if (onRefresh == null) {
               return gridView;
             } else {
+              // TODO add some refresh functionality at the bottom?
               return RefreshIndicator(
                 onRefresh: onRefresh,
                 child: gridView,
