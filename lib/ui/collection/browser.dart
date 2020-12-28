@@ -13,12 +13,63 @@ class Browser extends StatefulWidget {
 }
 
 class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
+  List<String> _locations = [''];
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Navigator(
+      key: _navigatorKey,
+      pages: _locations.map((location) {
+        return MaterialPage(child: BrowserLocation(location, _navigateToChild));
+      }).toList(),
+      onPopPage: (route, result) {
+        return route.didPop(result);
+      },
+    );
+  }
+
+  _navigateToChild(dto.Directory directory) {
+    final newLocations = List<String>.from(_locations);
+    newLocations.add(directory.path);
+    setState(() {
+      _locations = newLocations;
+    });
+  }
+
+  _navigateToParent() {
+    final newLocations = List<String>.from(_locations);
+    newLocations.removeLast();
+    setState(() {
+      _locations = newLocations;
+    });
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class BrowserLocation extends StatefulWidget {
+  final String location;
+  final void Function(dto.Directory) onDirectoryTapped;
+
+  BrowserLocation(this.location, this.onDirectoryTapped, {Key key})
+      : assert(location != null),
+        assert(onDirectoryTapped != null),
+        super(key: key);
+
+  @override
+  _BrowserLocationState createState() => _BrowserLocationState();
+}
+
+class _BrowserLocationState extends State<BrowserLocation> {
   List<dto.CollectionFile> _files;
 
   @override
   void initState() {
     super.initState();
-    _browseTo('');
+    _browseTo(widget.location);
   }
 
   _browseTo(String path) async {
@@ -32,7 +83,6 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     if (_files == null) {
       return Center(child: CircularProgressIndicator());
     }
@@ -43,7 +93,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
         final file = _files[index];
         if (file.isDirectory()) {
           final directory = file.asDirectory();
-          return Directory(directory, onTap: () => _browseTo(directory.path));
+          return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
         } else {
           assert(file.isSong());
           return Song(file.asSong());
@@ -51,9 +101,6 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
       },
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
 final _pathSeparatorRegExp = RegExp(r'[/\\]');
