@@ -112,7 +112,9 @@ class Song extends StatelessWidget {
   final String albumArtwork;
   final dto.Song song;
 
-  Song(this.song, this.albumArtwork) : assert(song != null);
+  Song(this.song, this.albumArtwork, {Key key})
+      : assert(song != null),
+        super(key: key);
 
   String getTitle() {
     List<String> components = [];
