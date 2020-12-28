@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="agersant.polaris.features.player.PlayerActivity">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
-
-    </com.google.android.material.appbar.AppBarLayout>
+    android:orientation="vertical">
 
     <agersant.polaris.ui.SquareLayout
         android:id="@+id/viewGroup"
@@ -53,7 +39,6 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/player_previous_track"
-                android:onClick="skipPrevious"
                 android:src="@drawable/ic_skip_previous_black_24dp"
                 android:tint="?colorOnBackground" />
 
@@ -65,7 +50,6 @@
                 android:layout_marginRight="32dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/player_play_pause"
-                android:onClick="togglePause"
                 android:src="@drawable/ic_play_arrow_black_24dp"
                 android:tint="?colorOnBackground" />
 
@@ -75,7 +59,6 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/player_next_track"
-                android:onClick="skipNext"
                 android:src="@drawable/ic_skip_next_black_24dp"
                 android:tint="?colorOnBackground" />
         </LinearLayout>
@@ -101,15 +84,5 @@
             tools:secondaryProgress="20" />
 
     </LinearLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="?colorHeaderBackground"
-        app:itemBackground="?colorHeaderBackground"
-        app:itemIconTint="@drawable/bottom_navigation_item"
-        app:itemTextColor="@drawable/bottom_navigation_item"
-        app:menu="@menu/menu_navigation" />
 
 </LinearLayout>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    tools:context="agersant.polaris.features.browse.CollectionFragment">
+
+    <Button
+        android:id="@+id/browse_directories"
+        style="@style/CollectionButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/collection_browse_directories"
+        app:icon="@drawable/ic_folder_black_24dp"
+        app:iconPadding="12dp"
+        app:iconTint="?android:textColorPrimary" />
+
+    <View style="@style/Divider" />
+
+    <Button
+        android:id="@+id/random_albums"
+        style="@style/CollectionButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/collection_random_albums"
+        app:icon="@drawable/ic_shuffle_black_24dp"
+        app:iconPadding="12dp"
+        app:iconTint="?android:textColorPrimary" />
+
+    <View style="@style/Divider" />
+
+    <Button
+        android:id="@+id/recent_albums"
+        style="@style/CollectionButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="@string/collection_recently_added"
+        app:icon="@drawable/ic_new_releases_black_24dp"
+        app:iconPadding="12dp"
+        app:iconTint="?android:textColorPrimary" />
+
+    <View style="@style/Divider" />
+
+    <Button
+        android:id="@+id/playlists"
+        style="@style/CollectionButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:enabled="false"
+        android:text="@string/collection_playlists"
+        app:icon="@drawable/ic_queue_music_black_24dp"
+        app:iconPadding="12dp"
+        app:iconTint="?android:textColorPrimary" />
+
+</LinearLayout>

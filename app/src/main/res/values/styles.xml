@@ -37,29 +37,26 @@
         <item name="subtitleTextColor">@color/toolbarSubtitle</item>
     </style>
 
-    <style name="PolarisButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="background">@color/background</item>
+    <style name="PolarisToolbarOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="colorOnPrimary">@color/headerTextPrimary</item> <!--Navigation icon color-->
+    </style>
+
+    <style name="ExplorerButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
         <item name="android:background">@color/background</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textAppearance">?textAppearanceBody1</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:drawableTint">?android:textColorPrimary</item>
-    </style>
-
-    <style name="ExplorerButton" parent="@style/PolarisButton">
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
     </style>
 
-    <style name="CollectionButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="CollectionButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:background">@color/background</item>
         <item name="android:textAppearance">?textAppearanceBody1</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
-        <item name="android:drawableTint">?android:textColorPrimary</item>
-        <item name="android:drawablePadding">12dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

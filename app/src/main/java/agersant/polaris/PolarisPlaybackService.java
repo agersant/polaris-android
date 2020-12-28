@@ -25,6 +25,8 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.Toast;
 
+import androidx.navigation.NavDeepLinkBuilder;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,7 +37,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import agersant.polaris.api.API;
-import agersant.polaris.features.player.PlayerActivity;
+import agersant.polaris.features.player.PlayerFragment;
 
 
 public class PolarisPlaybackService extends Service {
@@ -304,10 +306,10 @@ public class PolarisPlaybackService extends Service {
 		}
 
 		// On tap action
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
-				.addParentStack(PlayerActivity.class)
-				.addNextIntent(new Intent(this, PlayerActivity.class));
-		PendingIntent tapPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent tapPendingIntent = new NavDeepLinkBuilder(this)
+			.setGraph(R.navigation.nav_graph)
+			.setDestination(R.id.nav_now_playing)
+			.createPendingIntent();
 
 		// On dismiss action
 		Intent dismissIntent = new Intent(this, PolarisPlaybackService.class);
