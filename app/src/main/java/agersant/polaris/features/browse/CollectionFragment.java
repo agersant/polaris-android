@@ -8,15 +8,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisState;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
 import agersant.polaris.databinding.FragmentCollectionBinding;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 
 public class CollectionFragment extends Fragment {

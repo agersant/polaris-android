@@ -6,7 +6,7 @@
         android:defaultValue=""
         android:key="@string/pref_key_server_url"
         android:title="@string/pref_server_url"
-        app:useSimpleSummaryProvider="true"/>
+        app:useSimpleSummaryProvider="true" />
     <!--suppress AndroidDomInspection -->
     <EditTextPreference
         android:defaultValue=""

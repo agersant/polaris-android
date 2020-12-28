@@ -1,9 +1,8 @@
 package agersant.polaris.features.settings;
 
+import agersant.polaris.R;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
-
-import agersant.polaris.R;
 
 
 public class PasswordSummaryProvider implements Preference.SummaryProvider<EditTextPreference> {

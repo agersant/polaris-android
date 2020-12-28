@@ -24,176 +24,183 @@ import okhttp3.Response;
 import okio.BufferedSink;
 
 public class APIVersion3 extends APIBase
-		implements IRemoteAPI {
+    implements IRemoteAPI {
 
-	private final Gson gson;
+    private final Gson gson;
 
-	APIVersion3(DownloadQueue downloadQueue, RequestQueue requestQueue) {
-		super(downloadQueue, requestQueue);
-		this.gson = new GsonBuilder()
-				.registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
-				.registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
-				.registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
-				.create();
-	}
+    APIVersion3(DownloadQueue downloadQueue, RequestQueue requestQueue) {
+        super(downloadQueue, requestQueue);
+        this.gson = new GsonBuilder()
+            .registerTypeAdapter(CollectionItem.class, new CollectionItem.Deserializer())
+            .registerTypeAdapter(CollectionItem.Directory.class, new CollectionItem.Directory.Deserializer())
+            .registerTypeAdapter(CollectionItem.Song.class, new CollectionItem.Song.Deserializer())
+            .create();
+    }
 
-	String getAudioURL(String path) {
-		String serverAddress = ServerAPI.getAPIRootURL();
-		return serverAddress + "/serve/" + Uri.encode(path);
-	}
+    String getAudioURL(String path) {
+        String serverAddress = ServerAPI.getAPIRootURL();
+        return serverAddress + "/serve/" + Uri.encode(path);
+    }
 
-	String getThumbnailURL(String path) {
-		String serverAddress = ServerAPI.getAPIRootURL();
-		return serverAddress + "/serve/" + Uri.encode(path);
-	}
+    String getThumbnailURL(String path) {
+        String serverAddress = ServerAPI.getAPIRootURL();
+        return serverAddress + "/serve/" + Uri.encode(path);
+    }
 
-	public void browse(String path, final ItemsCallback handlers) {
-		String requestURL = ServerAPI.getAPIRootURL() + "/browse/" + Uri.encode(path);
-		HttpUrl parsedURL = HttpUrl.parse(requestURL);
-		if (parsedURL == null) {
-			handlers.onError();
-			return;
-		}
+    public void browse(String path, final ItemsCallback handlers) {
+        String requestURL = ServerAPI.getAPIRootURL() + "/browse/" + Uri.encode(path);
+        HttpUrl parsedURL = HttpUrl.parse(requestURL);
+        if (parsedURL == null) {
+            handlers.onError();
+            return;
+        }
 
-		Request request = new Request.Builder().url(parsedURL).build();
-		Callback callback = new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-				handlers.onError();
-			}
+        Request request = new Request.Builder().url(parsedURL).build();
+        Callback callback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                handlers.onError();
+            }
 
-			@Override
-			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
-				}
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.body() == null) {
+                    handlers.onError();
+                    return;
+                }
 
-				Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {}.getType();
-				ArrayList<CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().charStream(), collectionType);
-				} catch (JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
-			}
-		};
-		requestQueue.requestAsync(request, callback);
-	}
+                Type collectionType = new TypeToken<ArrayList<CollectionItem>>() {
+                }.getType();
+                ArrayList<CollectionItem> items;
+                try {
+                    items = gson.fromJson(response.body().charStream(), collectionType);
+                } catch (JsonSyntaxException e) {
+                    handlers.onError();
+                    return;
+                }
+                handlers.onSuccess(items);
+            }
+        };
+        requestQueue.requestAsync(request, callback);
+    }
 
-	void getAlbums(String url, final ItemsCallback handlers) {
-		HttpUrl parsedURL = HttpUrl.parse(url);
-		if (parsedURL == null) {
-			handlers.onError();
-			return;
-		}
+    void getAlbums(String url, final ItemsCallback handlers) {
+        HttpUrl parsedURL = HttpUrl.parse(url);
+        if (parsedURL == null) {
+            handlers.onError();
+            return;
+        }
 
-		Request request = new Request.Builder().url(parsedURL).build();
-		Callback callback = new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-				handlers.onError();
-			}
+        Request request = new Request.Builder().url(parsedURL).build();
+        Callback callback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                handlers.onError();
+            }
 
-			@Override
-			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
-				}
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.body() == null) {
+                    handlers.onError();
+                    return;
+                }
 
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {}.getType();
-				ArrayList<? extends CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().charStream(), collectionType);
-				} catch (JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
-			}
-		};
-		requestQueue.requestAsync(request, callback);
-	}
+                Type collectionType = new TypeToken<ArrayList<CollectionItem.Directory>>() {
+                }.getType();
+                ArrayList<? extends CollectionItem> items;
+                try {
+                    items = gson.fromJson(response.body().charStream(), collectionType);
+                } catch (JsonSyntaxException e) {
+                    handlers.onError();
+                    return;
+                }
+                handlers.onSuccess(items);
+            }
+        };
+        requestQueue.requestAsync(request, callback);
+    }
 
-	public void flatten(String path, final ItemsCallback handlers) {
-		String requestURL = ServerAPI.getAPIRootURL() + "/flatten/" + Uri.encode(path);
-		Request request = new Request.Builder().url(requestURL).build();
-		Callback callback = new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-				handlers.onError();
-			}
+    public void flatten(String path, final ItemsCallback handlers) {
+        String requestURL = ServerAPI.getAPIRootURL() + "/flatten/" + Uri.encode(path);
+        Request request = new Request.Builder().url(requestURL).build();
+        Callback callback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                handlers.onError();
+            }
 
-			@Override
-			public void onResponse(Call call, Response response) {
-				if (response.body() == null) {
-					handlers.onError();
-					return;
-				}
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (response.body() == null) {
+                    handlers.onError();
+                    return;
+                }
 
-				Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {}.getType();
-				ArrayList<? extends CollectionItem> items;
-				try {
-					items = gson.fromJson(response.body().charStream(), collectionType);
-				} catch (JsonSyntaxException e) {
-					handlers.onError();
-					return;
-				}
-				handlers.onSuccess(items);
-			}
-		};
-		requestQueue.requestAsync(request, callback);
-	}
+                Type collectionType = new TypeToken<ArrayList<CollectionItem.Song>>() {
+                }.getType();
+                ArrayList<? extends CollectionItem> items;
+                try {
+                    items = gson.fromJson(response.body().charStream(), collectionType);
+                } catch (JsonSyntaxException e) {
+                    handlers.onError();
+                    return;
+                }
+                handlers.onSuccess(items);
+            }
+        };
+        requestQueue.requestAsync(request, callback);
+    }
 
-	public void setLastFMNowPlaying(String path) {
-		String requestURL = ServerAPI.getAPIRootURL() + "/lastfm/now_playing/" + Uri.encode(path);
-		Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
-			@Override
-			public MediaType contentType() {
-				return null;
-			}
-			@Override
-			public void writeTo(BufferedSink sink) {
+    public void setLastFMNowPlaying(String path) {
+        String requestURL = ServerAPI.getAPIRootURL() + "/lastfm/now_playing/" + Uri.encode(path);
+        Request request = new Request.Builder().url(requestURL).put(new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return null;
+            }
 
-			}
-		}).build();
+            @Override
+            public void writeTo(BufferedSink sink) {
 
-		requestQueue.requestAsync(request, new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-			}
-			@Override
-			public void onResponse(Call call, Response response) {
-			}
-		});
-	}
+            }
+        }).build();
 
-	public void scrobbleOnLastFM(String path) {
+        requestQueue.requestAsync(request, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
 
-		String requestURL = ServerAPI.getAPIRootURL() + "/lastfm/scrobble/" + Uri.encode(path);
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+        });
+    }
 
-		Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
-			@Override
-			public MediaType contentType() {
-				return null;
-			}
-			@Override
-			public void writeTo(BufferedSink sink) {
+    public void scrobbleOnLastFM(String path) {
 
-			}
-		}).build();
+        String requestURL = ServerAPI.getAPIRootURL() + "/lastfm/scrobble/" + Uri.encode(path);
 
-		requestQueue.requestAsync(request, new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-			}
-			@Override
-			public void onResponse(Call call, Response response) {
-			}
-		});
-	}
+        Request request = new Request.Builder().url(requestURL).post(new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return null;
+            }
+
+            @Override
+            public void writeTo(BufferedSink sink) {
+
+            }
+        }).build();
+
+        requestQueue.requestAsync(request, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+            }
+        });
+    }
 }
 

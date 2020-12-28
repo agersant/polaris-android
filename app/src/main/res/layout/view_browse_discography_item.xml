@@ -1,57 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="100dp"
-	>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
 
-	<ImageView
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		tools:ignore="ContentDescription"
-		android:background="?android:colorBackground"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="ContentDescription"
+        android:background="?android:colorBackground" />
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-		<ImageView
-			android:id="@+id/artwork"
-			android:layout_width="100dp"
-			android:layout_height="100dp"
-			android:contentDescription="@string/album_artwork"
-			tools:background="@drawable/artwork"/>
+        <ImageView
+            android:id="@+id/artwork"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="@string/album_artwork"
+            tools:background="@drawable/artwork" />
 
-		<RelativeLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:padding="15dp"
-			>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="15dp">
 
-			<TextView
-				android:id="@+id/album"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:ellipsize="end"
-				android:maxLines="2"
-				android:textColor="?android:textColorPrimary"
-				android:textSize="20sp"
-				tools:text="Into the Labyrinth"/>
+            <TextView
+                android:id="@+id/album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="20sp"
+                tools:text="Into the Labyrinth" />
 
-			<TextView
-				android:id="@+id/artist"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/album"
-				android:maxLines="1"
-				android:textColor="?android:textColorSecondary"
-				android:textSize="16sp"
-				tools:text="Dead Can Dance"/>
+            <TextView
+                android:id="@+id/artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/album"
+                android:maxLines="1"
+                android:textColor="?android:textColorSecondary"
+                android:textSize="16sp"
+                tools:text="Dead Can Dance" />
 
-		</RelativeLayout>
+        </RelativeLayout>
 
-	</LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

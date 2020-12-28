@@ -16,112 +16,112 @@ import agersant.polaris.api.local.OfflineCache;
 
 public class DownloadQueue {
 
-	public static final String WORKLOAD_CHANGED = "WORKLOAD_CHANGED";
+    public static final String WORKLOAD_CHANGED = "WORKLOAD_CHANGED";
 
-	private final API api;
-	private final PlaybackQueue playbackQueue;
-	private final PolarisPlayer player;
-	private final OfflineCache offlineCache;
-	private final ArrayList<DownloadQueueWorkItem> workers;
+    private final API api;
+    private final PlaybackQueue playbackQueue;
+    private final PolarisPlayer player;
+    private final OfflineCache offlineCache;
+    private final ArrayList<DownloadQueueWorkItem> workers;
 
-	public DownloadQueue(Context context, API api, PlaybackQueue playbackQueue, PolarisPlayer player, OfflineCache offlineCache, ServerAPI serverAPI) {
+    public DownloadQueue(Context context, API api, PlaybackQueue playbackQueue, PolarisPlayer player, OfflineCache offlineCache, ServerAPI serverAPI) {
 
-		this.api  = api;
-		this.playbackQueue  = playbackQueue;
-		this.player  = player;
-		this.offlineCache  = offlineCache;
+        this.api = api;
+        this.playbackQueue = playbackQueue;
+        this.player = player;
+        this.offlineCache = offlineCache;
 
-		workers = new ArrayList<>();
-		for (int i = 0; i < 2; i++) {
-			File file = new File(context.getExternalCacheDir(), "stream" + i + ".tmp");
-			DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file, serverAPI, offlineCache, player);
-			workers.add(worker);
-		}
-	}
+        workers = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            File file = new File(context.getExternalCacheDir(), "stream" + i + ".tmp");
+            DownloadQueueWorkItem worker = new DownloadQueueWorkItem(file, serverAPI, offlineCache, player);
+            workers.add(worker);
+        }
+    }
 
-	synchronized MediaSource getAudio(CollectionItem item) {
-		DownloadQueueWorkItem existingWorker = findWorkerWithAudioForItem(item);
-		if (existingWorker != null) {
-			existingWorker.stopBackgroundDownload();
-			return existingWorker.getMediaSource();
-		}
+    synchronized MediaSource getAudio(CollectionItem item) {
+        DownloadQueueWorkItem existingWorker = findWorkerWithAudioForItem(item);
+        if (existingWorker != null) {
+            existingWorker.stopBackgroundDownload();
+            return existingWorker.getMediaSource();
+        }
 
-		DownloadQueueWorkItem newWorker = findIdleWorker();
-		if (newWorker == null) {
-			newWorker = findWorkerToInterrupt();
-		}
-		if (newWorker == null) {
-			System.out.println("ERROR: Could not find a worker for download queue.");
-			return null;
-		}
+        DownloadQueueWorkItem newWorker = findIdleWorker();
+        if (newWorker == null) {
+            newWorker = findWorkerToInterrupt();
+        }
+        if (newWorker == null) {
+            System.out.println("ERROR: Could not find a worker for download queue.");
+            return null;
+        }
 
-		newWorker.assignItem(item);
-		return newWorker.getMediaSource();
-	}
+        newWorker.assignItem(item);
+        return newWorker.getMediaSource();
+    }
 
-	private DownloadQueueWorkItem findWorkerWithAudioForItem(CollectionItem item) {
-		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.hasMediaSourceFor(item)) {
-				return worker;
-			}
-		}
-		return null;
-	}
+    private DownloadQueueWorkItem findWorkerWithAudioForItem(CollectionItem item) {
+        for (DownloadQueueWorkItem worker : workers) {
+            if (worker.hasMediaSourceFor(item)) {
+                return worker;
+            }
+        }
+        return null;
+    }
 
-	public boolean isStreaming(CollectionItem item) {
-		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.hasMediaSourceFor(item)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean isStreaming(CollectionItem item) {
+        for (DownloadQueueWorkItem worker : workers) {
+            if (worker.hasMediaSourceFor(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public boolean isDownloading(CollectionItem item) {
-		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.isDownloading(item)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean isDownloading(CollectionItem item) {
+        for (DownloadQueueWorkItem worker : workers) {
+            if (worker.isDownloading(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	private DownloadQueueWorkItem findIdleWorker() {
-		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.isIdle()) {
-				return worker;
-			}
-		}
-		return null;
-	}
+    private DownloadQueueWorkItem findIdleWorker() {
+        for (DownloadQueueWorkItem worker : workers) {
+            if (worker.isIdle()) {
+                return worker;
+            }
+        }
+        return null;
+    }
 
-	private DownloadQueueWorkItem findWorkerToInterrupt() {
-		for (DownloadQueueWorkItem worker : workers) {
-			if (worker.canBeInterrupted()) {
-				return worker;
-			}
-		}
-		return null;
-	}
+    private DownloadQueueWorkItem findWorkerToInterrupt() {
+        for (DownloadQueueWorkItem worker : workers) {
+            if (worker.canBeInterrupted()) {
+                return worker;
+            }
+        }
+        return null;
+    }
 
-	public synchronized void downloadNext() {
+    public synchronized void downloadNext() {
 
-		if (api.isOffline()) {
-			return;
-		}
+        if (api.isOffline()) {
+            return;
+        }
 
-		DownloadQueueWorkItem worker = findIdleWorker();
-		if (worker == null) {
-			return;
-		}
+        DownloadQueueWorkItem worker = findIdleWorker();
+        if (worker == null) {
+            return;
+        }
 
-		CollectionItem nextItem = playbackQueue.getNextItemToDownload(player.getCurrentItem(), offlineCache, this);
-		if (nextItem != null) {
-			if (!offlineCache.makeSpace(nextItem)) {
-				return;
-			}
-			worker.assignItem(nextItem);
-			worker.beginBackgroundDownload();
-		}
-	}
+        CollectionItem nextItem = playbackQueue.getNextItemToDownload(player.getCurrentItem(), offlineCache, this);
+        if (nextItem != null) {
+            if (!offlineCache.makeSpace(nextItem)) {
+                return;
+            }
+            worker.assignItem(nextItem);
+            worker.beginBackgroundDownload();
+        }
+    }
 }

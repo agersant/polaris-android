@@ -1,71 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="48dp"
-	android:duplicateParentState="true"
-	android:gravity="center_vertical"
-	android:background="@drawable/queue_item_background"
-	>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:duplicateParentState="true"
+    android:gravity="center_vertical"
+    android:background="@drawable/queue_item_background">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:layout_marginEnd="48dp"
-		android:layout_marginStart="12dp"
-		android:duplicateParentState="true"
-		android:gravity="center_vertical"
-		android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="48dp"
+        android:layout_marginStart="12dp"
+        android:duplicateParentState="true"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-		<TextView
-			android:id="@+id/title"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:duplicateParentState="true"
-			android:ellipsize="end"
-			android:maxLines="1"
-			android:textColor="@color/queue_item_title"
-			android:textSize="16sp"
-			tools:text="Elevator Sunshine Girl"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/queue_item_title"
+            android:textSize="16sp"
+            tools:text="Elevator Sunshine Girl" />
 
-		<TextView
-			android:id="@+id/artist"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:duplicateParentState="true"
-			android:ellipsize="end"
-			android:maxLines="1"
-			android:textColor="@color/queue_item_artist"
-			android:textSize="12sp"
-			tools:text="Solar Fields"/>
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/queue_item_artist"
+            android:textSize="12sp"
+            tools:text="Solar Fields" />
 
-	</LinearLayout>
+    </LinearLayout>
 
-	<ImageView
-		android:id="@+id/cache_icon"
-		android:layout_width="24dp"
-		android:layout_height="24dp"
-		android:layout_alignParentEnd="true"
-		android:layout_centerVertical="true"
-		android:layout_marginEnd="12dp"
-		android:background="@drawable/ic_sd_storage_black_24dp"
-		android:backgroundTint="@color/queue_item_icon"
-		android:duplicateParentState="true"
-		android:contentDescription="@string/queue_cached"
-		android:visibility="invisible"/>
+    <ImageView
+        android:id="@+id/cache_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ic_sd_storage_black_24dp"
+        android:backgroundTint="@color/queue_item_icon"
+        android:duplicateParentState="true"
+        android:contentDescription="@string/queue_cached"
+        android:visibility="invisible" />
 
-	<ImageView
-		android:id="@+id/download_icon"
-		android:layout_width="24dp"
-		android:layout_height="24dp"
-		android:layout_alignParentEnd="true"
-		android:layout_centerVertical="true"
-		android:layout_marginEnd="12dp"
-		android:background="@drawable/ic_sync_black_24dp"
-		android:backgroundTint="@color/queue_item_icon"
-		android:duplicateParentState="true"
-		android:contentDescription="@string/queue_downloading"
-		android:visibility="invisible"/>
+    <ImageView
+        android:id="@+id/download_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ic_sync_black_24dp"
+        android:backgroundTint="@color/queue_item_icon"
+        android:duplicateParentState="true"
+        android:contentDescription="@string/queue_downloading"
+        android:visibility="invisible" />
 
 </RelativeLayout>

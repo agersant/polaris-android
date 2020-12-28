@@ -9,10 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -27,6 +23,9 @@ import agersant.polaris.api.API;
 import agersant.polaris.api.ItemsCallback;
 import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.databinding.FragmentBrowseBinding;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 
 public class BrowseFragment extends Fragment {
