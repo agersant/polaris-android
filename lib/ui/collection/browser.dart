@@ -14,7 +14,6 @@ class Browser extends StatefulWidget {
 
 class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   List<String> _locations = [''];
-  final _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -37,7 +36,6 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
   Widget build(BuildContext context) {
     super.build(context);
     return Navigator(
-      key: _navigatorKey,
       pages: _locations.map((location) {
         return MaterialPage(child: BrowserLocation(location, _navigateToChild));
       }).toList(),
