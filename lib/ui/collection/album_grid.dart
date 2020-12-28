@@ -93,6 +93,7 @@ class Album extends StatelessWidget {
   Widget build(BuildContext context) {
     return OpenContainer(
       closedElevation: 0,
+      useRootNavigator: true,
       transitionType: ContainerTransitionType.fade,
       closedColor: Theme.of(context).scaffoldBackgroundColor,
       openColor: Theme.of(context).scaffoldBackgroundColor,

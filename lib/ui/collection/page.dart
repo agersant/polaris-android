@@ -5,29 +5,47 @@ import 'package:polaris/ui/collection/random.dart';
 
 import '../strings.dart';
 
-class CollectionPage extends StatelessWidget {
+class CollectionPage extends StatefulWidget {
+  @override
+  _CollectionPageState createState() => _CollectionPageState();
+}
+
+class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
+  final List<Tab> tabs = <Tab>[
+    Tab(text: collectionTabBrowseTitle),
+    Tab(text: collectionTabRandomTitle),
+    Tab(text: collectionTabRecentTitle),
+  ];
+
+  TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = new TabController(vsync: this, length: tabs.length);
+    _tabController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(collectionTitle),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: collectionTabBrowseTitle),
-              Tab(text: collectionTabRandomTitle),
-              Tab(text: collectionTabRecentTitle),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            Browser(),
-            RandomAlbums(),
-            Icon(Icons.new_releases),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(collectionTitle),
+        bottom: TabBar(tabs: tabs, controller: _tabController),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          Browser(handleBackButton: _tabController.index == 0),
+          RandomAlbums(),
+          Icon(Icons.new_releases),
+        ],
       ),
     );
   }

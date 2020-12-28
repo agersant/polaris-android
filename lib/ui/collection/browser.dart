@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
@@ -8,6 +9,10 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 final getIt = GetIt.instance;
 
 class Browser extends StatefulWidget {
+  final bool handleBackButton;
+
+  Browser({this.handleBackButton, Key key}) : super(key: key);
+
   @override
   _BrowserState createState() => _BrowserState();
 }
@@ -29,19 +34,32 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
 
   @override
   Future<bool> didPopRoute() async {
+    if (!widget.handleBackButton) {
+      return false;
+    }
     return _navigateToParent();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Navigator(
-      pages: _locations.map((location) {
-        return MaterialPage(child: BrowserLocation(location, _navigateToChild));
-      }).toList(),
-      onPopPage: (route, result) {
-        return route.didPop(result);
-      },
+
+    final Color fillColor = Theme.of(context).scaffoldBackgroundColor;
+    final sharedAxisTransition =
+        SharedAxisPageTransitionsBuilder(transitionType: SharedAxisTransitionType.scaled, fillColor: fillColor);
+    final PageTransitionsTheme transitionTheme = PageTransitionsTheme(
+        builders: {TargetPlatform.android: sharedAxisTransition, TargetPlatform.iOS: sharedAxisTransition});
+
+    return Theme(
+      data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
+      child: Navigator(
+        pages: _locations.map((location) {
+          return MaterialPage(child: BrowserLocation(location, _navigateToChild));
+        }).toList(),
+        onPopPage: (route, result) {
+          return route.didPop(result);
+        },
+      ),
     );
   }
 
