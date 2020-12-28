@@ -56,7 +56,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
   }
 
   bool _navigateToParent() {
-    if (_locations.length == 0) {
+    if (_locations.length <= 1) {
       return false;
     }
 
