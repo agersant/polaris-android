@@ -97,7 +97,7 @@ class Album extends StatelessWidget {
       closedColor: Theme.of(context).scaffoldBackgroundColor,
       openColor: Theme.of(context).scaffoldBackgroundColor,
       openBuilder: (context, action) {
-        return AlbumDetails(album.path);
+        return AlbumDetails(album);
       },
       closedBuilder: (context, action) {
         return Align(

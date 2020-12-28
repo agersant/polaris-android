@@ -10,9 +10,9 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
-  final String path;
+  final dto.Directory album;
 
-  AlbumDetails(this.path, {Key key}) : super(key: key);
+  AlbumDetails(this.album, {Key key}) : super(key: key);
 
   @override
   _AlbumDetailsState createState() => _AlbumDetailsState();
@@ -30,7 +30,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   void didUpdateWidget(AlbumDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.path != widget.path) {
+    if (oldWidget.album.path != widget.album.path) {
       _fetchData();
     }
   }
@@ -42,7 +42,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 
     final api = getIt<API>();
     // TODO error handling
-    final content = await api.browse(widget.path);
+    final content = await api.browse(widget.album.path);
     final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
 
     setState(() {
@@ -50,32 +50,14 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
-  String _getFromAnySong(String Function(dto.Song) prop) {
-    if (_songs == null || _songs.isEmpty) {
-      return null;
-    }
-    final song = _songs.firstWhere((s) => prop(s)?.isNotEmpty ?? false, orElse: () => null);
-    return song != null ? prop(song) : null;
-  }
-
   Widget _getThumbnail() {
-    final artworkPath = _getFromAnySong((s) => s.artwork);
+    final artworkPath = widget.album.artwork;
     return artworkPath != null ? Thumbnail(artworkPath) : null;
-  }
-
-  String _getAlbumTitle() {
-    final title = _getFromAnySong((s) => s.album);
-    return title ?? unknownAlbum;
-  }
-
-  String _getAlbumArtist() {
-    final albumArtist = _getFromAnySong((s) => s.albumArtist);
-    final artist = _getFromAnySong((s) => s.artist);
-    return albumArtist ?? artist ?? unknownArtist;
   }
 
   @override
   Widget build(BuildContext context) {
+    // TODO landscape mode
     // TODO back button invisible on light album covers
     return Scaffold(
       body: CustomScrollView(physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()), slivers: <Widget>[
@@ -93,20 +75,25 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         ),
         // TODO loading spinner
         // TODO handle zero songs
+        // TODO animate in
         if (_songs != null)
           SliverList(
             delegate: SliverChildListDelegate([
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: DefaultTextStyle(style: Theme.of(context).textTheme.headline5, child: Text(_getAlbumTitle())),
+                child: DefaultTextStyle(
+                    style: Theme.of(context).textTheme.headline5, child: Text(widget.album.album ?? unknownAlbum)),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DefaultTextStyle(style: Theme.of(context).textTheme.bodyText2, child: Text(_getAlbumArtist())),
-                    DefaultTextStyle(style: Theme.of(context).textTheme.caption, child: Text('${_songs.length} songs')),
+                    DefaultTextStyle(
+                        style: Theme.of(context).textTheme.bodyText2,
+                        child: Text(widget.album.artist ?? unknownArtist)),
+                    DefaultTextStyle(
+                        style: Theme.of(context).textTheme.caption, child: Text(widget.album.year?.toString() ?? '')),
                   ],
                 ),
               ),
@@ -114,7 +101,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           ),
         if (_songs != null)
           SliverList(
-            delegate: SliverChildListDelegate(_songs.map((song) => Song(song)).toList()),
+            delegate: SliverChildListDelegate(_songs.map((song) => Song(song, widget.album.artwork)).toList()),
           ),
       ]),
     );
@@ -122,9 +109,10 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 }
 
 class Song extends StatelessWidget {
+  final String albumArtwork;
   final dto.Song song;
 
-  Song(this.song);
+  Song(this.song, this.albumArtwork) : assert(song != null);
 
   String getTitle() {
     List<String> components = [];
@@ -151,7 +139,7 @@ class Song extends StatelessWidget {
     return ListTile(
       leading: ClipRRect(
           borderRadius: BorderRadius.circular(4.0),
-          child: SizedBox(height: 40, width: 40, child: Thumbnail(song.artwork))),
+          child: SizedBox(height: 40, width: 40, child: Thumbnail(albumArtwork ?? song.artwork))),
       title: Text(getTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
       trailing: Icon(Icons.more_vert),
