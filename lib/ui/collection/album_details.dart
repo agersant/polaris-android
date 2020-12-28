@@ -126,7 +126,7 @@ class Song extends StatelessWidget {
   }
 
   String getSubtitle() {
-    final artist = song.artist ?? song.albumArtist ?? unknownArtist;
+    final artist = song.formatArtist();
     List<String> components = [artist];
     if (song.duration != null) {
       components.add(formatDuration(Duration(seconds: song.duration)));
@@ -143,6 +143,7 @@ class Song extends StatelessWidget {
       title: Text(getTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
       trailing: Icon(Icons.more_vert),
+      dense: true,
     );
   }
 }

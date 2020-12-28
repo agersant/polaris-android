@@ -1,3 +1,6 @@
+import 'package:polaris/platform/dto.dart';
+import 'package:polaris/ui/strings.dart';
+
 String formatDuration(Duration d) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
@@ -7,5 +10,11 @@ String formatDuration(Duration d) {
     return '$hours:$twoDigitMinutes:$twoDigitSeconds';
   } else {
     return '$twoDigitMinutes:$twoDigitSeconds';
+  }
+}
+
+extension Formatting on Song {
+  String formatArtist() {
+    return artist ?? albumArtist ?? unknownArtist;
   }
 }
