@@ -126,6 +126,7 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
     // TODO handle zero files
     return ListView.builder(
+      physics: BouncingScrollPhysics(),
       itemCount: _files.length,
       itemBuilder: (context, index) {
         final file = _files[index];
