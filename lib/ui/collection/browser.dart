@@ -12,9 +12,26 @@ class Browser extends StatefulWidget {
   _BrowserState createState() => _BrowserState();
 }
 
-class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
+class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   List<String> _locations = [''];
   final _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<bool> didPopRoute() async {
+    return _navigateToParent();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +55,17 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
     });
   }
 
-  _navigateToParent() {
+  bool _navigateToParent() {
+    if (_locations.length == 0) {
+      return false;
+    }
+
     final newLocations = List<String>.from(_locations);
     newLocations.removeLast();
     setState(() {
       _locations = newLocations;
     });
+    return true;
   }
 
   @override
