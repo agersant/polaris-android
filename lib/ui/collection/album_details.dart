@@ -76,6 +76,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         // TODO loading spinner
         // TODO handle zero songs
         // TODO animate in
+        // TODO multi-disc albums
         if (_songs != null)
           SliverList(
             delegate: SliverChildListDelegate([
