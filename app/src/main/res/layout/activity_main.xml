@@ -38,4 +38,3 @@
         app:menu="@menu/menu_bottom_navigation" />
 
 </LinearLayout>
-
