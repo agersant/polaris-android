@@ -142,8 +142,6 @@ class _BrowserLocationState extends State<BrowserLocation> {
   }
 }
 
-final _pathSeparatorRegExp = RegExp(r'[/\\]');
-
 class Directory extends StatelessWidget {
   final dto.Directory directory;
   final GestureTapCallback onTap;
