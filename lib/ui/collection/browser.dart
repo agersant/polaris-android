@@ -114,15 +114,11 @@ class _BrowserLocationState extends State<BrowserLocation> {
   @override
   void initState() {
     super.initState();
-    _browseTo(widget.location);
-  }
-
-  _browseTo(String path) async {
     // TODO handle error
-    final newFiles = await getIt<API>().browse(path);
-    // TODO scroll to top
-    setState(() {
-      _files = newFiles;
+    getIt<API>().browse(widget.location).then((files) {
+      setState(() {
+        _files = files;
+      });
     });
   }
 
