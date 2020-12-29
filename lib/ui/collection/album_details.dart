@@ -50,27 +50,21 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
-  Widget _getThumbnail() {
-    final artworkPath = widget.album.artwork;
-    return artworkPath != null ? Thumbnail(artworkPath) : null;
-  }
-
   @override
   Widget build(BuildContext context) {
     // TODO landscape mode
-    // TODO back button invisible on light album covers
     return Scaffold(
       body: CustomScrollView(physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()), slivers: <Widget>[
         SliverAppBar(
           stretch: true,
-          pinned: true, // TODO this looks bad without title when scrolled down
           expandedHeight: 128,
+          automaticallyImplyLeading: false,
           flexibleSpace: FlexibleSpaceBar(
             stretchModes: <StretchMode>[
               StretchMode.zoomBackground,
               StretchMode.fadeTitle,
             ],
-            background: _getThumbnail(),
+            background: Thumbnail(widget.album.artwork),
           ),
         ),
         // TODO loading spinner
