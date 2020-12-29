@@ -237,24 +237,23 @@ class Directory extends StatelessWidget {
     return null;
   }
 
-  ListTile _buildTile() {
+  ListTile _buildTile({void Function() onTap}) {
     return ListTile(
       leading: _getLeading(),
       title: Text(directory.formatName()),
       subtitle: _getSubtitle(),
       trailing: Icon(Icons.more_vert),
       dense: true,
+      onTap: onTap,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final tile = _buildTile();
-    if (directory.album == null) {
-      return GestureDetector(
-        onTap: onTap,
-        child: tile,
-      );
+    final isAlbum = directory.album != null;
+    final tile = _buildTile(onTap: isAlbum ? null : onTap);
+    if (!isAlbum) {
+      return Material(child: tile);
     } else {
       return OpenContainer(
         closedElevation: 0,
@@ -262,12 +261,8 @@ class Directory extends StatelessWidget {
         transitionType: ContainerTransitionType.fade,
         closedColor: Theme.of(context).scaffoldBackgroundColor,
         openColor: Theme.of(context).scaffoldBackgroundColor,
-        openBuilder: (context, action) {
-          return AlbumDetails(directory);
-        },
-        closedBuilder: (context, action) {
-          return tile;
-        },
+        openBuilder: (context, action) => AlbumDetails(directory),
+        closedBuilder: (context, action) => Material(child: InkWell(child: tile, enableFeedback: true, onTap: action)),
       );
     }
   }
