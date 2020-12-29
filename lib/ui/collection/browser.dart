@@ -5,6 +5,7 @@ import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
+import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -56,7 +57,12 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
       data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
       child: Navigator(
         pages: _locations.map((location) {
-          return MaterialPage(child: BrowserLocation(location, _navigateToChild));
+          return MaterialPage(
+              child: BrowserLocation(
+            location,
+            onDirectoryTapped: _navigateToChild,
+            navigateBack: () => _navigateToParent(),
+          ));
         }).toList(),
         onPopPage: (route, result) {
           return route.didPop(result);
@@ -98,8 +104,9 @@ enum ViewMode {
 class BrowserLocation extends StatefulWidget {
   final String location;
   final void Function(dto.Directory) onDirectoryTapped;
+  final void Function() navigateBack;
 
-  BrowserLocation(this.location, this.onDirectoryTapped, {Key key})
+  BrowserLocation(this.location, {@required this.onDirectoryTapped, @required this.navigateBack, Key key})
       : assert(location != null),
         assert(onDirectoryTapped != null),
         super(key: key);
@@ -144,10 +151,15 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO some kind of breadcrumb / current directory name
     if (_files == null) {
       return Center(child: CircularProgressIndicator());
     }
-    // TODO handle zero files
+
+    if (_files.length == 0) {
+      return EmptyDirectory(widget.navigateBack);
+    }
+
     if (_getViewMode() == ViewMode.discography) {
       final albums = _files.map((f) => f.asDirectory()).toList();
       return AlbumGrid(albums);
@@ -170,11 +182,46 @@ class _BrowserLocationState extends State<BrowserLocation> {
   }
 }
 
+class EmptyDirectory extends StatelessWidget {
+  final void Function() navigateBack;
+
+  EmptyDirectory(this.navigateBack) : assert(navigateBack != null);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 24,
+              color: Theme.of(context).textTheme.caption.color,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(emptyDirectory),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: ElevatedButton(onPressed: navigateBack, child: Text(goBackButtonLabel)),
+        )
+      ],
+    );
+  }
+}
+
 class Directory extends StatelessWidget {
   final dto.Directory directory;
   final GestureTapCallback onTap;
 
-  Directory(this.directory, {this.onTap}) : assert(directory != null);
+  Directory(this.directory, {this.onTap, Key key})
+      : assert(directory != null),
+        super(key: key);
 
   Widget _getLeading() {
     if (directory.artwork != null || directory.album != null) {
@@ -229,7 +276,9 @@ class Directory extends StatelessWidget {
 class Song extends StatelessWidget {
   final dto.Song song;
 
-  Song(this.song) : assert(song != null);
+  Song(this.song, {Key key})
+      : assert(song != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {

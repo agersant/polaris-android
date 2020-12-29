@@ -22,3 +22,5 @@ final collectionTabRandomTitle = 'RANDOM';
 final collectionTabRecentTitle = 'RECENT';
 final unknownAlbum = 'Unknown Album';
 final unknownArtist = 'Unknown Artist';
+final emptyDirectory = 'There is nothing in this directory.';
+final goBackButtonLabel = 'GO BACK';
