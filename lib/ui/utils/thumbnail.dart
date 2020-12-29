@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:polaris/collection/interface.dart' as collection;
+import 'package:polaris/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
 
@@ -43,7 +45,7 @@ class _ThumbnailState extends State<Thumbnail> {
           return Container();
         }
         if (_imageProvider == null || snapshot.hasError || snapshot.data == null) {
-          return Container(); // TODO stripes https://medium.com/@baobao1996mn/flutter-draw-striped-objects-with-custompainter-4955f5014706
+          return FallbackArtwork();
         }
         assert(snapshot.hasData);
         return Image(
