@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
+import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -162,18 +163,39 @@ class Directory extends StatelessWidget {
     return null;
   }
 
+  ListTile _buildTile() {
+    return ListTile(
+      leading: _getLeading(),
+      title: Text(directory.formatName()),
+      subtitle: _getSubtitle(),
+      trailing: Icon(Icons.more_vert),
+      dense: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ListTile(
-        leading: _getLeading(),
-        title: Text(directory.formatName()),
-        subtitle: _getSubtitle(),
-        trailing: Icon(Icons.more_vert),
-        dense: true,
-      ),
-    );
+    final tile = _buildTile();
+    if (directory.album == null) {
+      return GestureDetector(
+        onTap: onTap,
+        child: tile,
+      );
+    } else {
+      return OpenContainer(
+        closedElevation: 0,
+        useRootNavigator: true,
+        transitionType: ContainerTransitionType.fade,
+        closedColor: Theme.of(context).scaffoldBackgroundColor,
+        openColor: Theme.of(context).scaffoldBackgroundColor,
+        openBuilder: (context, action) {
+          return AlbumDetails(directory);
+        },
+        closedBuilder: (context, action) {
+          return tile;
+        },
+      );
+    }
   }
 }
 
