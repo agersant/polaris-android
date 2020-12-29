@@ -25,26 +25,33 @@ class AlbumGrid extends StatelessWidget {
       builder: (context, orientation) {
         return LayoutBuilder(
           builder: (context, constraints) {
-            final titleStyle = Theme.of(context).textTheme.bodyText1;
-            final artistStyle = Theme.of(context).textTheme.caption;
-
             final screenWidth = constraints.maxWidth;
             final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
             final mainAxisSpacing = 24.0;
             final crossAxisSpacing = 16.0;
             final padding = 24.0;
 
-            final TextPainter titlePainter =
-                TextPainter(text: TextSpan(text: '', style: titleStyle), maxLines: 1, textDirection: TextDirection.ltr)
-                  ..layout(minWidth: 0, maxWidth: double.infinity);
-            final TextPainter artistPainter =
-                TextPainter(text: TextSpan(text: '', style: artistStyle), maxLines: 1, textDirection: TextDirection.ltr)
-                  ..layout(minWidth: 0, maxWidth: double.infinity);
+            final titleStyle = Theme.of(context).textTheme.bodyText1;
+            final artistStyle = Theme.of(context).textTheme.caption;
+            final titleStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: titleStyle.fontSize);
+            final artistStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: artistStyle.fontSize);
+
+            final TextPainter titlePainter = TextPainter(
+              maxLines: 1,
+              textDirection: TextDirection.ltr,
+              text: TextSpan(text: '', style: titleStyle),
+              strutStyle: titleStrutStyle,
+            )..layout(minWidth: 0, maxWidth: double.infinity);
+
+            final TextPainter artistPainter = TextPainter(
+              maxLines: 1,
+              textDirection: TextDirection.ltr,
+              text: TextSpan(text: '', style: artistStyle),
+              strutStyle: artistStrutStyle,
+            )..layout(minWidth: 0, maxWidth: double.infinity);
 
             final titleHeight = titlePainter.size.height;
             final artistHeight = artistPainter.size.height;
-            // TODO the heights above are incorrect for some items
-            // eg. KI SE KI by Be For U
 
             final childWidth =
                 ((screenWidth - 2 * padding) - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
@@ -59,7 +66,13 @@ class AlbumGrid extends StatelessWidget {
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
               children: albums.map((album) {
-                return Album(album, titleStyle: titleStyle, artistStyle: artistStyle);
+                return Album(
+                  album,
+                  titleStyle: titleStyle,
+                  artistStyle: artistStyle,
+                  titleStrutStyle: titleStrutStyle,
+                  artistStrutStyle: artistStrutStyle,
+                );
               }).toList(),
             );
 
@@ -83,8 +96,10 @@ class Album extends StatelessWidget {
   final Directory album;
   final TextStyle titleStyle;
   final TextStyle artistStyle;
+  final StrutStyle titleStrutStyle;
+  final StrutStyle artistStrutStyle;
 
-  Album(this.album, {this.titleStyle, this.artistStyle, Key key})
+  Album(this.album, {this.titleStyle, this.artistStyle, this.titleStrutStyle, this.artistStrutStyle, Key key})
       : assert(titleStyle != null),
         assert(artistStyle != null),
         super(key: key);
@@ -120,13 +135,19 @@ class Album extends StatelessWidget {
                 style: titleStyle,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
-                child: Text(album.album ?? unknownAlbum),
+                child: Text(
+                  album.album ?? unknownAlbum,
+                  strutStyle: titleStrutStyle,
+                ),
               ),
               DefaultTextStyle(
                 style: artistStyle,
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
-                child: Text(album.artist ?? unknownArtist),
+                child: Text(
+                  album.artist ?? unknownArtist,
+                  strutStyle: artistStrutStyle,
+                ),
               ),
             ],
           ),
