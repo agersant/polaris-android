@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
 import 'package:polaris/ui/collection/album_details.dart';
+import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -89,6 +90,11 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
   bool get wantKeepAlive => true;
 }
 
+enum ViewMode {
+  explorer,
+  discography,
+}
+
 class BrowserLocation extends StatefulWidget {
   final String location;
   final void Function(dto.Directory) onDirectoryTapped;
@@ -120,26 +126,51 @@ class _BrowserLocationState extends State<BrowserLocation> {
     });
   }
 
+  ViewMode _getViewMode() {
+    if (_files == null || _files.length == 0) {
+      return ViewMode.explorer;
+    }
+
+    var onlyDirectories = true;
+    var hasAnyPicture = false;
+    var allHaveAlbums = true;
+    for (var file in _files) {
+      onlyDirectories &= file.isDirectory();
+      hasAnyPicture |= file.asDirectory()?.artwork != null;
+      allHaveAlbums &= file.asDirectory()?.album != null;
+    }
+
+    if (onlyDirectories && hasAnyPicture && allHaveAlbums) {
+      return ViewMode.discography;
+    }
+    return ViewMode.explorer;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_files == null) {
       return Center(child: CircularProgressIndicator());
     }
     // TODO handle zero files
-    return ListView.builder(
-      physics: BouncingScrollPhysics(),
-      itemCount: _files.length,
-      itemBuilder: (context, index) {
-        final file = _files[index];
-        if (file.isDirectory()) {
-          final directory = file.asDirectory();
-          return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
-        } else {
-          assert(file.isSong());
-          return Song(file.asSong());
-        }
-      },
-    );
+    if (_getViewMode() == ViewMode.discography) {
+      final albums = _files.map((f) => f.asDirectory()).toList();
+      return AlbumGrid(albums);
+    } else {
+      return ListView.builder(
+        physics: BouncingScrollPhysics(),
+        itemCount: _files.length,
+        itemBuilder: (context, index) {
+          final file = _files[index];
+          if (file.isDirectory()) {
+            final directory = file.asDirectory();
+            return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
+          } else {
+            assert(file.isSong());
+            return Song(file.asSong());
+          }
+        },
+      );
+    }
   }
 }
 
