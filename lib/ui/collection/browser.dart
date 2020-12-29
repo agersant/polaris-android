@@ -150,8 +150,18 @@ class Directory extends StatelessWidget {
 
   Directory(this.directory, {this.onTap}) : assert(directory != null);
 
-  String _getDirectoryName() {
-    return directory.path.split(_pathSeparatorRegExp).last;
+  Widget _getLeading() {
+    if (directory.artwork != null || directory.album != null) {
+      return ListThumbnail(directory.artwork);
+    }
+    return Icon(Icons.folder);
+  }
+
+  Widget _getSubtitle() {
+    if (directory.album != null) {
+      return Text(directory.formatArtist());
+    }
+    return null;
   }
 
   @override
@@ -159,8 +169,9 @@ class Directory extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: ListTile(
-        leading: Icon(Icons.folder),
-        title: Text(_getDirectoryName()),
+        leading: _getLeading(),
+        title: Text(directory.formatName()),
+        subtitle: _getSubtitle(),
         trailing: Icon(Icons.more_vert),
         dense: true,
       ),
@@ -173,17 +184,11 @@ class Song extends StatelessWidget {
 
   Song(this.song) : assert(song != null);
 
-  String _getFileName() {
-    return song.title ?? song.path.split(_pathSeparatorRegExp).last;
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
-          child: SizedBox(height: 40, width: 40, child: Thumbnail(song.artwork))),
-      title: Text(_getFileName(), overflow: TextOverflow.ellipsis),
+      leading: ListThumbnail(song.artwork),
+      title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
       trailing: Icon(Icons.more_vert),
       dense: true,

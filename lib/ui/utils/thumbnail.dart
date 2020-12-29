@@ -54,3 +54,21 @@ class _ThumbnailState extends State<Thumbnail> {
     );
   }
 }
+
+class ListThumbnail extends StatelessWidget {
+  final String path;
+
+  ListThumbnail(this.path, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4.0),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Thumbnail(path),
+      ),
+    );
+  }
+}

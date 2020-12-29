@@ -117,17 +117,6 @@ class Song extends StatelessWidget {
       : assert(song != null),
         super(key: key);
 
-  String getTitle() {
-    List<String> components = [];
-    if (song.trackNumber != null) {
-      components.add('${song.trackNumber}');
-    }
-    if (song.title != null) {
-      components.add(song.title);
-    }
-    return components.join('. ');
-  }
-
   String getSubtitle() {
     final artist = song.formatArtist();
     List<String> components = [artist];
@@ -140,10 +129,8 @@ class Song extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
-          child: SizedBox(height: 40, width: 40, child: Thumbnail(albumArtwork ?? song.artwork))),
-      title: Text(getTitle(), overflow: TextOverflow.ellipsis),
+      leading: ListThumbnail(albumArtwork ?? song.artwork),
+      title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
       trailing: Icon(Icons.more_vert),
       dense: true,
