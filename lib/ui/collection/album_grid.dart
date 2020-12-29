@@ -118,38 +118,43 @@ class Album extends StatelessWidget {
       closedBuilder: (context, action) {
         return Align(
           alignment: Alignment.topCenter,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: _detailsSpacing),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: AspectRatio(
-                    aspectRatio: 1.0,
-                    child: GestureDetector(child: Thumbnail(album.artwork)),
+          child: Material(
+            child: InkWell(
+              onTap: action,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: _detailsSpacing),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: AspectRatio(
+                        aspectRatio: 1.0,
+                        child: Thumbnail(album.artwork),
+                      ),
+                    ),
                   ),
-                ),
+                  DefaultTextStyle(
+                    style: titleStyle,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      album.album ?? unknownAlbum,
+                      strutStyle: titleStrutStyle,
+                    ),
+                  ),
+                  DefaultTextStyle(
+                    style: artistStyle,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      album.artist ?? unknownArtist,
+                      strutStyle: artistStrutStyle,
+                    ),
+                  ),
+                ],
               ),
-              DefaultTextStyle(
-                style: titleStyle,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                child: Text(
-                  album.album ?? unknownAlbum,
-                  strutStyle: titleStrutStyle,
-                ),
-              ),
-              DefaultTextStyle(
-                style: artistStyle,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                child: Text(
-                  album.artist ?? unknownArtist,
-                  strutStyle: artistStrutStyle,
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
