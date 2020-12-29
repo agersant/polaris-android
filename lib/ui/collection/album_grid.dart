@@ -9,7 +9,7 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 
 class GridMetrics {}
 
-const double _detailsSpacing = 4.0;
+const double _detailsSpacing = 8.0;
 
 class AlbumGrid extends StatelessWidget {
   final List<Directory> albums;
@@ -25,8 +25,8 @@ class AlbumGrid extends StatelessWidget {
       builder: (context, orientation) {
         return LayoutBuilder(
           builder: (context, constraints) {
-            final titleStyle = Theme.of(context).textTheme.subtitle1;
-            final artistStyle = Theme.of(context).textTheme.subtitle2;
+            final titleStyle = Theme.of(context).textTheme.bodyText1;
+            final artistStyle = Theme.of(context).textTheme.caption;
 
             final screenWidth = constraints.maxWidth;
             final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
