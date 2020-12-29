@@ -208,7 +208,7 @@ class EmptyDirectory extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: ElevatedButton(onPressed: navigateBack, child: Text(goBackButtonLabel)),
+          child: OutlineButton(onPressed: navigateBack, child: Text(goBackButtonLabel)),
         )
       ],
     );
