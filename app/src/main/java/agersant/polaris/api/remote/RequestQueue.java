@@ -10,26 +10,26 @@ import okhttp3.ResponseBody;
 
 class RequestQueue {
 
-	private final OkHttpClient client;
+    private final OkHttpClient client;
 
-	RequestQueue(Auth auth) {
-		this.client = new OkHttpClient.Builder()
-				.retryOnConnectionFailure(true)
-				.addInterceptor(auth)
-				.build();
-	}
+    RequestQueue(Auth auth) {
+        this.client = new OkHttpClient.Builder()
+            .retryOnConnectionFailure(true)
+            .addInterceptor(auth)
+            .build();
+    }
 
-	ResponseBody requestSync(Request request) throws IOException {
-		Response response = client.newCall(request).execute();
-		if (!response.isSuccessful()) {
-			throw new IOException("Request failed with error code: " + response.code());
-		}
-		return response.body();
-	}
+    ResponseBody requestSync(Request request) throws IOException {
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new IOException("Request failed with error code: " + response.code());
+        }
+        return response.body();
+    }
 
-	void requestAsync(Request request, final Callback callback) {
-		client.newCall(request).enqueue(callback);
-	}
+    void requestAsync(Request request, final Callback callback) {
+        client.newCall(request).enqueue(callback);
+    }
 
 }
 

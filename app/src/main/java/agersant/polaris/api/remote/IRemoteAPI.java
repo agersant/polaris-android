@@ -10,19 +10,19 @@ import okhttp3.ResponseBody;
 
 public interface IRemoteAPI extends IPolarisAPI {
 
-	void getRandomAlbums(ItemsCallback handlers);
+    void getRandomAlbums(ItemsCallback handlers);
 
-	void getRecentAlbums(ItemsCallback handlers);
+    void getRecentAlbums(ItemsCallback handlers);
 
-	void setLastFMNowPlaying(String path);
+    void setLastFMNowPlaying(String path);
 
-	void scrobbleOnLastFM(String path);
+    void scrobbleOnLastFM(String path);
 
-	Uri getAudioUri(String path);
+    Uri getAudioUri(String path);
 
-	Uri getThumbnailUri(String path);
+    Uri getThumbnailUri(String path);
 
-	ResponseBody getAudio(String path) throws IOException;
+    ResponseBody getAudio(String path) throws IOException;
 
-	ResponseBody getThumbnail(String path) throws IOException;
+    ResponseBody getThumbnail(String path) throws IOException;
 }

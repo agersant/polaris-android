@@ -8,10 +8,10 @@ import agersant.polaris.CollectionItem;
 
 public interface IPolarisAPI {
 
-	MediaSource getAudio(CollectionItem item) throws IOException;
+    MediaSource getAudio(CollectionItem item) throws IOException;
 
-	void browse(String path, final ItemsCallback handlers);
+    void browse(String path, final ItemsCallback handlers);
 
-	void flatten(String path, final ItemsCallback handlers);
+    void flatten(String path, final ItemsCallback handlers);
 
 }

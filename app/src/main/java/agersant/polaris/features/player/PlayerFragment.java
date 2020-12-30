@@ -16,10 +16,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-
 import agersant.polaris.CollectionItem;
 import agersant.polaris.MainActivity;
 import agersant.polaris.PlaybackQueue;
@@ -29,6 +25,9 @@ import agersant.polaris.PolarisState;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
 import agersant.polaris.databinding.FragmentPlayerBinding;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 
 public class PlayerFragment extends Fragment {

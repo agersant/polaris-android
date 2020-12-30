@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	>
-	<item android:drawable="@color/background" app:state_is_playing="false"/>
-	<item android:drawable="@color/accent" app:state_is_playing="true"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:drawable="@color/background" app:state_is_playing="false" />
+    <item android:drawable="@color/accent" app:state_is_playing="true" />
 </selector>
