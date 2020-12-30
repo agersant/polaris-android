@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -81,7 +82,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     ));
 
     // TODO loading spinner
-    // TODO handle zero songs
     // TODO animate in
 
     // Header
@@ -116,16 +116,20 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     // Content
     if (_songs != null) {
       final discs = _splitIntoDiscs(_songs);
-      for (var disc in discs) {
-        slivers.add(SliverList(
-          delegate: SliverChildListDelegate([
-            Disc(
-              disc,
-              discCount: discs.length,
-              albumArtwork: widget.album.artwork,
-            )
-          ]),
-        ));
+      if (discs.length > 0) {
+        slivers.add(SliverFillRemaining(child: ErrorMessage(emptyAlbum)));
+      } else {
+        for (var disc in discs) {
+          slivers.add(SliverList(
+            delegate: SliverChildListDelegate([
+              Disc(
+                disc,
+                discCount: discs.length,
+                albumArtwork: widget.album.artwork,
+              )
+            ]),
+          ));
+        }
       }
     }
 
