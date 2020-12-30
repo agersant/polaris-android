@@ -61,13 +61,32 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO landscape mode
+  List<Widget> _getSongWidgets() {
+    final discs = _splitIntoDiscs(_songs);
+    if (discs.length == 0) {
+      return [
+        Padding(
+            padding: EdgeInsets.only(top: 64),
+            child: ErrorMessage(
+              emptyAlbum,
+              actionLabel: goBackButtonLabel,
+              action: () => Navigator.pop(context),
+            ))
+      ];
+    } else {
+      return discs
+          .map((discData) => Disc(
+                discData,
+                discCount: discs.length,
+                albumArtwork: widget.album.artwork,
+              ))
+          .toList();
+    }
+  }
 
+  Widget _getPortraitLayout() {
     var slivers = <Widget>[];
 
-    // App bar
     slivers.add(SliverAppBar(
       stretch: true,
       expandedHeight: 128,
@@ -81,12 +100,10 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ),
     ));
 
-    // TODO loading spinner
-    // TODO animate in
-
-    // Header
-    slivers.add(SliverList(
-      delegate: SliverChildListDelegate([
+    slivers.add(SliverToBoxAdapter(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
@@ -110,35 +127,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
             ],
           ),
         ),
-      ]),
-    ));
+      ],
+    )));
 
-    // Content
+    // TODO loading spinner
     if (_songs != null) {
-      final discs = _splitIntoDiscs(_songs);
-      if (discs.length == 0) {
-        slivers.add(SliverToBoxAdapter(
-            child: Padding(
-          padding: EdgeInsets.only(top: 64),
-          child: ErrorMessage(
-            emptyAlbum,
-            actionLabel: goBackButtonLabel,
-            action: () => Navigator.pop(context),
-          ),
-        )));
-      } else {
-        for (var disc in discs) {
-          slivers.add(SliverList(
-            delegate: SliverChildListDelegate([
-              Disc(
-                disc,
-                discCount: discs.length,
-                albumArtwork: widget.album.artwork,
-              )
-            ]),
-          ));
-        }
-      }
+      slivers.add(SliverList(delegate: SliverChildListDelegate(_getSongWidgets())));
     }
 
     return Scaffold(
@@ -146,6 +140,63 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: slivers,
       ),
+    );
+  }
+
+  Widget _getLandscapeLayout() {
+    final Widget leftColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: LargeThumbnail(widget.album.artwork),
+        ),
+        Text(widget.album.formatName(), style: Theme.of(context).textTheme.bodyText1),
+        Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.caption),
+      ],
+    );
+
+    Widget rightColumn;
+    if (_songs == null) {
+      rightColumn = Center(child: CircularProgressIndicator());
+    } else {
+      rightColumn = Padding(
+        padding: const EdgeInsets.only(left: 24),
+        child: ListView(
+          physics: BouncingScrollPhysics(),
+          children: _getSongWidgets(),
+        ),
+      );
+    }
+
+    final body = Padding(
+      padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 25, child: leftColumn),
+          Expanded(flex: 75, child: rightColumn),
+        ],
+      ),
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.album.formatName())),
+      body: body,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        // TODO animate in
+        if (orientation == Orientation.portrait) {
+          return _getPortraitLayout();
+        } else {
+          return _getLandscapeLayout();
+        }
+      },
     );
   }
 }

@@ -129,13 +129,7 @@ class Album extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: _detailsSpacing),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: AspectRatio(
-                        aspectRatio: 1.0,
-                        child: Thumbnail(album.artwork),
-                      ),
-                    ),
+                    child: LargeThumbnail(album.artwork),
                   ),
                   Text(
                     album.album ?? unknownAlbum,
