@@ -116,8 +116,16 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     // Content
     if (_songs != null) {
       final discs = _splitIntoDiscs(_songs);
-      if (discs.length > 0) {
-        slivers.add(SliverFillRemaining(child: ErrorMessage(emptyAlbum)));
+      if (discs.length == 0) {
+        slivers.add(SliverToBoxAdapter(
+            child: Padding(
+          padding: EdgeInsets.only(top: 64),
+          child: ErrorMessage(
+            emptyAlbum,
+            actionLabel: goBackButtonLabel,
+            action: () => Navigator.pop(context),
+          ),
+        )));
       } else {
         for (var disc in discs) {
           slivers.add(SliverList(
