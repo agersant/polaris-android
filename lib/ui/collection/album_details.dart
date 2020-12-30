@@ -53,52 +53,63 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   Widget build(BuildContext context) {
     // TODO landscape mode
-    return Scaffold(
-      body: CustomScrollView(physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()), slivers: <Widget>[
-        SliverAppBar(
-          stretch: true,
-          expandedHeight: 128,
-          automaticallyImplyLeading: false,
-          flexibleSpace: FlexibleSpaceBar(
-            stretchModes: <StretchMode>[
-              StretchMode.zoomBackground,
-              StretchMode.fadeTitle,
+
+    var slivers = <Widget>[];
+
+    // App bar
+    slivers.add(SliverAppBar(
+      stretch: true,
+      expandedHeight: 128,
+      automaticallyImplyLeading: false,
+      flexibleSpace: FlexibleSpaceBar(
+        stretchModes: <StretchMode>[
+          StretchMode.zoomBackground,
+          StretchMode.fadeTitle,
+        ],
+        background: Thumbnail(widget.album.artwork),
+      ),
+    ));
+
+    // TODO loading spinner
+    // TODO handle zero songs
+    // TODO animate in
+    // TODO multi-disc albums
+
+    // Header
+    slivers.add(SliverList(
+      delegate: SliverChildListDelegate([
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.headline5, child: Text(widget.album.album ?? unknownAlbum)),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DefaultTextStyle(
+                  style: Theme.of(context).textTheme.bodyText2, child: Text(widget.album.artist ?? unknownArtist)),
+              DefaultTextStyle(
+                  style: Theme.of(context).textTheme.caption, child: Text(widget.album.year?.toString() ?? '')),
             ],
-            background: Thumbnail(widget.album.artwork),
           ),
         ),
-        // TODO loading spinner
-        // TODO handle zero songs
-        // TODO animate in
-        // TODO multi-disc albums
-        if (_songs != null)
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: DefaultTextStyle(
-                    style: Theme.of(context).textTheme.headline5, child: Text(widget.album.album ?? unknownAlbum)),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DefaultTextStyle(
-                        style: Theme.of(context).textTheme.bodyText2,
-                        child: Text(widget.album.artist ?? unknownArtist)),
-                    DefaultTextStyle(
-                        style: Theme.of(context).textTheme.caption, child: Text(widget.album.year?.toString() ?? '')),
-                  ],
-                ),
-              ),
-            ]),
-          ),
-        if (_songs != null)
-          SliverList(
-            delegate: SliverChildListDelegate(_songs.map((song) => Song(song, widget.album.artwork)).toList()),
-          ),
       ]),
+    ));
+
+    // Content
+    if (_songs != null) {
+      slivers.add(SliverList(
+        delegate: SliverChildListDelegate(_songs.map((song) => Song(song, widget.album.artwork)).toList()),
+      ));
+    }
+
+    return Scaffold(
+      body: CustomScrollView(
+        physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        slivers: slivers,
+      ),
     );
   }
 }
