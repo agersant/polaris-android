@@ -23,4 +23,5 @@ final collectionTabRecentTitle = 'RECENT';
 final unknownAlbum = 'Unknown Album';
 final unknownArtist = 'Unknown Artist';
 final emptyDirectory = 'There is nothing in this directory.';
+final emptyAlbumList = 'There are no albums to display.';
 final goBackButtonLabel = 'GO BACK';

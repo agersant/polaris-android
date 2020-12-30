@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:polaris/platform/dto.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 class GridMetrics {}
@@ -19,7 +20,9 @@ class AlbumGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(albums.length > 0); // TODO handle empty album list
+    if (albums.length == 0) {
+      return ErrorMessage(emptyAlbumList);
+    }
 
     return OrientationBuilder(
       builder: (context, orientation) {

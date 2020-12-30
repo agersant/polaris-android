@@ -6,6 +6,7 @@ import 'package:polaris/platform/dto.dart' as dto;
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -157,7 +158,11 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
 
     if (_files.length == 0) {
-      return EmptyDirectory(widget.navigateBack);
+      return ErrorMessage(
+        emptyDirectory,
+        action: widget.navigateBack,
+        actionLabel: goBackButtonLabel,
+      );
     }
 
     if (_getViewMode() == ViewMode.discography) {
@@ -179,39 +184,6 @@ class _BrowserLocationState extends State<BrowserLocation> {
         },
       );
     }
-  }
-}
-
-class EmptyDirectory extends StatelessWidget {
-  final void Function() navigateBack;
-
-  EmptyDirectory(this.navigateBack) : assert(navigateBack != null);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 24,
-              color: Theme.of(context).textTheme.caption.color,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(emptyDirectory),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: OutlineButton(onPressed: navigateBack, child: Text(goBackButtonLabel)),
-        )
-      ],
-    );
   }
 }
 
