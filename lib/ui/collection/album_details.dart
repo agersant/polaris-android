@@ -130,9 +130,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ],
     )));
 
-    // TODO loading spinner
     if (_songs != null) {
       slivers.add(SliverList(delegate: SliverChildListDelegate(_getSongWidgets())));
+    } else {
+      slivers.add(SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator()),
+      ));
     }
 
     return Scaffold(
