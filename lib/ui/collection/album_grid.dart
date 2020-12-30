@@ -137,23 +137,19 @@ class Album extends StatelessWidget {
                       ),
                     ),
                   ),
-                  DefaultTextStyle(
+                  Text(
+                    album.album ?? unknownAlbum,
+                    strutStyle: titleStrutStyle,
                     style: titleStyle,
-                    softWrap: false,
                     overflow: TextOverflow.ellipsis,
-                    child: Text(
-                      album.album ?? unknownAlbum,
-                      strutStyle: titleStrutStyle,
-                    ),
+                    softWrap: false,
                   ),
-                  DefaultTextStyle(
+                  Text(
+                    album.artist ?? unknownArtist,
+                    strutStyle: artistStrutStyle,
                     style: artistStyle,
-                    softWrap: false,
                     overflow: TextOverflow.ellipsis,
-                    child: Text(
-                      album.artist ?? unknownArtist,
-                      strutStyle: artistStrutStyle,
-                    ),
+                    softWrap: false,
                   ),
                 ],
               ),
