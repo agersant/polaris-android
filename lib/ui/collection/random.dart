@@ -36,7 +36,6 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
     if (_albums == null) {
       return Center(child: CircularProgressIndicator());
     }
-    // TODO consider animating in
     return AlbumGrid(_albums, onRefresh: _onRefresh);
   }
 
