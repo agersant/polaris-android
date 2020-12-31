@@ -42,10 +42,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _songs = null;
       _error = null;
     });
-
-    final api = getIt<API>();
     try {
-      final content = await api.browse(widget.album.path);
+      final content = await getIt<API>().browse(widget.album.path);
       final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
         _songs = songs;
