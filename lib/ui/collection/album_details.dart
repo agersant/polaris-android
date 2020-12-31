@@ -21,6 +21,7 @@ class AlbumDetails extends StatefulWidget {
 
 class _AlbumDetailsState extends State<AlbumDetails> {
   List<dto.Song> _songs;
+  APIError _error;
 
   @override
   initState() {
@@ -39,16 +40,21 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   void _fetchData() async {
     setState(() {
       _songs = null;
+      _error = null;
     });
 
     final api = getIt<API>();
-    // TODO error handling
-    final content = await api.browse(widget.album.path);
-    final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
-
-    setState(() {
-      _songs = songs;
-    });
+    try {
+      final content = await api.browse(widget.album.path);
+      final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
+      setState(() {
+        _songs = songs;
+      });
+    } on APIError catch (e) {
+      setState(() {
+        _error = e;
+      });
+    }
   }
 
   List<DiscData> _splitIntoDiscs(List<dto.Song> songs) {
@@ -61,7 +67,19 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
-  List<Widget> _getSongWidgets() {
+  List<Widget> _getMainContent() {
+    if (_error != null) {
+      return [
+        Padding(
+            padding: EdgeInsets.only(top: 64),
+            child: ErrorMessage(
+              albumDetailsError,
+              action: _fetchData,
+              actionLabel: retryButtonLabel,
+            ))
+      ];
+    }
+
     final discs = _splitIntoDiscs(_songs);
     if (discs.length == 0) {
       return [
@@ -73,15 +91,15 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               action: () => Navigator.pop(context),
             ))
       ];
-    } else {
-      return discs
-          .map((discData) => Disc(
-                discData,
-                discCount: discs.length,
-                albumArtwork: widget.album.artwork,
-              ))
-          .toList();
     }
+
+    return discs
+        .map((discData) => Disc(
+              discData,
+              discCount: discs.length,
+              albumArtwork: widget.album.artwork,
+            ))
+        .toList();
   }
 
   Widget _getPortraitLayout() {
@@ -130,12 +148,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ],
     )));
 
-    if (_songs != null) {
-      slivers.add(SliverList(delegate: SliverChildListDelegate(_getSongWidgets())));
-    } else {
+    if (_songs == null && _error == null) {
       slivers.add(SliverFillRemaining(
         child: Center(child: CircularProgressIndicator()),
       ));
+    } else {
+      slivers.add(SliverList(delegate: SliverChildListDelegate(_getMainContent())));
     }
 
     return Scaffold(
@@ -160,14 +178,14 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     Widget rightColumn;
-    if (_songs == null) {
+    if (_songs == null && _error == null) {
       rightColumn = Center(child: CircularProgressIndicator());
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
         child: ListView(
           physics: BouncingScrollPhysics(),
-          children: _getSongWidgets(),
+          children: _getMainContent(),
         ),
       );
     }
