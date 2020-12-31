@@ -118,16 +118,29 @@ class BrowserLocation extends StatefulWidget {
 
 class _BrowserLocationState extends State<BrowserLocation> {
   List<dto.CollectionFile> _files;
+  APIError _error;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    // TODO handle error
-    getIt<API>().browse(widget.location).then((files) {
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    setState(() {
+      _files = null;
+      _error = null;
+    });
+    try {
+      final files = await getIt<API>().browse(widget.location);
       setState(() {
         _files = files;
       });
-    });
+    } on APIError catch (e) {
+      setState(() {
+        _error = e;
+      });
+    }
   }
 
   ViewMode _getViewMode() {
@@ -153,6 +166,15 @@ class _BrowserLocationState extends State<BrowserLocation> {
   @override
   Widget build(BuildContext context) {
     // TODO some kind of breadcrumb / current directory name
+
+    if (_error != null) {
+      return ErrorMessage(
+        browseError,
+        action: _fetchData,
+        actionLabel: retryButtonLabel,
+      );
+    }
+
     if (_files == null) {
       return Center(child: CircularProgressIndicator());
     }

@@ -43,8 +43,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      final content = await getIt<API>().browse(widget.album.path);
-      final songs = content.where((f) => f.isSong()).map((f) => f.asSong()).toList();
+      final files = await getIt<API>().browse(widget.album.path);
+      final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
         _songs = songs;
       });
