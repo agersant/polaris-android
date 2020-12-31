@@ -209,7 +209,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        // TODO animate in
         if (orientation == Orientation.portrait) {
           return _getPortraitLayout();
         } else {
