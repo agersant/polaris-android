@@ -28,5 +28,6 @@ final emptyAlbumList = 'There are no albums to display.';
 final emptyAlbum = 'There are no songs on this album.';
 final browseError = 'There was an error while reading this directory.';
 final randomError = 'There was an error while listing albums.';
+final recentError = 'There was an error while listing albums.';
 final albumDetailsError = 'There was an error while reading this album.';
 final goBackButtonLabel = 'GO BACK';

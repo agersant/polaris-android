@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/random.dart';
+import 'package:polaris/ui/collection/recent.dart';
 
 import '../strings.dart';
 
@@ -44,7 +45,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
         children: [
           Browser(handleBackButton: _tabController.index == 0),
           RandomAlbums(),
-          Icon(Icons.new_releases),
+          RecentAlbums(),
         ],
       ),
     );
