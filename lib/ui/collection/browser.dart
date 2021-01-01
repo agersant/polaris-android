@@ -55,6 +55,8 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
     final PageTransitionsTheme transitionTheme = PageTransitionsTheme(
         builders: {TargetPlatform.android: sharedAxisTransition, TargetPlatform.iOS: sharedAxisTransition});
 
+    final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor ?? Colors.black;
+
     return Theme(
       data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
       child: Column(
@@ -64,19 +66,23 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
             child: Breadcrumbs(_locations.last, _popLocations),
           ),
+          SizedBox(height: 1, child: Container(color: dividerColor)),
           Expanded(
-            child: Navigator(
-              pages: _locations.map((location) {
-                return MaterialPage(
-                    child: BrowserLocation(
-                  location,
-                  onDirectoryTapped: _enterDirectory,
-                  navigateBack: () => _navigateToParent(),
-                ));
-              }).toList(),
-              onPopPage: (route, result) {
-                return route.didPop(result);
-              },
+            child: ClipRect(
+              clipBehavior: Clip.hardEdge,
+              child: Navigator(
+                pages: _locations.map((location) {
+                  return MaterialPage(
+                      child: BrowserLocation(
+                    location,
+                    onDirectoryTapped: _enterDirectory,
+                    navigateBack: () => _navigateToParent(),
+                  ));
+                }).toList(),
+                onPopPage: (route, result) {
+                  return route.didPop(result);
+                },
+              ),
             ),
           ),
         ],
@@ -333,6 +339,18 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
     });
   }
 
+  Widget _buildChevron() {
+    final Color chevronColor = Theme.of(context).textTheme.caption.color;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
+      child: Icon(
+        Icons.chevron_right,
+        color: chevronColor,
+        size: 16,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<String> segments = _getSegments();
@@ -346,15 +364,18 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
         child: Text(value, style: style),
       );
     });
-    List<Widget> children = textWidgets.expand((t) => [Icon(Icons.chevron_right), t]).skip(1).toList();
+    List<Widget> children = textWidgets.expand((textWidget) => [_buildChevron(), textWidget]).skip(1).toList();
 
-    return ScrollConfiguration(
-      behavior: BreadcrumbsScrollBehavior(),
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: children,
+    return SizedBox(
+      height: 24,
+      child: ScrollConfiguration(
+        behavior: BreadcrumbsScrollBehavior(),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: children,
+          ),
         ),
       ),
     );
