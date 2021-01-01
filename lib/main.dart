@@ -22,7 +22,11 @@ final lightTheme = ThemeData(
 
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
-  primarySwatch: Colors.blue, // TODO this gets ignored (https://github.com/flutter/flutter/issues/19089)
+  primarySwatch: Colors.blue,
+  // Colors below are a workaround for https://github.com/flutter/flutter/issues/19089
+  toggleableActiveColor: Colors.blue[200],
+  accentColor: Colors.blue[200],
+  textSelectionHandleColor: Colors.blue[400],
 );
 
 Future _registerSingletons() async {
