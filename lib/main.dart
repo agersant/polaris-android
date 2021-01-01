@@ -10,6 +10,7 @@ import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
 import 'package:polaris/ui/collection/page.dart';
+import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:provider/provider.dart';
 
@@ -46,44 +47,71 @@ void main() async {
   runApp(PolarisApp());
 }
 
+class PolarisPath {}
+
+class PolarisRouteInformationParser extends RouteInformationParser<PolarisPath> {
+  @override
+  Future<PolarisPath> parseRouteInformation(RouteInformation routeInformation) async {
+    return PolarisPath();
+  }
+}
+
+class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
+    with ChangeNotifier, PopNavigatorRouterDelegateMixin<PolarisPath> {
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  PolarisRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
+        ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
+      ],
+      child: Consumer2<connection.Manager, authentication.Manager>(
+        builder: (context, connectionManager, authenticationManager, child) {
+          final isStartupComplete = connectionManager.state == connection.State.connected &&
+              authenticationManager.state == authentication.State.authenticated;
+
+          return Column(
+            children: [
+              Expanded(
+                child: Navigator(
+                  key: navigatorKey,
+                  pages: [
+                    if (!isStartupComplete) MaterialPage(child: StartupPage()),
+                    if (isStartupComplete) MaterialPage(child: CollectionPage()),
+                  ],
+                  onPopPage: (route, result) {
+                    if (!route.didPop(result)) {
+                      return false;
+                    }
+                    return true;
+                  },
+                ),
+              ),
+              if (isStartupComplete) Player(),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Future<void> setNewRoutePath(PolarisPath configuration) => null;
+}
+
 class PolarisApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Polaris',
       theme: lightTheme,
       darkTheme: darkTheme,
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
-          ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ],
-        child: Consumer2<connection.Manager, authentication.Manager>(
-          builder: (context, connectionManager, authenticationManager, child) {
-            final isStartupComplete = connectionManager.state == connection.State.connected &&
-                authenticationManager.state == authentication.State.authenticated;
-
-            List<Page<dynamic>> pages;
-            if (!isStartupComplete) {
-              pages = [MaterialPage(child: StartupPage())];
-            } else {
-              pages = [
-                MaterialPage(child: CollectionPage()),
-              ];
-            }
-
-            return Navigator(
-              pages: pages,
-              onPopPage: (route, result) {
-                if (!route.didPop(result)) {
-                  return false;
-                }
-                return true;
-              },
-            );
-          },
-        ),
-      ),
+      routeInformationParser: PolarisRouteInformationParser(),
+      routerDelegate: PolarisRouterDelegate(),
     );
   }
 }
