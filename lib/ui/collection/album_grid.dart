@@ -80,7 +80,7 @@ class AlbumGrid extends StatelessWidget {
             );
 
             if (onRefresh == null) {
-              return gridView;
+              return gridView; // TODO remove baked-in padding
             } else {
               // TODO add some refresh functionality at the bottom?
               return RefreshIndicator(

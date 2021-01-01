@@ -15,6 +15,10 @@ String formatDuration(Duration d) {
   }
 }
 
+List<String> splitPath(String path) {
+  return path.split(_pathSeparatorRegExp).toList();
+}
+
 extension SongFormatting on Song {
   String formatTrackNumberAndTitle() {
     if (title == null) {

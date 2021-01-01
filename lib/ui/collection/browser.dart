@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
@@ -56,25 +57,43 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
 
     return Theme(
       data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
-      child: Navigator(
-        pages: _locations.map((location) {
-          return MaterialPage(
-              child: BrowserLocation(
-            location,
-            onDirectoryTapped: _navigateToChild,
-            navigateBack: () => _navigateToParent(),
-          ));
-        }).toList(),
-        onPopPage: (route, result) {
-          return route.didPop(result);
-        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            child: Breadcrumbs(_locations.last, _popLocations),
+          ),
+          Expanded(
+            child: Navigator(
+              pages: _locations.map((location) {
+                return MaterialPage(
+                    child: BrowserLocation(
+                  location,
+                  onDirectoryTapped: _enterDirectory,
+                  navigateBack: () => _navigateToParent(),
+                ));
+              }).toList(),
+              onPopPage: (route, result) {
+                return route.didPop(result);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  _navigateToChild(dto.Directory directory) {
+  void _enterDirectory(dto.Directory directory) {
     final newLocations = List<String>.from(_locations);
     newLocations.add(directory.path);
+    setState(() {
+      _locations = newLocations;
+    });
+  }
+
+  void _popLocations(int numLocationsToPop) {
+    final newLocations = _locations.take(_locations.length - numLocationsToPop).toList();
     setState(() {
       _locations = newLocations;
     });
@@ -165,8 +184,6 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO some kind of breadcrumb / current directory name
-
     if (_error != null) {
       return ErrorMessage(
         browseError,
@@ -278,5 +295,76 @@ class Song extends StatelessWidget {
       trailing: Icon(Icons.more_vert),
       dense: true,
     );
+  }
+}
+
+class Breadcrumbs extends StatefulWidget {
+  final String path;
+  final void Function(int) popLocations;
+
+  Breadcrumbs(this.path, this.popLocations, {Key key})
+      : assert(path != null),
+        super(key: key);
+
+  @override
+  _BreadcrumbsState createState() => _BreadcrumbsState();
+}
+
+class _BreadcrumbsState extends State<Breadcrumbs> {
+  final _scrollController = ScrollController();
+
+  List<String> _getSegments() {
+    return ["All"].followedBy(splitPath(widget.path).where((s) => s.isNotEmpty)).toList();
+  }
+
+  @override
+  void didUpdateWidget(Breadcrumbs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.path != widget.path) {
+      _scrollToEnd();
+    }
+  }
+
+  void _scrollToEnd() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(
+        _scrollController.position.maxScrollExtent,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> segments = _getSegments();
+
+    final textWidgets = segments.asMap().entries.map((entry) {
+      final int index = entry.key;
+      final String value = entry.value;
+      final style = index == segments.length - 1 ? TextStyle(color: Theme.of(context).accentColor) : null;
+      return GestureDetector(
+        onTap: () => widget.popLocations(segments.length - 1 - index),
+        child: Text(value, style: style),
+      );
+    });
+    List<Widget> children = textWidgets.expand((t) => [Icon(Icons.chevron_right), t]).skip(1).toList();
+
+    return ScrollConfiguration(
+      behavior: BreadcrumbsScrollBehavior(),
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: children,
+        ),
+      ),
+    );
+  }
+}
+
+// Disable ink
+class BreadcrumbsScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }
