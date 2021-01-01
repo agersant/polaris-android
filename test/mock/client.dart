@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart' as mockito;
 import 'package:mockito/mockito.dart';
+import 'package:polaris/platform/dto.dart';
 import 'package:polaris/platform/http_api.dart';
 
 final missingProtocolHostURL = 'my-polaris-server';
@@ -29,7 +32,16 @@ class Mock extends mockito.Mock implements http.Client {
 
     // Browse
     when(this.get(argThat(startsWith(goodHostURL + browseEndpoint)), headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response('[]', 200));
+        .thenAnswer((Invocation invocation) async {
+      final String endpoint = invocation.positionalArguments[0];
+      final String path = endpoint.substring((goodHostURL + browseEndpoint).length);
+      final List<CollectionFile> files = _browseData[path];
+      if (files == null) {
+        return http.Response('', 404);
+      }
+      final String payload = jsonEncode(files);
+      return http.Response(payload, 200);
+    });
   }
 
   mockBadLogin() {
@@ -37,3 +49,11 @@ class Mock extends mockito.Mock implements http.Client {
         .thenAnswer((_) async => http.Response('', 401));
   }
 }
+
+Map<String, List<CollectionFile>> _browseData = {
+  '': [
+    CollectionFile(Right(
+      Directory()..path = 'root',
+    ))
+  ],
+};

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dartz/dartz.dart';
 
 class APIVersion {
@@ -28,10 +27,10 @@ class Authorization {
 class Credentials {
   String username, password;
   Credentials({this.username, this.password});
-  String toJson() => json.encode({
+  Map<String, dynamic> toJson() => {
         'username': username,
         'password': password,
-      });
+      };
 }
 
 class Directory {
@@ -53,6 +52,15 @@ class Directory {
       ..artwork = json['artwork']
       ..dateAdded = json['date_added'];
   }
+
+  Map<String, dynamic> toJson() => {
+        'path': path,
+        'artist': artist,
+        'year': year,
+        'album': album,
+        'artwork': artwork,
+        'dateAdded': dateAdded,
+      };
 }
 
 class Song {
@@ -82,6 +90,19 @@ class Song {
       ..artwork = json['artwork']
       ..duration = json['duration'];
   }
+
+  Map<String, dynamic> toJson() => {
+        'path': path,
+        'trackNumber': trackNumber,
+        'discNumber': discNumber,
+        'title': title,
+        'artist': artist,
+        'albumArtist': albumArtist,
+        'year': year,
+        'album': album,
+        'artwork': artwork,
+        'duration': duration,
+      };
 }
 
 class CollectionFile {
@@ -106,12 +127,17 @@ class CollectionFile {
   }
 
   factory CollectionFile.fromJson(Map<String, dynamic> json) {
-    if (json['Directory'] != null) {
-      return CollectionFile(Right(Directory.fromJson(json['Directory'])));
-    }
     if (json['Song'] != null) {
       return CollectionFile(Left(Song.fromJson(json['Song'])));
     }
+    if (json['Directory'] != null) {
+      return CollectionFile(Right(Directory.fromJson(json['Directory'])));
+    }
     return null;
   }
+
+  Map<String, dynamic> toJson() => content.fold(
+        (song) => {'Song': song},
+        (directory) => {'Directory': directory},
+      );
 }
