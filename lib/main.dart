@@ -22,7 +22,7 @@ final lightTheme = ThemeData(
 
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
-  primarySwatch: Colors.blue,
+  primarySwatch: Colors.blue, // TODO this gets ignored (https://github.com/flutter/flutter/issues/19089)
 );
 
 Future _registerSingletons() async {
