@@ -53,7 +53,7 @@ jobs:
           lane: "publish_to_beta"
           skip-tracking: "true"
           subdirectory: "android"
-          options: '{ "apk_path": "app/build/outputs/apk/release/app-release.apk" }'
+          options: '{ "aab": "../build/app/outputs/bundle/release/app-release.aab" }'
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
       - name: Commit and tag changes to beta branch
