@@ -17,6 +17,13 @@ final compatibleAPIVersion = '{"major": 6, "minor": 0}';
 final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
 final authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admin": false}';
 
+final rootDirectoryName = 'root';
+final heronDirectoryName = 'Heron';
+final aegeusDirectoryName = 'Aegeus';
+final rootDirectoryPath = rootDirectoryName;
+final heronDirectoryPath = rootDirectoryName + '/' + heronDirectoryName;
+final aegeusDirectoryPath = heronDirectoryPath + '/' + aegeusDirectoryName;
+
 class Mock extends mockito.Mock implements http.Client {
   Mock() {
     // API version
@@ -34,7 +41,7 @@ class Mock extends mockito.Mock implements http.Client {
     when(this.get(argThat(startsWith(goodHostURL + browseEndpoint)), headers: anyNamed('headers')))
         .thenAnswer((Invocation invocation) async {
       final String endpoint = invocation.positionalArguments[0];
-      final String path = endpoint.substring((goodHostURL + browseEndpoint).length);
+      final String path = Uri.decodeComponent(endpoint.substring((goodHostURL + browseEndpoint).length));
       final List<CollectionFile> files = _browseData[path];
       if (files == null) {
         return http.Response('', 404);
@@ -53,7 +60,21 @@ class Mock extends mockito.Mock implements http.Client {
 Map<String, List<CollectionFile>> _browseData = {
   '': [
     CollectionFile(Right(
-      Directory()..path = 'root',
+      Directory()..path = rootDirectoryPath,
+    ))
+  ],
+  rootDirectoryPath: [
+    CollectionFile(Right(
+      Directory()..path = heronDirectoryPath,
+    ))
+  ],
+  heronDirectoryPath: [
+    CollectionFile(Right(
+      Directory()
+        ..path = aegeusDirectoryPath
+        ..album = 'Aegeus'
+        ..artist = 'Heron'
+        ..year = 2016,
     ))
   ],
 };
