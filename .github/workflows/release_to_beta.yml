@@ -16,7 +16,7 @@ jobs:
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.0.3
         with:
-          fileName: "android-signing-keystore.jks"
+          fileName: "android/android-signing-keystore.jks"
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
       - name: Merge to beta branch
         uses: devmasx/merge-branch@v1.3.1
@@ -31,20 +31,14 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "1.22.5"
-      - name: Build Flutter app
-        run: flutter build appbundle
       - name: Update version name in gradle build file
         run: gawk -i inplace '/^[[:space:]]*versionName/ { $1 = "\t\t"$1; $2 = "\"${{ github.event.inputs.versionName }}\""; } 1' android/app/build.gradle
       - name: Increment version code in gradle build file
         run: gawk -i inplace '/^[[:space:]]*versionCode/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' android/app/build.gradle
       - name: Read version code from gradle build file
         run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
-      - name: Build APK
-        uses: maierj/fastlane-action@v1.4.0
-        with:
-          lane: "build_release"
-          skip-tracking: "true"
-          subdirectory: "android"
+      - name: Build Flutter app
+        run: flutter build appbundle
         env:
           VERSION_CODE: ${{ env.VERSION_CODE }}
           SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
