@@ -24,6 +24,11 @@ final rootDirectoryPath = rootDirectoryName;
 final heronDirectoryPath = rootDirectoryName + '/' + heronDirectoryName;
 final aegeusDirectoryPath = heronDirectoryPath + '/' + aegeusDirectoryName;
 
+final labyrinthSongName = 'Labyrinth';
+final fallInwardsSongName = 'Falling Inwards';
+final labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
+final fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
+
 class Mock extends mockito.Mock implements http.Client {
   Mock() {
     // API version
@@ -76,5 +81,23 @@ Map<String, List<CollectionFile>> _browseData = {
         ..artist = 'Heron'
         ..year = 2016,
     ))
+  ],
+  aegeusDirectoryPath: [
+    CollectionFile(Left(
+      Song()
+        ..path = labyrinthFilePath
+        ..title = labyrinthSongName
+        ..artist = heronDirectoryName
+        ..trackNumber = 1
+        ..album = aegeusDirectoryName,
+    )),
+    CollectionFile(Left(
+      Song()
+        ..path = fallInwardsFilePath
+        ..title = fallInwardsSongName
+        ..artist = heronDirectoryName
+        ..trackNumber = 2
+        ..album = aegeusDirectoryName,
+    )),
   ],
 };
