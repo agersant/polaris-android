@@ -12,13 +12,13 @@ jobs:
     name: Build
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@master
       - name: Retrieve encryption keys
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.0.3
         with:
           fileName: "android/android-signing-keystore.jks"
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-      - uses: actions/checkout@master
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "1.22.5"
