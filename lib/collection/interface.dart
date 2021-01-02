@@ -18,7 +18,7 @@ class _Job {
 class Interface {
   final _host = getIt<host.Manager>();
   final _api = getIt<API>();
-  final _cacheManager = getIt<cache.Manager>();
+  final _cache = getIt<cache.Interface>();
   final _imageJobs = Map<String, _Job>();
 
   Future<ImageProvider> getImage(String path) async {
@@ -26,7 +26,7 @@ class Interface {
       return null;
     }
     final host = _host.url;
-    final cacheFile = await _cacheManager.getImage(host, path);
+    final cacheFile = await _cache.getImage(host, path);
     if (cacheFile != null) {
       return FileImage(cacheFile);
     }
@@ -49,7 +49,7 @@ class Interface {
     final job = _Job(path, _api.downloadImage(path));
     _imageJobs[path] = job;
     job.result.then((bytes) async {
-      await _cacheManager.putImage(host, path, bytes);
+      await _cache.putImage(host, path, bytes);
     }).catchError((e) => developer.log('Error downloading image: $path', error: e));
     return job;
   }

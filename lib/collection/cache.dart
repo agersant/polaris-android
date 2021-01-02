@@ -9,7 +9,12 @@ final _slashRegExp = RegExp(r'[:/\.\\]');
 final _firstVersion = 1;
 final _currentVersion = 4;
 
-class Manager {
+abstract class Interface {
+  Future<File> getImage(String host, String path);
+  putImage(String host, String path, Uint8List bytes);
+}
+
+class Manager implements Interface {
   Directory _root;
 
   Manager(this._root);
