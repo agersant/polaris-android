@@ -8,8 +8,18 @@ on:
       - flutter
 
 jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "1.22.5"
+      - run: flutter test
+
   build:
-    name: Build
+    name: Build Android App Bundle
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
