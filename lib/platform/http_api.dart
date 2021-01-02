@@ -50,7 +50,7 @@ class HttpAPI implements API {
           break;
         case _Method.post:
           headers[HttpHeaders.contentTypeHeader] = 'application/json';
-          response = _client.post(url, headers: headers, body: body);
+          response = _client.post(url, headers: headers, body: jsonEncode(body));
           break;
       }
     } catch (e) {

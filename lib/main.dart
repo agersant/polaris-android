@@ -37,7 +37,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<API>(HttpAPI());
   getIt.registerSingleton<connection.Manager>(connection.Manager());
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
-  getIt.registerSingleton<cache.Manager>(await cache.Manager.create());
+  getIt.registerSingleton<cache.Interface>(await cache.Manager.create());
   getIt.registerSingleton<collection.Interface>(collection.Interface());
 }
 
