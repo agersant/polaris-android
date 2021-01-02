@@ -13,10 +13,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
+      - name: Build Flutter app
+        run: flutter build appbundle
       - uses: maierj/fastlane-action@v1.4.0
         with:
           lane: "build_debug"
           skip-tracking: "true"
+          subdirectory: "android"
 
   release:
     name: Build (release)
@@ -28,10 +31,13 @@ jobs:
           fileName: "android-signing-keystore.jks"
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
       - uses: actions/checkout@master
+      - name: Build Flutter app
+        run: flutter build appbundle
       - uses: maierj/fastlane-action@v1.4.0
         with:
           lane: "build_release"
           skip-tracking: "true"
+          subdirectory: "android"
         env:
           SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
           SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}

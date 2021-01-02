@@ -3,36 +3,35 @@ name: Promote Beta To Production
 on: workflow_dispatch
 
 jobs:
-
   publish:
     name: Promote
     runs-on: ubuntu-20.04
     steps:
-    - name: Merge beta branch to production branch
-      uses: devmasx/merge-branch@v1.3.1
-      with:
-        type: now
-        from_branch: beta
-        target_branch: production
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Checkout source
-      uses: actions/checkout@master
-      with:
-        ref: production
-    - name: Read version name
-      run: echo "VERSION_NAME=v$(gradle -q printVersionName)" >> $GITHUB_ENV
-    - name: Promote release
-      uses: maierj/fastlane-action@v1.4.0
-      with:
-        lane: 'promote_beta_to_production'
-        skip-tracking: 'true'
-      env:
-        GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
-    - name: Tag production branch
-      run: |
-        git config --global user.name ${{ github.actor }}
-        git config --global user.email "<>"
-        git tag -f -a google-play-production -m "Deployed to Google play"
-        git tag -f -a ${{ env.VERSION_NAME }} -m "Version number"
-        git push -f --tags
-
+      - name: Merge beta branch to production branch
+        uses: devmasx/merge-branch@v1.3.1
+        with:
+          type: now
+          from_branch: beta
+          target_branch: production
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout source
+        uses: actions/checkout@master
+        with:
+          ref: production
+      - name: Read version name
+        run: echo "VERSION_NAME=v$(gradle -q printVersionName)" >> $GITHUB_ENV
+      - name: Promote release
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: "promote_beta_to_production"
+          skip-tracking: "true"
+          subdirectory: "android"
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
+      - name: Tag production branch
+        run: |
+          git config --global user.name ${{ github.actor }}
+          git config --global user.email "<>"
+          git tag -f -a google-play-production -m "Deployed to Google play"
+          git tag -f -a ${{ env.VERSION_NAME }} -m "Version number"
+          git push -f --tags
