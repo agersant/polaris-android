@@ -47,6 +47,7 @@ void main() {
     await tester.tap(rootDirectory);
     await tester.pumpAndSettle();
 
+    expect(heronBreadcrumb, findsNothing);
     await tester.tap(heronDirectory);
     await tester.pumpAndSettle();
     expect(heronBreadcrumb, findsOneWidget);
