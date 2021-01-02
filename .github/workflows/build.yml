@@ -5,35 +5,35 @@ on:
   push:
     branches:
       - master
+      - flutter
 
 jobs:
-
   debug:
     name: Build (debug)
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@master
-    - uses: maierj/fastlane-action@v1.4.0
-      with:
-        lane: 'build_debug'
-        skip-tracking: 'true'
+      - uses: actions/checkout@master
+      - uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: "build_debug"
+          skip-tracking: "true"
 
   release:
     name: Build (release)
     runs-on: ubuntu-20.04
     steps:
-    - id: decode_keystore
-      uses: timheuer/base64-to-file@v1.0.3
-      with:
-        fileName: 'android-signing-keystore.jks'
-        encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-    - uses: actions/checkout@master
-    - uses: maierj/fastlane-action@v1.4.0
-      with:
-        lane: 'build_release'
-        skip-tracking: 'true'
-      env:
-        SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
-        SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
-        SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
-        SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+      - id: decode_keystore
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: "android-signing-keystore.jks"
+          encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+      - uses: actions/checkout@master
+      - uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: "build_release"
+          skip-tracking: "true"
+        env:
+          SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
+          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}

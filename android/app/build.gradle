@@ -11,15 +11,11 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
+def secretProperties = new Properties()
+secretProperties.setProperty("SIGNING_KEYSTORE_PATH", "${System.getenv("SIGNING_KEYSTORE_PATH")}")
+secretProperties.setProperty("SIGNING_KEYSTORE_PASSWORD", "${System.getenv("SIGNING_KEYSTORE_PASSWORD")}")
+secretProperties.setProperty("SIGNING_KEY_ALIAS", "${System.getenv("SIGNING_KEY_ALIAS")}")
+secretProperties.setProperty("SIGNING_KEY_PASSWORD", "${System.getenv("SIGNING_KEY_PASSWORD")}")
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -37,19 +33,29 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.polaris"
+        applicationId "agersant.polaris"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode 1
+        versionName "0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("${secretProperties["SIGNING_KEYSTORE_PATH"]}")
+            storePassword "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
+            keyAlias "${secretProperties["SIGNING_KEY_ALIAS"]}"
+            keyPassword "${secretProperties["SIGNING_KEY_PASSWORD"]}"
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            debuggable false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
         }
     }
 }
@@ -60,4 +66,16 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+task printVersionCode {
+    doLast {
+        println android.defaultConfig.versionCode
+    }
+}
+
+task printVersionName {
+    doLast {
+        println android.defaultConfig.versionName
+    }
 }
