@@ -339,32 +339,21 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
     });
   }
 
-  Widget _buildChevron() {
-    final Color chevronColor = Theme.of(context).textTheme.caption.color;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
-      child: Icon(
-        Icons.chevron_right,
-        color: chevronColor,
-        size: 16,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final List<String> segments = _getSegments();
 
-    final textWidgets = segments.asMap().entries.map((entry) {
+    final breadcrumbs = segments.asMap().entries.map((entry) {
       final int index = entry.key;
       final String value = entry.value;
       final style = index == segments.length - 1 ? TextStyle(color: Theme.of(context).accentColor) : null;
-      return GestureDetector(
+      return Breadcrumb(
+        name: value,
+        style: style,
         onTap: () => widget.popLocations(segments.length - 1 - index),
-        child: Text(value, style: style),
       );
     });
-    List<Widget> children = textWidgets.expand((textWidget) => [_buildChevron(), textWidget]).skip(1).toList();
+    List<Widget> children = breadcrumbs.expand((breadcrumb) => [Chevron(), breadcrumb]).skip(1).toList();
 
     return SizedBox(
       height: 24,
@@ -378,6 +367,40 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class Chevron extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final Color chevronColor = Theme.of(context).textTheme.caption.color;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
+      child: Icon(
+        Icons.chevron_right,
+        color: chevronColor,
+        size: 16,
+      ),
+    );
+  }
+}
+
+class Breadcrumb extends StatelessWidget {
+  final String name;
+  final TextStyle style;
+  final void Function() onTap;
+
+  Breadcrumb({Key key, this.name, this.onTap, this.style})
+      : assert(name != null),
+        assert(onTap != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(name, style: style),
     );
   }
 }
