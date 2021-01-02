@@ -167,6 +167,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
+          // TODO ideally this would line up with the list of songs on the left,
+          // but the top padding built-in the ListTile makes it impossible :(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: LargeThumbnail(widget.album.artwork),
         ),
