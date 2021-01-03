@@ -18,9 +18,9 @@ extension IntoMediaItem on Song {
       artist: formatArtist(),
       duration: duration != null ? Duration(seconds: duration) : null,
       artUri: null, // TODO Add album art URL to proxy server
-      extras: {
-        'uri': uri.toString()
-      }, // TODO Replace this with 'path'. Proxy HTTP server can handle credentials for us.
+      // TODO Replace this with 'path'. Proxy HTTP server can handle credentials (and caching) for us.
+      // https://github.com/ryanheise/just_audio/issues/172#issuecomment-685722410
+      extras: {'uri': uri.toString()},
     );
   }
 }
