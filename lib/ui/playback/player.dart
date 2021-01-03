@@ -17,7 +17,6 @@ class _PlayerState extends State<Player> {
     AudioService.start(
       backgroundTaskEntrypoint: audioPlayerTaskEntrypoint,
       androidNotificationChannelName: appName,
-      androidStopForegroundOnPause: true,
       androidNotificationColor: Colors.blue[400].value, // TODO evaluate where this goes and how it looks
       androidNotificationIcon: 'mipmap/ic_launcher',
       androidEnableQueue: true,
