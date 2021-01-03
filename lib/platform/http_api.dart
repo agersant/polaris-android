@@ -16,6 +16,7 @@ final randomEndpoint = '/api/random/';
 final recentEndpoint = '/api/recent/';
 final loginEndpoint = '/api/auth/';
 final thumbnailEndpoint = '/api/thumbnail/';
+final audioEndpoint = '/api/audio/';
 
 enum _Method {
   get,
@@ -128,5 +129,12 @@ class HttpAPI implements API {
   Future<Uint8List> downloadImage(String path) async {
     final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     return _makeRequest(_Method.get, url, authenticate: true).then((r) => r.bodyBytes);
+  }
+
+  @override
+  Uri getAudioURI(String path) {
+    final uriString =
+        _hostManager.url + audioEndpoint + Uri.encodeComponent(path) + '?auth_token=' + (_tokenManager.token ?? '');
+    return Uri.parse(uriString);
   }
 }

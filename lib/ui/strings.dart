@@ -1,3 +1,5 @@
+final appName = 'Polaris';
+
 // Errors
 final errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
 final errorNetwork = 'The Polaris server could not be reached.';

@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
@@ -91,7 +92,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   },
                 ),
               ),
-              if (isStartupComplete) Player(),
+              if (isStartupComplete) AudioServiceWidget(child: Player()),
             ],
           );
         },

@@ -1,8 +1,10 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/platform/api.dart';
 import 'package:polaris/platform/dto.dart' as dto;
+import 'package:polaris/playback/media_item.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
@@ -289,12 +291,20 @@ class Song extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: ListThumbnail(albumArtwork ?? song.artwork),
-      title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
-      subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
-      trailing: Icon(Icons.more_vert),
-      dense: true,
+    return Material(
+      child: InkWell(
+        onTap: () {
+          // TODO hello-world only
+          AudioService.playMediaItem(song.toMediaItem());
+        },
+        child: ListTile(
+          leading: ListThumbnail(albumArtwork ?? song.artwork),
+          title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
+          subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
+          trailing: Icon(Icons.more_vert),
+          dense: true,
+        ),
+      ),
     );
   }
 }

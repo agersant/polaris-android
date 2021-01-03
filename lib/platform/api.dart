@@ -16,4 +16,5 @@ abstract class API {
   Future<List<Directory>> random();
   Future<List<Directory>> recent();
   Future<Uint8List> downloadImage(String path);
+  Uri getAudioURI(String path);
 }
