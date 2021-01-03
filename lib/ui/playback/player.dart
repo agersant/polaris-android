@@ -1,8 +1,11 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:polaris/playback/media_proxy.dart';
 import 'package:polaris/playback/player_task.dart';
+import 'package:polaris/ui/strings.dart';
 
-import '../strings.dart';
+final getIt = GetIt.instance;
 
 class Player extends StatefulWidget {
   @override
@@ -20,6 +23,9 @@ class _PlayerState extends State<Player> {
       androidNotificationColor: Colors.blue[400].value, // TODO evaluate where this goes and how it looks
       androidNotificationIcon: 'mipmap/ic_launcher',
       androidEnableQueue: true,
+      params: {
+        MediaProxy.portParam: getIt<MediaProxy>().port,
+      },
     );
   }
 

@@ -23,6 +23,19 @@ enum _Method {
   post,
 }
 
+extension MethodToString on _Method {
+  String toHTTPMethod() {
+    switch (this) {
+      case _Method.get:
+        return 'GET';
+      case _Method.post:
+        return 'POST';
+      default:
+        return null;
+    }
+  }
+}
+
 class HttpAPI implements API {
   final _hostManager = getIt<host.Manager>();
   final _tokenManager = getIt<token.Manager>();
@@ -35,25 +48,23 @@ class HttpAPI implements API {
     return _hostManager.url + endpoint;
   }
 
-  Future<Response> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
-    Map<String, String> headers = Map();
+  Future<StreamedResponse> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
+    Request request = Request(method.toHTTPMethod(), Uri.parse(url));
+
     if (authenticate) {
       if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
-        headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
+        request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
       }
     }
 
-    Future<Response> response;
+    if (method == _Method.post) {
+      request.headers[HttpHeaders.contentTypeHeader] = 'application/json';
+      request.body = jsonEncode(body);
+    }
+
+    Future<StreamedResponse> response;
     try {
-      switch (method) {
-        case _Method.get:
-          response = _client.get(url, headers: headers);
-          break;
-        case _Method.post:
-          headers[HttpHeaders.contentTypeHeader] = 'application/json';
-          response = _client.post(url, headers: headers, body: jsonEncode(body));
-          break;
-      }
+      response = _client.send(request);
     } catch (e) {
       throw APIError.networkError;
     }
@@ -69,12 +80,16 @@ class HttpAPI implements API {
     });
   }
 
-  @override
+  Future<Uint8List> _completeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
+    final streamedResponse = _makeRequest(method, url, body: body, authenticate: authenticate);
+    return streamedResponse.then((r) => r.stream.toBytes().catchError((e) => throw APIError.networkError));
+  }
+
   Future<APIVersion> getAPIVersion() async {
     final url = _makeURL(apiVersionEndpoint);
-    final response = await _makeRequest(_Method.get, url);
+    final responseBody = await _completeRequest(_Method.get, url);
     try {
-      return APIVersion.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return APIVersion.fromJson(jsonDecode(utf8.decode(responseBody)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -84,9 +99,9 @@ class HttpAPI implements API {
   Future<Authorization> login(String username, String password) async {
     final url = _makeURL(loginEndpoint);
     final credentials = Credentials(username: username, password: password).toJson();
-    final response = await _makeRequest(_Method.post, url, body: credentials);
+    final responseBody = await _completeRequest(_Method.post, url, body: credentials);
     try {
-      return Authorization.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Authorization.fromJson(jsonDecode(utf8.decode(responseBody)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -95,9 +110,9 @@ class HttpAPI implements API {
   @override
   Future<List<CollectionFile>> browse(String path) async {
     final url = _makeURL(browseEndpoint + Uri.encodeComponent(path));
-    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
     try {
-      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((c) => CollectionFile.fromJson(c)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((c) => CollectionFile.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -106,9 +121,9 @@ class HttpAPI implements API {
   @override
   Future<List<Directory>> random() async {
     final url = _makeURL(randomEndpoint);
-    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
     try {
-      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -117,9 +132,9 @@ class HttpAPI implements API {
   @override
   Future<List<Directory>> recent() async {
     final url = _makeURL(recentEndpoint);
-    final response = await _makeRequest(_Method.get, url, authenticate: true);
+    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
     try {
-      return (json.decode(utf8.decode(response.bodyBytes)) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -128,13 +143,12 @@ class HttpAPI implements API {
   @override
   Future<Uint8List> downloadImage(String path) async {
     final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
-    return _makeRequest(_Method.get, url, authenticate: true).then((r) => r.bodyBytes);
+    return _completeRequest(_Method.get, url, authenticate: true);
   }
 
   @override
-  Uri getAudioURI(String path) {
-    final uriString =
-        _hostManager.url + audioEndpoint + Uri.encodeComponent(path) + '?auth_token=' + (_tokenManager.token ?? '');
-    return Uri.parse(uriString);
+  Future<StreamedResponse> downloadAudio(String path) async {
+    final url = _makeURL(audioEndpoint + Uri.encodeComponent(path));
+    return _makeRequest(_Method.get, url, authenticate: true);
   }
 }

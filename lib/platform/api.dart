@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:http/http.dart';
 import 'package:polaris/platform/dto.dart';
 
 enum APIError {
@@ -16,5 +17,5 @@ abstract class API {
   Future<List<Directory>> random();
   Future<List<Directory>> recent();
   Future<Uint8List> downloadImage(String path);
-  Uri getAudioURI(String path);
+  Future<StreamedResponse> downloadAudio(String path);
 }

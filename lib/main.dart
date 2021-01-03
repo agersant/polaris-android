@@ -10,6 +10,7 @@ import 'package:polaris/platform/connection.dart' as connection;
 import 'package:polaris/platform/http_api.dart';
 import 'package:polaris/platform/host.dart' as host;
 import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/playback/media_proxy.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/startup/page.dart';
@@ -40,6 +41,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
   getIt.registerSingleton<cache.Interface>(await cache.Manager.create());
   getIt.registerSingleton<collection.Interface>(collection.Interface());
+  getIt.registerSingleton<MediaProxy>(await MediaProxy.create());
 }
 
 void main() async {
