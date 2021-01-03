@@ -19,6 +19,7 @@ class _AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onStart(Map<String, dynamic> params) async {
     proxyServerPort = params[MediaProxy.portParam];
     assert(proxyServerPort != null);
+    _player.play();
   }
 
   @override
@@ -30,7 +31,6 @@ class _AudioPlayerTask extends BackgroundAudioTask {
     final int port = proxyServerPort;
     final Uri uri = Uri.http('$host:$port', MediaProxy.audioEndpoint, {MediaProxy.pathQueryParameter: path});
     _player.setAudioSource(AudioSource.uri(uri), preload: false); // TODO handle exceptions
-    _player.play();
     return super.onPlayMediaItem(mediaItem);
   }
 }
