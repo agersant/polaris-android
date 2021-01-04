@@ -1,13 +1,11 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/platform/dto.dart';
 import 'package:polaris/playback/media_item.dart';
 import 'package:polaris/playback/media_proxy.dart';
 import 'package:polaris/playback/player_task.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
-import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
