@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart' as mockito;
 import 'package:mockito/mockito.dart';
-import 'package:polaris/platform/dto.dart';
-import 'package:polaris/platform/http_api.dart';
+import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/http_collection_api.dart';
 
 final missingProtocolHostURL = 'my-polaris-server';
 final goodHostURL = 'http://' + missingProtocolHostURL;
@@ -53,6 +54,21 @@ class Mock extends mockito.Mock implements http.Client {
       }
       final String payload = jsonEncode(files);
       return http.Response(payload, 200);
+    });
+
+    // Also browse TODO get rid of sad duplication
+    when(this.send(any)).thenAnswer((Invocation invocation) async {
+      final Request request = invocation.positionalArguments[0];
+      final String endpoint = request.url.path;
+      if (endpoint.startsWith(browseEndpoint)) {
+        final String path = Uri.decodeComponent(endpoint.substring(browseEndpoint.length));
+        final List<CollectionFile> files = _browseData[path];
+        if (files != null) {
+          final String payload = jsonEncode(files);
+          return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);
+        }
+      }
+      return http.StreamedResponse(Stream<List<int>>.value([]), 404);
     });
   }
 

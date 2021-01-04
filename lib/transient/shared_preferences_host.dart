@@ -1,8 +1,9 @@
+import 'package:polaris/shared/host.dart' as host;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String preferenceKey = "polaris_server_url";
 
-class Manager {
+class SharedPreferencesHost implements host.Manager {
   String _url;
 
   String get url => _url;
@@ -20,16 +21,20 @@ class Manager {
     _url = newURL;
   }
 
-  void persist() async {
+  void onConnectionAttempt(String newURL) {
+    url = newURL;
+  }
+
+  Future<void> onSuccessfulConnection() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(preferenceKey, url);
   }
 
-  static Future<Manager> create() async {
+  static Future<SharedPreferencesHost> create() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String url = prefs.getString(preferenceKey);
-    return Manager(url);
+    return SharedPreferencesHost(url);
   }
 
-  Manager(this._url);
+  SharedPreferencesHost(this._url);
 }

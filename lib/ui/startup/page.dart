@@ -1,14 +1,11 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get_it/get_it.dart';
-import 'package:polaris/platform/authentication.dart' as authentication;
-import 'package:polaris/platform/connection.dart' as connection;
+import 'package:polaris/transient/authentication.dart' as authentication;
+import 'package:polaris/transient/connection.dart' as connection;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
-
-final getIt = GetIt.instance;
 
 enum StartupState {
   reconnecting,

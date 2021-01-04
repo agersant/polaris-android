@@ -1,8 +1,7 @@
 import 'dart:math';
 import 'package:animations/animations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:polaris/platform/dto.dart';
+import 'package:polaris/shared/dto.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';

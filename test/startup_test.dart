@@ -2,14 +2,11 @@ import 'harness.dart';
 import 'mock/client.dart' as client;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:polaris/main.dart';
-import 'package:polaris/platform/host.dart' as host;
-import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/shared/token.dart' as token;
+import 'package:polaris/transient/shared_preferences_host.dart' as host;
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';
-
-final getIt = GetIt.instance;
 
 final startupPage = find.byType(StartupPage);
 

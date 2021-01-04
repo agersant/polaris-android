@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
-import 'package:polaris/platform/api.dart';
-import 'package:polaris/platform/connection.dart' as connection;
-import 'package:polaris/platform/dto.dart';
-import 'package:polaris/platform/token.dart' as token;
-
-final getIt = GetIt.instance;
+import 'package:polaris/shared/api_error.dart';
+import 'package:polaris/transient/connection.dart' as connection;
+import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/token.dart' as token;
+import 'package:polaris/transient/guest_api.dart';
 
 enum Error {
   authenticationAlreadyInProgress,
@@ -39,9 +36,9 @@ enum State {
 }
 
 class Manager extends ChangeNotifier {
-  API _api = getIt<API>();
-  connection.Manager _connectionManager = getIt<connection.Manager>();
-  token.Manager _tokenManager = getIt<token.Manager>();
+  final connection.Manager connectionManager;
+  final token.Manager tokenManager;
+  final GuestAPI guestAPI;
 
   State _state = State.unauthenticated;
   State get state => _state;
@@ -50,22 +47,28 @@ class Manager extends ChangeNotifier {
   Stream<Error> _errorStream;
   Stream<Error> get errorStream => _errorStream;
 
-  Manager() {
+  Manager({
+    @required this.connectionManager,
+    @required this.tokenManager,
+    @required this.guestAPI,
+  })  : assert(connectionManager != null),
+        assert(tokenManager != null),
+        assert(guestAPI != null) {
     _errorStream = _errorStreamController.stream.asBroadcastStream();
-    _connectionManager.addListener(() async => await _onConnectionStateChanged());
+    connectionManager.addListener(() async => await _onConnectionStateChanged());
     _onConnectionStateChanged();
   }
 
   _onConnectionStateChanged() async {
-    final previousConnectionState = _connectionManager.previousState;
-    final connectionState = _connectionManager.state;
+    final previousConnectionState = connectionManager.previousState;
+    final connectionState = connectionManager.state;
     if (connectionState == connection.State.connected) {
       if (previousConnectionState == connection.State.reconnecting) {
         try {
           await _reauthenticate();
         } catch (e) {}
       } else {
-        _tokenManager.token = null;
+        tokenManager.token = null;
         _setState(State.unauthenticated);
       }
     }
@@ -73,13 +76,13 @@ class Manager extends ChangeNotifier {
 
   Future _reauthenticate() async {
     assert(_state == State.unauthenticated);
-    if (_tokenManager.token == null || _tokenManager.token.isEmpty) {
+    if (tokenManager.token == null || tokenManager.token.isEmpty) {
       return;
     }
 
     _setState(State.reauthenticating);
     try {
-      await _api.browse('');
+      await guestAPI.testConnection();
     } on APIError catch (e) {
       _setState(State.unauthenticated);
       _emitError(e.toAuthenticationError());
@@ -102,7 +105,7 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticating);
     Authorization authorization;
     try {
-      authorization = await _api.login(username, password);
+      authorization = await guestAPI.login(username, password);
     } on APIError catch (e) {
       _setState(State.unauthenticated);
       _emitError(e.toAuthenticationError());
@@ -113,8 +116,8 @@ class Manager extends ChangeNotifier {
       return;
     }
 
-    _tokenManager.token = authorization.token;
-    _tokenManager.persist();
+    tokenManager.token = authorization.token;
+    tokenManager.persist();
     _setState(State.authenticated);
   }
 

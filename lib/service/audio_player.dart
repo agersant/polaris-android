@@ -1,20 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:polaris/playback/media_item.dart';
-import 'package:polaris/playback/media_proxy.dart';
-
-void audioPlayerTaskEntrypoint() async {
-  AudioServiceBackground.run(() => _AudioPlayerTask());
-}
+import 'package:polaris/service/proxy_server.dart';
+import 'package:polaris/shared/media_item.dart';
 
 // https://pub.dev/documentation/audio_service/latest/audio_service/BackgroundAudioTask-class.html
-class _AudioPlayerTask extends BackgroundAudioTask {
+class AudioPlayerTask extends BackgroundAudioTask {
   StreamSubscription<PlaybackEvent> _eventSubscription;
   final _player = AudioPlayer();
   final _audioSource = ConcatenatingAudioSource(children: []);
-  int proxyServerPort;
+  final int proxyServerPort;
+
+  AudioPlayerTask({@required this.proxyServerPort}) : assert(proxyServerPort != null);
 
   List<MediaItem> _queue = [];
   int get index => _player.currentIndex;
@@ -55,9 +54,6 @@ class _AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
-    proxyServerPort = params[MediaProxy.portParam];
-    assert(proxyServerPort != null);
-
     _player.currentIndexStream.listen((index) {
       if (index != null) AudioServiceBackground.setMediaItem(_queue[index]);
     });
@@ -122,6 +118,6 @@ class _AudioPlayerTask extends BackgroundAudioTask {
     assert(path != null);
     final String host = InternetAddress.loopbackIPv4.host;
     final int port = proxyServerPort;
-    return Uri.http('$host:$port', MediaProxy.audioEndpoint, {MediaProxy.pathQueryParameter: path});
+    return Uri.http('$host:$port', ProxyServer.audioEndpoint, {ProxyServer.pathQueryParameter: path});
   }
 }

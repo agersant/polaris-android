@@ -2,10 +2,12 @@ import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:flutter/painting.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/collection/cache.dart' as cache;
-import 'package:polaris/platform/api.dart';
-import 'package:polaris/platform/host.dart' as host;
+import 'package:http/http.dart';
+import 'package:polaris/service/cache.dart' as cache;
+import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/host.dart' as host;
 
+// TODO no getIt
 final getIt = GetIt.instance;
 
 class _Job {
@@ -15,11 +17,16 @@ class _Job {
   _Job(this.path, this.result);
 }
 
-class Interface {
+class Collection {
   final _host = getIt<host.Manager>();
-  final _api = getIt<API>();
+  final _api = getIt<CollectionAPI>();
   final _cache = getIt<cache.Interface>();
   final _imageJobs = Map<String, _Job>();
+
+  Future<ByteStream> getAudio(String path) async {
+    // TODO
+    return null;
+  }
 
   Future<ImageProvider> getImage(String path) async {
     if (path == null || path.isEmpty) {

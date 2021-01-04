@@ -1,15 +1,15 @@
+import 'package:polaris/shared/loopback_host.dart';
+
 import 'mock/client.dart' as client;
-import 'mock/cache.dart' as cache;
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
-import 'package:polaris/collection/cache.dart' as cache show Interface;
-import 'package:polaris/collection/interface.dart' as collection;
-import 'package:polaris/platform/api.dart';
-import 'package:polaris/platform/authentication.dart' as authentication;
-import 'package:polaris/platform/connection.dart' as connection;
-import 'package:polaris/platform/http_api.dart';
-import 'package:polaris/platform/host.dart' as host;
-import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/http_collection_api.dart';
+import 'package:polaris/shared/token.dart' as token;
+import 'package:polaris/shared/host.dart' as host;
+import 'package:polaris/transient/authentication.dart' as authentication;
+import 'package:polaris/transient/connection.dart' as connection;
+import 'package:polaris/transient/http_guest_api.dart';
+import 'package:polaris/transient/shared_preferences_host.dart' as host;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
@@ -32,18 +32,33 @@ class Harness {
 
     getIt.allowReassignment = true;
 
-    getIt.registerSingleton<host.Manager>(await host.Manager.create());
-    getIt.registerSingleton<token.Manager>(await token.Manager.create());
-
+    final hostManager = await host.SharedPreferencesHost.create();
+    final tokenManager = await token.Manager.create();
     final mockClient = client.Mock();
-    getIt.registerSingleton<Client>(mockClient);
-    getIt.registerSingleton<API>(HttpAPI());
+    final guestAPI = HttpGuestAPI(
+      tokenManager: tokenManager,
+      hostManager: hostManager,
+      client: mockClient,
+    );
+    final collectionAPI = HttpCollectionAPI(
+      client: mockClient,
+      hostManager: LoopbackHost(25000),
+      tokenManager: null,
+    );
+    final connectionManager = connection.Manager(
+      hostManager: hostManager,
+      guestAPI: guestAPI,
+    );
+    final authenticationManager = authentication.Manager(
+      connectionManager: connectionManager,
+      tokenManager: tokenManager,
+      guestAPI: guestAPI,
+    );
 
-    getIt.registerSingleton<connection.Manager>(connection.Manager());
-    getIt.registerSingleton<authentication.Manager>(authentication.Manager());
-
-    getIt.registerSingleton<cache.Interface>(await cache.Manager.create());
-    getIt.registerSingleton<collection.Interface>(collection.Interface());
+    getIt.registerSingleton<host.Manager>(hostManager);
+    getIt.registerSingleton<connection.Manager>(connectionManager);
+    getIt.registerSingleton<authentication.Manager>(authenticationManager);
+    getIt.registerSingleton<CollectionAPI>(collectionAPI);
 
     return Harness(mockClient);
   }

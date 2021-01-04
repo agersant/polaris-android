@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/platform/api.dart';
-import 'package:polaris/platform/dto.dart';
+import 'package:polaris/shared/api_error.dart';
+import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -44,7 +45,7 @@ class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClie
       _error = null;
     });
     try {
-      final albums = await getIt<API>().recent();
+      final albums = await getIt<CollectionAPI>().recent();
       setState(() {
         _albums = albums;
       });

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:polaris/collection/interface.dart' as collection;
+import 'package:polaris/shared/collection_api.dart';
 import 'package:polaris/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
@@ -16,43 +15,40 @@ class Thumbnail extends StatefulWidget {
 }
 
 class _ThumbnailState extends State<Thumbnail> {
-  Future<ImageProvider> _imageProvider;
+  Uri uri;
 
   @override
   void initState() {
     super.initState();
-    final interface = getIt<collection.Interface>();
-    _imageProvider = interface.getImage(widget.path);
+    _updateURL();
   }
 
   @override
   void didUpdateWidget(Thumbnail oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final interface = getIt<collection.Interface>();
     if (oldWidget.path != widget.path) {
       setState(() {
-        _imageProvider = interface.getImage(widget.path);
+        _updateURL();
       });
+    }
+  }
+
+  void _updateURL() {
+    if (widget.path != null) {
+      final collectionAPI = getIt<CollectionAPI>();
+      uri = collectionAPI.getImageURI(widget.path);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _imageProvider,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Container();
-        }
-        if (_imageProvider == null || snapshot.hasError || snapshot.data == null) {
-          return FallbackArtwork();
-        }
-        assert(snapshot.hasData);
-        return Image(
-          image: snapshot.data,
-          fit: BoxFit.cover,
-        );
-      },
+    if (uri == null) {
+      return FallbackArtwork();
+    }
+    // TODO detect failed loads and display FallbackArtwork();
+    return Image.network(
+      uri.toString(),
+      fit: BoxFit.cover,
     );
   }
 }

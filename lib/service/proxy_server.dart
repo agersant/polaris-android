@@ -1,22 +1,27 @@
 import 'dart:io';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/platform/api.dart';
+import 'package:polaris/service/collection.dart';
 
+// TODO no getIt
 final getIt = GetIt.instance;
 
-class MediaProxy {
+class ProxyServer {
   static final String portParam = 'port';
   static final String audioEndpoint = '/audio';
   static final String pathQueryParameter = 'path';
+  final Collection collection;
 
-  final _api = getIt<API>();
+  ProxyServer({this.collection}) : assert(collection != null);
+
   HttpServer _server;
 
-  static Future<MediaProxy> create() async {
-    final mediaProxy = new MediaProxy();
+  static Future<ProxyServer> create() async {
+    final mediaProxy = new ProxyServer();
     await mediaProxy.start();
     return mediaProxy;
   }
+
+  // TODO this must implement full Polaris API :(
 
   Future start() async {
     _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -25,14 +30,13 @@ class MediaProxy {
       final bool isAudioRequest = request.uri.path == audioEndpoint;
       assert(isAudioRequest);
       final String path = request.uri.queryParameters[pathQueryParameter];
-      final streamedResponse = await _api.downloadAudio(path);
+      final data = await collection.getAudio(path); // TODO error handling
 
-      request.response.contentLength = streamedResponse.contentLength ?? -1;
-      request.response.statusCode = streamedResponse.statusCode;
-      request.response.headers
-          .add(HttpHeaders.contentTypeHeader, streamedResponse.headers[HttpHeaders.contentTypeHeader]);
+      request.response.contentLength = -1;
+      request.response.statusCode = 200;
+      // TODO content-type header?
 
-      streamedResponse.stream.pipe(request.response);
+      data.pipe(request.response);
     });
   }
 

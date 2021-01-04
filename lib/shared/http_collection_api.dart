@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:get_it/get_it.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-import 'package:polaris/platform/api.dart';
-import 'package:polaris/platform/dto.dart';
-import 'package:polaris/platform/host.dart' as host;
-import 'package:polaris/platform/token.dart' as token;
+import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/host.dart' as host;
+import 'package:polaris/shared/token.dart' as token;
 
-final getIt = GetIt.instance;
+import 'api_error.dart';
 
 final apiVersionEndpoint = '/api/version/';
 final browseEndpoint = '/api/browse/';
@@ -18,6 +18,7 @@ final loginEndpoint = '/api/auth/';
 final thumbnailEndpoint = '/api/thumbnail/';
 final audioEndpoint = '/api/audio/';
 
+// TODO this is copy pasta
 enum _Method {
   get,
   post,
@@ -36,24 +37,28 @@ extension MethodToString on _Method {
   }
 }
 
-class HttpAPI implements API {
-  final _hostManager = getIt<host.Manager>();
-  final _tokenManager = getIt<token.Manager>();
-  final _client = getIt<Client>();
+class HttpCollectionAPI implements CollectionAPI {
+  final host.Manager hostManager;
+  final token.Manager tokenManager;
+  final Client client;
+
+  HttpCollectionAPI({@required this.client, @required this.tokenManager, @required this.hostManager})
+      : assert(client != null),
+        assert(hostManager != null);
 
   String _makeURL(String endpoint) {
-    if (_hostManager.url == null) {
+    if (hostManager.url == null) {
       throw APIError.unspecifiedHost;
     }
-    return _hostManager.url + endpoint;
+    return hostManager.url + endpoint;
   }
 
   Future<StreamedResponse> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
     Request request = Request(method.toHTTPMethod(), Uri.parse(url));
 
-    if (authenticate) {
-      if (_tokenManager.token != null && _tokenManager.token.isNotEmpty) {
-        request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + _tokenManager.token;
+    if (authenticate && tokenManager != null) {
+      if (tokenManager.token != null && tokenManager.token.isNotEmpty) {
+        request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + tokenManager.token;
       }
     }
 
@@ -64,7 +69,7 @@ class HttpAPI implements API {
 
     Future<StreamedResponse> response;
     try {
-      response = _client.send(request);
+      response = client.send(request);
     } catch (e) {
       throw APIError.networkError;
     }
@@ -83,28 +88,6 @@ class HttpAPI implements API {
   Future<Uint8List> _completeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
     final streamedResponse = _makeRequest(method, url, body: body, authenticate: authenticate);
     return streamedResponse.then((r) => r.stream.toBytes().catchError((e) => throw APIError.networkError));
-  }
-
-  Future<APIVersion> getAPIVersion() async {
-    final url = _makeURL(apiVersionEndpoint);
-    final responseBody = await _completeRequest(_Method.get, url);
-    try {
-      return APIVersion.fromJson(jsonDecode(utf8.decode(responseBody)));
-    } catch (e) {
-      throw APIError.responseParseError;
-    }
-  }
-
-  @override
-  Future<Authorization> login(String username, String password) async {
-    final url = _makeURL(loginEndpoint);
-    final credentials = Credentials(username: username, password: password).toJson();
-    final responseBody = await _completeRequest(_Method.post, url, body: credentials);
-    try {
-      return Authorization.fromJson(jsonDecode(utf8.decode(responseBody)));
-    } catch (e) {
-      throw APIError.responseParseError;
-    }
   }
 
   @override
@@ -144,6 +127,16 @@ class HttpAPI implements API {
   Future<Uint8List> downloadImage(String path) async {
     final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     return _completeRequest(_Method.get, url, authenticate: true);
+  }
+
+  @override
+  Uri getImageURI(String path) {
+    assert(path != null);
+    Uri uri = Uri.parse(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
+    if (tokenManager != null) {
+      uri.queryParameters['auth_token'] = tokenManager.token;
+    }
+    return uri;
   }
 
   @override
