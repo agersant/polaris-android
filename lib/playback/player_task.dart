@@ -21,7 +21,12 @@ class _AudioPlayerTask extends BackgroundAudioTask {
   MediaItem get mediaItem => index == null ? null : _queue[index];
 
   @override
-  Future<void> onPlay() => _player.play();
+  Future<void> onPlay() async {
+    if (_player.processingState == ProcessingState.completed) {
+      await _player.seek(Duration(milliseconds: 0), index: index);
+    }
+    await _player.play();
+  }
 
   @override
   Future<void> onPause() => _player.pause();

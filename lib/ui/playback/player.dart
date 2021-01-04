@@ -89,10 +89,7 @@ class _PlayerState extends State<Player> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (playing)
-                                pauseButton()
-                              else
-                                playButton(), // TODO should re-play last song if completed
+                              if (playing) pauseButton() else playButton(),
                               nextButton(), // TODO grey out when cannot skip next
                             ],
                           );
