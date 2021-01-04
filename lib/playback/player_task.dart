@@ -27,6 +27,20 @@ class _AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onPause() => _player.pause();
 
   @override
+  Future<void> onSkipToNext() async {
+    final mediaItem = AudioServiceBackground.mediaItem;
+    final queue = AudioServiceBackground.queue ?? [];
+    int currentIndex = queue.indexOf(mediaItem);
+    if (currentIndex == -1) {
+      // TODO untested
+      await _player.seek(Duration(milliseconds: 0), index: 0);
+    } else {
+      await _player.seekToNext();
+    }
+    await onPlay();
+  }
+
+  @override
   Future<void> onStop() async {
     await _player.dispose();
     _eventSubscription.cancel();

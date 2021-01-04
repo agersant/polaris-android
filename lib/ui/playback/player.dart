@@ -63,8 +63,18 @@ class _PlayerState extends State<Player> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(state.song.title, style: Theme.of(context).textTheme.subtitle1),
-                            Text(state.song.artist, style: Theme.of(context).textTheme.caption),
+                            Text(
+                              state.song.title,
+                              style: Theme.of(context).textTheme.subtitle2,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            Text(
+                              state.song.artist,
+                              style: Theme.of(context).textTheme.caption,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ],
                         ),
                       ),
@@ -75,7 +85,11 @@ class _PlayerState extends State<Player> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (playing) pauseButton() else playButton(),
+                              if (playing)
+                                pauseButton()
+                              else
+                                playButton(), // TODO still shows playing at the end of playlist
+                              nextButton(), // TODO grey out when cannot skip next
                             ],
                           );
                         },
@@ -100,6 +114,12 @@ IconButton playButton() => IconButton(
       icon: Icon(Icons.play_arrow),
       iconSize: 24.0,
       onPressed: AudioService.play,
+    );
+
+IconButton nextButton() => IconButton(
+      icon: Icon(Icons.skip_next),
+      iconSize: 24.0,
+      onPressed: AudioService.skipToNext,
     );
 
 class PlaybackState {
