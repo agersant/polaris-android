@@ -88,6 +88,7 @@ class _PlayerState extends State<Player> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              // TODO add previous button
                               if (playing) pauseButton(foregroundColor) else playButton(foregroundColor),
                               nextButton(foregroundColor), // TODO grey out when cannot skip next
                             ],
