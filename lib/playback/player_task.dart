@@ -13,6 +13,7 @@ void audioPlayerTaskEntrypoint() async {
 class _AudioPlayerTask extends BackgroundAudioTask {
   StreamSubscription<PlaybackEvent> _eventSubscription;
   final _player = AudioPlayer();
+  final _audioSource = ConcatenatingAudioSource(children: []);
   int proxyServerPort;
 
   List<MediaItem> _queue = [];
@@ -45,17 +46,18 @@ class _AudioPlayerTask extends BackgroundAudioTask {
     _eventSubscription = _player.playbackEventStream.listen((event) {
       _broadcastState();
     });
+
+    await _player.setAudioSource(_audioSource, preload: false);
   }
 
   @override
   Future<void> onAddQueueItem(MediaItem mediaItem) async {
+    await _audioSource.add(AudioSource.uri(_getPlaybackURI(mediaItem)));
     _queue.add(mediaItem);
-    AudioServiceBackground.setQueue(_queue);
-    // TODO restarts playback when changing playlist
-    await _player.setAudioSource(ConcatenatingAudioSource(
-      children: _queue.map((item) => AudioSource.uri(_getPlaybackURI(item))).toList(),
-    ));
-    onPlay(); // TODO subtleties around when this should happen or not
+    await AudioServiceBackground.setQueue(_queue);
+    if (_queue.length == 1) {
+      await onPlay();
+    }
   }
 
   Future<void> _broadcastState() async {
