@@ -30,6 +30,7 @@ class MediaProxy {
       request.response.contentLength = streamedResponse.contentLength ?? -1;
       request.response.statusCode = streamedResponse.statusCode;
       for (var header in streamedResponse.headers.entries) {
+        // TODO explodes when path contains non-ASCII characters w/ content-disposition header
         request.response.headers.add(header.key, header.value);
       }
       request.response.headers
