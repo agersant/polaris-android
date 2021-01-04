@@ -101,7 +101,6 @@ class _AudioPlayerTask extends BackgroundAudioTask {
   }
 
   AudioProcessingState _getProcessingState() {
-    // if (_skipState != null) return _skipState; // TODO
     switch (_player.processingState) {
       case ProcessingState.idle:
         return AudioProcessingState.stopped;
