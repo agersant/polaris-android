@@ -33,30 +33,29 @@ class _PlayerState extends State<Player> {
     );
   }
 
-  Stream<CurrentSongState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, CurrentSongState>(
-      AudioService.currentMediaItemStream,
-      AudioService.positionStream,
-      (mediaItem, position) => CurrentSongState(mediaItem.toSong(), position));
-
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<CurrentSongState>(
-        stream: _mediaStateStream,
+    return StreamBuilder<MediaItem>(
+        stream: AudioService.currentMediaItemStream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Container(); // TODO animate the whole thing out when no data
           }
-          final state = snapshot.data;
+          final theme = Theme.of(context);
+          final backgroundColor = theme.colorScheme.surface;
+          final foregroundColor = theme.colorScheme.onSurface;
+          final song = snapshot.data.toSong();
           return SizedBox(
               height: 64,
               child: Material(
+                elevation: 8,
                 child: Container(
-                  color: Theme.of(context).backgroundColor, // TODO ugly
+                  color: backgroundColor,
                   child: Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListThumbnail(state.song.artwork),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: ListThumbnail(song.artwork),
                       ),
                       Expanded(
                         child: Column(
@@ -64,14 +63,14 @@ class _PlayerState extends State<Player> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              state.song.title,
-                              style: Theme.of(context).textTheme.subtitle2,
+                              song.title,
+                              style: theme.textTheme.subtitle2.copyWith(color: foregroundColor),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
                             Text(
-                              state.song.artist,
-                              style: Theme.of(context).textTheme.caption,
+                              song.artist,
+                              style: theme.textTheme.caption.copyWith(color: foregroundColor.withOpacity(0.75)),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -89,8 +88,8 @@ class _PlayerState extends State<Player> {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (playing) pauseButton() else playButton(),
-                              nextButton(), // TODO grey out when cannot skip next
+                              if (playing) pauseButton(foregroundColor) else playButton(foregroundColor),
+                              nextButton(foregroundColor), // TODO grey out when cannot skip next
                             ],
                           );
                         },
@@ -105,27 +104,23 @@ class _PlayerState extends State<Player> {
   }
 }
 
-IconButton pauseButton() => IconButton(
+IconButton pauseButton(Color color) => IconButton(
       icon: Icon(Icons.pause),
-      iconSize: 24.0,
       onPressed: AudioService.pause,
+      iconSize: 24.0,
+      color: color,
     );
 
-IconButton playButton() => IconButton(
+IconButton playButton(Color color) => IconButton(
       icon: Icon(Icons.play_arrow),
-      iconSize: 24.0,
       onPressed: AudioService.play,
-    );
-
-IconButton nextButton() => IconButton(
-      icon: Icon(Icons.skip_next),
       iconSize: 24.0,
-      onPressed: AudioService.skipToNext,
+      color: color,
     );
 
-class CurrentSongState {
-  final Song song;
-  final Duration position;
-
-  CurrentSongState(this.song, this.position);
-}
+IconButton nextButton(Color color) => IconButton(
+      icon: Icon(Icons.skip_next),
+      onPressed: AudioService.skipToNext,
+      iconSize: 24.0,
+      color: color,
+    );
