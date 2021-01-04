@@ -1,9 +1,13 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/platform/dto.dart';
+import 'package:polaris/playback/media_item.dart';
 import 'package:polaris/playback/media_proxy.dart';
 import 'package:polaris/playback/player_task.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -29,8 +33,48 @@ class _PlayerState extends State<Player> {
     );
   }
 
+  Stream<PlaybackState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, PlaybackState>(
+      AudioService.currentMediaItemStream,
+      AudioService.positionStream,
+      (mediaItem, position) => PlaybackState(mediaItem.toSong(), position));
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: 48, child: Container(color: Colors.red));
+    return StreamBuilder<PlaybackState>(
+        stream: _mediaStateStream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Container(); // TODO animate the whole thing out when no data
+          }
+          final state = snapshot.data;
+          return SizedBox(
+              height: 64,
+              child: Container(
+                color: Theme.of(context).backgroundColor, // TODO ugly
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListThumbnail(state.song.artwork),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(state.song.title, style: Theme.of(context).textTheme.subtitle1),
+                        Text(state.song.artist, style: Theme.of(context).textTheme.caption),
+                      ],
+                    ),
+                  ],
+                ),
+              ));
+        });
   }
+}
+
+class PlaybackState {
+  final Song song;
+  final Duration position;
+
+  PlaybackState(this.song, this.position);
 }

@@ -295,7 +295,7 @@ class Song extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // TODO hello-world only
-          AudioService.playMediaItem(song.toMediaItem());
+          AudioService.addQueueItem(song.toMediaItem());
         },
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),

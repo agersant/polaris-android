@@ -33,6 +33,7 @@ dependencies:
   http: ^0.12.2
   path_provider: ^1.6.24
   provider: ^4.3.0
+  rxdart: ^0.25.0
   shared_preferences: ^0.5.12
 
 dev_dependencies:
