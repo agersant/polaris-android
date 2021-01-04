@@ -41,6 +41,10 @@ Future _registerSingletons() async {
   getIt.registerSingleton<authentication.Manager>(authentication.Manager());
   getIt.registerSingleton<cache.Interface>(await cache.Manager.create());
   getIt.registerSingleton<collection.Interface>(collection.Interface());
+  // TODO proxy HTTP server can die when Android kills our app to save memory, while playback keeps running
+  // Should run in the audio player task instead?
+  // AudioService.start should provide polaris server URL and auth token? (how does this work with offline mode?)
+  // This also means caching logic needs to happen in audio player isolate?
   getIt.registerSingleton<MediaProxy>(await MediaProxy.create());
 }
 
