@@ -80,6 +80,8 @@ class _PlayerState extends State<Player> {
                           );
                         },
                       ),
+                      // TODO Buffering indicator
+                      // TODO Seekbar
                     ],
                   ),
                 ),
