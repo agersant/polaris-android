@@ -33,14 +33,14 @@ class _PlayerState extends State<Player> {
     );
   }
 
-  Stream<PlaybackState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, PlaybackState>(
+  Stream<CurrentSongState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, CurrentSongState>(
       AudioService.currentMediaItemStream,
       AudioService.positionStream,
-      (mediaItem, position) => PlaybackState(mediaItem.toSong(), position));
+      (mediaItem, position) => CurrentSongState(mediaItem.toSong(), position));
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PlaybackState>(
+    return StreamBuilder<CurrentSongState>(
         stream: _mediaStateStream,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -78,17 +78,21 @@ class _PlayerState extends State<Player> {
                           ],
                         ),
                       ),
-                      StreamBuilder<bool>(
-                        stream: AudioService.playbackStateStream.map((state) => state.playing).distinct(),
+                      StreamBuilder<PlaybackState>(
+                        stream: AudioService.playbackStateStream,
                         builder: (context, snapshot) {
-                          final playing = snapshot.data ?? false;
+                          bool playing = false;
+                          if (snapshot.hasData) {
+                            playing = snapshot.data.playing &&
+                                snapshot.data.processingState != AudioProcessingState.completed;
+                          }
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (playing)
                                 pauseButton()
                               else
-                                playButton(), // TODO still shows playing at the end of playlist
+                                playButton(), // TODO should re-play last song if completed
                               nextButton(), // TODO grey out when cannot skip next
                             ],
                           );
@@ -122,9 +126,9 @@ IconButton nextButton() => IconButton(
       onPressed: AudioService.skipToNext,
     );
 
-class PlaybackState {
+class CurrentSongState {
   final Song song;
   final Duration position;
 
-  PlaybackState(this.song, this.position);
+  CurrentSongState(this.song, this.position);
 }
