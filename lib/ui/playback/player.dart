@@ -49,28 +49,56 @@ class _PlayerState extends State<Player> {
           final state = snapshot.data;
           return SizedBox(
               height: 64,
-              child: Container(
-                color: Theme.of(context).backgroundColor, // TODO ugly
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListThumbnail(state.song.artwork),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(state.song.title, style: Theme.of(context).textTheme.subtitle1),
-                        Text(state.song.artist, style: Theme.of(context).textTheme.caption),
-                      ],
-                    ),
-                  ],
+              child: Material(
+                child: Container(
+                  color: Theme.of(context).backgroundColor, // TODO ugly
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListThumbnail(state.song.artwork),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(state.song.title, style: Theme.of(context).textTheme.subtitle1),
+                            Text(state.song.artist, style: Theme.of(context).textTheme.caption),
+                          ],
+                        ),
+                      ),
+                      StreamBuilder<bool>(
+                        stream: AudioService.playbackStateStream.map((state) => state.playing).distinct(),
+                        builder: (context, snapshot) {
+                          final playing = snapshot.data ?? false;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (playing) pauseButton() else playButton(),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ));
         });
   }
 }
+
+IconButton pauseButton() => IconButton(
+      icon: Icon(Icons.pause),
+      iconSize: 24.0,
+      onPressed: AudioService.pause,
+    );
+
+IconButton playButton() => IconButton(
+      icon: Icon(Icons.play_arrow),
+      iconSize: 24.0,
+      onPressed: AudioService.play,
+    );
 
 class PlaybackState {
   final Song song;
