@@ -67,7 +67,7 @@ class Player extends StatelessWidget {
                         },
                       ),
                       // TODO Buffering indicator
-                      // TODO Seekbar
+                      // TODO Progress bar
                     ],
                   ),
                 ),
