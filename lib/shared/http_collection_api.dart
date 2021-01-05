@@ -124,23 +124,23 @@ class HttpCollectionAPI implements CollectionAPI {
   }
 
   @override
-  Future<Uint8List> downloadImage(String path) async {
-    final url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
-    return _completeRequest(_Method.get, url, authenticate: true);
+  Future<StreamedResponse> downloadImage(String path) {
+    final uri = getImageURI(path);
+    return _makeRequest(_Method.get, uri.toString());
   }
 
   @override
   Uri getImageURI(String path) {
     assert(path != null);
-    Uri uri = Uri.parse(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
+    String url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     if (tokenManager != null) {
-      uri.queryParameters['auth_token'] = tokenManager.token;
+      url += '&auth_token=' + tokenManager.token;
     }
-    return uri;
+    return Uri.parse(url);
   }
 
   @override
-  Future<StreamedResponse> downloadAudio(String path) async {
+  Future<StreamedResponse> downloadAudio(String path) {
     final url = _makeURL(audioEndpoint + Uri.encodeComponent(path));
     return _makeRequest(_Method.get, url, authenticate: true);
   }

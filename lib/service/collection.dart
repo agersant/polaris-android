@@ -1,18 +1,16 @@
 import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:polaris/service/cache.dart' as cache;
 import 'package:polaris/shared/collection_api.dart';
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/host.dart' as host;
 
-class _Job {
+class _ImageJob {
   String path;
-  Future<Uint8List> result;
-
-  _Job(this.path, this.result);
+  Future<Uint8List> imageData;
+  _ImageJob(this.path, this.imageData);
 }
 
 class Collection {
@@ -20,7 +18,7 @@ class Collection {
   final CollectionAPI collectionAPI;
   final cache.Interface cacheManager;
 
-  final _imageJobs = Map<String, _Job>();
+  final _imageJobs = Map<String, _ImageJob>();
 
   Collection({@required this.hostManager, @required this.collectionAPI, @required this.cacheManager})
       : assert(hostManager != null),
@@ -39,36 +37,42 @@ class Collection {
     return collectionAPI.recent();
   }
 
-  Future<ByteStream> getAudio(String path) async {
+  Future<Stream<List<int>>> getAudio(String path) async {
     // TODO
     return null;
   }
 
-  Future<ImageProvider> getImage(String path) async {
+  Future<Stream<List<int>>> getImage(String path) async {
     if (path == null || path.isEmpty) {
       return null;
     }
     final host = hostManager.url;
     final cacheFile = await cacheManager.getImage(host, path);
     if (cacheFile != null) {
-      return FileImage(cacheFile);
+      return cacheFile.openRead();
     }
     final job = _imageJobs[path] ?? _downloadImage(host, path);
     try {
-      return MemoryImage(await job.result);
+      return Stream.value(await job.imageData);
     } catch (e) {
       return null;
     }
   }
 
-  _Job _downloadImage(String host, String path) {
+  _ImageJob _downloadImage(String host, String path) {
     assert(!_imageJobs.containsKey(path));
     developer.log('Beginning image download: $path');
-    final job = _Job(path, collectionAPI.downloadImage(path));
+    final streamedResponse = collectionAPI.downloadImage(path);
+    final job = _ImageJob(
+        path,
+        streamedResponse
+            .then((r) => http.Response.fromStream(r))
+            .then((r) => r.bodyBytes)
+            .catchError((e) => developer.log('Error downloading image: $path', error: e)));
     _imageJobs[path] = job;
-    job.result.then((bytes) async {
+    job.imageData.then((bytes) async {
       await cacheManager.putImage(host, path, bytes);
-    }).catchError((e) => developer.log('Error downloading image: $path', error: e));
+    });
     return job;
   }
 }
