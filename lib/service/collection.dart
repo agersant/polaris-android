@@ -31,6 +31,14 @@ class Collection {
     return collectionAPI.browse(path);
   }
 
+  Future<List<Directory>> random() async {
+    return collectionAPI.random();
+  }
+
+  Future<List<Directory>> recent() async {
+    return collectionAPI.recent();
+  }
+
   Future<ByteStream> getAudio(String path) async {
     // TODO
     return null;
