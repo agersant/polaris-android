@@ -1,13 +1,17 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/widgets.dart';
 
-// Copy-pasta from the widget with the same name from audio_service, but with handler for didPopRoute()
-// We don't want to disconnect when random popups get closed
-// Related to this hack. Warning when backing out of app:
+// Copy-pasta from the widget with the same name from audio_service, but without the handler for didPopRoute()
+// This handler is problematic because AudioServiceWidget registers with WidgetsBindingObserver
+// before the Polaris Browser, and disconnects from the AudioService before the browser intercepts back button presses.
+// This leaves us with a disconnected audio service while the UI is still up.
+// However, the disconnect in didPopRoute is also important. Avoids resource leak:
 // Activity agersant.polaris.MainActivity has leaked ServiceConnection android.media.browse.MediaBrowser$MediaServiceConnection@12e1f74 that was originally bound here
+//
+// Related to this hack. Warning when backing out of app:
 // https://github.com/ryanheise/audio_service/issues/73
 // https://github.com/ryanheise/audio_service/pull/77
-// TODO submit bug report about this
+// TODO submit bug report about this and/or find a better workaround
 class PolarisAudioServiceWidget extends StatefulWidget {
   final Widget child;
 
