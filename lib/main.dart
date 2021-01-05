@@ -99,12 +99,11 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       providers: [
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
+        ChangeNotifierProvider.value(value: getIt<ServiceLauncher>()),
       ],
-      child: Consumer2<connection.Manager, authentication.Manager>(
-        builder: (context, connectionManager, authenticationManager, child) {
-          final isStartupComplete = connectionManager.state == connection.State.connected &&
-              authenticationManager.state == authentication.State.authenticated;
-          // TODO wait for service to be started
+      child: Consumer<ServiceLauncher>(
+        builder: (context, serviceLauncher, child) {
+          final isStartupComplete = serviceLauncher.isServiceRunning;
 
           return AudioServiceWidget(
             child: Column(

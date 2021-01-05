@@ -11,6 +11,7 @@ enum StartupState {
   reconnecting,
   connect,
   login,
+  // TODO add state for starting service
 }
 
 class StartupPage extends StatelessWidget {

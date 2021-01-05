@@ -9,12 +9,13 @@ import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/ui/strings.dart';
 
-class ServiceLauncher {
+class ServiceLauncher extends ChangeNotifier {
   final connection.Manager connectionManager;
   final authentication.Manager authenticationManager;
   final host.Manager hostManager;
   final token.Manager tokenManager;
   final LoopbackHost loopbackHost;
+  bool isServiceRunning = false;
 
   ServiceLauncher({
     @required this.connectionManager,
@@ -46,7 +47,11 @@ class ServiceLauncher {
       // TODO this is a little jank? Not sure it can be much better
       loopbackHost.port = await AudioService.customAction(service.customActionGetPort);
       assert(loopbackHost.port != null);
+      isServiceRunning = true;
+      notifyListeners();
     } else {
+      isServiceRunning = false;
+      notifyListeners();
       await AudioService.stop();
     }
   }
