@@ -51,6 +51,9 @@ class Manager implements Interface {
   }
 
   putImage(String host, String path, Uint8List bytes) async {
+    assert(host != null);
+    assert(path != null);
+    assert(bytes != null);
     developer.log('Adding image to disk cache: $path');
     final fullPath = _generateImagePath(host, path);
     final file = new File(fullPath);
