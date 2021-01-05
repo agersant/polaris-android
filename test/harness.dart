@@ -9,7 +9,7 @@ import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/transient/authentication.dart' as authentication;
 import 'package:polaris/transient/connection.dart' as connection;
 import 'package:polaris/transient/http_guest_api.dart';
-import 'package:polaris/transient/shared_preferences_host.dart' as host;
+import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
@@ -42,7 +42,7 @@ class Harness {
     );
     final collectionAPI = HttpCollectionAPI(
       client: mockClient,
-      hostManager: LoopbackHost(25000),
+      hostManager: LoopbackHost(),
       tokenManager: null,
     );
     final connectionManager = connection.Manager(

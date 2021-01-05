@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/service/entrypoint.dart';
 import 'package:polaris/service/proxy_server.dart';
 import 'package:polaris/shared/media_item.dart';
 
@@ -18,6 +19,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
   List<MediaItem> _queue = [];
   int get index => _player.currentIndex;
   MediaItem get mediaItem => index == null ? null : _queue[index];
+
+  @override
+  Future<dynamic> onCustomAction(String name, dynamic arguments) async {
+    if (name == customActionGetPort) {
+      return proxyServerPort;
+    }
+  }
 
   @override
   Future<void> onPlay() async {

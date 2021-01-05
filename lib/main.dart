@@ -11,7 +11,7 @@ import 'package:polaris/transient/authentication.dart' as authentication;
 import 'package:polaris/transient/connection.dart' as connection;
 import 'package:polaris/transient/http_guest_api.dart';
 import 'package:polaris/transient/service_launcher.dart';
-import 'package:polaris/transient/shared_preferences_host.dart';
+import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/startup/page.dart';
@@ -42,9 +42,10 @@ Future _registerSingletons() async {
     hostManager: hostManager,
     client: client,
   );
+  final loopbackHost = LoopbackHost();
   final collectionAPI = HttpCollectionAPI(
     client: client,
-    hostManager: LoopbackHost(25000), // TODO Make port arg optional and let serviceLauncher set it)
+    hostManager: loopbackHost,
     tokenManager: null,
   );
   final connectionManager = connection.Manager(
@@ -61,6 +62,7 @@ Future _registerSingletons() async {
     tokenManager: tokenManager,
     connectionManager: connectionManager,
     authenticationManager: authenticationManager,
+    loopbackHost: loopbackHost,
   );
 
   getIt.registerSingleton<host.Manager>(hostManager);
@@ -102,6 +104,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         builder: (context, connectionManager, authenticationManager, child) {
           final isStartupComplete = connectionManager.state == connection.State.connected &&
               authenticationManager.state == authentication.State.authenticated;
+          // TODO wait for service to be started
 
           return AudioServiceWidget(
             child: Column(
