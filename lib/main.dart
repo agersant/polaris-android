@@ -1,4 +1,3 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
@@ -7,6 +6,7 @@ import 'package:polaris/shared/http_collection_api.dart';
 import 'package:polaris/shared/loopback_host.dart';
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
+import 'package:polaris/transient/audio_service_widget.dart';
 import 'package:polaris/transient/authentication.dart' as authentication;
 import 'package:polaris/transient/connection.dart' as connection;
 import 'package:polaris/transient/http_guest_api.dart';
@@ -105,7 +105,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         builder: (context, serviceLauncher, child) {
           final isStartupComplete = serviceLauncher.isServiceRunning;
 
-          return AudioServiceWidget(
+          return PolarisAudioServiceWidget(
             child: Column(
               children: [
                 Expanded(
