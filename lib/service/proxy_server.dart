@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:polaris/service/collection.dart';
 import 'package:polaris/shared/dto.dart';
-import 'package:polaris/shared/http_collection_api.dart';
+import 'package:polaris/shared/polaris.dart';
 
 class ProxyServer {
   static final String portParam = 'port';

@@ -6,7 +6,7 @@ import 'package:http/http.dart';
 import 'package:mockito/mockito.dart' as mockito;
 import 'package:mockito/mockito.dart';
 import 'package:polaris/shared/dto.dart';
-import 'package:polaris/shared/http_collection_api.dart';
+import 'package:polaris/shared/polaris.dart';
 
 final missingProtocolHostURL = 'my-polaris-server';
 final goodHostURL = 'http://' + missingProtocolHostURL;

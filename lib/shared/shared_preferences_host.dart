@@ -1,11 +1,14 @@
+import 'package:flutter/widgets.dart';
 import 'package:polaris/shared/host.dart' as host;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String preferenceKey = "polaris_server_url";
 
-class SharedPreferencesHost implements host.Manager {
-  String _url;
+class SharedPreferencesHost extends ChangeNotifier implements host.Manager {
+  host.State _state = host.State.available;
+  get state => _state;
 
+  String _url;
   String get url => _url;
 
   set url(String newURL) {

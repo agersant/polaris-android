@@ -2,16 +2,14 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:polaris/shared/collection_api.dart';
-import 'package:polaris/shared/http_collection_api.dart';
 import 'package:polaris/shared/loopback_host.dart';
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/transient/authentication.dart' as authentication;
 import 'package:polaris/transient/connection.dart' as connection;
-import 'package:polaris/transient/http_guest_api.dart';
-import 'package:polaris/transient/service_launcher.dart';
+import 'package:polaris/transient/service.dart' as service;
 import 'package:polaris/transient/ui_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/playback/player.dart';
@@ -39,16 +37,10 @@ Future _registerSingletons() async {
   final hostManager = await SharedPreferencesHost.create();
   final tokenManager = await token.Manager.create();
   final client = Client();
-  final guestAPI = HttpGuestAPI(
+  final guestAPI = polaris.HttpGuestAPI(
     tokenManager: tokenManager,
     hostManager: hostManager,
     client: client,
-  );
-  final loopbackHost = LoopbackHost();
-  final collectionAPI = HttpCollectionAPI(
-    client: client,
-    hostManager: loopbackHost,
-    tokenManager: null,
   );
   final connectionManager = connection.Manager(
     hostManager: hostManager,
@@ -59,19 +51,25 @@ Future _registerSingletons() async {
     tokenManager: tokenManager,
     guestAPI: guestAPI,
   );
-  final serviceLauncher = ServiceLauncher(
+  final serviceManager = service.Manager(
     hostManager: hostManager,
     tokenManager: tokenManager,
     connectionManager: connectionManager,
     authenticationManager: authenticationManager,
-    loopbackHost: loopbackHost,
+    launcher: service.AudioServiceLauncher(),
+  );
+  final loopbackHost = LoopbackHost(serviceManager: serviceManager);
+  final polarisAPI = polaris.HttpAPI(
+    client: client,
+    hostManager: loopbackHost,
+    tokenManager: null,
   );
 
   getIt.registerSingleton<host.Manager>(hostManager);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
-  getIt.registerSingleton<ServiceLauncher>(serviceLauncher);
-  getIt.registerSingleton<CollectionAPI>(collectionAPI);
+  getIt.registerSingleton<service.Manager>(serviceManager);
+  getIt.registerSingleton<polaris.API>(polarisAPI);
   getIt.registerSingleton<UIModel>(UIModel());
 }
 
@@ -102,11 +100,11 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       providers: [
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<ServiceLauncher>()),
+        ChangeNotifierProvider.value(value: getIt<polaris.API>()),
       ],
-      child: Consumer<ServiceLauncher>(
-        builder: (context, serviceLauncher, child) {
-          final isStartupComplete = serviceLauncher.isServiceRunning;
+      child: Consumer<polaris.API>(
+        builder: (context, polarisAPI, child) {
+          final isStartupComplete = polarisAPI.state == polaris.State.available;
 
           return BackButtonHandler(
             AudioServiceWidget(

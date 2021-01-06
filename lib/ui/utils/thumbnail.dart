@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
@@ -35,7 +35,7 @@ class _ThumbnailState extends State<Thumbnail> {
 
   void _updateURL() {
     if (widget.path != null) {
-      final collectionAPI = getIt<CollectionAPI>();
+      final collectionAPI = getIt<polaris.API>();
       uri = collectionAPI.getImageURI(widget.path);
     }
   }

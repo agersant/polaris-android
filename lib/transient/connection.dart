@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/shared/api_error.dart';
 import 'package:polaris/shared/host.dart' as host;
-import 'package:polaris/transient/guest_api.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 
 enum Error {
   connectionAlreadyInProgress,
@@ -12,15 +11,15 @@ enum Error {
   unknownError,
 }
 
-extension _ToConnectionError on APIError {
+extension _ToConnectionError on polaris.APIError {
   Error toConnectionError() {
     switch (this) {
-      case APIError.unauthorized:
-      case APIError.requestFailed:
-      case APIError.responseParseError:
+      case polaris.APIError.unauthorized:
+      case polaris.APIError.requestFailed:
+      case polaris.APIError.responseParseError:
         return Error.requestFailed;
-      case APIError.networkError:
-      case APIError.unspecifiedHost:
+      case polaris.APIError.networkError:
+      case polaris.APIError.unspecifiedHost:
         return Error.networkError;
     }
     return Error.unknownError;
@@ -35,7 +34,7 @@ enum State {
 }
 
 class Manager extends ChangeNotifier {
-  final GuestAPI guestAPI;
+  final polaris.GuestAPI guestAPI;
   final host.Manager hostManager;
 
   State _state = State.disconnected;
@@ -88,7 +87,7 @@ class Manager extends ChangeNotifier {
     var apiVersion;
     try {
       apiVersion = await guestAPI.getAPIVersion();
-    } on APIError catch (e) {
+    } on polaris.APIError catch (e) {
       _setState(State.disconnected);
       _emitError(e.toConnectionError());
       return;

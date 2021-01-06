@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/service/cache.dart' as cache;
-import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/polaris.dart' as collection;
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/host.dart' as host;
 
@@ -15,7 +15,7 @@ class _ImageJob {
 
 class Collection {
   final host.Manager hostManager; // TODO remove dependency on hostmanager (go through collection API instead)
-  final CollectionAPI collectionAPI;
+  final collection.API collectionAPI;
   final cache.Interface cacheManager;
 
   final _imageJobs = Map<String, _ImageJob>();

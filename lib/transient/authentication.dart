@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/shared/api_error.dart';
 import 'package:polaris/transient/connection.dart' as connection;
 import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/token.dart' as token;
-import 'package:polaris/transient/guest_api.dart';
 
 enum Error {
   authenticationAlreadyInProgress,
@@ -13,15 +12,15 @@ enum Error {
   unknownError,
 }
 
-extension _ToAuthenticationError on APIError {
+extension _ToAuthenticationError on polaris.APIError {
   Error toAuthenticationError() {
     switch (this) {
-      case APIError.unauthorized:
+      case polaris.APIError.unauthorized:
         return Error.incorrectCredentials;
-      case APIError.requestFailed:
-      case APIError.networkError:
-      case APIError.unspecifiedHost:
-      case APIError.responseParseError:
+      case polaris.APIError.requestFailed:
+      case polaris.APIError.networkError:
+      case polaris.APIError.unspecifiedHost:
+      case polaris.APIError.responseParseError:
         return Error.requestFailed;
     }
     return Error.unknownError;
@@ -38,7 +37,7 @@ enum State {
 class Manager extends ChangeNotifier {
   final connection.Manager connectionManager;
   final token.Manager tokenManager;
-  final GuestAPI guestAPI;
+  final polaris.GuestAPI guestAPI;
 
   State _state = State.unauthenticated;
   State get state => _state;
@@ -83,7 +82,7 @@ class Manager extends ChangeNotifier {
     _setState(State.reauthenticating);
     try {
       await guestAPI.testConnection();
-    } on APIError catch (e) {
+    } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
       _emitError(e.toAuthenticationError());
       return;
@@ -106,7 +105,7 @@ class Manager extends ChangeNotifier {
     Authorization authorization;
     try {
       authorization = await guestAPI.login(username, password);
-    } on APIError catch (e) {
+    } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
       _emitError(e.toAuthenticationError());
       return;

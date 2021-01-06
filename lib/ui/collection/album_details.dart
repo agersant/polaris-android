@@ -2,8 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/api_error.dart';
-import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/shared/media_item.dart';
 import 'package:polaris/ui/strings.dart';
@@ -24,7 +23,7 @@ class AlbumDetails extends StatefulWidget {
 
 class _AlbumDetailsState extends State<AlbumDetails> {
   List<dto.Song> _songs;
-  APIError _error;
+  polaris.APIError _error;
 
   @override
   initState() {
@@ -46,12 +45,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      final files = await getIt<CollectionAPI>().browse(widget.album.path);
+      final files = await getIt<polaris.API>().browse(widget.album.path);
       final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
         _songs = songs;
       });
-    } on APIError catch (e) {
+    } on polaris.APIError catch (e) {
       setState(() {
         _error = e;
       });

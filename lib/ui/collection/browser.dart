@@ -2,8 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/api_error.dart';
-import 'package:polaris/shared/collection_api.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/transient/ui_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
@@ -99,7 +98,7 @@ class BrowserLocation extends StatefulWidget {
 
 class _BrowserLocationState extends State<BrowserLocation> {
   List<dto.CollectionFile> _files;
-  APIError _error;
+  polaris.APIError _error;
 
   @override
   initState() {
@@ -113,11 +112,11 @@ class _BrowserLocationState extends State<BrowserLocation> {
       _error = null;
     });
     try {
-      final files = await getIt<CollectionAPI>().browse(widget.location);
+      final files = await getIt<polaris.API>().browse(widget.location);
       setState(() {
         _files = files;
       });
-    } on APIError catch (e) {
+    } on polaris.APIError catch (e) {
       setState(() {
         _error = e;
       });
