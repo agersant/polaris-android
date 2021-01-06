@@ -24,65 +24,65 @@ class ProxyServer {
 
   Future start() async {
     _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-    run();
+    _server.listen((HttpRequest request) {
+      _handleRequest(request);
+    });
   }
 
-  Future run() async {
-    await for (HttpRequest request in _server) {
-      try {
-        if (request.uri.path.startsWith(browseEndpoint)) {
-          final String path = Uri.decodeComponent(request.uri.path.substring(browseEndpoint.length));
-          final List<CollectionFile> results = await collection.browse(path); // TODO error handling
-          final encoded = utf8.encode(jsonEncode(results));
-          request.response
-            ..contentLength = encoded.length
-            ..statusCode = HttpStatus.ok
-            ..add(encoded)
-            ..close();
-        } else if (request.uri.path.startsWith(randomEndpoint)) {
-          final List<Directory> results = await collection.random(); // TODO error handling
-          final encoded = utf8.encode(jsonEncode(results));
-          request.response
-            ..contentLength = encoded.length
-            ..statusCode = HttpStatus.ok
-            ..add(encoded)
-            ..close();
-        } else if (request.uri.path.startsWith(recentEndpoint)) {
-          final List<Directory> results = await collection.recent(); // TODO error handling
-          final encoded = utf8.encode(jsonEncode(results));
-          request.response
-            ..contentLength = encoded.length
-            ..statusCode = HttpStatus.ok
-            ..add(encoded)
-            ..close();
-        } else if (request.uri.path.startsWith(thumbnailEndpoint)) {
-          final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
-          final data = await collection.getImage(path); // TODO error handling
-          request.response
-            ..contentLength = -1
-            ..statusCode = HttpStatus.ok;
-          // TODO content-type header?
-          data.pipe(request.response);
-        } else if (request.uri.path.startsWith(audioEndpoint)) {
-          final String path = request.uri.queryParameters[pathQueryParameter];
-          final data = await collection.getAudio(path); // TODO error handling
-          request.response
-            ..contentLength = -1
-            ..statusCode = HttpStatus.ok;
-          // TODO content-type header?
-          data.pipe(request.response);
-        } else {
-          request.response
-            ..contentLength = 0
-            ..statusCode = HttpStatus.notFound
-            ..close();
-        }
-      } catch (e) {
-        developer.log('Unhandled server error: $e');
+  void _handleRequest(HttpRequest request) async {
+    try {
+      if (request.uri.path.startsWith(browseEndpoint)) {
+        final String path = Uri.decodeComponent(request.uri.path.substring(browseEndpoint.length));
+        final List<CollectionFile> results = await collection.browse(path); // TODO error handling
+        final encoded = utf8.encode(jsonEncode(results));
         request.response
-          ..statusCode = HttpStatus.internalServerError
+          ..contentLength = encoded.length
+          ..statusCode = HttpStatus.ok
+          ..add(encoded)
+          ..close();
+      } else if (request.uri.path.startsWith(randomEndpoint)) {
+        final List<Directory> results = await collection.random(); // TODO error handling
+        final encoded = utf8.encode(jsonEncode(results));
+        request.response
+          ..contentLength = encoded.length
+          ..statusCode = HttpStatus.ok
+          ..add(encoded)
+          ..close();
+      } else if (request.uri.path.startsWith(recentEndpoint)) {
+        final List<Directory> results = await collection.recent(); // TODO error handling
+        final encoded = utf8.encode(jsonEncode(results));
+        request.response
+          ..contentLength = encoded.length
+          ..statusCode = HttpStatus.ok
+          ..add(encoded)
+          ..close();
+      } else if (request.uri.path.startsWith(thumbnailEndpoint)) {
+        final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
+        final data = await collection.getImage(path); // TODO error handling
+        request.response
+          ..contentLength = -1
+          ..statusCode = HttpStatus.ok;
+        // TODO content-type header?
+        data.pipe(request.response);
+      } else if (request.uri.path.startsWith(audioEndpoint)) {
+        final String path = request.uri.queryParameters[pathQueryParameter];
+        final data = await collection.getAudio(path); // TODO error handling
+        request.response
+          ..contentLength = -1
+          ..statusCode = HttpStatus.ok;
+        // TODO content-type header?
+        data.pipe(request.response);
+      } else {
+        request.response
+          ..contentLength = 0
+          ..statusCode = HttpStatus.notFound
           ..close();
       }
+    } catch (e) {
+      developer.log('Unhandled server error: $e');
+      request.response
+        ..statusCode = HttpStatus.internalServerError
+        ..close();
     }
   }
 
