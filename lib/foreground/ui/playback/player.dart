@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:polaris/shared/media_item.dart';
-import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:polaris/foreground/ui/utils/thumbnail.dart';
 
 class Player extends StatelessWidget {
   @override

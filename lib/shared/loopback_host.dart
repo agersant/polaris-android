@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:polaris/shared/host.dart' as host;
-import 'package:polaris/transient/service.dart' as service;
+import 'package:polaris/foreground/service.dart' as service;
 
 class LoopbackHost extends ChangeNotifier implements host.Manager {
   final service.Manager serviceManager;

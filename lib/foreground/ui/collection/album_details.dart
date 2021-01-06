@@ -5,10 +5,10 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/shared/media_item.dart';
-import 'package:polaris/ui/strings.dart';
-import 'package:polaris/ui/utils/error_message.dart';
-import 'package:polaris/ui/utils/format.dart';
-import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:polaris/foreground/ui/strings.dart';
+import 'package:polaris/foreground/ui/utils/error_message.dart';
+import 'package:polaris/foreground/ui/utils/format.dart';
+import 'package:polaris/foreground/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
 

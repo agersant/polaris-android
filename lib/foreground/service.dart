@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:polaris/service/entrypoint.dart' as service;
-import 'package:polaris/transient/authentication.dart' as authentication;
-import 'package:polaris/transient/connection.dart' as connection;
+import 'package:polaris/background/entrypoint.dart' as service;
+import 'package:polaris/foreground/authentication.dart' as authentication;
+import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/token.dart' as token;
-import 'package:polaris/ui/strings.dart';
+import 'package:polaris/foreground/ui/strings.dart';
 
 class Manager extends ChangeNotifier {
   final connection.Manager connectionManager;

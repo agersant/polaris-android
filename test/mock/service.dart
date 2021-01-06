@@ -1,4 +1,4 @@
-import 'package:polaris/transient/service.dart';
+import 'package:polaris/foreground/service.dart';
 
 class MockServiceLauncher implements Launcher {
   bool _started = false;

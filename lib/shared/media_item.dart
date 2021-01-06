@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:polaris/shared/dto.dart';
-import 'package:polaris/ui/utils/format.dart';
+import 'package:polaris/foreground/ui/utils/format.dart';
 
 final String extraKeyPath = 'path';
 final String extraKeyTrackNumber = 'trackNumber';

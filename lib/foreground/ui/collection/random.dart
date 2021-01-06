@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart';
-import 'package:polaris/ui/strings.dart';
-import 'package:polaris/ui/collection/album_grid.dart';
-import 'package:polaris/ui/utils/error_message.dart';
+import 'package:polaris/foreground/ui/strings.dart';
+import 'package:polaris/foreground/ui/collection/album_grid.dart';
+import 'package:polaris/foreground/ui/utils/error_message.dart';
 
 final getIt = GetIt.instance;
 

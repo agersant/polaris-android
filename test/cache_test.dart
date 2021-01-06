@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:polaris/service/cache.dart' as cache;
+import 'package:polaris/background/cache.dart' as cache;
 
 void main() {
   test('Missing image returns null', () async {

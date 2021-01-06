@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/main.dart';
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
-import 'package:polaris/ui/startup/page.dart';
-import 'package:polaris/ui/strings.dart';
+import 'package:polaris/foreground/ui/startup/page.dart';
+import 'package:polaris/foreground/ui/strings.dart';
 
 final startupPage = find.byType(StartupPage);
 

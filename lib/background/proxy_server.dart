@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/service/collection.dart';
+import 'package:polaris/background/collection.dart';
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/polaris.dart';
 

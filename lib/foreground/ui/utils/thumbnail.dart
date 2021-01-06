@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
-import 'package:polaris/ui/utils/fallback_artwork.dart';
+import 'package:polaris/foreground/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
 

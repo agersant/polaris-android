@@ -6,10 +6,10 @@ import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
-import 'package:polaris/transient/authentication.dart' as authentication;
-import 'package:polaris/transient/connection.dart' as connection;
-import 'package:polaris/transient/service.dart' as service;
-import 'package:polaris/transient/ui_model.dart';
+import 'package:polaris/foreground/authentication.dart' as authentication;
+import 'package:polaris/foreground/connection.dart' as connection;
+import 'package:polaris/foreground/service.dart' as service;
+import 'package:polaris/foreground/ui/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;

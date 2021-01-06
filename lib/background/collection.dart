@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:polaris/service/cache.dart' as cache;
+import 'package:polaris/background/cache.dart' as cache;
 import 'package:polaris/shared/polaris.dart' as collection;
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/host.dart' as host;

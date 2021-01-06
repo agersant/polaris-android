@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/transient/connection.dart' as connection;
+import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/token.dart' as token;

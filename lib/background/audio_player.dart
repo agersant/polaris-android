@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:polaris/service/entrypoint.dart';
-import 'package:polaris/service/proxy_server.dart';
+import 'package:polaris/background/entrypoint.dart';
+import 'package:polaris/background/proxy_server.dart';
 import 'package:polaris/shared/media_item.dart';
 
 // https://pub.dev/documentation/audio_service/latest/audio_service/BackgroundAudioTask-class.html
