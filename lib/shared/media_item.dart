@@ -44,6 +44,6 @@ extension DTOConversions on MediaItem {
       ..year = extras[extraKeyYear]
       ..album = album
       ..artwork = extras[extraKeyArtwork]
-      ..duration = duration.inSeconds;
+      ..duration = duration?.inSeconds;
   }
 }
