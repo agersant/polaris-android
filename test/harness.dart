@@ -1,4 +1,6 @@
 import 'package:polaris/shared/loopback_host.dart';
+import 'package:polaris/transient/service_launcher.dart';
+import 'package:polaris/transient/ui_model.dart';
 
 import 'mock/client.dart' as client;
 import 'package:get_it/get_it.dart';
@@ -40,9 +42,10 @@ class Harness {
       hostManager: hostManager,
       client: mockClient,
     );
+    final loopbackHost = LoopbackHost();
     final collectionAPI = HttpCollectionAPI(
       client: mockClient,
-      hostManager: LoopbackHost(),
+      hostManager: loopbackHost,
       tokenManager: null,
     );
     final connectionManager = connection.Manager(
@@ -54,11 +57,20 @@ class Harness {
       tokenManager: tokenManager,
       guestAPI: guestAPI,
     );
+    final serviceLauncher = ServiceLauncher(
+      hostManager: hostManager,
+      tokenManager: tokenManager,
+      connectionManager: connectionManager,
+      authenticationManager: authenticationManager,
+      loopbackHost: loopbackHost,
+    );
 
     getIt.registerSingleton<host.Manager>(hostManager);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
+    getIt.registerSingleton<ServiceLauncher>(serviceLauncher);
     getIt.registerSingleton<CollectionAPI>(collectionAPI);
+    getIt.registerSingleton<UIModel>(UIModel());
 
     return Harness(mockClient);
   }

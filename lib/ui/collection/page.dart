@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
+import 'package:polaris/transient/ui_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/random.dart';
 import 'package:polaris/ui/collection/recent.dart';
-
 import '../strings.dart';
+
+final getIt = GetIt.instance;
 
 class CollectionPage extends StatefulWidget {
   @override
@@ -12,19 +15,24 @@ class CollectionPage extends StatefulWidget {
 }
 
 class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
+  final _uiModel = getIt<UIModel>();
   final List<Tab> tabs = <Tab>[
     Tab(text: collectionTabBrowseTitle),
     Tab(text: collectionTabRandomTitle),
     Tab(text: collectionTabRecentTitle),
   ];
-
   TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: tabs.length);
-    _tabController.addListener(() => setState(() {}));
+    _tabController.addListener(_handleActiveTabChanged);
+    _handleActiveTabChanged();
+  }
+
+  _handleActiveTabChanged() {
+    _uiModel.isBrowserActive = _tabController.index == 0;
   }
 
   @override
@@ -43,7 +51,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
       body: TabBarView(
         controller: _tabController,
         children: [
-          Browser(handleBackButton: _tabController.index == 0),
+          Browser(),
           RandomAlbums(),
           RecentAlbums(),
         ],

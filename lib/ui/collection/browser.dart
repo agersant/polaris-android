@@ -5,47 +5,23 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/api_error.dart';
 import 'package:polaris/shared/collection_api.dart';
 import 'package:polaris/shared/dto.dart' as dto;
+import 'package:polaris/transient/ui_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
 class Browser extends StatefulWidget {
-  final bool handleBackButton;
-
-  Browser({this.handleBackButton, Key key}) : super(key: key);
-
   @override
   _BrowserState createState() => _BrowserState();
 }
 
-class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  List<String> _locations = [''];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  Future<bool> didPopRoute() async {
-    if (!widget.handleBackButton) {
-      return false;
-    }
-    return _navigateToParent();
-  }
-
+class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -58,65 +34,44 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin, W
 
     final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor ?? Colors.black;
 
-    return Theme(
-      data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            child: Breadcrumbs(_locations.last, _popLocations),
-          ),
-          SizedBox(height: 1, child: Container(color: dividerColor)),
-          Expanded(
-            child: ClipRect(
-              clipBehavior: Clip.hardEdge,
-              child: Navigator(
-                pages: _locations.map((location) {
-                  return MaterialPage(
-                      child: BrowserLocation(
-                    location,
-                    onDirectoryTapped: _enterDirectory,
-                    navigateBack: () => _navigateToParent(),
-                  ));
-                }).toList(),
-                onPopPage: (route, result) {
-                  return route.didPop(result);
-                },
-              ),
+    return ChangeNotifierProvider.value(
+      value: getIt<UIModel>(),
+      child: Consumer<UIModel>(
+        builder: (BuildContext context, UIModel uiModel, Widget child) {
+          return Theme(
+            data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                  child: Breadcrumbs(uiModel.browserStack.last, uiModel.popBrowserLocations),
+                ),
+                SizedBox(height: 1, child: Container(color: dividerColor)),
+                Expanded(
+                  child: ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: Navigator(
+                      pages: uiModel.browserStack.map((location) {
+                        return MaterialPage(
+                            child: BrowserLocation(
+                          location,
+                          onDirectoryTapped: uiModel.pushBrowserLocation,
+                          navigateBack: uiModel.popBrowserLocation,
+                        ));
+                      }).toList(),
+                      onPopPage: (route, result) {
+                        return route.didPop(result);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
-  }
-
-  void _enterDirectory(dto.Directory directory) {
-    final newLocations = List<String>.from(_locations);
-    newLocations.add(directory.path);
-    setState(() {
-      _locations = newLocations;
-    });
-  }
-
-  void _popLocations(int numLocationsToPop) {
-    final newLocations = _locations.take(_locations.length - numLocationsToPop).toList();
-    setState(() {
-      _locations = newLocations;
-    });
-  }
-
-  bool _navigateToParent() {
-    if (_locations.length <= 1) {
-      return false;
-    }
-
-    final newLocations = List<String>.from(_locations);
-    newLocations.removeLast();
-    setState(() {
-      _locations = newLocations;
-    });
-    return true;
   }
 
   @override
