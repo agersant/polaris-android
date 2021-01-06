@@ -30,10 +30,11 @@ class ProxyServer {
   }
 
   void _handleRequest(HttpRequest request) async {
+    // TODO handle errors from collection calls
     try {
       if (request.uri.path.startsWith(browseEndpoint)) {
         final String path = Uri.decodeComponent(request.uri.path.substring(browseEndpoint.length));
-        final List<CollectionFile> results = await collection.browse(path); // TODO error handling
+        final List<CollectionFile> results = await collection.browse(path);
         final encoded = utf8.encode(jsonEncode(results));
         request.response
           ..contentLength = encoded.length
@@ -41,7 +42,7 @@ class ProxyServer {
           ..add(encoded)
           ..close();
       } else if (request.uri.path.startsWith(randomEndpoint)) {
-        final List<Directory> results = await collection.random(); // TODO error handling
+        final List<Directory> results = await collection.random();
         final encoded = utf8.encode(jsonEncode(results));
         request.response
           ..contentLength = encoded.length
@@ -49,7 +50,7 @@ class ProxyServer {
           ..add(encoded)
           ..close();
       } else if (request.uri.path.startsWith(recentEndpoint)) {
-        final List<Directory> results = await collection.recent(); // TODO error handling
+        final List<Directory> results = await collection.recent();
         final encoded = utf8.encode(jsonEncode(results));
         request.response
           ..contentLength = encoded.length
@@ -58,7 +59,7 @@ class ProxyServer {
           ..close();
       } else if (request.uri.path.startsWith(thumbnailEndpoint)) {
         final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
-        final data = await collection.getImage(path); // TODO error handling
+        final data = await collection.getImage(path);
         request.response
           ..contentLength = -1
           ..statusCode = HttpStatus.ok;
@@ -66,7 +67,7 @@ class ProxyServer {
         data.pipe(request.response);
       } else if (request.uri.path.startsWith(audioEndpoint)) {
         final String path = request.uri.queryParameters[pathQueryParameter];
-        final data = await collection.getAudio(path); // TODO error handling
+        final data = await collection.getAudio(path);
         request.response
           ..contentLength = -1
           ..statusCode = HttpStatus.ok;
