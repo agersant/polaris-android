@@ -38,8 +38,11 @@ class Collection {
   }
 
   Future<Stream<List<int>>> getAudio(String path) async {
-    // TODO
-    return null;
+    // TODO cache support
+    return collectionAPI
+        .downloadAudio(path)
+        .then((r) => r.stream)
+        .catchError((e) => developer.log('Error downloading song: $path', error: e));
   }
 
   Future<Stream<List<int>>> getImage(String path) async {
