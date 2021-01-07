@@ -63,7 +63,6 @@ class ProxyServer {
         request.response
           ..contentLength = -1
           ..statusCode = HttpStatus.ok;
-        // TODO content-type header?
         data.pipe(request.response);
       } else if (request.uri.path.startsWith(audioEndpoint)) {
         final String path = request.uri.queryParameters[pathQueryParameter];
@@ -71,7 +70,6 @@ class ProxyServer {
         request.response
           ..contentLength = -1
           ..statusCode = HttpStatus.ok;
-        // TODO content-type header?
         data.pipe(request.response);
       } else {
         request.response
