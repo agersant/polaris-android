@@ -68,16 +68,24 @@ class Collection {
     final streamedResponse = collectionAPI.downloadImage(path);
     final job = _ImageJob(
         path,
-        streamedResponse
-            .then((r) => http.Response.fromStream(r))
-            .then((r) => r.bodyBytes)
-            .catchError((e) => developer.log('Error downloading image: $path', error: e)));
+        streamedResponse.then((r) => http.Response.fromStream(r)).then((r) {
+          if (r.statusCode >= 300) {
+            throw r.statusCode;
+          }
+          if (r.bodyBytes == null) {
+            throw "Empty image body";
+          }
+          return r.bodyBytes;
+        }).catchError((e) {
+          developer.log('Error downloading image: $path', error: e);
+          throw e;
+        }));
     _imageJobs[path] = job;
+
     job.imageData.then((bytes) async {
-      if (bytes != null) {
-        await cacheManager.putImage(host, path, bytes);
-      }
+      await cacheManager.putImage(host, path, bytes);
     });
+
     return job;
   }
 }

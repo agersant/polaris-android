@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
@@ -15,7 +16,7 @@ class Thumbnail extends StatefulWidget {
 }
 
 class _ThumbnailState extends State<Thumbnail> {
-  Uri uri;
+  Future<Uint8List> futureImage;
 
   @override
   void initState() {
@@ -35,20 +36,32 @@ class _ThumbnailState extends State<Thumbnail> {
 
   void _updateURL() {
     if (widget.path != null) {
-      final collectionAPI = getIt<polaris.API>();
-      uri = collectionAPI.getImageURI(widget.path);
+      futureImage = getIt<polaris.API>().downloadImage(widget.path).then((r) => r.stream.toBytes());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (uri == null) {
-      return FallbackArtwork();
-    }
-    // TODO detect failed loads and display FallbackArtwork();
-    return Image.network(
-      uri.toString(),
-      fit: BoxFit.cover,
+    return FutureBuilder<Uint8List>(
+      future: futureImage,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return FallbackArtwork();
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return Container();
+          case ConnectionState.done:
+            if (!snapshot.hasData) {
+              return FallbackArtwork();
+            }
+            return Image.memory(
+              snapshot.data,
+              fit: BoxFit.cover,
+            );
+        }
+        return FallbackArtwork();
+      },
     );
   }
 }

@@ -109,7 +109,7 @@ class HttpGuestAPI implements GuestAPI {
       if (r.statusCode == 401) {
         throw APIError.unauthorized;
       }
-      if (r.statusCode != 200) {
+      if (r.statusCode >= 300) {
         throw APIError.requestFailed;
       }
       return r;
@@ -197,7 +197,7 @@ class HttpAPI extends ChangeNotifier implements API {
       if (r.statusCode == 401) {
         throw APIError.unauthorized;
       }
-      if (r.statusCode != 200) {
+      if (r.statusCode >= 300) {
         throw APIError.requestFailed;
       }
       return r;
