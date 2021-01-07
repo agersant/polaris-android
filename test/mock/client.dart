@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mockito/mockito.dart' as mockito;
@@ -8,11 +7,13 @@ import 'package:mockito/mockito.dart';
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/polaris.dart';
 
-final missingProtocolHostURL = 'my-polaris-server';
-final goodHostURL = 'http://' + missingProtocolHostURL;
-final badHostURL = 'http://not-a-polaris-server';
-final trailingSlashHostURL = goodHostURL + '/';
-final incompatibleHostURL = 'http://incompatible-polaris-server';
+final goodHost = 'my-polaris-server';
+final badHost = 'not-a-polaris-server';
+final incompatibleHost = 'incompatible-polaris-server';
+final goodHostURI = 'http://' + goodHost;
+final badHostURI = 'http://' + badHost;
+final incompatibleHostURI = 'http://' + incompatibleHost;
+final trailingSlashHostURI = goodHostURI + '/';
 
 final compatibleAPIVersion = '{"major": 6, "minor": 0}';
 final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
@@ -31,36 +32,35 @@ final labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3'
 final fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
 
 class Mock extends mockito.Mock implements http.Client {
+  bool _failLogin = false;
+
+  mockBadLogin() {
+    _failLogin = true;
+  }
+
   Mock() {
-    // API version
-    when(this.get(goodHostURL + apiVersionEndpoint, headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response(compatibleAPIVersion, 200));
-    when(this.get(incompatibleHostURL + apiVersionEndpoint, headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response(incompatibleAPIVersion, 200));
-    when(this.get(badHostURL + apiVersionEndpoint, headers: anyNamed('headers'))).thenThrow('borked internet');
-
-    // Login
-    when(this.post(goodHostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response(authorization, 200));
-
-    // Browse
-    when(this.get(argThat(startsWith(goodHostURL + browseEndpoint)), headers: anyNamed('headers')))
-        .thenAnswer((Invocation invocation) async {
-      final String endpoint = invocation.positionalArguments[0];
-      final String path = Uri.decodeComponent(endpoint.substring((goodHostURL + browseEndpoint).length));
-      final List<CollectionFile> files = _browseData[path];
-      if (files == null) {
-        return http.Response('', 404);
-      }
-      final String payload = jsonEncode(files);
-      return http.Response(payload, 200);
-    });
-
-    // Also browse TODO get rid of sad duplication
     when(this.send(any)).thenAnswer((Invocation invocation) async {
       final Request request = invocation.positionalArguments[0];
       final String endpoint = request.url.path;
-      if (endpoint.startsWith(browseEndpoint)) {
+
+      if (endpoint.startsWith(apiVersionEndpoint)) {
+        final String host = request.url.host;
+        if (host == goodHost) {
+          return http.StreamedResponse(Stream<List<int>>.value(compatibleAPIVersion.codeUnits), 200);
+        }
+        if (host == incompatibleHost) {
+          return http.StreamedResponse(Stream<List<int>>.value(incompatibleAPIVersion.codeUnits), 200);
+        }
+        if (host == badHost) {
+          return http.StreamedResponse(Stream<List<int>>.value([]), 404);
+        }
+      } else if (endpoint.startsWith(loginEndpoint)) {
+        if (_failLogin) {
+          return http.StreamedResponse(Stream<List<int>>.value([]), 401);
+        } else {
+          return http.StreamedResponse(Stream<List<int>>.value(authorization.codeUnits), 200);
+        }
+      } else if (endpoint.startsWith(browseEndpoint)) {
         final String path = Uri.decodeComponent(endpoint.substring(browseEndpoint.length));
         final List<CollectionFile> files = _browseData[path];
         if (files != null) {
@@ -70,11 +70,6 @@ class Mock extends mockito.Mock implements http.Client {
       }
       return http.StreamedResponse(Stream<List<int>>.value([]), 404);
     });
-  }
-
-  mockBadLogin() {
-    when(this.post(goodHostURL + loginEndpoint, body: anyNamed('body'), headers: anyNamed('headers')))
-        .thenAnswer((_) async => http.Response('', 401));
   }
 }
 

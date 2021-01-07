@@ -19,7 +19,7 @@ class Harness {
   Harness(this.mockClient);
 
   static final Map<String, dynamic> reconnectPreferences = {
-    host.preferenceKey: client.goodHostURL,
+    host.preferenceKey: client.goodHostURI,
     token.preferenceKey: 'auth-token',
   };
 

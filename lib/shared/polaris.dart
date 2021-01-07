@@ -62,117 +62,26 @@ abstract class GuestAPI {
   Future<void> testConnection();
 }
 
-class HttpGuestAPI implements GuestAPI {
+abstract class _BaseHttpAPI extends ChangeNotifier {
   final host.Manager hostManager;
   final token.Manager tokenManager;
   final Client client;
 
-  HttpGuestAPI({
+  _BaseHttpAPI({
     @required this.client,
     @required this.hostManager,
     @required this.tokenManager,
   })  : assert(client != null),
-        assert(hostManager != null),
-        assert(tokenManager != null);
+        assert(hostManager != null);
 
-  String _makeURL(String endpoint) {
+  String makeURL(String endpoint) {
     if (hostManager.url == null) {
       throw APIError.unspecifiedHost;
     }
     return hostManager.url + endpoint;
   }
 
-  Future<Response> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
-    Map<String, String> headers = Map();
-    if (authenticate) {
-      if (tokenManager.token != null && tokenManager.token.isNotEmpty) {
-        headers[HttpHeaders.authorizationHeader] = 'Bearer ' + tokenManager.token;
-      }
-    }
-
-    Future<Response> response;
-    try {
-      switch (method) {
-        case _Method.get:
-          response = client.get(url, headers: headers);
-          break;
-        case _Method.post:
-          headers[HttpHeaders.contentTypeHeader] = 'application/json';
-          response = client.post(url, headers: headers, body: jsonEncode(body));
-          break;
-      }
-    } catch (e) {
-      throw APIError.networkError;
-    }
-
-    return response.catchError((e) => throw APIError.networkError).then((r) {
-      if (r.statusCode == 401) {
-        throw APIError.unauthorized;
-      }
-      if (r.statusCode >= 300) {
-        throw APIError.requestFailed;
-      }
-      return r;
-    });
-  }
-
-  @override
-  Future<APIVersion> getAPIVersion() async {
-    final url = _makeURL(apiVersionEndpoint);
-    final response = await _makeRequest(_Method.get, url);
-    try {
-      return APIVersion.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-    } catch (e) {
-      throw APIError.responseParseError;
-    }
-  }
-
-  @override
-  Future<Authorization> login(String username, String password) async {
-    final url = _makeURL(loginEndpoint);
-    final credentials = Credentials(username: username, password: password).toJson();
-    final response = await _makeRequest(_Method.post, url, body: credentials);
-    try {
-      return Authorization.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-    } catch (e) {
-      throw APIError.responseParseError;
-    }
-  }
-
-  @override
-  Future<void> testConnection() async {
-    final url = _makeURL(browseEndpoint);
-    return await _makeRequest(_Method.get, url, authenticate: true);
-  }
-}
-
-class HttpAPI extends ChangeNotifier implements API {
-  final host.Manager hostManager;
-  final token.Manager tokenManager;
-  final Client client;
-  State _state = State.unavailable;
-  get state => _state;
-
-  HttpAPI({@required this.client, @required this.tokenManager, @required this.hostManager})
-      : assert(client != null),
-        assert(hostManager != null) {
-    hostManager.addListener(_updateState);
-    _updateState();
-  }
-
-  void _updateState() {
-    _state = hostManager.state == host.State.available ? State.available : State.unavailable;
-    notifyListeners();
-  }
-
-  String _makeURL(String endpoint) {
-    if (hostManager.url == null) {
-      throw APIError.unspecifiedHost;
-    }
-    return hostManager.url + endpoint;
-  }
-
-  Future<StreamedResponse> _makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
+  Future<StreamedResponse> makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
     Request request = Request(method.toHTTPMethod(), Uri.parse(url));
 
     if (authenticate && tokenManager != null) {
@@ -204,15 +113,73 @@ class HttpAPI extends ChangeNotifier implements API {
     });
   }
 
-  Future<Uint8List> _completeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
-    final streamedResponse = _makeRequest(method, url, body: body, authenticate: authenticate);
+  Future<Uint8List> completeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
+    final streamedResponse = makeRequest(method, url, body: body, authenticate: authenticate);
     return streamedResponse.then((r) => r.stream.toBytes().catchError((e) => throw APIError.networkError));
+  }
+}
+
+class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
+  HttpGuestAPI({
+    @required Client client,
+    @required host.Manager hostManager,
+    @required token.Manager tokenManager,
+  })  : assert(client != null),
+        assert(hostManager != null),
+        assert(tokenManager != null),
+        super(client: client, hostManager: hostManager, tokenManager: tokenManager);
+
+  @override
+  Future<APIVersion> getAPIVersion() async {
+    final url = makeURL(apiVersionEndpoint);
+    final responseBody = await completeRequest(_Method.get, url);
+    try {
+      return APIVersion.fromJson(jsonDecode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<Authorization> login(String username, String password) async {
+    final url = makeURL(loginEndpoint);
+    final credentials = Credentials(username: username, password: password).toJson();
+    final responseBody = await completeRequest(_Method.post, url, body: credentials);
+    try {
+      return Authorization.fromJson(jsonDecode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<void> testConnection() async {
+    final url = makeURL(browseEndpoint);
+    return await makeRequest(_Method.get, url, authenticate: true);
+  }
+}
+
+class HttpAPI extends _BaseHttpAPI implements API {
+  State _state = State.unavailable;
+  get state => _state;
+
+  HttpAPI({@required Client client, @required token.Manager tokenManager, @required host.Manager hostManager})
+      : assert(client != null),
+        assert(hostManager != null),
+        super(client: client, hostManager: hostManager, tokenManager: tokenManager) {
+    hostManager.addListener(_updateState);
+    _updateState();
+  }
+
+  void _updateState() {
+    _state = hostManager.state == host.State.available ? State.available : State.unavailable;
+    notifyListeners();
   }
 
   @override
   Future<List<CollectionFile>> browse(String path) async {
-    final url = _makeURL(browseEndpoint + Uri.encodeComponent(path));
-    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
+    final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
+    final responseBody = await completeRequest(_Method.get, url, authenticate: true);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((c) => CollectionFile.fromJson(c)).toList();
     } catch (e) {
@@ -222,8 +189,8 @@ class HttpAPI extends ChangeNotifier implements API {
 
   @override
   Future<List<Directory>> random() async {
-    final url = _makeURL(randomEndpoint);
-    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
+    final url = makeURL(randomEndpoint);
+    final responseBody = await completeRequest(_Method.get, url, authenticate: true);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
@@ -233,8 +200,8 @@ class HttpAPI extends ChangeNotifier implements API {
 
   @override
   Future<List<Directory>> recent() async {
-    final url = _makeURL(recentEndpoint);
-    final responseBody = await _completeRequest(_Method.get, url, authenticate: true);
+    final url = makeURL(recentEndpoint);
+    final responseBody = await completeRequest(_Method.get, url, authenticate: true);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
     } catch (e) {
@@ -245,13 +212,13 @@ class HttpAPI extends ChangeNotifier implements API {
   @override
   Future<StreamedResponse> downloadImage(String path) {
     final uri = getImageURI(path);
-    return _makeRequest(_Method.get, uri.toString());
+    return makeRequest(_Method.get, uri.toString());
   }
 
   @override
   Uri getImageURI(String path) {
     assert(path != null);
-    String url = _makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
+    String url = makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     if (tokenManager != null) {
       url += '&auth_token=' + tokenManager.token;
     }
@@ -260,7 +227,7 @@ class HttpAPI extends ChangeNotifier implements API {
 
   @override
   Future<StreamedResponse> downloadAudio(String path) {
-    final url = _makeURL(audioEndpoint + Uri.encodeComponent(path));
-    return _makeRequest(_Method.get, url, authenticate: true);
+    final url = makeURL(audioEndpoint + Uri.encodeComponent(path));
+    return makeRequest(_Method.get, url, authenticate: true);
   }
 }
