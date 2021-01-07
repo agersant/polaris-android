@@ -3,6 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	>
-	<item android:drawable="@color/white" app:state_is_playing="false"/>
-	<item android:drawable="@color/pink400" app:state_is_playing="true"/>
+	<item android:drawable="@color/background" app:state_is_playing="false"/>
+	<item android:drawable="@color/accent" app:state_is_playing="true"/>
 </selector>

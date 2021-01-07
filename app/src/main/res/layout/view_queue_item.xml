@@ -50,7 +50,7 @@
 		android:layout_centerVertical="true"
 		android:layout_marginEnd="12dp"
 		android:background="@drawable/ic_sd_storage_black_24dp"
-		android:backgroundTint="@color/queue_item_cache_icon"
+		android:backgroundTint="@color/queue_item_icon"
 		android:duplicateParentState="true"
 		android:contentDescription="@string/queue_cached"
 		android:visibility="invisible"/>
@@ -63,7 +63,7 @@
 		android:layout_centerVertical="true"
 		android:layout_marginEnd="12dp"
 		android:background="@drawable/ic_sync_black_24dp"
-		android:backgroundTint="@color/queue_item_cache_icon"
+		android:backgroundTint="@color/queue_item_icon"
 		android:duplicateParentState="true"
 		android:contentDescription="@string/queue_downloading"
 		android:visibility="invisible"/>

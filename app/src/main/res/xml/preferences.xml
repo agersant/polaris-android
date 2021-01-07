@@ -1,37 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<!--suppress AndroidDomInspection -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--suppress AndroidDomInspection -->
     <EditTextPreference
-		android:defaultValue=""
-		android:key="@string/pref_key_server_url"
-		android:title="@string/pref_server_url"/>
-	<!--suppress AndroidDomInspection -->
+        android:defaultValue=""
+        android:key="@string/pref_key_server_url"
+        android:title="@string/pref_server_url"
+        app:useSimpleSummaryProvider="true"/>
+    <!--suppress AndroidDomInspection -->
     <EditTextPreference
-		android:defaultValue=""
-		android:key="@string/pref_key_username"
-		android:title="@string/pref_username"/>
-	<!--suppress AndroidDomInspection -->
+        android:defaultValue=""
+        android:key="@string/pref_key_username"
+        android:title="@string/pref_username"
+        app:useSimpleSummaryProvider="true" />
+    <!--suppress AndroidDomInspection -->
     <EditTextPreference
-		android:defaultValue=""
-		android:inputType="textPassword"
-		android:key="@string/pref_key_password"
-		android:title="@string/pref_password"/>
-	<SwitchPreference
-		android:defaultValue="false"
-		android:key="@string/pref_key_offline"
-		android:title="@string/pref_offline"/>
-	<ListPreference
-		android:defaultValue="5"
-		android:key="@string/pref_key_num_songs_preload"
-		android:title="@string/pref_num_songs_preload"
-		android:entries="@array/pref_num_songs_preload_entries"
-		android:entryValues="@array/pref_num_songs_preload_entry_values"
-		/>
-	<ListPreference
-		android:defaultValue="500"
-		android:key="@string/pref_key_offline_cache_size"
-		android:title="@string/pref_offline_cache_size"
-		android:entries="@array/pref_offline_cache_size_entries"
-		android:entryValues="@array/pref_offline_cache_size_entry_values"
-		/>
+        android:defaultValue=""
+        android:inputType="textPassword"
+        android:key="@string/pref_key_password"
+        android:title="@string/pref_password" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/pref_key_offline"
+        android:title="@string/pref_offline"
+        app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:defaultValue="5"
+        android:entries="@array/pref_num_songs_preload_entries"
+        android:entryValues="@array/pref_num_songs_preload_entry_values"
+        android:key="@string/pref_key_num_songs_preload"
+        android:title="@string/pref_num_songs_preload"
+        app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:defaultValue="500"
+        android:entries="@array/pref_offline_cache_size_entries"
+        android:entryValues="@array/pref_offline_cache_size_entry_values"
+        android:key="@string/pref_key_offline_cache_size"
+        android:title="@string/pref_offline_cache_size"
+        app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        android:defaultValue="System"
+        android:entries="@array/pref_theme_entries"
+        android:entryValues="@array/pref_theme_entry_values"
+        android:key="@string/pref_key_theme"
+        android:title="@string/pref_theme"
+        app:useSimpleSummaryProvider="true" />
 </PreferenceScreen>
