@@ -74,7 +74,9 @@ class Collection {
             .catchError((e) => developer.log('Error downloading image: $path', error: e)));
     _imageJobs[path] = job;
     job.imageData.then((bytes) async {
-      await cacheManager.putImage(host, path, bytes);
+      if (bytes != null) {
+        await cacheManager.putImage(host, path, bytes);
+      }
     });
     return job;
   }
