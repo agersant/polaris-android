@@ -14,7 +14,7 @@ class _ImageJob {
 }
 
 class Collection {
-  final host.Manager hostManager; // TODO remove dependency on hostmanager (go through collection API instead)
+  final host.Manager hostManager;
   final collection.API collectionAPI;
   final cache.Interface cacheManager;
 
