@@ -8,6 +8,4 @@ enum State {
 abstract class Manager extends ChangeNotifier {
   State get state;
   String get url;
-  void onConnectionAttempt(String url);
-  Future<void> onSuccessfulConnection();
 }

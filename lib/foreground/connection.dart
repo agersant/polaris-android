@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/shared/shared_preferences_host.dart';
 
 enum Error {
   connectionAlreadyInProgress,
@@ -35,7 +35,7 @@ enum State {
 
 class Manager extends ChangeNotifier {
   final polaris.GuestAPI guestAPI;
-  final host.Manager hostManager;
+  final SharedPreferencesHost hostManager;
 
   State _state = State.disconnected;
   State get state => _state;
