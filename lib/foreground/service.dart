@@ -33,14 +33,17 @@ class Manager extends ChangeNotifier {
   }
 
   Future<void> _updateService() async {
-    // TODO this will try to kill service when UI reboots but service is still alive!
-    final bool canRunService = connectionManager.state == connection.State.connected &&
+    final bool isConnected = connectionManager.state == connection.State.connected &&
         authenticationManager.state == authentication.State.authenticated;
-    if (canRunService) {
+    final bool isDisconnected = connectionManager.state == connection.State.disconnected ||
+        authenticationManager.state == authentication.State.unauthenticated;
+    final bool isReconnecting = connectionManager.state == connection.State.reconnecting ||
+        authenticationManager.state == authentication.State.reauthenticating;
+    if (isConnected) {
       await launcher.start();
       isServiceRunning = true;
       notifyListeners();
-    } else {
+    } else if (isDisconnected && !isReconnecting) {
       isServiceRunning = false;
       notifyListeners();
       await launcher.stop();
