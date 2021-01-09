@@ -88,11 +88,11 @@ class PolarisRouteInformationParser extends RouteInformationParser<PolarisPath> 
   }
 }
 
+final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
+
 class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<PolarisPath> {
-  final GlobalKey<NavigatorState> navigatorKey;
-
-  PolarisRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey = globalNavigatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +116,10 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       pages: [
                         if (!isStartupComplete) MaterialPage(child: StartupPage()),
                         if (isStartupComplete) MaterialPage(child: CollectionPage()),
+                        // TODO Ideally playlist page would be here, and so would album details
+                        // However, OpenContainer() can't be used with the pages API.
+                        // As a result, both album details and playlist have to use Navigator.push
+                        // So they can be ordered correctly.
                       ],
                       onPopPage: (route, result) {
                         if (!route.didPop(result)) {

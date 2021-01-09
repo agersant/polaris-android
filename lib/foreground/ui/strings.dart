@@ -33,3 +33,6 @@ final randomError = 'There was an error while listing albums.';
 final recentError = 'There was an error while listing albums.';
 final albumDetailsError = 'There was an error while reading this album.';
 final goBackButtonLabel = 'GO BACK';
+
+// Playback
+final playlistTitle = "Playlist";
