@@ -13,6 +13,7 @@ import 'package:polaris/shared/shared_preferences_host.dart';
 final getIt = GetIt.instance;
 
 final String customActionGetPort = 'getPort';
+final String customActionMoveQueueItem = 'moveQueueItem';
 
 ProxyServer _proxyServer;
 
