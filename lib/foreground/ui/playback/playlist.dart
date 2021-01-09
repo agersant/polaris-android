@@ -17,6 +17,21 @@ class PlaylistPage extends StatefulWidget {
 }
 
 class _PlaylistPageState extends State<PlaylistPage> with SingleTickerProviderStateMixin {
+  // Keep a local copy of the queue so we can re-order without waiting for communication with background service
+  // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
+  List<MediaItem> queue;
+
+  @override
+  void initState() {
+    super.initState();
+    AudioService.queueStream.listen((newQueue) {
+      setState(() {
+        queue = newQueue;
+      });
+    });
+    queue = AudioService.queue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,13 +41,16 @@ class _PlaylistPageState extends State<PlaylistPage> with SingleTickerProviderSt
       body: StreamBuilder<List<MediaItem>>(
           stream: AudioService.queueStream,
           builder: (context, snapshot) {
-            if (snapshot.data == null) {
+            if (queue == null) {
               return Container();
             }
             return ReorderableListView(
-              children: snapshot.data.map((mediaItem) => _songWidget(mediaItem)).toList(),
-              onReorder: (int a, int b) async {
-                await AudioService.customAction(customActionMoveQueueItem, [a, b]);
+              children: queue.map((mediaItem) => _songWidget(mediaItem)).toList(),
+              onReorder: (int oldIndex, int newIndex) {
+                final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
+                queue.insert(insertIndex, queue.removeAt(oldIndex));
+                setState(() {});
+                AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
               },
             );
           }),
