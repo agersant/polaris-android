@@ -21,6 +21,7 @@ List<String> splitPath(String path) {
 
 extension SongFormatting on Song {
   String formatTitle() {
+    // TODO empty titles strings for Switched-on Lotus
     return title ?? path.split(_pathSeparatorRegExp).last;
   }
 
