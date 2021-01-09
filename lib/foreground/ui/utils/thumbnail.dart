@@ -93,8 +93,8 @@ class ListThumbnail extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(4.0),
       child: SizedBox(
-        width: 40,
-        height: 40,
+        width: 44,
+        height: 44,
         child: Thumbnail(path),
       ),
     );
