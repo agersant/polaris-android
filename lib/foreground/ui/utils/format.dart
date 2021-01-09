@@ -20,9 +20,13 @@ List<String> splitPath(String path) {
 }
 
 extension SongFormatting on Song {
+  String formatTitle() {
+    return title ?? path.split(_pathSeparatorRegExp).last;
+  }
+
   String formatTrackNumberAndTitle() {
     if (title == null) {
-      return path.split(_pathSeparatorRegExp).last;
+      return formatTitle();
     }
 
     List<String> components = [];
