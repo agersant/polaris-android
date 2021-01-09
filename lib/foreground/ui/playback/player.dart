@@ -1,11 +1,11 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/ui/playback/playlist.dart';
-import 'package:polaris/shared/dto.dart';
 import 'package:polaris/main.dart';
-import 'package:polaris/shared/media_item.dart';
+import 'package:polaris/foreground/ui/playback/playlist.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
+import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/media_item.dart';
 
 final getIt = GetIt.instance;
 
