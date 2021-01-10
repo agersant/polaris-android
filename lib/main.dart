@@ -116,9 +116,9 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       pages: [
                         if (!isStartupComplete) MaterialPage(child: StartupPage()),
                         if (isStartupComplete) MaterialPage(child: CollectionPage()),
-                        // TODO Ideally playlist page would be here, and so would album details
+                        // TODO Ideally queue page would be here, and so would album details
                         // However, OpenContainer() can't be used with the pages API.
-                        // As a result, both album details and playlist have to use Navigator.push
+                        // As a result, both album details and queue have to use Navigator.push
                         // So they can be ordered correctly.
                       ],
                       onPopPage: (route, result) {

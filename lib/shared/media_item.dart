@@ -13,7 +13,7 @@ final String extraKeyArtwork = 'artwork';
 extension MediaItemConversions on Song {
   MediaItem toMediaItem() {
     return MediaItem(
-      id: path, // TODO This is not unique enough (dupes in playlist)
+      id: path, // TODO This is not unique enough (dupes in queue)
       playable: true,
       album: album,
       title: title,

@@ -35,4 +35,4 @@ final albumDetailsError = 'There was an error while reading this album.';
 final goBackButtonLabel = 'GO BACK';
 
 // Playback
-final playlistTitle = "Playlist";
+final queueTitle = "Queue";

@@ -11,12 +11,12 @@ import 'package:polaris/shared/media_item.dart';
 
 final getIt = GetIt.instance;
 
-class PlaylistPage extends StatefulWidget {
+class QueuePage extends StatefulWidget {
   @override
-  _PlaylistPageState createState() => _PlaylistPageState();
+  _QueuePageState createState() => _QueuePageState();
 }
 
-class _PlaylistPageState extends State<PlaylistPage> with SingleTickerProviderStateMixin {
+class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMixin {
   // Keep a local copy of the queue so we can re-order without waiting for communication with background service
   // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
   List<MediaItem> queue;
@@ -36,7 +36,7 @@ class _PlaylistPageState extends State<PlaylistPage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(playlistTitle),
+        title: Text(queueTitle),
       ),
       body: StreamBuilder<List<MediaItem>>(
           stream: AudioService.queueStream,
