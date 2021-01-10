@@ -14,7 +14,7 @@ final getIt = GetIt.instance;
 
 class QueueState {
   final List<MediaItem> queue;
-  final MediaItem mediaItem;
+  MediaItem mediaItem;
 
   QueueState(this.queue, this.mediaItem);
 }
@@ -56,9 +56,15 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
           builder: (context, snapshot) {
             return ReorderableListView(
               // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
-              children: localState.queue
-                  .map((mediaItem) => _songWidget(context, mediaItem, mediaItem.id == localState.mediaItem.id))
-                  .toList(),
+              children: localState.queue.map((mediaItem) {
+                final bool isCurrent = mediaItem.id == localState.mediaItem.id;
+                final onTap = () {
+                  localState.mediaItem = mediaItem;
+                  setState(() {});
+                  AudioService.skipToQueueItem(mediaItem.id);
+                };
+                return _songWidget(context, mediaItem, isCurrent, onTap);
+              }).toList(),
               onReorder: (int oldIndex, int newIndex) {
                 final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
                 localState.queue.insert(insertIndex, localState.queue.removeAt(oldIndex));
@@ -71,7 +77,7 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
   }
 }
 
-Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent) {
+Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Function() onTap) {
   final dto.Song song = mediaItem.toSong();
   final nowPlayingBackground = Colors.pink.shade400;
   final nowPlayingForeground = Colors.white;
@@ -81,7 +87,7 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent) {
   return Material(
     key: Key(mediaItem.id),
     child: InkWell(
-      onTap: () => AudioService.skipToQueueItem(mediaItem.id),
+      onTap: onTap,
       child: ListTile(
         tileColor: tileColor,
         leading: ListThumbnail(song.artwork),
