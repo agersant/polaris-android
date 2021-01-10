@@ -51,9 +51,11 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
         title: Text(queueTitle),
       ),
       body: StreamBuilder<List<MediaItem>>(
+          // TODO number of songs and duration
           stream: AudioService.queueStream,
           builder: (context, snapshot) {
             return ReorderableListView(
+              // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
               children: localState.queue
                   .map((mediaItem) => _songWidget(context, mediaItem, mediaItem.id == localState.mediaItem.id))
                   .toList(),
