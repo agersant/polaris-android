@@ -76,13 +76,18 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent) {
   final tileColor = isCurrent ? nowPlayingBackground : ListTileTheme.of(context)?.tileColor;
   final titleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground : null);
   final subtitleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground.withOpacity(0.70) : null);
-  return ListTile(
+  return Material(
     key: Key(mediaItem.id),
-    tileColor: tileColor,
-    leading: ListThumbnail(song.artwork),
-    title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis, style: titleTextStyle),
-    subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis, style: subtitleTextStyle),
-    trailing: Icon(Icons.more_vert),
-    dense: true,
+    child: InkWell(
+      onTap: () => AudioService.skipToQueueItem(mediaItem.id),
+      child: ListTile(
+        tileColor: tileColor,
+        leading: ListThumbnail(song.artwork),
+        title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis, style: titleTextStyle),
+        subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis, style: subtitleTextStyle),
+        trailing: Icon(Icons.more_vert),
+        dense: true,
+      ),
+    ),
   );
 }
