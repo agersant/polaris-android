@@ -8,8 +8,19 @@ import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/strings.dart';
 import 'package:polaris/shared/media_item.dart';
+import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
+
+class QueueState {
+  final List<MediaItem> queue;
+  final MediaItem mediaItem;
+
+  QueueState(this.queue, this.mediaItem);
+}
+
+Stream<QueueState> get _queueStateStream => Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
+    AudioService.queueStream, AudioService.currentMediaItemStream, (queue, mediaItem) => QueueState(queue, mediaItem));
 
 class QueuePage extends StatefulWidget {
   @override
@@ -19,17 +30,18 @@ class QueuePage extends StatefulWidget {
 class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMixin {
   // Keep a local copy of the queue so we can re-order without waiting for communication with background service
   // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
-  List<MediaItem> queue;
+  QueueState localState;
 
   @override
   void initState() {
     super.initState();
-    AudioService.queueStream.listen((newQueue) {
+    _queueStateStream.listen((newState) {
       setState(() {
-        queue = newQueue;
+        localState = newState;
       });
     });
-    queue = AudioService.queue;
+    localState = QueueState(AudioService.queue, AudioService.currentMediaItem);
+    // TODO autoscroll to current song?
   }
 
   @override
@@ -41,14 +53,13 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
       body: StreamBuilder<List<MediaItem>>(
           stream: AudioService.queueStream,
           builder: (context, snapshot) {
-            if (queue == null) {
-              return Container();
-            }
             return ReorderableListView(
-              children: queue.map((mediaItem) => _songWidget(mediaItem)).toList(),
+              children: localState.queue
+                  .map((mediaItem) => _songWidget(context, mediaItem, mediaItem.id == localState.mediaItem.id))
+                  .toList(),
               onReorder: (int oldIndex, int newIndex) {
                 final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
-                queue.insert(insertIndex, queue.removeAt(oldIndex));
+                localState.queue.insert(insertIndex, localState.queue.removeAt(oldIndex));
                 setState(() {});
                 AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
               },
@@ -58,13 +69,19 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
   }
 }
 
-Widget _songWidget(MediaItem mediaItem) {
+Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent) {
   final dto.Song song = mediaItem.toSong();
+  final nowPlayingBackground = Colors.pink.shade400;
+  final nowPlayingForeground = Colors.white;
+  final tileColor = isCurrent ? nowPlayingBackground : ListTileTheme.of(context)?.tileColor;
+  final titleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground : null);
+  final subtitleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground.withOpacity(0.70) : null);
   return ListTile(
     key: Key(mediaItem.id),
+    tileColor: tileColor,
     leading: ListThumbnail(song.artwork),
-    title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
-    subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
+    title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis, style: titleTextStyle),
+    subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis, style: subtitleTextStyle),
     trailing: Icon(Icons.more_vert),
     dense: true,
   );
