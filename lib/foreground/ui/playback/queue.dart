@@ -87,7 +87,6 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent) {
         leading: ListThumbnail(song.artwork),
         title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis, style: titleTextStyle),
         subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis, style: subtitleTextStyle),
-        trailing: Icon(Icons.more_vert),
         dense: true,
       ),
     ),
