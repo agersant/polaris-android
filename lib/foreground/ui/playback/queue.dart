@@ -90,6 +90,7 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Fu
   final dto.Song song = mediaItem.toSong();
   final nowPlayingBackground = Colors.pink.shade400;
   final nowPlayingForeground = Colors.white;
+  // TODO Leave colors alone and add a canned animated equalizer icon
   final tileColor = isCurrent ? nowPlayingBackground : ListTileTheme.of(context)?.tileColor;
   final titleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground : null);
   final subtitleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground.withOpacity(0.70) : null);
