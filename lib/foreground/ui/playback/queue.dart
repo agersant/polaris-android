@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -31,17 +33,24 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
   // Keep a local copy of the queue so we can re-order without waiting for communication with background service
   // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
   QueueState localState;
+  StreamSubscription<QueueState> stateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _queueStateStream.listen((newState) {
+    stateSubscription = _queueStateStream.listen((newState) {
       setState(() {
         localState = newState;
       });
     });
     localState = QueueState(AudioService.queue, AudioService.currentMediaItem);
     // TODO autoscroll to current song?
+  }
+
+  @override
+  void dispose() {
+    stateSubscription.cancel();
+    super.dispose();
   }
 
   @override
