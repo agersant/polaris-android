@@ -14,6 +14,7 @@ final getIt = GetIt.instance;
 
 final String customActionGetPort = 'getPort';
 final String customActionMoveQueueItem = 'moveQueueItem';
+final String customActionAddNextQueueItem = 'addNextQueueItem';
 
 ProxyServer _proxyServer;
 

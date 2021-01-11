@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/background/entrypoint.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/shared/media_item.dart';
@@ -293,18 +294,46 @@ class Song extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () {
-          // TODO hello-world only
-          AudioService.addQueueItem(song.toMediaItem());
-        },
+        onTap: () => AudioService.addQueueItem(song.toMediaItem()),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
           subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
-          trailing: Icon(Icons.more_vert),
+          trailing: _songContextMenu(song),
           dense: true,
         ),
       ),
     );
   }
 }
+
+enum SongAction {
+  queueLast,
+  queueNext,
+}
+
+_songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
+      onSelected: (SongAction result) {
+        final MediaItem mediaItem = song.toMediaItem();
+        switch (result) {
+          case SongAction.queueLast:
+            AudioService.addQueueItem(mediaItem);
+            break;
+          case SongAction.queueNext:
+            AudioService.customAction(customActionAddNextQueueItem, [mediaItem.toJson()]);
+            break;
+          default:
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<SongAction>>[
+        PopupMenuItem<SongAction>(
+          value: SongAction.queueLast,
+          child: Text(queueLast),
+        ),
+        PopupMenuItem<SongAction>(
+          value: SongAction.queueNext,
+          child: Text(queueNext),
+        ),
+      ],
+    );

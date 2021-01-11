@@ -24,6 +24,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<dynamic> onCustomAction(String name, dynamic arguments) async {
     if (name == customActionGetPort) {
       return proxyServerPort;
+    } else if (name == customActionAddNextQueueItem) {
+      return onAddNextQueueItem(MediaItem.fromJson(arguments[0]));
     } else if (name == customActionMoveQueueItem) {
       return onMoveQueueItem(arguments[0], arguments[1]);
     }
@@ -91,6 +93,23 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onAddQueueItem(MediaItem mediaItem) async {
     await _audioSource.add(AudioSource.uri(_getPlaybackURI(mediaItem)));
     _queue.add(mediaItem);
+
+    await AudioServiceBackground.setQueue(_queue);
+    if (_queue.length == 1) {
+      await onPlay();
+    }
+  }
+
+  Future<void> onAddNextQueueItem(MediaItem mediaItem) async {
+    int currentIndex = _player.currentIndex;
+    if (currentIndex == null || currentIndex >= _queue.length) {
+      return await onAddQueueItem(mediaItem);
+    }
+    currentIndex++;
+
+    await _audioSource.insert(currentIndex, AudioSource.uri(_getPlaybackURI(mediaItem)));
+    _queue.insert(currentIndex, mediaItem);
+
     await AudioServiceBackground.setQueue(_queue);
     if (_queue.length == 1) {
       await onPlay();
