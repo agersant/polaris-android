@@ -144,8 +144,8 @@ IconButton _nextButton(Color color) => IconButton(
 
 Widget _progressBar() => LayoutBuilder(
       builder: (context, size) {
-        final Color backgroundColor = Theme.of(context).colorScheme.primary.withOpacity(0.4);
-        final Color foregroundColor = Theme.of(context).colorScheme.primary;
+        final Color backgroundColor = Theme.of(context).backgroundColor;
+        final Color foregroundColor = Theme.of(context).accentColor;
         return Stack(
           children: [
             Container(color: backgroundColor),
