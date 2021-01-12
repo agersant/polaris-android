@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/background/entrypoint.dart';
+import 'package:polaris/foreground/ui/utils/animated_equalizer.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/foreground/ui/utils/format.dart';
@@ -17,7 +18,6 @@ final getIt = GetIt.instance;
 class QueueState {
   final List<MediaItem> queue;
   MediaItem mediaItem;
-
   QueueState(this.queue, this.mediaItem);
 }
 
@@ -59,20 +59,21 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
       appBar: AppBar(
         title: Text(queueTitle),
       ),
-      body: StreamBuilder<List<MediaItem>>(
+      body: StreamBuilder<PlaybackState>(
           // TODO number of songs and duration
-          stream: AudioService.queueStream,
+          stream: AudioService.playbackStateStream,
           builder: (context, snapshot) {
             return ReorderableListView(
               // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
               children: localState.queue.map((mediaItem) {
                 final bool isCurrent = mediaItem.id == localState.mediaItem.id;
+                final bool isPlaying = snapshot.data?.playing ?? false;
                 final onTap = () {
                   localState.mediaItem = mediaItem;
                   setState(() {});
                   AudioService.skipToQueueItem(mediaItem.id);
                 };
-                return _songWidget(context, mediaItem, isCurrent, onTap);
+                return _songWidget(context, mediaItem, isCurrent, isPlaying, onTap);
               }).toList(),
               onReorder: (int oldIndex, int newIndex) {
                 final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
@@ -86,23 +87,27 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
   }
 }
 
-Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Function() onTap) {
+Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bool isPlaying, Function() onTap) {
   final dto.Song song = mediaItem.toSong();
-  final nowPlayingBackground = Colors.pink.shade400;
-  final nowPlayingForeground = Colors.white;
-  // TODO Leave colors alone and add a canned animated equalizer icon
-  final tileColor = isCurrent ? nowPlayingBackground : ListTileTheme.of(context)?.tileColor;
-  final titleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground : null);
-  final subtitleTextStyle = TextStyle(color: isCurrent ? nowPlayingForeground.withOpacity(0.70) : null);
+  final Color eqColor = Theme.of(context).colorScheme.primary;
+
   return Material(
     key: Key(mediaItem.id),
     child: InkWell(
       onTap: onTap,
       child: ListTile(
-        tileColor: tileColor,
         leading: ListThumbnail(song.artwork),
-        title: Text(song.formatTitle(), overflow: TextOverflow.ellipsis, style: titleTextStyle),
-        subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis, style: subtitleTextStyle),
+        title: Row(
+          children: [
+            if (isCurrent)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                child: AnimatedEqualizer(eqColor, Size(16, 12), isPlaying),
+              ),
+            Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
+          ],
+        ),
+        subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
         dense: true,
       ),
     ),
