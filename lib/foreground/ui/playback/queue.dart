@@ -102,6 +102,7 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bo
             if (isCurrent)
               Padding(
                 padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                // TODO buffering indicator?
                 child: AnimatedEqualizer(eqColor, Size(16, 12), isPlaying),
               ),
             Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
