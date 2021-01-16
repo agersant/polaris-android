@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:polaris/shared/dto.dart';
+import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/foreground/ui/utils/format.dart';
 
 final String extraKeyPath = 'path';
@@ -11,7 +12,8 @@ final String extraKeyYear = 'year';
 final String extraKeyArtwork = 'artwork';
 
 extension MediaItemConversions on Song {
-  MediaItem toMediaItem() {
+  MediaItem toMediaItem(polaris.API polarisAPI) {
+    assert(polarisAPI != null);
     return MediaItem(
       id: path, // TODO This is not unique enough (dupes in queue)
       playable: true,
@@ -19,7 +21,7 @@ extension MediaItemConversions on Song {
       title: title,
       artist: formatArtist(),
       duration: duration != null ? Duration(seconds: duration) : null,
-      artUri: null, // TODO Support (through proxy? real server? file URI?)
+      artUri: artwork == null ? null : polarisAPI.getImageURI(artwork).toString(),
       extras: {
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,

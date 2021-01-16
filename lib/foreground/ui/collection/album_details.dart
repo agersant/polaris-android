@@ -292,9 +292,10 @@ class Song extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final polarisAPI = getIt<polaris.API>();
     return Material(
       child: InkWell(
-        onTap: () => AudioService.addQueueItem(song.toMediaItem()),
+        onTap: () => AudioService.addQueueItem(song.toMediaItem(polarisAPI)),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
@@ -314,7 +315,7 @@ enum SongAction {
 
 _songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
       onSelected: (SongAction result) {
-        final MediaItem mediaItem = song.toMediaItem();
+        final MediaItem mediaItem = song.toMediaItem(getIt<polaris.API>());
         switch (result) {
           case SongAction.queueLast:
             AudioService.addQueueItem(mediaItem);
