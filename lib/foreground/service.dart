@@ -69,7 +69,6 @@ class AudioServiceLauncher implements Launcher {
     await AudioService.start(
       backgroundTaskEntrypoint: service.entrypoint,
       androidNotificationChannelName: appName,
-      androidNotificationColor: Colors.blue[400].value, // TODO evaluate where this goes and how it looks
       androidNotificationIcon: 'mipmap/ic_launcher',
       androidEnableQueue: true,
     );
