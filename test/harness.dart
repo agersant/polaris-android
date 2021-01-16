@@ -11,6 +11,7 @@ import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/foreground/service.dart' as service;
 import 'package:polaris/foreground/ui/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 final getIt = GetIt.instance;
 
@@ -70,6 +71,7 @@ class Harness {
     getIt.registerSingleton<service.Manager>(serviceManager);
     getIt.registerSingleton<polaris.API>(collectionAPI);
     getIt.registerSingleton<UIModel>(UIModel());
+    getIt.registerSingleton<Uuid>(Uuid());
 
     return Harness(mockClient);
   }

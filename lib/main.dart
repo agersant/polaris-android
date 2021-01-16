@@ -16,6 +16,7 @@ import 'package:polaris/foreground/ui/playback/player.dart';
 import 'package:polaris/foreground/ui/startup/page.dart';
 import 'package:polaris/foreground/ui/utils/back_button_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 final getIt = GetIt.instance;
 
@@ -71,6 +72,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<service.Manager>(serviceManager);
   getIt.registerSingleton<polaris.API>(polarisAPI);
   getIt.registerSingleton<UIModel>(UIModel());
+  getIt.registerSingleton<Uuid>(Uuid());
 }
 
 void main() async {

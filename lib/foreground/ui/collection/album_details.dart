@@ -10,6 +10,7 @@ import 'package:polaris/foreground/ui/strings.dart';
 import 'package:polaris/foreground/ui/utils/error_message.dart';
 import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
+import 'package:uuid/uuid.dart';
 
 final getIt = GetIt.instance;
 
@@ -292,10 +293,11 @@ class Song extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uuid = getIt<Uuid>();
     final polarisAPI = getIt<polaris.API>();
     return Material(
       child: InkWell(
-        onTap: () => AudioService.addQueueItem(song.toMediaItem(polarisAPI)),
+        onTap: () => AudioService.addQueueItem(song.toMediaItem(uuid, polarisAPI)),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
@@ -315,7 +317,7 @@ enum SongAction {
 
 _songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
       onSelected: (SongAction result) {
-        final MediaItem mediaItem = song.toMediaItem(getIt<polaris.API>());
+        final MediaItem mediaItem = song.toMediaItem(getIt<Uuid>(), getIt<polaris.API>());
         switch (result) {
           case SongAction.queueLast:
             AudioService.addQueueItem(mediaItem);
