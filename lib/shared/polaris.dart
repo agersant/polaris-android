@@ -9,6 +9,7 @@ import 'package:polaris/shared/token.dart' as token;
 
 final apiVersionEndpoint = '/api/version/';
 final browseEndpoint = '/api/browse/';
+final flattenEndpoint = '/api/flatten/';
 final randomEndpoint = '/api/random/';
 final recentEndpoint = '/api/recent/';
 final loginEndpoint = '/api/auth/';
@@ -49,6 +50,7 @@ enum APIError {
 abstract class API extends ChangeNotifier {
   State get state;
   Future<List<CollectionFile>> browse(String path);
+  Future<List<Song>> flatten(String path);
   Future<List<Directory>> random();
   Future<List<Directory>> recent();
   Uri getImageURI(String path);
@@ -182,6 +184,17 @@ class HttpAPI extends _BaseHttpAPI implements API {
     final responseBody = await completeRequest(_Method.get, url, authenticate: true);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((c) => CollectionFile.fromJson(c)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<Song>> flatten(String path) async {
+    final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
+    final responseBody = await completeRequest(_Method.get, url, authenticate: true);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List).map((c) => Song.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
