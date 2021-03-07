@@ -72,6 +72,7 @@ mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
   }
 
   void handleError(connection.Error error) {
+    // TODO Migrate to https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
     Scaffold.of(context).removeCurrentSnackBar();
     switch (error) {
       case connection.Error.unsupportedAPIVersion:
