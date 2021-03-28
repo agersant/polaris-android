@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import java.util.Random;
 
-import agersant.polaris.MainActivity;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisPlayer;
@@ -217,12 +216,12 @@ public class QueueFragment extends Fragment {
     private int getIconForOrdering(PlaybackQueue.Ordering ordering) {
         switch (ordering) {
             case REPEAT_ONE:
-                return R.drawable.ic_repeat_one_white_24dp;
+                return R.drawable.ic_repeat_one_24;
             case REPEAT_ALL:
-                return R.drawable.ic_repeat_white_24dp;
+                return R.drawable.ic_repeat_24;
             case SEQUENCE:
             default:
-                return R.drawable.ic_reorder_white_24dp;
+                return R.drawable.ic_reorder_24;
         }
     }
 

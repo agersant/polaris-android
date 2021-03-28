@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_ordering"
-        android:icon="@drawable/ic_reorder_white_24dp"
+        android:icon="@drawable/ic_reorder_24"
         android:title="@string/ordering"
         app:showAsAction="ifRoom">
         <menu>
@@ -26,12 +26,12 @@
     </item>
     <item
         android:id="@+id/action_shuffle"
-        android:icon="@drawable/ic_shuffle_white_24dp"
+        android:icon="@drawable/ic_shuffle_24"
         android:title="@string/shuffle"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_clear"
-        android:icon="@drawable/ic_delete_white_24dp"
+        android:icon="@drawable/ic_delete_24"
         android:title="@string/clear"
         app:showAsAction="ifRoom" />
 </menu>
