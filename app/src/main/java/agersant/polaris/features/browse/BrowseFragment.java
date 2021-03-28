@@ -91,21 +91,6 @@ public class BrowseFragment extends Fragment {
         return binding.getRoot();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Navigation.findNavController(binding.getRoot()).navigate(R.id.nav_settings);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
     private void loadContent() {
         progressBar.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.GONE);

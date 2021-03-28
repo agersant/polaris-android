@@ -24,6 +24,7 @@ import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
 import agersant.polaris.databinding.FragmentQueueBinding;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -226,8 +227,9 @@ public class QueueFragment extends Fragment {
     }
 
     private void updateOrderingIcon() {
+        Toolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         int icon = getIconForOrdering(playbackQueue.getOrdering());
-        MenuItem orderingItem = MainActivity.getToolbar().getMenu().findItem(R.id.action_ordering);
+        MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
         if (orderingItem != null) {
             orderingItem.setIcon(icon);
         }

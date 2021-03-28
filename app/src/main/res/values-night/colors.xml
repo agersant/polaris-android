@@ -10,4 +10,5 @@
     <color name="textPrimary">@color/text_primary_dark</color>
     <color name="textSecondary">@color/text_secondary_dark</color>
     <color name="background">#212121</color> <!--Grey900-->
+    <color name="belowBackground">#000000</color> <!-- Black -->
 </resources>

@@ -51,21 +51,6 @@ public class CollectionFragment extends Fragment {
         updateButtons();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Navigation.findNavController(binding.getRoot()).navigate(R.id.nav_settings);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
     public void browseDirectories(View view) {
         Bundle args = new Bundle();
         args.putSerializable(BrowseFragment.NAVIGATION_MODE, BrowseFragment.NavigationMode.PATH);

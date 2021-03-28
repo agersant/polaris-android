@@ -8,14 +8,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.MaterialToolbar
 
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        @JvmStatic
-        lateinit var toolbar: MaterialToolbar
-    }
 
     private lateinit var navController: NavController
 
@@ -23,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
-        toolbar = binding.toolbar
+        val toolbar = binding.toolbar
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -36,11 +30,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_collection,
                 R.id.nav_queue,
                 R.id.nav_now_playing,
-            )
+            ),
+            binding.backdropMenu,
         )
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         binding.bottomNav.setupWithNavController(navController)
+        binding.backdropNav.setupWithNavController(navController)
+        binding.backdropMenu.setUpWith(navController, binding.toolbar)
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             toolbar.subtitle = ""
