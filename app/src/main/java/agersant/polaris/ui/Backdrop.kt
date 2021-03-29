@@ -2,6 +2,7 @@ package agersant.polaris.ui
 
 import agersant.polaris.R
 import android.content.Context
+import android.graphics.Outline
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.*
@@ -35,10 +36,20 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
     }
 
     private var backdropMenu: BackdropMenu? = null
+    private var outlineRadius = 0f
     val backdropOverlay = OverlayView(context)
+
 
     init {
         background = ContextCompat.getDrawable(context, R.drawable.content_background)
+        outlineRadius = resources.getDimension(R.dimen.backdrop_radius)
+        outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                outline.setRoundRect(0, 0, width, height + outlineRadius.toInt(), outlineRadius)
+            }
+        }
+        clipToOutline = true
+
         addView(backdropOverlay)
     }
 
