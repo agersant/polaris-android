@@ -75,7 +75,7 @@ class BackdropMenu(context: Context, attrs: AttributeSet? = null) : LinearLayout
     private var backdropLayoutId: Int? = null
     private val backdropLayout: BackdropLayout? by lazy {
         backdropLayoutId ?: return@lazy null
-        val layout: BackdropLayout? = (parent.parent as ViewGroup).findViewById(backdropLayoutId!!) ?: null
+        val layout: BackdropLayout? = rootView.findViewById(backdropLayoutId!!)
         layout?.attachBackdropMenu(this)
         layout
     }
