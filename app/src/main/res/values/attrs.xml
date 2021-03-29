@@ -13,4 +13,5 @@
     <attr name="colorHeaderBackground" format="color" />
     <attr name="colorHeaderTextPrimary" format="color" />
     <attr name="colorHeaderTextSecondary" format="color" />
+    <attr name="colorLine" format="color" />
 </resources>
