@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="backdrop_radius" type="dimen">24dp</item>
+    <item name="backdrop_radius" type="dimen">16dp</item>
 </resources>
