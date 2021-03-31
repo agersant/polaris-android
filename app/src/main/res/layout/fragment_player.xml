@@ -10,9 +10,7 @@
         android:id="@+id/viewGroup"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/artwork_margin"
-        android:background="@drawable/artwork_background"
-        app:cardCornerRadius="@dimen/artwork_radius">
+        android:layout_margin="@dimen/artwork_margin">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

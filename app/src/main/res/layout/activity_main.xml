@@ -31,50 +31,29 @@
 
     </agersant.polaris.ui.BackdropMenu>
 
-    <LinearLayout
+    <agersant.polaris.ui.BackdropLayout
+        android:id="@+id/backdrop_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:elevation="4dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <agersant.polaris.ui.BackdropLayout
-            android:id="@+id/backdrop_layout"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/nav_graph" />
+    </agersant.polaris.ui.BackdropLayout>
 
-        </agersant.polaris.ui.BackdropLayout>
-
-        <View
-            android:id="@+id/bottom_nav_divider"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/line_width"
-            android:background="@color/line"
-            app:layout_constraintBottom_toTopOf="@id/bottom_nav" />
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_nav"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:elevation="0dp"
-            app:elevation="0dp"
-            app:itemBackground="?android:colorBackground"
-            app:itemIconTint="@drawable/bottom_navigation_item"
-            app:itemTextColor="@drawable/bottom_navigation_item"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:menu="@menu/menu_bottom_navigation" />
-
-    </LinearLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/menu_bottom_navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
