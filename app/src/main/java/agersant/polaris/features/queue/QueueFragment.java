@@ -37,6 +37,7 @@ public class QueueFragment extends Fragment {
     private BroadcastReceiver receiver;
     private View tutorial;
     private RecyclerView recyclerView;
+    private Toolbar toolbar;
     private PlaybackQueue playbackQueue;
     private PolarisPlayer player;
     private OfflineCache offlineCache;
@@ -113,6 +114,7 @@ public class QueueFragment extends Fragment {
         recyclerView.setItemAnimator(animator);
 
         tutorial = binding.queueTutorial;
+        toolbar = requireActivity().findViewById(R.id.toolbar);
 
         populate();
         updateTutorial();
@@ -226,7 +228,6 @@ public class QueueFragment extends Fragment {
     }
 
     private void updateOrderingIcon() {
-        Toolbar toolbar = requireActivity().findViewById(R.id.toolbar);
         int icon = getIconForOrdering(playbackQueue.getOrdering());
         MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
         if (orderingItem != null) {
