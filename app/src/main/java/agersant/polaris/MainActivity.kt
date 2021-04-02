@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 
 class MainActivity : AppCompatActivity() {
@@ -17,7 +16,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
-        val toolbar = binding.toolbar
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
@@ -41,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         binding.backdropMenu.setUpWith(navController, binding.toolbar)
 
         navController.addOnDestinationChangedListener { _, _, _ ->
-            toolbar.subtitle = ""
+            binding.toolbar.subtitle = ""
         }
     }
 
