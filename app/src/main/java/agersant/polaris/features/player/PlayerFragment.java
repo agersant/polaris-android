@@ -22,7 +22,7 @@ import agersant.polaris.R;
 import agersant.polaris.api.API;
 import agersant.polaris.databinding.FragmentPlayerBinding;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 
@@ -39,6 +39,7 @@ public class PlayerFragment extends Fragment {
     private Handler seekBarUpdateHandler;
     private Runnable updateSeekBar;
     private TextView buffering;
+    private Toolbar toolbar;
     private API api;
     private PolarisPlayer player;
     private PlaybackQueue playbackQueue;
@@ -119,6 +120,8 @@ public class PlayerFragment extends Fragment {
         skipPrevious = binding.skipPrevious;
         seekBar = binding.seekBar;
         buffering = binding.buffering;
+
+        toolbar = getActivity().findViewById(R.id.toolbar);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int newPosition = 0;
@@ -228,12 +231,12 @@ public class PlayerFragment extends Fragment {
 
         String title = item.getTitle();
         if (title != null) {
-            ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle(title);
+            toolbar.setTitle(title);
         }
 
         String artist = item.getArtist();
         if (artist != null) {
-            ((AppCompatActivity) requireActivity()).getSupportActionBar().setSubtitle(artist);
+            toolbar.setSubtitle(artist);
         }
 
         String artworkPath = item.getArtwork();
