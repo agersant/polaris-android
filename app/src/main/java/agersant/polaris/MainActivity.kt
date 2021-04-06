@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_collection,
                 R.id.nav_queue,
                 R.id.nav_now_playing,
-                R.id.nav_settings,
             ),
             binding.backdropMenu,
         )
