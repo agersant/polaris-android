@@ -2,9 +2,7 @@ package agersant.polaris
 
 import agersant.polaris.databinding.ActivityMainBinding
 import agersant.polaris.navigation.setupWithNavController
-import agersant.polaris.ui.MainViewModel
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.observe
@@ -14,7 +12,6 @@ import androidx.navigation.ui.setupWithNavController
 
 class MainActivity : AppCompatActivity() {
 
-    private val model: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private var currentController: LiveData<NavController>? = null
 
