@@ -1,49 +1,78 @@
 package agersant.polaris
 
 import agersant.polaris.databinding.ActivityMainBinding
+import agersant.polaris.navigation.setupWithNavController
+import agersant.polaris.ui.MainViewModel
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var navController: NavController
+    private val model: MainViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+    private var currentController: LiveData<NavController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_collection,
-                R.id.nav_queue,
-                R.id.nav_now_playing,
-            ),
-            binding.backdropMenu,
-        )
-
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
-        binding.bottomNav.setupWithNavController(navController)
-        binding.backdropNav.setupWithNavController(navController)
-        binding.backdropMenu.setUpWith(navController, binding.toolbar)
-
-        navController.addOnDestinationChangedListener { _, _, _ ->
-            binding.toolbar.subtitle = ""
+        if (savedInstanceState == null) {
+            setupNavigation()
         }
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        setupNavigation()
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onNavigateUp()
+        return currentController?.value?.navigateUp() ?: false
+    }
+
+    fun setupNavigation() {
+        val navGraphIds = listOf(
+            R.navigation.collection,
+            R.navigation.queue,
+            R.navigation.now_playing,
+        )
+
+        val navController = binding.bottomNav.setupWithNavController(
+            navGraphIds = navGraphIds,
+            fragmentManager = supportFragmentManager,
+            containerId = R.id.nav_host_fragment,
+            intent = intent,
+        )
+
+        navController.observe(this) { controller ->
+            val appBarConfiguration = AppBarConfiguration(
+                setOf(
+                    R.id.nav_collection,
+                    R.id.nav_queue,
+                    R.id.nav_now_playing,
+                ),
+                binding.backdropMenu,
+            )
+
+            binding.toolbar.setupWithNavController(controller, appBarConfiguration)
+            binding.backdropNav.setupWithNavController(controller)
+            binding.backdropMenu.setUpWith(controller, binding.toolbar)
+            controller.addOnDestinationChangedListener { _, _, _ ->
+                binding.toolbar.subtitle = ""
+            }
+        }
+
     }
 }

@@ -27,7 +27,7 @@
             android:scrollIndicators="none"
             android:scrollbarSize="0dp"
             android:scrollbars="none"
-            app:menu="@menu/menu_backdrop" />
+            app:menu="@menu/backdrop_navigation" />
 
     </agersant.polaris.ui.BackdropMenu>
 
@@ -41,11 +41,8 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph" />
+            android:layout_height="match_parent" />
 
     </agersant.polaris.ui.BackdropLayout>
 
@@ -54,6 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/menu_bottom_navigation" />
+        app:menu="@menu/bottom_navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,15 +39,4 @@
         app:iconPadding="12dp"
         app:iconTint="?android:textColorPrimary" />
 
-    <Button
-        android:id="@+id/playlists"
-        style="@style/CollectionButton"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:enabled="false"
-        android:text="@string/collection_playlists"
-        app:icon="@drawable/ic_queue_music_black_24dp"
-        app:iconPadding="12dp"
-        app:iconTint="?android:textColorPrimary" />
-
 </LinearLayout>

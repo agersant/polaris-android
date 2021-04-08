@@ -2,9 +2,6 @@ package agersant.polaris.features.browse;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -24,8 +21,8 @@ import agersant.polaris.api.ItemsCallback;
 import agersant.polaris.api.remote.ServerAPI;
 import agersant.polaris.databinding.FragmentBrowseBinding;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 
 public class BrowseFragment extends Fragment {
@@ -39,6 +36,7 @@ public class BrowseFragment extends Fragment {
     private ItemsCallback fetchCallback;
     private NavigationMode navigationMode;
     private SwipyRefreshLayout.OnRefreshListener onRefresh;
+    private Toolbar toolbar;
     private ArrayList<? extends CollectionItem> items;
     private API api;
     private ServerAPI serverAPI;
@@ -57,6 +55,7 @@ public class BrowseFragment extends Fragment {
         errorMessage = binding.browseErrorMessage;
         progressBar = binding.progressBar;
         contentHolder = binding.browseContentHolder;
+        toolbar = getActivity().findViewById(R.id.toolbar);
 
         binding.browseErrorRetry.setOnClickListener((view) -> loadContent());
 
@@ -96,6 +95,7 @@ public class BrowseFragment extends Fragment {
         errorMessage.setVisibility(View.GONE);
         switch (navigationMode) {
             case PATH: {
+                toolbar.setTitle(R.string.collection_browse_directories);
                 String path = requireArguments().getString(BrowseFragment.PATH);
                 if (path == null) {
                     path = "";
@@ -104,10 +104,12 @@ public class BrowseFragment extends Fragment {
                 break;
             }
             case RANDOM: {
+                toolbar.setTitle(R.string.collection_random_albums);
                 loadRandom();
                 break;
             }
             case RECENT: {
+                toolbar.setTitle(R.string.collection_recently_added);
                 loadRecent();
                 break;
             }

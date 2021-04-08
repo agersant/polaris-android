@@ -153,7 +153,7 @@ public class QueueFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_queue, menu);
+        inflater.inflate(R.menu.queue, menu);
         updateOrderingIcon();
     }
 
