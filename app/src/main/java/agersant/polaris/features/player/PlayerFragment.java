@@ -10,8 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.slider.Slider;
 
 import agersant.polaris.CollectionItem;
 import agersant.polaris.PlaybackQueue;
@@ -21,9 +26,6 @@ import agersant.polaris.PolarisState;
 import agersant.polaris.R;
 import agersant.polaris.api.API;
 import agersant.polaris.databinding.FragmentPlayerBinding;
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 
 
 public class PlayerFragment extends Fragment {
@@ -32,14 +34,18 @@ public class PlayerFragment extends Fragment {
     private BroadcastReceiver receiver;
     private FragmentPlayerBinding binding;
     private ImageView artwork;
+    private TextView titleText;
+    private TextView albumText;
+    private TextView artistText;
     private ImageView pauseToggle;
     private ImageView skipNext;
     private ImageView skipPrevious;
-    private SeekBar seekBar;
+    private TextView positionText;
+    private TextView durationText;
+    private Slider seekBar;
     private Handler seekBarUpdateHandler;
     private Runnable updateSeekBar;
-    private TextView buffering;
-    private Toolbar toolbar;
+    private CircularProgressIndicator buffering;
     private API api;
     private PolarisPlayer player;
     private PlaybackQueue playbackQueue;
@@ -92,12 +98,13 @@ public class PlayerFragment extends Fragment {
 
     private void scheduleSeekBarUpdates() {
         updateSeekBar = () -> {
-            if (!seeking) {
-                int precision = 10000;
-                float position = player.getPositionRelative();
-                seekBar.setMax(precision);
-                seekBar.setProgress((int) (precision * position));
-            }
+            float duration = player.getDuration() / 1000f;
+            float position = Math.min(player.getCurrentPosition() / 1000f, duration);
+            float relativePosition = position / duration;
+
+            if (!seeking) seekBar.setValue(relativePosition);
+            durationText.setText(formatTime((int) duration));
+            positionText.setText(formatTime((int) position));
             seekBarUpdateHandler.postDelayed(updateSeekBar, 20/*ms*/);
         };
         seekBarUpdateHandler.post(updateSeekBar);
@@ -115,31 +122,31 @@ public class PlayerFragment extends Fragment {
 
         binding = FragmentPlayerBinding.inflate(inflater);
         artwork = binding.artwork;
-        pauseToggle = binding.pauseToggle;
-        skipNext = binding.skipNext;
-        skipPrevious = binding.skipPrevious;
-        seekBar = binding.seekBar;
-        buffering = binding.buffering;
+        titleText = binding.controls.title;
+        albumText = binding.controls.album;
+        artistText = binding.controls.artist;
+        pauseToggle = binding.controls.play;
+        skipNext = binding.controls.next;
+        skipPrevious = binding.controls.previous;
+        positionText = binding.controls.position;
+        durationText = binding.controls.duration;
+        seekBar = binding.controls.seekBar;
+        buffering = binding.controls.buffering;
 
-        toolbar = getActivity().findViewById(R.id.toolbar);
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int newPosition = 0;
-
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                newPosition = progress;
-            }
-
-            public void onStartTrackingTouch(SeekBar seekBar) {
+        seekBar.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
                 seeking = true;
             }
 
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                player.seekToRelative((float) newPosition / seekBar.getMax());
-                seeking = false;
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                player.seekToRelative(slider.getValue() / slider.getValueTo());
                 updateControls();
+                seeking = false;
             }
         });
+        seekBar.setLabelFormatter((value) -> formatTime((int) (value * player.getDuration() / 1000f)));
 
         skipPrevious.setOnClickListener((view) -> player.skipPrevious());
         skipNext.setOnClickListener((view) -> player.skipNext());
@@ -192,9 +199,18 @@ public class PlayerFragment extends Fragment {
     private void updateControls() {
         final float disabledAlpha = 0.2f;
 
-        int playPauseIcon = player.isPlaying() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
-        pauseToggle.setImageResource(playPauseIcon);
-        pauseToggle.setAlpha(player.isIdle() ? disabledAlpha : 1.f);
+        if (player.isPlaying() && !player.isIdle()) {
+            pauseToggle.setImageResource(R.drawable.ic_pause_black_24dp);
+        } else {
+            pauseToggle.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+        }
+        if (player.isIdle()) {
+            pauseToggle.setClickable(true);
+            pauseToggle.setAlpha(disabledAlpha);
+        } else {
+            pauseToggle.setClickable(true);
+            pauseToggle.setAlpha(1f);
+        }
 
         if (playbackQueue.hasNextTrack(player.getCurrentItem())) {
             skipNext.setClickable(true);
@@ -214,15 +230,12 @@ public class PlayerFragment extends Fragment {
     }
 
     private void updateBuffering() {
-        if (player.isOpeningSong()) {
-            buffering.setText(R.string.player_opening);
-        } else if (player.isBuffering()) {
-            buffering.setText(R.string.player_buffering);
-        }
         if (player.isPlaying() && (player.isOpeningSong() || player.isBuffering())) {
-            buffering.setVisibility(View.VISIBLE);
+            buffering.show();
+            positionText.setVisibility(View.INVISIBLE);
         } else {
-            buffering.setVisibility(View.INVISIBLE);
+            buffering.hide();
+            positionText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -231,12 +244,16 @@ public class PlayerFragment extends Fragment {
 
         String title = item.getTitle();
         if (title != null) {
-            toolbar.setTitle(title);
+            titleText.setText(title);
+        }
+        String album = item.getAlbum();
+        if (album != null) {
+            albumText.setText(album);
         }
 
         String artist = item.getArtist();
         if (artist != null) {
-            toolbar.setSubtitle(artist);
+            artistText.setText(artist);
         }
 
         String artworkPath = item.getArtwork();
@@ -245,5 +262,12 @@ public class PlayerFragment extends Fragment {
         } else {
             artwork.setImageResource(R.drawable.ic_fallback_artwork);
         }
+    }
+
+    private String formatTime(int time) {
+        int minutes = time / 60;
+        int seconds = time % 60;
+
+        return minutes + ":" + String.format("%02d", seconds);
     }
 }
