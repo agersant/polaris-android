@@ -100,7 +100,7 @@ public class PlayerFragment extends Fragment {
         updateSeekBar = () -> {
             float duration = player.getDuration() / 1000f;
             float position = Math.min(player.getCurrentPosition() / 1000f, duration);
-            float relativePosition = position / duration;
+            float relativePosition = (duration != 0f) ? position / duration : 0f;
 
             if (!seeking) seekBar.setValue(relativePosition);
             durationText.setText(formatTime((int) duration));
