@@ -37,7 +37,7 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
 
     private var backdropMenu: BackdropMenu? = null
     private var outlineRadius = 0f
-    val backdropOverlay = OverlayView(context)
+    private val backdropOverlay = OverlayView(context)
 
 
     init {
@@ -67,7 +67,6 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
 
 class BackdropMenu(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs), Openable {
 
-    private val wrapContentMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
     private var isOpen = false
     private var toolbar: Toolbar? = null
     private var toolbarIcon: Drawable? = null
@@ -109,37 +108,27 @@ class BackdropMenu(context: Context, attrs: AttributeSet? = null) : LinearLayout
 
     override fun open() {
         if (isOpen) {
-            animateToClosedPos()
+            animateClose()
         } else {
-            animateToOpenedPos()
+            animateOpen()
         }
     }
 
     override fun close() {
-        if (!isOpen) return
-
-        animateToClosedPos()
+        if (isOpen) animateClose()
     }
 
-    private fun setOpened() {
+    private fun animateOpen() {
         toolbarIcon = toolbar?.navigationIcon
         toolbar?.setNavigationIcon(R.drawable.ic_close)
         isOpen = true
-    }
-
-    private fun animateToOpenedPos() {
-        setOpened()
 
         springAnim.animateToFinalPosition(measuredHeight.toFloat())
     }
 
-    private fun setClosed() {
+    private fun animateClose() {
         toolbarIcon?.let { toolbar?.navigationIcon = it }
         isOpen = false
-    }
-
-    private fun animateToClosedPos() {
-        setClosed()
 
         springAnim.animateToFinalPosition(0f)
     }
