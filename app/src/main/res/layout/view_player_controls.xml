@@ -18,12 +18,15 @@
         tools:text="7emptest" />
 
     <ImageView
+        android:id="@+id/album_icon"
         android:layout_width="16sp"
         android:layout_height="16sp"
         android:layout_marginEnd="4sp"
         android:src="@drawable/ic_album_24"
         app:layout_constraintBottom_toBottomOf="@id/album"
         app:layout_constraintEnd_toStartOf="@id/album"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/album"
         app:tint="?android:textColorSecondary" />
 
@@ -33,20 +36,23 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:textColor="?android:textColorSecondary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/album_icon"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:text="Fear Inoculum" />
 
     <ImageView
+        android:id="@+id/artist_icon"
         android:layout_width="16sp"
         android:layout_height="16sp"
         android:layout_marginEnd="4sp"
         android:src="@drawable/ic_person_24"
         app:layout_constraintBottom_toBottomOf="@id/artist"
         app:layout_constraintEnd_toStartOf="@id/artist"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/artist"
         app:tint="?android:textColorSecondary" />
 
@@ -56,10 +62,10 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        android:textColor="?android:textColorSecondary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/artist_icon"
         app:layout_constraintTop_toBottomOf="@id/album"
         tools:text="TOOL" />
 
@@ -120,7 +126,7 @@
         tools:text="15:45" />
 
     <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/seekbar_barrier"
+        android:id="@+id/seek_bar_barrier"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:barrierDirection="bottom"
@@ -132,12 +138,12 @@
         android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginVertical="8dp"
-        android:src="@drawable/ic_skip_previous_black_24dp"
+        android:src="@drawable/ic_skip_previous_24"
         app:layout_constraintBottom_toTopOf="@id/button_barrier"
         app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seekbar_barrier"
+        app:layout_constraintTop_toBottomOf="@id/seek_bar_barrier"
         app:tint="?colorOnBackground" />
 
     <ImageView
@@ -146,12 +152,12 @@
         android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginVertical="8dp"
-        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:src="@drawable/ic_play_arrow_24"
         app:layout_constraintBottom_toTopOf="@id/button_barrier"
         app:layout_constraintEnd_toStartOf="@id/next"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/previous"
-        app:layout_constraintTop_toBottomOf="@id/seekbar_barrier"
+        app:layout_constraintTop_toBottomOf="@id/seek_bar_barrier"
         app:tint="?colorOnBackground" />
 
     <ImageView
@@ -160,12 +166,23 @@
         android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
         android:layout_marginVertical="8dp"
-        android:src="@drawable/ic_skip_next_black_24dp"
+        android:src="@drawable/ic_skip_next_24"
         app:layout_constraintBottom_toTopOf="@id/button_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/play"
-        app:layout_constraintTop_toBottomOf="@id/seekbar_barrier"
+        app:layout_constraintTop_toBottomOf="@id/seek_bar_barrier"
+        app:tint="?colorOnBackground" />
+
+    <ImageView
+        android:id="@+id/details"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_info_24"
+        app:layout_constraintBottom_toBottomOf="@id/next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/next"
         app:tint="?colorOnBackground" />
 
     <androidx.constraintlayout.widget.Barrier
