@@ -134,7 +134,9 @@ class PlayerFragment : Fragment() {
                 player.resume()
             }
         }
-        details.setOnClickListener { showDetails() }
+        details.setOnClickListener {
+            player.currentItem?.let { showDetails(it) }
+        }
 
         refresh()
 
@@ -214,10 +216,6 @@ class PlayerFragment : Fragment() {
             buffering.hide()
             positionText.visibility = View.VISIBLE
         }
-    }
-
-    private fun showDetails() {
-
     }
 
     private fun formatTime(time: Int): String {

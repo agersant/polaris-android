@@ -28,6 +28,16 @@
     <string name="player_details">Details</string>
     <string name="player_unknown">[unknown]</string>
 
+    <string name="player_path">Path</string>
+    <string name="player_album_artist">Album Artist</string>
+    <string name="player_artist">Artist</string>
+    <string name="player_album">Album</string>
+    <string name="player_title">Title</string>
+    <string name="player_disc_number">Disc Number</string>
+    <string name="player_track_number">Track Number</string>
+    <string name="player_duration">Duration</string>
+    <string name="player_year">Year</string>
+
     <string name="pref_server_url">Server address</string>
     <string name="pref_username">Username</string>
     <string name="pref_password">Password</string>

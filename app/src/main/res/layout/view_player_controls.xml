@@ -10,6 +10,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingHorizontal="8dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,6 +38,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingEnd="8dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,6 +67,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingEnd="8dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -179,7 +188,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginEnd="24dp"
-        android:src="@drawable/ic_info_24"
+        android:src="@drawable/ic_info_outline_24"
         app:layout_constraintBottom_toBottomOf="@id/next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/next"
@@ -190,6 +199,6 @@
         android:layout_width="match_parent"
         android:layout_height="8dp"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="previous,play,next" />
+        app:constraint_referenced_ids="previous,play,next,details" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
