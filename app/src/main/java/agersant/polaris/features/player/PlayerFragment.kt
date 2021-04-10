@@ -6,6 +6,7 @@ import agersant.polaris.PolarisPlayer
 import agersant.polaris.R
 import agersant.polaris.api.API
 import agersant.polaris.databinding.FragmentPlayerBinding
+import agersant.polaris.util.formatTime
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -216,11 +217,5 @@ class PlayerFragment : Fragment() {
             buffering.hide()
             positionText.visibility = View.VISIBLE
         }
-    }
-
-    private fun formatTime(time: Int): String {
-        val minutes = time / 60
-        val seconds = time % 60
-        return minutes.toString() + ":" + String.format("%02d", seconds)
     }
 }

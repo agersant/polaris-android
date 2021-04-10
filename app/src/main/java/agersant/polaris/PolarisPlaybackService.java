@@ -212,6 +212,7 @@ public class PolarisPlaybackService extends Service {
             metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentItem.getAlbumArtist());
             metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentItem.getTrackNumber());
             metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DISC_NUMBER, currentItem.getDiscNumber());
+            metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_YEAR, currentItem.getYear());
         }
         metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (long) player.getDuration());
         mediaSession.setMetadata(metadataBuilder.build());
