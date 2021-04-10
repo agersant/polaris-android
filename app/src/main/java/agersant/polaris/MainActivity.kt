@@ -71,5 +71,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // The NavigationExtension has no way to check if the deeplink was already handled so we remove the intent after handling.
+        if (intent.hasExtra(NavController.KEY_DEEP_LINK_INTENT)) {
+            intent.removeExtra(NavController.KEY_DEEP_LINK_INTENT)
+            intent.removeExtra("android-support-nav:controller:deepLinkIds")
+        }
     }
 }
