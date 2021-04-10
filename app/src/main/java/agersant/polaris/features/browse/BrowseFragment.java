@@ -90,12 +90,31 @@ public class BrowseFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        switch (navigationMode) {
+            case PATH: {
+                toolbar.setTitle(R.string.collection_browse_directories);
+                break;
+            }
+            case RANDOM: {
+                toolbar.setTitle(R.string.collection_random_albums);
+                break;
+            }
+            case RECENT: {
+                toolbar.setTitle(R.string.collection_recently_added);
+                break;
+            }
+        }
+    }
+
     private void loadContent() {
         progressBar.setVisibility(View.VISIBLE);
         errorMessage.setVisibility(View.GONE);
         switch (navigationMode) {
             case PATH: {
-                toolbar.setTitle(R.string.collection_browse_directories);
                 String path = requireArguments().getString(BrowseFragment.PATH);
                 if (path == null) {
                     path = "";
@@ -104,12 +123,10 @@ public class BrowseFragment extends Fragment {
                 break;
             }
             case RANDOM: {
-                toolbar.setTitle(R.string.collection_random_albums);
                 loadRandom();
                 break;
             }
             case RECENT: {
-                toolbar.setTitle(R.string.collection_recently_added);
                 loadRecent();
                 break;
             }
