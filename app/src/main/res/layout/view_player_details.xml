@@ -1,126 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:paddingTop="16dp">
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_path" />
+    <View style="@style/DialogDivider" />
 
-    <TextView
-        android:id="@+id/path"
-        style="@style/DetailsValue"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Music/TOOL/Fear Inoculur/09 - TOOL - 7emptest.m4a" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_album_artist" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="16dp">
 
-    <TextView
-        android:id="@+id/album_artist"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="TOOL" />
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_path" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_artist" />
+            <TextView
+                android:id="@+id/path"
+                style="@style/DetailsValue"
+                tools:text="Music/TOOL/Fear Inoculur/09 - TOOL - 7emptest.m4a" />
 
-    <TextView
-        android:id="@+id/artist"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="TOOL" />
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_album" />
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_album_artist" />
 
-    <TextView
-        android:id="@+id/album"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Fear Incolulum" />
+            <TextView
+                android:id="@+id/album_artist"
+                style="@style/DetailsValue"
+                tools:text="TOOL" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_title" />
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="7emptest" />
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_artist" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_disc_number" />
+            <TextView
+                android:id="@+id/artist"
+                style="@style/DetailsValue"
+                tools:text="TOOL" />
 
-    <TextView
-        android:id="@+id/disc_number"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="1" />
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_track_number" />
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_album" />
 
-    <TextView
-        android:id="@+id/track_number"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="9" />
+            <TextView
+                android:id="@+id/album"
+                style="@style/DetailsValue"
+                tools:text="Fear Incolulum" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_duration" />
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
 
-    <TextView
-        android:id="@+id/duration"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="15:45" />
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_title" />
 
-    <TextView
-        style="@style/DetailsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/player_year" />
+            <TextView
+                android:id="@+id/title"
+                style="@style/DetailsValue"
+                tools:text="7emptest" />
 
-    <TextView
-        android:id="@+id/year"
-        style="@style/DetailsValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="15:45" />
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_disc_number" />
+
+            <TextView
+                android:id="@+id/disc_number"
+                style="@style/DetailsValue"
+                tools:text="1" />
+
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_track_number" />
+
+            <TextView
+                android:id="@+id/track_number"
+                style="@style/DetailsValue"
+                tools:text="9" />
+
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_duration" />
+
+            <TextView
+                android:id="@+id/duration"
+                style="@style/DetailsValue"
+                tools:text="15:45" />
+
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/player_year" />
+
+            <TextView
+                android:id="@+id/year"
+                style="@style/DetailsValue"
+                tools:text="15:45" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <View style="@style/DialogDivider" />
 
 </LinearLayout>

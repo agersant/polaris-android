@@ -21,7 +21,7 @@
     <color name="textSecondary">@color/text_secondary_light</color>
     <color name="background">#FFFFFF</color> <!-- White -->
     <color name="belowBackground">@color/grey200</color>
-    <color name="line">@color/grey300</color>
+    <color name="dialogDivider">@color/grey300</color>
 
     <color name="grey50">#FAFAFA</color>
     <color name="grey200">#EEEEEE</color>

@@ -11,5 +11,5 @@
     <color name="textSecondary">@color/text_secondary_dark</color>
     <color name="background">@color/grey900</color>
     <color name="belowBackground">#000000</color> <!-- Black -->
-    <color name="line">@color/grey800</color>
+    <color name="dialogDivider">@color/grey700</color>
 </resources>

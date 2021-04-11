@@ -1,11 +1,9 @@
 package agersant.polaris.features.player
 
-import agersant.polaris.PlaybackQueue
-import agersant.polaris.PolarisApplication
-import agersant.polaris.PolarisPlayer
-import agersant.polaris.R
+import agersant.polaris.*
 import agersant.polaris.api.API
 import agersant.polaris.databinding.FragmentPlayerBinding
+import agersant.polaris.databinding.ViewPlayerDetailsBinding
 import agersant.polaris.util.formatTime
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,12 +16,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.Slider
 import kotlin.math.roundToInt
 
 class PlayerFragment : Fragment() {
+    private val viewModel: PlayerViewModel by viewModels()
     private var seeking = false
     private var receiver: BroadcastReceiver? = null
     private lateinit var binding: FragmentPlayerBinding
@@ -100,6 +101,7 @@ class PlayerFragment : Fragment() {
         player = state.player
         playbackQueue = state.playbackQueue
         seekBarUpdateHandler = Handler()
+
         binding = FragmentPlayerBinding.inflate(inflater)
         artwork = binding.artwork
         titleText = binding.controls.title
@@ -135,8 +137,10 @@ class PlayerFragment : Fragment() {
                 player.resume()
             }
         }
-        details.setOnClickListener {
-            player.currentItem?.let { showDetails(it) }
+        details.setOnClickListener { showDetails() }
+
+        if (viewModel.detailsShowing) {
+            showDetails()
         }
 
         refresh()
@@ -217,5 +221,33 @@ class PlayerFragment : Fragment() {
             buffering.hide()
             positionText.visibility = View.VISIBLE
         }
+    }
+
+    private fun showDetails() {
+        val item = player.currentItem ?: return
+        val detailsBinding = ViewPlayerDetailsBinding.inflate(layoutInflater)
+
+        detailsBinding.path.text = item.path
+        detailsBinding.albumArtist.text = item.albumArtist ?: getString(R.string.player_unknown)
+        detailsBinding.artist.text = item.artist ?: getString(R.string.player_unknown)
+        detailsBinding.album.text = item.album ?: getString(R.string.player_unknown)
+        detailsBinding.title.text = item.title ?: getString(R.string.player_unknown)
+        detailsBinding.discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else getString(R.string.player_unknown)
+        detailsBinding.trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else getString(R.string.player_unknown)
+        detailsBinding.year.text = if (item.year != -1) item.year.toString() else getString(R.string.player_unknown)
+        detailsBinding.duration.text = if (item.duration != -1) {
+            formatTime(item.duration)
+        } else {
+            getString(R.string.player_unknown)
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.player_details)
+            .setView(detailsBinding.root)
+            .setPositiveButton(android.R.string.ok, null)
+            .setOnDismissListener { viewModel.detailsShowing = false }
+            .show()
+
+        viewModel.detailsShowing = true
     }
 }
