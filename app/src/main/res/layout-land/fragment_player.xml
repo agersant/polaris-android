@@ -5,40 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <agersant.polaris.ui.SquareLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/artwork_container"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_margin="@dimen/artwork_margin"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="@dimen/artwork_radius"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toStartOf="@id/controls"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:preserveWidth="true">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
+            android:id="@+id/artwork"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/artwork_radius"
-            app:cardElevation="0dp">
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/player_artwork"
+            tools:src="@drawable/artwork" />
 
-            <ImageView
-                android:id="@+id/artwork"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/player_artwork"
-                tools:src="@drawable/artwork" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-    </agersant.polaris.ui.SquareLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <include
         android:id="@+id/controls"
         layout="@layout/view_player_controls"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="@id/artwork_container"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/artwork_container" />
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toEndOf="@id/artwork_container"
+        app:layout_constraintWidth_min="320dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

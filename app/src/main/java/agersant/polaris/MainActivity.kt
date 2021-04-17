@@ -60,14 +60,13 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_queue,
                     R.id.nav_now_playing,
                 ),
-                binding.backdropMenu,
+                binding.backdropLayout,
             )
 
             binding.toolbar.setupWithNavController(controller, appBarConfiguration)
             binding.backdropNav.setupWithNavController(controller)
-            binding.backdropMenu.setUpWith(controller, binding.toolbar)
             controller.addOnDestinationChangedListener { _, _, _ ->
-                binding.toolbar.subtitle = ""
+                binding.backdropLayout.close()
             }
         }
 

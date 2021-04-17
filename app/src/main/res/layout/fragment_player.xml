@@ -5,31 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <agersant.polaris.ui.SquareLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/artwork_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/artwork_margin"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="@dimen/artwork_radius"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toTopOf="@id/controls"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
+            android:id="@+id/artwork"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/artwork_radius"
-            app:cardElevation="0dp">
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/player_artwork"
+            tools:src="@drawable/artwork" />
 
-            <ImageView
-                android:id="@+id/artwork"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/player_artwork"
-                tools:src="@drawable/artwork" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-    </agersant.polaris.ui.SquareLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <include
         android:id="@+id/controls"

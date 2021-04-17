@@ -3,5 +3,4 @@
     <dimen name="backdrop_radius">16dp</dimen>
     <dimen name="artwork_radius">8dp</dimen>
     <dimen name="artwork_margin">8dp</dimen>
-    <dimen name="line_width">1.5dp</dimen>
 </resources>
