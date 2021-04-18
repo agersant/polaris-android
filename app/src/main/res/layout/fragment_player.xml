@@ -35,6 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_min="wrap"
         app:layout_constraintTop_toBottomOf="@id/artwork_container">
 
         <include
