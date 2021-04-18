@@ -28,7 +28,6 @@ class PlayerFragment : Fragment() {
     private val viewModel: PlayerViewModel by viewModels()
     private var seeking = false
     private var receiver: BroadcastReceiver? = null
-    private lateinit var binding: FragmentPlayerBinding
     private lateinit var artwork: ImageView
     private lateinit var titleText: TextView
     private lateinit var albumText: TextView
@@ -48,34 +47,47 @@ class PlayerFragment : Fragment() {
     private lateinit var playbackQueue: PlaybackQueue
 
     private fun subscribeToEvents() {
-        val that = this
-        val filter = IntentFilter()
-        filter.addAction(PolarisPlayer.PLAYING_TRACK)
-        filter.addAction(PolarisPlayer.PAUSED_TRACK)
-        filter.addAction(PolarisPlayer.RESUMED_TRACK)
-        filter.addAction(PolarisPlayer.COMPLETED_TRACK)
-        filter.addAction(PolarisPlayer.OPENING_TRACK)
-        filter.addAction(PolarisPlayer.BUFFERING)
-        filter.addAction(PolarisPlayer.NOT_BUFFERING)
-        filter.addAction(PlaybackQueue.CHANGED_ORDERING)
-        filter.addAction(PlaybackQueue.QUEUED_ITEM)
-        filter.addAction(PlaybackQueue.QUEUED_ITEMS)
-        filter.addAction(PlaybackQueue.REMOVED_ITEM)
-        filter.addAction(PlaybackQueue.REMOVED_ITEMS)
-        filter.addAction(PlaybackQueue.REORDERED_ITEMS)
+        val filter = IntentFilter().apply {
+            addAction(PolarisPlayer.PLAYING_TRACK)
+            addAction(PolarisPlayer.PAUSED_TRACK)
+            addAction(PolarisPlayer.RESUMED_TRACK)
+            addAction(PolarisPlayer.COMPLETED_TRACK)
+            addAction(PolarisPlayer.OPENING_TRACK)
+            addAction(PolarisPlayer.BUFFERING)
+            addAction(PolarisPlayer.NOT_BUFFERING)
+            addAction(PlaybackQueue.CHANGED_ORDERING)
+            addAction(PlaybackQueue.QUEUED_ITEM)
+            addAction(PlaybackQueue.QUEUED_ITEMS)
+            addAction(PlaybackQueue.REMOVED_ITEM)
+            addAction(PlaybackQueue.REMOVED_ITEMS)
+            addAction(PlaybackQueue.REORDERED_ITEMS)
+        }
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
-                    PolarisPlayer.OPENING_TRACK, PolarisPlayer.BUFFERING, PolarisPlayer.NOT_BUFFERING -> {
-                        that.updateBuffering()
-                        that.updateContent()
-                        that.updateControls()
+                    PolarisPlayer.OPENING_TRACK,
+                    PolarisPlayer.BUFFERING,
+                    PolarisPlayer.NOT_BUFFERING -> {
+                        this@PlayerFragment.updateBuffering()
+                        this@PlayerFragment.updateContent()
+                        this@PlayerFragment.updateControls()
                     }
                     PolarisPlayer.PLAYING_TRACK -> {
-                        that.updateContent()
-                        that.updateControls()
+                        this@PlayerFragment.updateContent()
+                        this@PlayerFragment.updateControls()
                     }
-                    PolarisPlayer.PAUSED_TRACK, PolarisPlayer.RESUMED_TRACK, PolarisPlayer.COMPLETED_TRACK, PlaybackQueue.CHANGED_ORDERING, PlaybackQueue.REMOVED_ITEM, PlaybackQueue.REMOVED_ITEMS, PlaybackQueue.REORDERED_ITEMS, PlaybackQueue.QUEUED_ITEM, PlaybackQueue.QUEUED_ITEMS, PlaybackQueue.OVERWROTE_QUEUE -> that.updateControls()
+                    PolarisPlayer.PAUSED_TRACK,
+                    PolarisPlayer.RESUMED_TRACK,
+                    PolarisPlayer.COMPLETED_TRACK,
+                    PlaybackQueue.CHANGED_ORDERING,
+                    PlaybackQueue.REMOVED_ITEM,
+                    PlaybackQueue.REMOVED_ITEMS,
+                    PlaybackQueue.REORDERED_ITEMS,
+                    PlaybackQueue.QUEUED_ITEM,
+                    PlaybackQueue.QUEUED_ITEMS,
+                    PlaybackQueue.OVERWROTE_QUEUE -> {
+                        this@PlayerFragment.updateControls()
+                    }
                 }
             }
         }
@@ -87,6 +99,7 @@ class PlayerFragment : Fragment() {
             val duration = player.duration / 1000f
             val position = Math.min(player.currentPosition / 1000f, duration)
             val relativePosition = if (duration != 0f) position / duration else 0f
+
             if (!seeking) seekBar.value = relativePosition
             durationText.text = formatTime(duration.roundToInt())
             positionText.text = formatTime(position.roundToInt())
@@ -95,15 +108,16 @@ class PlayerFragment : Fragment() {
         seekBarUpdateHandler.post(updateSeekBar)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         setHasOptionsMenu(true)
+
         val state = PolarisApplication.getState()
         api = state.api
         player = state.player
         playbackQueue = state.playbackQueue
         seekBarUpdateHandler = Handler()
 
-        binding = FragmentPlayerBinding.inflate(inflater)
+        val binding = FragmentPlayerBinding.inflate(inflater)
         artwork = binding.artwork
         titleText = binding.controls.title
         albumText = binding.controls.album
@@ -143,8 +157,6 @@ class PlayerFragment : Fragment() {
         if (viewModel.detailsShowing) {
             showDetails()
         }
-
-        refresh()
 
         return binding.root
     }
