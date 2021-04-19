@@ -149,18 +149,16 @@ public class BrowseFragment extends Fragment {
         String album = items.get(0).getAlbum();
         boolean allSongs = true;
         boolean allDirectories = true;
-        boolean anyHasArtwork = false;
         boolean allHaveAlbum = album != null;
         boolean allSameAlbum = true;
         for (CollectionItem item : items) {
             allSongs &= !item.isDirectory();
             allDirectories &= item.isDirectory();
-            anyHasArtwork |= item.getArtwork() != null;
             allHaveAlbum &= item.getAlbum() != null;
             allSameAlbum &= album != null && album.equals(item.getAlbum());
         }
 
-        if (allDirectories && anyHasArtwork && allHaveAlbum) {
+        if (allDirectories && allHaveAlbum) {
             return DisplayMode.DISCOGRAPHY;
         }
 
