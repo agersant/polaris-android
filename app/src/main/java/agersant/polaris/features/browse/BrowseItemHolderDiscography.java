@@ -38,6 +38,10 @@ class BrowseItemHolderDiscography extends BrowseItemHolder {
             album.setText(albumValue);
         }
 
-        api.loadImageIntoView(item, artwork);
+        if (item.getArtwork() != null) {
+            api.loadImageIntoView(item, artwork);
+        } else {
+            artwork.setImageResource(R.drawable.ic_fallback_artwork);
+        }
     }
 }

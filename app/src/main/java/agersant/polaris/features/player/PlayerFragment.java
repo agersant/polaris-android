@@ -258,6 +258,8 @@ public class PlayerFragment extends Fragment {
         String artworkPath = item.getArtwork();
         if (artworkPath != null) {
             api.loadImageIntoView(item, artwork);
+        } else {
+            artwork.setImageResource(R.drawable.ic_fallback_artwork);
         }
     }
 }
