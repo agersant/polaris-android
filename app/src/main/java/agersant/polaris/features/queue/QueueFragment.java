@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import java.util.Random;
 
-import agersant.polaris.MainActivity;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisPlayer;
@@ -24,6 +23,7 @@ import agersant.polaris.api.local.OfflineCache;
 import agersant.polaris.api.remote.DownloadQueue;
 import agersant.polaris.databinding.FragmentQueueBinding;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -37,6 +37,7 @@ public class QueueFragment extends Fragment {
     private BroadcastReceiver receiver;
     private View tutorial;
     private RecyclerView recyclerView;
+    private Toolbar toolbar;
     private PlaybackQueue playbackQueue;
     private PolarisPlayer player;
     private OfflineCache offlineCache;
@@ -113,6 +114,7 @@ public class QueueFragment extends Fragment {
         recyclerView.setItemAnimator(animator);
 
         tutorial = binding.queueTutorial;
+        toolbar = requireActivity().findViewById(R.id.toolbar);
 
         populate();
         updateTutorial();
@@ -151,7 +153,7 @@ public class QueueFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_queue, menu);
+        inflater.inflate(R.menu.queue, menu);
         updateOrderingIcon();
     }
 
@@ -216,18 +218,18 @@ public class QueueFragment extends Fragment {
     private int getIconForOrdering(PlaybackQueue.Ordering ordering) {
         switch (ordering) {
             case REPEAT_ONE:
-                return R.drawable.ic_repeat_one_white_24dp;
+                return R.drawable.ic_repeat_one_24;
             case REPEAT_ALL:
-                return R.drawable.ic_repeat_white_24dp;
+                return R.drawable.ic_repeat_24;
             case SEQUENCE:
             default:
-                return R.drawable.ic_reorder_white_24dp;
+                return R.drawable.ic_reorder_24;
         }
     }
 
     private void updateOrderingIcon() {
         int icon = getIconForOrdering(playbackQueue.getOrdering());
-        MenuItem orderingItem = MainActivity.getToolbar().getMenu().findItem(R.id.action_ordering);
+        MenuItem orderingItem = toolbar.getMenu().findItem(R.id.action_ordering);
         if (orderingItem != null) {
             orderingItem.setIcon(icon);
         }

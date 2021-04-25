@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ids reference the navigation graphs not the root fragments -->
     <item
-        android:id="@+id/nav_collection"
+        android:id="@+id/collection"
         android:icon="@drawable/ic_library_music_black_24dp"
         android:title="@string/collection" />
     <item
-        android:id="@+id/nav_queue"
+        android:id="@+id/queue"
         android:icon="@drawable/ic_playlist_play_black_24dp"
         android:title="@string/queue" />
     <item
-        android:id="@+id/nav_now_playing"
+        android:id="@+id/now_playing"
         android:icon="@drawable/ic_play_circle_outline_black_24dp"
         android:title="@string/now_playing" />
 </menu>

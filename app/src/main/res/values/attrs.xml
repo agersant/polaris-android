@@ -6,8 +6,12 @@
     <declare-styleable name="QueueItemView">
         <attr name="state_is_playing" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="BackdropMenu">
+        <attr name="backdropLayout" format="reference" />
+    </declare-styleable>
 
     <attr name="colorHeaderBackground" format="color" />
     <attr name="colorHeaderTextPrimary" format="color" />
     <attr name="colorHeaderTextSecondary" format="color" />
+    <attr name="colorLine" format="color" />
 </resources>

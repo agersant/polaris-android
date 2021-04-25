@@ -9,5 +9,7 @@
 
     <color name="textPrimary">@color/text_primary_dark</color>
     <color name="textSecondary">@color/text_secondary_dark</color>
-    <color name="background">#212121</color> <!--Grey900-->
+    <color name="background">@color/grey900</color>
+    <color name="belowBackground">#000000</color> <!-- Black -->
+    <color name="line">@color/grey800</color>
 </resources>

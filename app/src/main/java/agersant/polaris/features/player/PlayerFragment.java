@@ -7,9 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,7 +14,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import agersant.polaris.CollectionItem;
-import agersant.polaris.MainActivity;
 import agersant.polaris.PlaybackQueue;
 import agersant.polaris.PolarisApplication;
 import agersant.polaris.PolarisPlayer;
@@ -26,8 +22,8 @@ import agersant.polaris.R;
 import agersant.polaris.api.API;
 import agersant.polaris.databinding.FragmentPlayerBinding;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 
 
 public class PlayerFragment extends Fragment {
@@ -43,6 +39,7 @@ public class PlayerFragment extends Fragment {
     private Handler seekBarUpdateHandler;
     private Runnable updateSeekBar;
     private TextView buffering;
+    private Toolbar toolbar;
     private API api;
     private PolarisPlayer player;
     private PlaybackQueue playbackQueue;
@@ -124,6 +121,8 @@ public class PlayerFragment extends Fragment {
         seekBar = binding.seekBar;
         buffering = binding.buffering;
 
+        toolbar = getActivity().findViewById(R.id.toolbar);
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int newPosition = 0;
 
@@ -175,21 +174,6 @@ public class PlayerFragment extends Fragment {
     public void onResume() {
         super.onResume();
         refresh();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            Navigation.findNavController(binding.getRoot()).navigate(R.id.nav_settings);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     private void refresh() {
@@ -247,12 +231,12 @@ public class PlayerFragment extends Fragment {
 
         String title = item.getTitle();
         if (title != null) {
-            MainActivity.getToolbar().setTitle(title);
+            toolbar.setTitle(title);
         }
 
         String artist = item.getArtist();
         if (artist != null) {
-            MainActivity.getToolbar().setSubtitle(artist);
+            toolbar.setSubtitle(artist);
         }
 
         String artworkPath = item.getArtwork();

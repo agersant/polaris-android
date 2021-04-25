@@ -1,53 +1,80 @@
 package agersant.polaris
 
 import agersant.polaris.databinding.ActivityMainBinding
+import agersant.polaris.navigation.setupWithNavController
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.appbar.MaterialToolbar
 
 class MainActivity : AppCompatActivity() {
 
-    companion object {
-        @JvmStatic
-        lateinit var toolbar: MaterialToolbar
-    }
-
-    private lateinit var navController: NavController
+    private lateinit var binding: ActivityMainBinding
+    private var currentController: LiveData<NavController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        toolbar = binding.toolbar
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_collection,
-                R.id.nav_queue,
-                R.id.nav_now_playing,
-            )
-        )
-
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.bottomNav.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, _, _ ->
-            toolbar.subtitle = ""
+        if (savedInstanceState == null) {
+            setupNavigation()
         }
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        setupNavigation()
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onNavigateUp()
+        return currentController?.value?.navigateUp() ?: false
+    }
+
+    fun setupNavigation() {
+        val navGraphIds = listOf(
+            R.navigation.collection,
+            R.navigation.queue,
+            R.navigation.now_playing,
+        )
+
+        val navController = binding.bottomNav.setupWithNavController(
+            navGraphIds = navGraphIds,
+            fragmentManager = supportFragmentManager,
+            containerId = R.id.nav_host_fragment,
+            intent = intent,
+        )
+
+        navController.observe(this) { controller ->
+            val appBarConfiguration = AppBarConfiguration(
+                setOf(
+                    R.id.nav_collection,
+                    R.id.nav_queue,
+                    R.id.nav_now_playing,
+                ),
+                binding.backdropMenu,
+            )
+
+            binding.toolbar.setupWithNavController(controller, appBarConfiguration)
+            binding.backdropNav.setupWithNavController(controller)
+            binding.backdropMenu.setUpWith(controller, binding.toolbar)
+            controller.addOnDestinationChangedListener { _, _, _ ->
+                binding.toolbar.subtitle = ""
+            }
+        }
+
+        // The NavigationExtension has no way to check if the deeplink was already handled so we remove the intent after handling.
+        if (intent.hasExtra(NavController.KEY_DEEP_LINK_INTENT)) {
+            intent.removeExtra(NavController.KEY_DEEP_LINK_INTENT)
+            intent.removeExtra("android-support-nav:controller:deepLinkIds")
+        }
     }
 }

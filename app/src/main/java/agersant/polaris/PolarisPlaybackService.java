@@ -305,7 +305,7 @@ public class PolarisPlaybackService extends Service {
 
         // On tap action
         PendingIntent tapPendingIntent = new NavDeepLinkBuilder(this)
-            .setGraph(R.navigation.nav_graph)
+            .setGraph(R.navigation.now_playing)
             .setDestination(R.id.nav_now_playing)
             .createPendingIntent();
 
