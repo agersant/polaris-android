@@ -3,11 +3,12 @@
 
     <!-- Base application theme. -->
     <style name="Polaris" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/belowBackground</item>
+        <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
+        <item name="android:windowBackground">@color/belowBackground</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="colorSurface">@color/background</item>
         <item name="colorPrimary">@color/primary</item> <!--Task manager toolbar-->
-        <item name="colorPrimaryDark">@color/primaryVariant</item> <!--Status bar background-->
+        <item name="colorPrimaryDark">@color/primaryVariant</item>
         <item name="colorPrimaryVariant">@color/primaryVariant</item>
         <item name="colorAccent">@color/primary</item> <!--Media player seek bar-->
         <item name="colorSecondary">@color/primary</item>
@@ -19,9 +20,9 @@
         <item name="colorHeaderBackground">@color/headerBackground</item>
         <item name="colorHeaderTextPrimary">@color/headerTextPrimary</item>
         <item name="colorHeaderTextSecondary">@color/headerTextSecondary</item>
+        <item name="colorLine">@color/line</item>
 
-        <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Primary</item>
-        <item name="toolbarStyle">@style/PolarisToolbar</item>
+        <item name="navigationViewStyle">@style/BackdropNavigation</item>
     </style>
 
     <style name="Divider">
@@ -32,34 +33,28 @@
         <item name="android:background">?android:dividerHorizontal</item>
     </style>
 
-    <style name="PolarisToolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="titleTextColor">@color/toolbarTitle</item>
-        <item name="subtitleTextColor">@color/toolbarSubtitle</item>
+    <style name="BackdropNavigation" parent="Widget.Design.NavigationView">
+        <item name="background">@color/belowBackground</item>
+        <item name="itemHorizontalPadding">16dp</item>
+        <item name="android:overScrollMode">never</item>
     </style>
 
-    <style name="PolarisButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="background">@color/background</item>
+    <style name="ExplorerButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
         <item name="android:background">@color/background</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textAppearance">?textAppearanceBody1</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:drawableTint">?android:textColorPrimary</item>
-    </style>
-
-    <style name="ExplorerButton" parent="@style/PolarisButton">
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
     </style>
 
-    <style name="CollectionButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="CollectionButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:background">@color/background</item>
         <item name="android:textAppearance">?textAppearanceBody1</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
-        <item name="android:drawableTint">?android:textColorPrimary</item>
-        <item name="android:drawablePadding">12dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

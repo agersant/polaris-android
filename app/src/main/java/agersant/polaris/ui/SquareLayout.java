@@ -9,43 +9,43 @@ import agersant.polaris.R;
 
 public class SquareLayout extends FrameLayout {
 
-	private boolean preserveWidth = true;
+    private boolean preserveWidth = true;
 
-	public SquareLayout(Context context) {
-		super(context);
-	}
+    public SquareLayout(Context context) {
+        super(context);
+    }
 
-	public SquareLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		readAttributes(context, attrs);
-	}
+    public SquareLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        readAttributes(context, attrs);
+    }
 
-	public SquareLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		readAttributes(context, attrs);
-	}
+    public SquareLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        readAttributes(context, attrs);
+    }
 
-	private void readAttributes(Context context, AttributeSet attrs) {
-		TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.SquareLayout);
-		boolean preserveWidthArg = arr.getBoolean(R.styleable.SquareLayout_preserveWidth, true);
-		setPreserveWidth(preserveWidthArg);
-		arr.recycle();
-	}
+    private void readAttributes(Context context, AttributeSet attrs) {
+        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.SquareLayout);
+        boolean preserveWidthArg = arr.getBoolean(R.styleable.SquareLayout_preserveWidth, true);
+        setPreserveWidth(preserveWidthArg);
+        arr.recycle();
+    }
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		int squareSize;
-		if (preserveWidth) {
-			squareSize = getMeasuredWidth();
-		} else {
-			squareSize = getMeasuredHeight();
-		}
-		int measureSpec = MeasureSpec.makeMeasureSpec(squareSize, MeasureSpec.EXACTLY);
-		super.onMeasure(measureSpec, measureSpec);
-	}
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int squareSize;
+        if (preserveWidth) {
+            squareSize = getMeasuredWidth();
+        } else {
+            squareSize = getMeasuredHeight();
+        }
+        int measureSpec = MeasureSpec.makeMeasureSpec(squareSize, MeasureSpec.EXACTLY);
+        super.onMeasure(measureSpec, measureSpec);
+    }
 
-	private void setPreserveWidth(boolean preserveWidth) {
-		this.preserveWidth = preserveWidth;
-	}
+    private void setPreserveWidth(boolean preserveWidth) {
+        this.preserveWidth = preserveWidth;
+    }
 }

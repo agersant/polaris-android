@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-	<Button
-		android:id="@+id/browse_explorer_button"
-		style="@style/ExplorerButton"
-		android:layout_width="match_parent"
-		android:drawablePadding="12dp"
-		android:ellipsize="end"
-		android:gravity="center_vertical"
-		android:maxLines="1"
-		android:paddingStart="20dp"
-		android:paddingEnd="20dp"
-		tools:drawableLeft="@drawable/ic_folder_open_black_24dp"
-		tools:text="Dead Can Dance"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/browse_explorer_button"
+        style="@style/ExplorerButton"
+        android:layout_width="match_parent"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        app:icon="@drawable/ic_folder_open_black_24dp"
+        app:iconTint="?android:textColorPrimary"
+        tools:text="Dead Can Dance" />
 </LinearLayout>

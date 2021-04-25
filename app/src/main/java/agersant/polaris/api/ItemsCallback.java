@@ -7,8 +7,8 @@ import agersant.polaris.CollectionItem;
 
 public interface ItemsCallback {
 
-	void onSuccess(ArrayList<? extends CollectionItem> items);
+    void onSuccess(ArrayList<? extends CollectionItem> items);
 
-	void onError();
+    void onError();
 
 }

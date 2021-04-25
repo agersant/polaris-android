@@ -1,1 +1,0 @@
-- Fixed a bug where Polaris Android would emit malformed cookie headers to authenticate with a Polaris server
