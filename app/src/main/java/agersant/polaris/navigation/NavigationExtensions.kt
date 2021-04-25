@@ -1,3 +1,5 @@
+// https://github.com/android/architecture-components-samples/blob/master/NavigationAdvancedSample/app/src/main/java/com/example/android/navigationadvancedsample/NavigationExtensions.kt
+
 /*
  * Copyright 2019, The Android Open Source Project
  *
