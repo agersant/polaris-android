@@ -15,7 +15,7 @@ android {
         applicationId "agersant.polaris"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 1
+        versionCode 415293114
         versionName "0.0"
     }
     signingConfigs {
