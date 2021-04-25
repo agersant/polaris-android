@@ -1,1 +1,1 @@
-- Added support for dark theme (thanks @Saecki)
+- UI modernization
