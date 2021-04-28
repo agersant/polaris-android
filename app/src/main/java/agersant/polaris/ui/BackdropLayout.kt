@@ -58,6 +58,9 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
             val fraction = value / backdropMenu.height
             backdropOverlay.update(fraction)
         }
+        addEndListener { _, _, _, _ ->
+            if (!isOpen) backdropMenu.visibility = View.INVISIBLE
+        }
     }
 
     init {
@@ -97,6 +100,7 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
         springAnim.animateToFinalPosition(backdropMenu.height.toFloat())
         if (!animate) springAnim.skipToEnd()
 
+        backdropMenu.visibility = View.VISIBLE
         isOpen = true
     }
 
