@@ -31,7 +31,6 @@ final darkTheme = ThemeData(
   // Colors below are a workaround for https://github.com/flutter/flutter/issues/19089
   toggleableActiveColor: Colors.blue[200],
   accentColor: Colors.blue[200],
-  textSelectionHandleColor: Colors.blue[400],
 );
 
 Future _registerSingletons() async {
