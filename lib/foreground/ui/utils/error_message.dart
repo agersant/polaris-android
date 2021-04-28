@@ -29,7 +29,7 @@ class ErrorMessage extends StatelessWidget {
         if (actionLabel != null && action != null)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: OutlineButton(onPressed: action, child: Text(actionLabel)),
+            child: OutlinedButton(onPressed: action, child: Text(actionLabel)),
           )
       ],
     );
