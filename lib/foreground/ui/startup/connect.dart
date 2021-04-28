@@ -72,23 +72,22 @@ mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
   }
 
   void handleError(connection.Error error) {
-    // TODO Migrate to https://flutter.dev/docs/release/breaking-changes/scaffold-messenger
-    Scaffold.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     switch (error) {
       case connection.Error.unsupportedAPIVersion:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorAPIVersion)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorAPIVersion)));
         break;
       case connection.Error.connectionAlreadyInProgress:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyConnecting)));
         break;
       case connection.Error.networkError:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorNetwork)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorNetwork)));
         break;
       case connection.Error.requestFailed:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
         break;
       case connection.Error.unknownError:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
         break;
     }
   }

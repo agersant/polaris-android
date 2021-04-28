@@ -88,19 +88,19 @@ mixin AuthenticationErrorHandler<T extends StatefulWidget> on State<T> {
   }
 
   void handleError(authentication.Error error) {
-    Scaffold.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     switch (error) {
       case authentication.Error.authenticationAlreadyInProgress:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyAuthenticating)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyAuthenticating)));
         break;
       case authentication.Error.incorrectCredentials:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorIncorrectCredentials)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorIncorrectCredentials)));
         break;
       case authentication.Error.requestFailed:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
         break;
       case authentication.Error.unknownError:
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
         break;
     }
   }
