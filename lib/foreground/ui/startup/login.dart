@@ -48,7 +48,7 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
                 }
                 return Row(
                   children: [
-                    FlatButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
+                    TextButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
                     Spacer(),
                     ElevatedButton(onPressed: _onLoginPressed, child: Text(loginButtonLabel)),
                   ],

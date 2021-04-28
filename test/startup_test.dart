@@ -15,7 +15,7 @@ final connectButton = find.widgetWithText(ElevatedButton, connectButtonLabel);
 
 final usernameInputField = find.widgetWithText(TextFormField, usernameFieldLabel);
 final passwordInputField = find.widgetWithText(TextFormField, passwordFieldLabel);
-final disconnectButton = find.widgetWithText(FlatButton, disconnectButtonLabel);
+final disconnectButton = find.widgetWithText(TextButton, disconnectButtonLabel);
 final loginButton = find.widgetWithText(ElevatedButton, loginButtonLabel);
 
 void main() {
