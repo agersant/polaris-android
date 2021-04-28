@@ -22,7 +22,7 @@ extension MediaItemConversions on Song {
       title: title,
       artist: formatArtist(),
       duration: duration != null ? Duration(seconds: duration) : null,
-      artUri: artwork == null ? null : polarisAPI.getImageURI(artwork).toString(),
+      artUri: artwork == null ? null : polarisAPI.getImageURI(artwork),
       extras: {
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,

@@ -79,6 +79,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     _player.currentIndexStream.listen((index) {
+      // TODO https://github.com/ryanheise/just_audio/issues/392
+      // This prevents player UI from showing up until one song is done playing
       if (index != null) AudioServiceBackground.setMediaItem(_queue[index]);
     });
 
