@@ -93,11 +93,11 @@ class Song {
 
   Map<String, dynamic> toJson() => {
         'path': path,
-        'trackNumber': trackNumber,
-        'discNumber': discNumber,
+        'track_number': trackNumber,
+        'disc_number': discNumber,
         'title': title,
         'artist': artist,
-        'albumArtist': albumArtist,
+        'album_artist': albumArtist,
         'year': year,
         'album': album,
         'artwork': artwork,
