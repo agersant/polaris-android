@@ -130,19 +130,33 @@ class Album extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: _detailsSpacing),
                     child: LargeThumbnail(album.artwork),
                   ),
-                  Text(
-                    album.album ?? unknownAlbum,
-                    strutStyle: titleStrutStyle,
-                    style: titleStyle,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
-                  ),
-                  Text(
-                    album.artist ?? unknownArtist,
-                    strutStyle: artistStrutStyle,
-                    style: artistStyle,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              album.album ?? unknownAlbum,
+                              strutStyle: titleStrutStyle,
+                              style: titleStyle,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            ),
+                            Text(
+                              album.artist ?? unknownArtist,
+                              strutStyle: artistStrutStyle,
+                              style: artistStyle,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.more_vert,
+                      ),
+                    ],
                   ),
                 ],
               ),
