@@ -187,9 +187,9 @@ class PlayerFragment : Fragment() {
     private fun updateContent() {
         val item = player.currentItem
 
-        titleText.text = item?.title ?: getString(R.string.player_unknown)
-        albumText.text = item?.album ?: getString(R.string.player_unknown)
-        artistText.text = item?.artist ?: getString(R.string.player_unknown)
+        titleText.text = item?.title ?: getString(R.string.details_unknown)
+        albumText.text = item?.album ?: getString(R.string.details_unknown)
+        artistText.text = item?.artist ?: getString(R.string.details_unknown)
 
         if (item?.artwork != null) {
             api.loadImageIntoView(item, artwork)

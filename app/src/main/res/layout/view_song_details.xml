@@ -29,7 +29,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_path" />
+                android:text="@string/details_path" />
 
             <TextView
                 android:id="@+id/path"
@@ -42,7 +42,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_album_artist" />
+                android:text="@string/details_album_artist" />
 
             <TextView
                 android:id="@+id/album_artist"
@@ -55,7 +55,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_artist" />
+                android:text="@string/details_artist" />
 
             <TextView
                 android:id="@+id/artist"
@@ -68,7 +68,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_album" />
+                android:text="@string/details_album" />
 
             <TextView
                 android:id="@+id/album"
@@ -81,7 +81,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_title" />
+                android:text="@string/details_title" />
 
             <TextView
                 android:id="@+id/title"
@@ -94,7 +94,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_disc_number" />
+                android:text="@string/details_disc_number" />
 
             <TextView
                 android:id="@+id/disc_number"
@@ -107,7 +107,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_track_number" />
+                android:text="@string/details_track_number" />
 
             <TextView
                 android:id="@+id/track_number"
@@ -120,7 +120,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_duration" />
+                android:text="@string/details_duration" />
 
             <TextView
                 android:id="@+id/duration"
@@ -133,7 +133,7 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/player_year" />
+                android:text="@string/details_year" />
 
             <TextView
                 android:id="@+id/year"

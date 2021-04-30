@@ -19,22 +19,22 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
         }
 
         path.text = item.path
-        albumArtist.text = item.albumArtist ?: getString(R.string.player_unknown)
-        artist.text = item.artist ?: getString(R.string.player_unknown)
-        album.text = item.album ?: getString(R.string.player_unknown)
-        title.text = item.title ?: getString(R.string.player_unknown)
-        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else getString(R.string.player_unknown)
-        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else getString(R.string.player_unknown)
-        year.text = if (item.year != -1) item.year.toString() else getString(R.string.player_unknown)
+        albumArtist.text = item.albumArtist ?: getString(R.string.details_unknown)
+        artist.text = item.artist ?: getString(R.string.details_unknown)
+        album.text = item.album ?: getString(R.string.details_unknown)
+        title.text = item.title ?: getString(R.string.details_unknown)
+        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else getString(R.string.details_unknown)
+        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else getString(R.string.details_unknown)
+        year.text = if (item.year != -1) item.year.toString() else getString(R.string.details_unknown)
         duration.text = if (item.duration != -1) {
             formatTime(item.duration)
         } else {
-            getString(R.string.player_unknown)
+            getString(R.string.details_unknown)
         }
     }
 
     val dialog = AlertDialog.Builder(this)
-        .setTitle(R.string.player_details)
+        .setTitle(R.string.details)
         .setView(detailsBinding.root)
         .setPositiveButton(android.R.string.ok, null)
         .create()
