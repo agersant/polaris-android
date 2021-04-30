@@ -18,18 +18,19 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
             bottomDivider.isVisible = (v.canScrollVertically(1))
         }
 
+        val unknown by lazy { getString(R.string.details_unknown) }
         path.text = item.path
-        albumArtist.text = item.albumArtist ?: getString(R.string.details_unknown)
-        artist.text = item.artist ?: getString(R.string.details_unknown)
-        album.text = item.album ?: getString(R.string.details_unknown)
-        title.text = item.title ?: getString(R.string.details_unknown)
-        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else getString(R.string.details_unknown)
-        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else getString(R.string.details_unknown)
-        year.text = if (item.year != -1) item.year.toString() else getString(R.string.details_unknown)
+        albumArtist.text = item.albumArtist ?: unknown
+        artist.text = item.artist ?: unknown
+        album.text = item.album ?: unknown
+        title.text = item.title ?: unknown
+        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else unknown
+        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else unknown
+        year.text = if (item.year != -1) item.year.toString() else unknown
         duration.text = if (item.duration != -1) {
             formatTime(item.duration)
         } else {
-            getString(R.string.details_unknown)
+            unknown
         }
     }
 
