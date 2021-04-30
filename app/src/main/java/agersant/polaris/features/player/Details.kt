@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 
-fun showDetailsDialog(context: Context, item: CollectionItem): AlertDialog = context.run {
+fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
     val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     val detailsBinding = ViewSongDetailsBinding.inflate(inflater).apply {
         scrollView.setOnScrollChangeListener { v, _, _, _, _ ->
@@ -19,7 +19,7 @@ fun showDetailsDialog(context: Context, item: CollectionItem): AlertDialog = con
         }
 
         path.text = item.path
-        albumArtist.text = item.albumArtist ?: context.getString(R.string.player_unknown)
+        albumArtist.text = item.albumArtist ?: getString(R.string.player_unknown)
         artist.text = item.artist ?: getString(R.string.player_unknown)
         album.text = item.album ?: getString(R.string.player_unknown)
         title.text = item.title ?: getString(R.string.player_unknown)
@@ -33,7 +33,7 @@ fun showDetailsDialog(context: Context, item: CollectionItem): AlertDialog = con
         }
     }
 
-    val dialog = AlertDialog.Builder(context)
+    val dialog = AlertDialog.Builder(this)
         .setTitle(R.string.player_details)
         .setView(detailsBinding.root)
         .setPositiveButton(android.R.string.ok, null)

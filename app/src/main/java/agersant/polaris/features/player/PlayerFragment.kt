@@ -239,7 +239,7 @@ class PlayerFragment : Fragment() {
     private fun showDetails() {
         val item = player.currentItem ?: return
 
-        val dialog = showDetailsDialog(requireContext(), item)
+        val dialog = requireContext().showDetailsDialog(item)
         dialog.setOnDismissListener {
             viewModel.detailsShowing = false
         }
