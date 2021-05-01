@@ -29,38 +29,12 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/details_path" />
+                android:text="@string/details_title" />
 
             <TextView
-                android:id="@+id/path"
+                android:id="@+id/title"
                 style="@style/DetailsValue"
-                tools:text="Music/TOOL/Fear Inoculur/09 - TOOL - 7emptest.m4a" />
-
-            <Space
-                style="@style/DetailsSpace"
-                android:layout_width="match_parent" />
-
-            <TextView
-                style="@style/DetailsLabel"
-                android:text="@string/details_album_artist" />
-
-            <TextView
-                android:id="@+id/album_artist"
-                style="@style/DetailsValue"
-                tools:text="TOOL" />
-
-            <Space
-                style="@style/DetailsSpace"
-                android:layout_width="match_parent" />
-
-            <TextView
-                style="@style/DetailsLabel"
-                android:text="@string/details_artist" />
-
-            <TextView
-                android:id="@+id/artist"
-                style="@style/DetailsValue"
-                tools:text="TOOL" />
+                tools:text="7emptest" />
 
             <Space
                 style="@style/DetailsSpace"
@@ -81,12 +55,12 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/details_title" />
+                android:text="@string/details_year" />
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/year"
                 style="@style/DetailsValue"
-                tools:text="7emptest" />
+                tools:text="15:45" />
 
             <Space
                 style="@style/DetailsSpace"
@@ -94,12 +68,25 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/details_disc_number" />
+                android:text="@string/details_artist" />
 
             <TextView
-                android:id="@+id/disc_number"
+                android:id="@+id/artist"
                 style="@style/DetailsValue"
-                tools:text="1" />
+                tools:text="TOOL" />
+
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
+                android:text="@string/details_album_artist" />
+
+            <TextView
+                android:id="@+id/album_artist"
+                style="@style/DetailsValue"
+                tools:text="TOOL" />
 
             <Space
                 style="@style/DetailsSpace"
@@ -120,6 +107,19 @@
 
             <TextView
                 style="@style/DetailsLabel"
+                android:text="@string/details_disc_number" />
+
+            <TextView
+                android:id="@+id/disc_number"
+                style="@style/DetailsValue"
+                tools:text="1" />
+
+            <Space
+                style="@style/DetailsSpace"
+                android:layout_width="match_parent" />
+
+            <TextView
+                style="@style/DetailsLabel"
                 android:text="@string/details_duration" />
 
             <TextView
@@ -133,12 +133,12 @@
 
             <TextView
                 style="@style/DetailsLabel"
-                android:text="@string/details_year" />
+                android:text="@string/details_path" />
 
             <TextView
-                android:id="@+id/year"
+                android:id="@+id/path"
                 style="@style/DetailsValue"
-                tools:text="15:45" />
+                tools:text="Music/TOOL/Fear Inoculur/09 - TOOL - 7emptest.m4a" />
 
         </LinearLayout>
 

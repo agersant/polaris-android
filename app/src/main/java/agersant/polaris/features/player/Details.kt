@@ -19,19 +19,19 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
         }
 
         val unknown by lazy { getString(R.string.details_unknown) }
-        path.text = item.path
-        albumArtist.text = item.albumArtist ?: unknown
-        artist.text = item.artist ?: unknown
-        album.text = item.album ?: unknown
         title.text = item.title ?: unknown
-        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else unknown
-        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else unknown
+        album.text = item.album ?: unknown
+        artist.text = item.artist ?: unknown
+        albumArtist.text = item.albumArtist ?: unknown
         year.text = if (item.year != -1) item.year.toString() else unknown
+        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else unknown
+        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else unknown
         duration.text = if (item.duration != -1) {
             formatTime(item.duration)
         } else {
             unknown
         }
+        path.text = item.path
     }
 
     val dialog = AlertDialog.Builder(this)
