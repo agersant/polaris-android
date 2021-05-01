@@ -89,6 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:barrierDirection="bottom"
+        app:barrierMargin="12dp"
         app:constraint_referenced_ids="title,album_container,artist_container" />
 
 
@@ -149,10 +150,10 @@
 
     <ImageView
         android:id="@+id/previous"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
-        android:src="@drawable/ic_skip_previous_24"
+        android:src="@drawable/ic_round_skip_previous_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -162,10 +163,10 @@
 
     <ImageView
         android:id="@+id/play"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
-        android:src="@drawable/ic_play_arrow_24"
+        android:src="@drawable/ic_round_play_arrow_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/next"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -175,27 +176,15 @@
 
     <ImageView
         android:id="@+id/next"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginHorizontal="24dp"
-        android:src="@drawable/ic_skip_next_24"
+        android:src="@drawable/ic_round_skip_next_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/play"
         app:layout_constraintTop_toBottomOf="@id/seek_bar_barrier"
-        app:tint="?colorOnBackground" />
-
-    <ImageView
-        android:id="@+id/details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_info_outline_24"
-        app:layout_constraintBottom_toBottomOf="@id/next"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/next"
         app:tint="?colorOnBackground" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

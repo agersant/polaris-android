@@ -31,7 +31,6 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
         } else {
             unknown
         }
-        path.text = item.path
     }
 
     val dialog = AlertDialog.Builder(this)

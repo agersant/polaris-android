@@ -13,9 +13,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -39,7 +37,6 @@ class PlayerFragment : Fragment() {
     private lateinit var durationText: TextView
     private lateinit var seekBar: Slider
     private lateinit var buffering: CircularProgressIndicator
-    private lateinit var details: ImageView
     private lateinit var seekBarUpdateHandler: Handler
     private lateinit var updateSeekBar: Runnable
     private lateinit var api: API
@@ -129,7 +126,6 @@ class PlayerFragment : Fragment() {
         durationText = binding.controls.duration
         seekBar = binding.controls.seekBar
         buffering = binding.controls.buffering
-        details = binding.controls.details
 
         seekBar.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
@@ -152,7 +148,6 @@ class PlayerFragment : Fragment() {
                 player.resume()
             }
         }
-        details.setOnClickListener { showDetails() }
 
         if (viewModel.detailsShowing) {
             showDetails()
@@ -176,6 +171,18 @@ class PlayerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         refresh()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.now_playing, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_details -> showDetails()
+        }
+
+        return false
     }
 
     private fun refresh() {
@@ -204,9 +211,9 @@ class PlayerFragment : Fragment() {
         val isNotIdle = !player.isIdle
 
         if (player.isPlaying && isNotIdle) {
-            pauseToggle.setImageResource(R.drawable.ic_pause_24)
+            pauseToggle.setImageResource(R.drawable.ic_round_pause_24)
         } else {
-            pauseToggle.setImageResource(R.drawable.ic_play_arrow_24)
+            pauseToggle.setImageResource(R.drawable.ic_round_play_arrow_24)
         }
         pauseToggle.isClickable = isNotIdle
         pauseToggle.alpha = if (isNotIdle) 1f else disabledAlpha
@@ -218,9 +225,6 @@ class PlayerFragment : Fragment() {
         val hasPrevTrack = playbackQueue.hasPreviousTrack(player.currentItem)
         skipPrevious.isClickable = hasPrevTrack
         skipPrevious.alpha = if (hasPrevTrack) 1f else disabledAlpha
-
-        details.isClickable = isNotIdle
-        details.alpha = if (isNotIdle) 1f else disabledAlpha
 
         seekBar.isEnabled = isNotIdle
         positionText.isEnabled = isNotIdle

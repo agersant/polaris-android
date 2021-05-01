@@ -127,19 +127,6 @@
                 style="@style/DetailsValue"
                 tools:text="15:45" />
 
-            <Space
-                style="@style/DetailsSpace"
-                android:layout_width="match_parent" />
-
-            <TextView
-                style="@style/DetailsLabel"
-                android:text="@string/details_path" />
-
-            <TextView
-                android:id="@+id/path"
-                style="@style/DetailsValue"
-                tools:text="Music/TOOL/Fear Inoculur/09 - TOOL - 7emptest.m4a" />
-
         </LinearLayout>
 
     </ScrollView>
