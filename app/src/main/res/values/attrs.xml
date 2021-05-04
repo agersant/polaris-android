@@ -6,6 +6,7 @@
     <declare-styleable name="BackdropLayout">
         <attr name="backdropMenu" format="reference" />
         <attr name="toolbar" format="reference" />
+        <attr name="cornerRadius" format="dimension" />
     </declare-styleable>
 
     <attr name="colorHeaderBackground" format="color" />

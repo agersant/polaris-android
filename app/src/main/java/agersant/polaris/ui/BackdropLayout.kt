@@ -1,6 +1,8 @@
 package agersant.polaris.ui
 
 import agersant.polaris.R
+import agersant.polaris.util.dp
+import agersant.polaris.util.getAttrColor
 import android.content.Context
 import android.graphics.Outline
 import android.graphics.drawable.Drawable
@@ -10,7 +12,6 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.customview.widget.Openable
 import androidx.dynamicanimation.animation.DynamicAnimation
@@ -19,7 +20,7 @@ import androidx.dynamicanimation.animation.SpringForce
 
 class BackdropLayout(context: Context, attrs: AttributeSet? = null) : ConstraintLayout(context, attrs), Openable {
 
-    inner class OverlayView(context: Context) : View(context) {
+    private inner class OverlayView(context: Context) : View(context) {
         init {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -28,7 +29,7 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
             isVisible = false
             alpha = 0f
             z = 100f
-            background = ContextCompat.getDrawable(context, R.drawable.content_background)
+            setBackgroundColor(context.getAttrColor(android.R.attr.colorBackground))
 
             setOnClickListener { close() }
         }
@@ -42,15 +43,18 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
     private var isOpen = false
     private var outlineRadius = 0f
     private val backdropOverlay = OverlayView(context)
-    private var toolbarId: Int = 0
     private var toolbarIcon: Drawable? = null
+
+    private var toolbarId: Int = 0
     private val toolbar: Toolbar by lazy {
         rootView.findViewById(toolbarId)
     }
+
     private var backdropMenuId: Int = 0
     private val backdropMenu: View by lazy {
         rootView.findViewById(backdropMenuId)
     }
+
     private val springAnim: SpringAnimation = SpringAnimation(this, DynamicAnimation.TRANSLATION_Y, 0f).apply {
         spring.dampingRatio = SpringForce.DAMPING_RATIO_NO_BOUNCY
         spring.stiffness = 800f
@@ -67,10 +71,9 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
         val arr = context.obtainStyledAttributes(attrs, R.styleable.BackdropLayout)
         backdropMenuId = arr.getResourceId(R.styleable.BackdropLayout_backdropMenu, -1)
         toolbarId = arr.getResourceId(R.styleable.BackdropLayout_toolbar, -1)
+        outlineRadius = arr.getDimension(R.styleable.BackdropLayout_cornerRadius, 16.dp)
         arr.recycle()
 
-        background = ContextCompat.getDrawable(context, R.drawable.content_background)
-        outlineRadius = resources.getDimension(R.dimen.backdrop_radius)
         outlineProvider = object : ViewOutlineProvider() {
             override fun getOutline(view: View, outline: Outline) {
                 outline.setRoundRect(0, 0, width, height + outlineRadius.toInt(), outlineRadius)
@@ -85,36 +88,34 @@ class BackdropLayout(context: Context, attrs: AttributeSet? = null) : Constraint
 
     override fun open() {
         if (isOpen) {
-            close(true)
+            closeInternal()
         } else {
-            open(true)
+            openInternal()
         }
     }
 
-    fun open(animate: Boolean) {
+    private fun openInternal() {
         if (!isOpen) {
             toolbarIcon = toolbar.navigationIcon
             toolbar.setNavigationIcon(R.drawable.ic_close)
         }
 
         springAnim.animateToFinalPosition(backdropMenu.height.toFloat())
-        if (!animate) springAnim.skipToEnd()
 
         backdropMenu.visibility = View.VISIBLE
         isOpen = true
     }
 
     override fun close() {
-        if (isOpen) close(true)
+        if (isOpen) closeInternal()
     }
 
-    fun close(animate: Boolean) {
+    private fun closeInternal() {
         if (isOpen) {
             toolbarIcon?.let { toolbar.navigationIcon = it }
         }
 
         springAnim.animateToFinalPosition(0f)
-        if (!animate) springAnim.skipToEnd()
 
         isOpen = false
     }
