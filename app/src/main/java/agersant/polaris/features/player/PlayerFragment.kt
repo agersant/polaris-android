@@ -178,11 +178,13 @@ class PlayerFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.show_details -> showDetails()
+        return when (item.itemId) {
+            R.id.show_details -> {
+                showDetails()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        return false
     }
 
     private fun refresh() {
