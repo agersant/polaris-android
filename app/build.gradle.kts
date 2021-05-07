@@ -52,31 +52,31 @@ dependencies {
     implementation(fileTree("dir" to "libs", "include" to "*.jar")) // TODO: find out if we need this
 
     // Core
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.3.0-rc01")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation(Deps.Kotlin.stdlib)
+    implementation(Deps.Androidx.coreKtx)
+    implementation(Deps.Androidx.appcompat)
+    implementation(Deps.material)
 
     // Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:${Versions.navigation}")
-    implementation("androidx.navigation:navigation-ui-ktx:${Versions.navigation}")
+    implementation(Deps.Nav.fragmentKtx)
+    implementation(Deps.Nav.uiKtx)
 
     // Preference
-    implementation("androidx.preference:preference-ktx:1.1.1")
+    implementation(Deps.Androidx.preferenceKtx)
 
     // Media session
-    implementation("androidx.media:media:1.3.1")
+    implementation(Deps.Androidx.media)
 
     // Media player
-    implementation("com.google.android.exoplayer:exoplayer-core:2.13.3")
-    implementation("com.github.Saecki.ExoPlayer-Extensions:flac:2.13.3")
+    implementation(Deps.ExoPlayer.core)
+    implementation(Deps.ExoPlayer.flacExtension) { isTransitive = false }
 
     // Rest client
-    implementation("com.google.code.gson:gson:2.8.6")
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation(Deps.gson)
+    implementation(Deps.okhttp)
 
     // Swipe refresh layout
-    implementation("com.github.orangegangsters:swipy:1.2.3@aar")
+    implementation(Deps.swipyRefresh)
 }
 
 task("printVersionCode") {
