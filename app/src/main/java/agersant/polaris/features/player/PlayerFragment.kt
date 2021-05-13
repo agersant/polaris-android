@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.Slider
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 class PlayerFragment : Fragment() {
@@ -66,9 +67,9 @@ class PlayerFragment : Fragment() {
                     PolarisPlayer.OPENING_TRACK,
                     PolarisPlayer.BUFFERING,
                     PolarisPlayer.NOT_BUFFERING -> {
-                        this@PlayerFragment.updateBuffering()
                         this@PlayerFragment.updateContent()
                         this@PlayerFragment.updateControls()
+                        this@PlayerFragment.updateBuffering()
                     }
                     PolarisPlayer.PLAYING_TRACK -> {
                         this@PlayerFragment.updateContent()
@@ -95,7 +96,7 @@ class PlayerFragment : Fragment() {
     private fun scheduleSeekBarUpdates() {
         updateSeekBar = Runnable {
             val duration = player.duration / 1000f
-            val position = Math.min(player.currentPosition / 1000f, duration)
+            val position = min(player.currentPosition / 1000f, duration)
             val relativePosition = if (duration != 0f) position / duration else 0f
 
             if (!seeking) seekBar.value = relativePosition
@@ -158,6 +159,7 @@ class PlayerFragment : Fragment() {
     }
 
     override fun onStart() {
+        refresh()
         subscribeToEvents()
         scheduleSeekBarUpdates()
         super.onStart()
@@ -166,12 +168,8 @@ class PlayerFragment : Fragment() {
     override fun onStop() {
         requireActivity().unregisterReceiver(receiver)
         receiver = null
+        seekBarUpdateHandler.removeCallbacks(updateSeekBar)
         super.onStop()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        refresh()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
