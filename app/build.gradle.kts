@@ -49,8 +49,6 @@ android {
 }
 
 dependencies {
-    implementation(fileTree("dir" to "libs", "include" to "*.jar")) // TODO: find out if we need this
-
     // Core
     implementation(Deps.Kotlin.stdlib)
     implementation(Deps.Androidx.coreKtx)
