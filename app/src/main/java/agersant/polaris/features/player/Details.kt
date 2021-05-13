@@ -39,7 +39,7 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
         .setPositiveButton(android.R.string.ok, null)
         .create()
 
-    Handler().post {
+    Handler(mainLooper).post {
         detailsBinding.topDivider.isVisible = detailsBinding.scrollView.canScrollVertically(-1)
         detailsBinding.bottomDivider.isVisible = detailsBinding.scrollView.canScrollVertically(1)
     }

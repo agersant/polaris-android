@@ -13,6 +13,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -112,7 +113,7 @@ class PlayerFragment : Fragment() {
         api = state.api
         player = state.player
         playbackQueue = state.playbackQueue
-        seekBarUpdateHandler = Handler()
+        seekBarUpdateHandler = Handler(Looper.getMainLooper())
 
         val binding = FragmentPlayerBinding.inflate(inflater)
         artwork = binding.artwork
