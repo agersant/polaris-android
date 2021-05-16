@@ -233,12 +233,14 @@ class PlayerFragment : Fragment() {
     }
 
     private fun updateBuffering() {
-        if (player.isPlaying && (player.isOpeningSong || player.isBuffering)) {
+        if (player.isOpeningSong || player.isBuffering) {
             buffering.show()
             positionText.visibility = View.INVISIBLE
+            durationText.visibility = View.INVISIBLE
         } else {
             buffering.hide()
             positionText.visibility = View.VISIBLE
+            durationText.visibility = View.VISIBLE
         }
     }
 
