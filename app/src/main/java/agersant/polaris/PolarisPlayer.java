@@ -8,13 +8,9 @@ import android.content.IntentFilter;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import agersant.polaris.api.API;
 import agersant.polaris.api.FetchAudioTask;
@@ -43,7 +39,7 @@ public class PolarisPlayer implements Player.EventListener {
         this.api = api;
         this.playbackQueue = playbackQueue;
         resumeProgress = -1.f;
-        mediaPlayer = ExoPlayerFactory.newSimpleInstance(context, new DefaultTrackSelector());
+        mediaPlayer = new SimpleExoPlayer.Builder(context).build();
         mediaPlayer.addListener(this);
 
         IntentFilter filter = new IntentFilter();
@@ -112,7 +108,8 @@ public class PolarisPlayer implements Player.EventListener {
             if (fetchedMediaSource != null) {
                 try {
                     mediaSource = fetchedMediaSource;
-                    mediaPlayer.prepare(mediaSource);
+                    mediaPlayer.setMediaSource(mediaSource);
+                    mediaPlayer.prepare();
                     broadcast(PLAYING_TRACK);
                 } catch (Exception e) {
                     System.out.println("Error while beginning media playback: " + e);
@@ -228,15 +225,7 @@ public class PolarisPlayer implements Player.EventListener {
     }
 
     @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    public void onPlaybackStateChanged(int playbackState) {
         if (playbackState == Player.STATE_BUFFERING) {
             broadcast(BUFFERING);
         } else {
@@ -262,9 +251,5 @@ public class PolarisPlayer implements Player.EventListener {
     @Override
     public void onPlayerError(ExoPlaybackException error) {
         broadcast(PLAYBACK_ERROR);
-    }
-
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
     }
 }
