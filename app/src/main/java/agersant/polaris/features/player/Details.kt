@@ -7,11 +7,12 @@ import agersant.polaris.util.formatTime
 import android.content.Context
 import android.os.Handler
 import android.view.LayoutInflater
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 
 fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
-    val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    val inflater = LayoutInflater.from(this)
     val detailsBinding = ViewSongDetailsBinding.inflate(inflater).apply {
         scrollView.setOnScrollChangeListener { v, _, _, _, _ ->
             topDivider.isVisible = (v.canScrollVertically(-1))
@@ -19,16 +20,35 @@ fun Context.showDetailsDialog(item: CollectionItem): AlertDialog {
         }
 
         val unknown by lazy { getString(R.string.details_unknown) }
-        title.text = item.title ?: unknown
-        album.text = item.album ?: unknown
-        artist.text = item.artist ?: unknown
-        albumArtist.text = item.albumArtist ?: unknown
-        year.text = if (item.year != -1) item.year.toString() else unknown
-        trackNumber.text = if (item.trackNumber != -1) item.trackNumber.toString() else unknown
-        discNumber.text = if (item.discNumber != -1) item.discNumber.toString() else unknown
+        fun TextView.display(value: String?) {
+            if (value != null) {
+                text = value
+            } else {
+                isEnabled = false
+                text = unknown
+            }
+        }
+
+        fun TextView.display(value: Int) {
+            if (value != -1) {
+                text = value.toString()
+            } else {
+                isEnabled = false
+                text = unknown
+            }
+        }
+
+        title.display(item.title)
+        album.display(item.album)
+        artist.display(item.artist)
+        albumArtist.display(item.albumArtist)
+        year.display(item.year)
+        trackNumber.display(item.trackNumber)
+        discNumber.display(item.discNumber)
         duration.text = if (item.duration != -1) {
             formatTime(item.duration)
         } else {
+            duration.isEnabled = false
             unknown
         }
     }

@@ -27,7 +27,7 @@
     <string name="player_buffering">Buffering…</string>
 
     <string name="details">Details</string>
-    <string name="details_unknown">[unknown]</string>
+    <string name="details_unknown">unknown</string>
     <string name="details_title">Title</string>
     <string name="details_album">Album</string>
     <string name="details_year">Year</string>
