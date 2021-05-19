@@ -195,7 +195,7 @@ class PlayerFragment : Fragment() {
     private fun updateContent() {
         val item = player.currentItem
 
-        val unknown by lazy { getString(R.string.details_unknown) }
+        val unknown by lazy { getString(R.string.player_unknown) }
         titleText.text = item?.title ?: unknown
         albumText.text = item?.album ?: unknown
         artistText.text = item?.artist ?: unknown

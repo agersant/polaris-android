@@ -25,9 +25,9 @@
     <string name="player_pause">Pause</string>
     <string name="player_opening">Opening…</string>
     <string name="player_buffering">Buffering…</string>
+    <string name="player_unknown">unknown</string>
 
     <string name="details">Details</string>
-    <string name="details_unknown">unknown</string>
     <string name="details_title">Title</string>
     <string name="details_album">Album</string>
     <string name="details_year">Year</string>

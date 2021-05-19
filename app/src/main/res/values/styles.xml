@@ -75,8 +75,4 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="DetailsSpace">
-        <item name="android:layout_height">12dp</item>
-    </style>
-
 </resources>
