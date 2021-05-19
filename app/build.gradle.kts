@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("name.remal.check-dependency-updates") version "1.3.1"
 }
 
 android {
