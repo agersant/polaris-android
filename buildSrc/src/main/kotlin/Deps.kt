@@ -3,7 +3,7 @@ object Deps {
     const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.1"
 
     object Kotlin {
-        const val version = "1.5.0"
+        const val version = "1.5.10"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
     }
@@ -30,7 +30,7 @@ object Deps {
 
     const val material = "com.google.android.material:material:1.3.0"
 
-    const val gson = "com.google.code.gson:gson:2.8.6"
+    const val gson = "com.google.code.gson:gson:2.8.7"
     const val okhttp = "com.squareup.okhttp3:okhttp:4.9.1"
 
     const val swipyRefresh = "com.github.orangegangsters:swipy:1.2.3@aar"
