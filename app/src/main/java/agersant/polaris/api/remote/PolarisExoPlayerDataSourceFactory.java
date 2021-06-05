@@ -66,7 +66,7 @@ public final class PolarisExoPlayerDataSourceFactory implements DataSource.Facto
         private RandomAccessFile file;
 
         PolarisExoPlayerHttpDataSource(OfflineCache offlineCache, RequestProperties requestProperties, PolarisExoPlayerTransferListener listener, File scratchLocation, CollectionItem item) {
-            super("Polaris Android", null, DEFAULT_CONNECT_TIMEOUT_MILLIS, DEFAULT_READ_TIMEOUT_MILLIS, true, requestProperties);
+            super("Polaris Android", DEFAULT_CONNECT_TIMEOUT_MILLIS, DEFAULT_READ_TIMEOUT_MILLIS, true, requestProperties); //TODO: use factory instead of deprecated constructor
             addTransferListener(listener);
             this.scratchLocation = scratchLocation;
             this.offlineCache = offlineCache;

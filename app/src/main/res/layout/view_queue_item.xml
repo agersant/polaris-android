@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="48dp"
+    android:background="@drawable/queue_item_background"
     android:duplicateParentState="true"
-    android:gravity="center_vertical"
-    android:background="@drawable/queue_item_background">
+    android:gravity="center_vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginEnd="48dp"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="48dp"
         android:duplicateParentState="true"
         android:gravity="center_vertical"
         android:orientation="vertical">
@@ -49,8 +49,8 @@
         android:layout_marginEnd="12dp"
         android:background="@drawable/ic_sd_storage_black_24dp"
         android:backgroundTint="@color/queue_item_icon"
-        android:duplicateParentState="true"
         android:contentDescription="@string/queue_cached"
+        android:duplicateParentState="true"
         android:visibility="invisible" />
 
     <ImageView
@@ -62,8 +62,8 @@
         android:layout_marginEnd="12dp"
         android:background="@drawable/ic_sync_black_24dp"
         android:backgroundTint="@color/queue_item_icon"
-        android:duplicateParentState="true"
         android:contentDescription="@string/queue_downloading"
+        android:duplicateParentState="true"
         android:visibility="invisible" />
 
 </RelativeLayout>

@@ -212,6 +212,7 @@ public class PolarisPlaybackService extends Service {
             metadataBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentItem.getAlbumArtist());
             metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, currentItem.getTrackNumber());
             metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DISC_NUMBER, currentItem.getDiscNumber());
+            metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_YEAR, currentItem.getYear());
         }
         metadataBuilder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (long) player.getDuration());
         mediaSession.setMetadata(metadataBuilder.build());
@@ -347,13 +348,13 @@ public class PolarisPlaybackService extends Service {
         }
 
         // Add media control actions
-        notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
+        notificationBuilder.addAction(generateAction(R.drawable.ic_skip_previous_24, R.string.player_next_track, MEDIA_INTENT_SKIP_PREVIOUS));
         if (isPlaying) {
-            notificationBuilder.addAction(generateAction(R.drawable.ic_pause_black_24dp, R.string.player_pause, MEDIA_INTENT_PAUSE));
+            notificationBuilder.addAction(generateAction(R.drawable.ic_pause_24, R.string.player_pause, MEDIA_INTENT_PAUSE));
         } else {
-            notificationBuilder.addAction(generateAction(R.drawable.ic_play_arrow_black_24dp, R.string.player_play, MEDIA_INTENT_PLAY));
+            notificationBuilder.addAction(generateAction(R.drawable.ic_play_arrow_24, R.string.player_play, MEDIA_INTENT_PLAY));
         }
-        notificationBuilder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, R.string.player_previous_track, MEDIA_INTENT_SKIP_NEXT));
+        notificationBuilder.addAction(generateAction(R.drawable.ic_skip_next_24, R.string.player_previous_track, MEDIA_INTENT_SKIP_NEXT));
 
         // Emit notification
         emitNotification(notificationBuilder, item);

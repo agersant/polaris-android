@@ -25,6 +25,17 @@
     <string name="player_pause">Pause</string>
     <string name="player_opening">Opening…</string>
     <string name="player_buffering">Buffering…</string>
+    <string name="player_unknown">unknown</string>
+
+    <string name="details">Details</string>
+    <string name="details_title">Title</string>
+    <string name="details_album">Album</string>
+    <string name="details_year">Year</string>
+    <string name="details_artist">Artist</string>
+    <string name="details_album_artist">Album Artist</string>
+    <string name="details_track_number">Track Number</string>
+    <string name="details_disc_number">Disc Number</string>
+    <string name="details_duration">Duration</string>
 
     <string name="pref_server_url">Server address</string>
     <string name="pref_username">Username</string>

@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <agersant.polaris.ui.BackdropMenu
-        android:id="@+id/backdrop_menu"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/backdrop_nav"
+        style="@style/BackdropNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:backdropLayout="@id/backdrop_layout"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/backdrop_nav"
-            style="@style/BackdropNavigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollIndicators="none"
-            android:scrollbarSize="0dp"
-            android:scrollbars="none"
-            app:menu="@menu/backdrop_navigation" />
-
-    </agersant.polaris.ui.BackdropMenu>
+        android:scrollIndicators="none"
+        android:scrollbarSize="0dp"
+        android:scrollbars="none"
+        android:visibility="invisible"
+        app:elevation="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:menu="@menu/backdrop_navigation" />
 
     <agersant.polaris.ui.BackdropLayout
         android:id="@+id/backdrop_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="?android:colorBackground"
         android:elevation="4dp"
+        app:backdropMenu="@id/backdrop_nav"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:toolbar="@id/toolbar">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
@@ -49,7 +44,7 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation" />
 

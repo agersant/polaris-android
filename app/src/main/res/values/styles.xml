@@ -20,17 +20,17 @@
         <item name="colorHeaderBackground">@color/headerBackground</item>
         <item name="colorHeaderTextPrimary">@color/headerTextPrimary</item>
         <item name="colorHeaderTextSecondary">@color/headerTextSecondary</item>
-        <item name="colorLine">@color/line</item>
+        <item name="colorDialogDivider">@color/dialogDivider</item>
+
+        <item name="dialogCornerRadius">8dp</item>
 
         <item name="navigationViewStyle">@style/BackdropNavigation</item>
     </style>
 
-    <style name="Divider">
+    <style name="DialogDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:background">?android:dividerHorizontal</item>
+        <item name="android:background">?colorDialogDivider</item>
     </style>
 
     <style name="BackdropNavigation" parent="Widget.Design.NavigationView">
@@ -56,6 +56,23 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="DetailsLabel" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?textAppearanceBody2</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="DetailsValue" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?textAppearanceBody1</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>
