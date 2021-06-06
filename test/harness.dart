@@ -10,6 +10,7 @@ import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/foreground/service.dart' as service;
 import 'package:polaris/foreground/ui/collection/browser_model.dart';
+import 'package:polaris/foreground/ui/playback/queue_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -71,6 +72,7 @@ class Harness {
     getIt.registerSingleton<service.Manager>(serviceManager);
     getIt.registerSingleton<polaris.API>(collectionAPI);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
+    getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(Uuid());
 
     return Harness(mockClient);
