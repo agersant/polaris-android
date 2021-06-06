@@ -75,7 +75,7 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
 
   String makeURL(String endpoint) {
     // TODO Ideally we would never have a _BaseHTTPAPI constructed without a valid host
-    return hostManager.url ?? "" + endpoint;
+    return (hostManager.url ?? "") + endpoint;
   }
 
   Future<StreamedResponse> makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
@@ -129,7 +129,8 @@ class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
     final url = makeURL(apiVersionEndpoint);
     final responseBody = await completeRequest(_Method.get, url);
     try {
-      return APIVersion.fromJson(jsonDecode(utf8.decode(responseBody)));
+      String body = utf8.decode(responseBody);
+      return APIVersion.fromJson(jsonDecode(body));
     } catch (e) {
       throw APIError.responseParseError;
     }

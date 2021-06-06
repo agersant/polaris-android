@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:mockito/mockito.dart' as mockito;
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/polaris.dart';
 
@@ -31,7 +30,7 @@ final fallInwardsSongName = 'Falling Inwards';
 final labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
 final fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
 
-class Mock extends mockito.Mock implements http.Client {
+class Mock extends mocktail.Mock implements http.Client {
   bool _failLogin = false;
 
   mockBadLogin() {
@@ -39,7 +38,9 @@ class Mock extends mockito.Mock implements http.Client {
   }
 
   Mock() {
-    when(this.send(any)).thenAnswer((Invocation invocation) async {
+    mocktail.registerFallbackValue(new http.Request("", new Uri()));
+
+    mocktail.when(() => this.send(mocktail.any())).thenAnswer((Invocation invocation) async {
       final Request request = invocation.positionalArguments[0];
       final String endpoint = request.url.path;
 
@@ -62,7 +63,7 @@ class Mock extends mockito.Mock implements http.Client {
         }
       } else if (endpoint.startsWith(browseEndpoint)) {
         final String path = Uri.decodeComponent(endpoint.substring(browseEndpoint.length));
-        final List<CollectionFile> files = _browseData[path];
+        final List<CollectionFile>? files = _browseData[path];
         if (files != null) {
           final String payload = jsonEncode(files);
           return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);

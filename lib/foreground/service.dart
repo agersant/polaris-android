@@ -54,7 +54,7 @@ class Manager extends ChangeNotifier {
 abstract class Launcher {
   Future<void> start();
   Future<void> stop();
-  Future<int?> getServicePort();
+  Future<int?>? getServicePort();
 }
 
 class AudioServiceLauncher implements Launcher {
@@ -78,7 +78,7 @@ class AudioServiceLauncher implements Launcher {
   }
 
   @override
-  Future<int> getServicePort() async {
+  Future<int?>? getServicePort() async {
     return _started ? await AudioService.customAction(service.customActionGetPort) : null;
   }
 }

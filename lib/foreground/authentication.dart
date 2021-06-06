@@ -72,7 +72,7 @@ class Manager extends ChangeNotifier {
   Future _reauthenticate() async {
     assert(_state == State.unauthenticated);
     String? token = tokenManager.token;
-    if (token != null && token.isNotEmpty) {
+    if (token == null || token.isEmpty) {
       return;
     }
 
