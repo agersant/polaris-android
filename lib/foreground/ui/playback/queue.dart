@@ -44,7 +44,7 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
       });
     });
     localState = QueueState(AudioService.queue, AudioService.currentMediaItem);
-    // TODO autoscroll to current song?
+    // TODO autoscroll to current song
   }
 
   @override
@@ -60,16 +60,16 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
         title: Text(queueTitle),
       ),
       body: StreamBuilder<PlaybackState>(
-          // TODO number of songs and duration
+          // TODO display number of songs and total duration
           stream: AudioService.playbackStateStream,
           builder: (context, snapshot) {
             List<MediaItem>? queue = localState.queue;
             if (queue == null) {
               return Container();
             } else {
-              return ReorderableListView(
-                // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
-                children: queue.map((mediaItem) {
+              return ReorderableListView.builder(
+                itemBuilder: (context, index) {
+                  final MediaItem mediaItem = queue[index];
                   final bool isCurrent = mediaItem.id == localState.mediaItem?.id;
                   final bool isPlaying = snapshot.data?.playing ?? false;
                   final onTap = () {
@@ -78,13 +78,15 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
                     AudioService.skipToQueueItem(mediaItem.id);
                   };
                   return _songWidget(context, mediaItem, isCurrent, isPlaying, onTap);
-                }).toList(),
+                },
+                itemCount: queue.length,
                 onReorder: (int oldIndex, int newIndex) {
                   final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
                   queue.insert(insertIndex, queue.removeAt(oldIndex));
                   setState(() {});
                   AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
                 },
+                physics: BouncingScrollPhysics(),
               );
             }
           }),
