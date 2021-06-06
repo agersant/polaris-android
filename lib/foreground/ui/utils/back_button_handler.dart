@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/ui/model.dart';
+import 'package:polaris/foreground/ui/collection/browser_model.dart';
 
 final getIt = GetIt.instance;
 
@@ -32,10 +32,10 @@ class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindi
 
   @override
   Future<bool> didPopRoute() async {
-    final uiModel = getIt<UIModel>();
-    if (!uiModel.isBrowserActive) {
+    final browserModel = getIt<BrowserModel>();
+    if (!browserModel.isBrowserActive) {
       return false;
     }
-    return uiModel.popBrowserLocation();
+    return browserModel.popBrowserLocation();
   }
 }

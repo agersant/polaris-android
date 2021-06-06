@@ -10,7 +10,7 @@ import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/foreground/service.dart' as service;
-import 'package:polaris/foreground/ui/model.dart';
+import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/collection/page.dart';
 import 'package:polaris/foreground/ui/playback/player.dart';
 import 'package:polaris/foreground/ui/startup/page.dart';
@@ -70,7 +70,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<service.Manager>(serviceManager);
   getIt.registerSingleton<polaris.API>(polarisAPI);
-  getIt.registerSingleton<UIModel>(UIModel());
+  getIt.registerSingleton<BrowserModel>(BrowserModel());
   getIt.registerSingleton<Uuid>(Uuid());
 }
 

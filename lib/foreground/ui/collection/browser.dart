@@ -4,7 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
-import 'package:polaris/foreground/ui/model.dart';
+import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/collection/album_details.dart';
 import 'package:polaris/foreground/ui/collection/album_grid.dart';
 import 'package:polaris/foreground/ui/strings.dart';
@@ -34,9 +34,9 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
     final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor;
 
     return ChangeNotifierProvider.value(
-      value: getIt<UIModel>(),
-      child: Consumer<UIModel>(
-        builder: (BuildContext context, UIModel uiModel, Widget? child) {
+      value: getIt<BrowserModel>(),
+      child: Consumer<BrowserModel>(
+        builder: (BuildContext context, BrowserModel browserModel, Widget? child) {
           return Theme(
             data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
             child: Column(
@@ -44,19 +44,19 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                  child: Breadcrumbs(uiModel.browserStack.last, uiModel.popBrowserLocations),
+                  child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
                 ),
                 SizedBox(height: 1, child: Container(color: dividerColor)),
                 Expanded(
                   child: ClipRect(
                     clipBehavior: Clip.hardEdge,
                     child: Navigator(
-                      pages: uiModel.browserStack.map((location) {
+                      pages: browserModel.browserStack.map((location) {
                         return MaterialPage(
                             child: BrowserLocation(
                           location,
-                          onDirectoryTapped: uiModel.pushBrowserLocation,
-                          navigateBack: uiModel.popBrowserLocation,
+                          onDirectoryTapped: browserModel.pushBrowserLocation,
+                          navigateBack: browserModel.popBrowserLocation,
                         ));
                       }).toList(),
                       onPopPage: (route, result) {

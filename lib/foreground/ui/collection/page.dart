@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/ui/model.dart';
+import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/collection/browser.dart';
 import 'package:polaris/foreground/ui/collection/random.dart';
 import 'package:polaris/foreground/ui/collection/recent.dart';
@@ -15,7 +15,7 @@ class CollectionPage extends StatefulWidget {
 }
 
 class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
-  final _uiModel = getIt<UIModel>();
+  final _browserModel = getIt<BrowserModel>();
   final List<Tab> tabs = <Tab>[
     Tab(text: collectionTabBrowseTitle),
     Tab(text: collectionTabRandomTitle),
@@ -31,7 +31,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
   }
 
   _handleActiveTabChanged() {
-    _uiModel.isBrowserActive = _tabController.index == 0;
+    _browserModel.isBrowserActive = _tabController.index == 0;
   }
 
   @override
