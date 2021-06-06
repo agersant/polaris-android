@@ -145,7 +145,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     final bool isPlaying = _player.playing && processingState != AudioProcessingState.completed;
     await AudioServiceBackground.setState(
       controls: [
-        MediaControl.skipToPrevious, // TODO implement skip to previous
+        MediaControl.skipToPrevious,
         if (isPlaying) MediaControl.pause else MediaControl.play,
         MediaControl.skipToNext,
       ],
