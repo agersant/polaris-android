@@ -70,14 +70,17 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
               return ReorderableListView.builder(
                 itemBuilder: (context, index) {
                   final MediaItem mediaItem = queue[index];
+                  final AudioProcessingState processingState =
+                      snapshot.data?.processingState ?? AudioProcessingState.none;
                   final bool isCurrent = mediaItem.id == localState.mediaItem?.id;
                   final bool isPlaying = snapshot.data?.playing ?? false;
+
                   final onTap = () {
                     localState.mediaItem = mediaItem;
                     setState(() {});
                     AudioService.skipToQueueItem(mediaItem.id);
                   };
-                  return _songWidget(context, mediaItem, isCurrent, isPlaying, onTap);
+                  return _songWidget(context, mediaItem, isCurrent, isPlaying, processingState, onTap);
                 },
                 itemCount: queue.length,
                 onReorder: (int oldIndex, int newIndex) {
@@ -94,9 +97,9 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
   }
 }
 
-Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bool isPlaying, Function() onTap) {
+Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bool isPlaying,
+    AudioProcessingState state, Function() onTap) {
   final dto.Song song = mediaItem.toSong();
-  final Color eqColor = Theme.of(context).colorScheme.primary;
 
   return Material(
     key: Key(mediaItem.id),
@@ -106,12 +109,10 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bo
         leading: ListThumbnail(song.artwork),
         title: Row(
           children: [
-            if (isCurrent)
+            if (isCurrent && state != AudioProcessingState.completed)
               Padding(
-                padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                // TODO buffering indicator?
-                child: AnimatedEqualizer(eqColor, Size(16, 12), isPlaying),
-              ),
+                  padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                  child: _currentSongIcon(context, isPlaying, state)),
             Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
           ],
         ),
@@ -120,4 +121,28 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bo
       ),
     ),
   );
+}
+
+Widget _currentSongIcon(BuildContext context, bool isPlaying, AudioProcessingState state) {
+  final Color color = Theme.of(context).colorScheme.primary;
+  final bool isBuffering = state != AudioProcessingState.ready && state != AudioProcessingState.completed;
+
+  if (isBuffering) {
+    return Padding(
+        padding: const EdgeInsets.only(top: 2.0),
+        child: SizedBox(
+            width: 16,
+            height: 10,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: new AlwaysStoppedAnimation<Color>(color),
+                ),
+              ),
+            )));
+  } else {
+    return AnimatedEqualizer(color, Size(16, 12), isPlaying);
+  }
 }
