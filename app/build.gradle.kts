@@ -57,8 +57,8 @@ dependencies {
     implementation(Deps.material)
 
     // Navigation
-    implementation(Deps.Nav.fragmentKtx)
-    implementation(Deps.Nav.uiKtx)
+    implementation(Deps.Androidx.Nav.fragmentKtx)
+    implementation(Deps.Androidx.Nav.uiKtx)
 
     // Preference
     implementation(Deps.Androidx.preferenceKtx)
