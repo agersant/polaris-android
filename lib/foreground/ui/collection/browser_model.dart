@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:polaris/shared/dto.dart';
 
-class UIModel extends ChangeNotifier {
+class BrowserModel extends ChangeNotifier {
   List<String> _browserStack = const [''];
   List<String> get browserStack => _browserStack;
   bool isBrowserActive = false;
