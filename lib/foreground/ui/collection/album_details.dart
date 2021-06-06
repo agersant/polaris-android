@@ -17,15 +17,15 @@ final getIt = GetIt.instance;
 class AlbumDetails extends StatefulWidget {
   final dto.Directory album;
 
-  AlbumDetails(this.album, {Key key}) : super(key: key);
+  AlbumDetails(this.album, {Key? key}) : super(key: key);
 
   @override
   _AlbumDetailsState createState() => _AlbumDetailsState();
 }
 
 class _AlbumDetailsState extends State<AlbumDetails> {
-  List<dto.Song> _songs;
-  polaris.APIError _error;
+  List<dto.Song>? _songs;
+  polaris.APIError? _error;
 
   @override
   initState() {
@@ -70,7 +70,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   }
 
   List<Widget> _getMainContent() {
-    if (_error != null) {
+    List<dto.Song>? songs = _songs;
+    if (_error != null || songs == null) {
       return [
         Padding(
             padding: EdgeInsets.only(top: 64),
@@ -82,7 +83,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ];
     }
 
-    final discs = _splitIntoDiscs(_songs);
+    final discs = _splitIntoDiscs(songs);
     if (discs.length == 0) {
       return [
         Padding(
@@ -226,20 +227,17 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 }
 
 class DiscData {
-  final int discNumber;
+  final int? discNumber;
   final List<dto.Song> songs;
-  DiscData(this.discNumber, this.songs) : assert(songs != null);
+  DiscData(this.discNumber, this.songs);
 }
 
 class Disc extends StatelessWidget {
   final DiscData discData;
   final int discCount;
-  final String albumArtwork;
+  final String? albumArtwork;
 
-  Disc(this.discData, {this.discCount, this.albumArtwork, Key key})
-      : assert(discData != null),
-        assert(discCount != null),
-        super(key: key);
+  Disc(this.discData, {required this.discCount, this.albumArtwork, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -275,18 +273,17 @@ class Disc extends StatelessWidget {
 }
 
 class Song extends StatelessWidget {
-  final String albumArtwork;
+  final String? albumArtwork;
   final dto.Song song;
 
-  Song(this.song, this.albumArtwork, {Key key})
-      : assert(song != null),
-        super(key: key);
+  Song(this.song, this.albumArtwork, {Key? key}) : super(key: key);
 
   String getSubtitle() {
     final artist = song.formatArtist();
     List<String> components = [artist];
-    if (song.duration != null) {
-      components.add(formatDuration(Duration(seconds: song.duration)));
+    int? duration = song.duration;
+    if (duration != null) {
+      components.add(formatDuration(Duration(seconds: duration)));
     }
     return components.join(' · ');
   }

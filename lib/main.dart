@@ -141,7 +141,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
   }
 
   @override
-  Future<void> setNewRoutePath(PolarisPath configuration) => null;
+  Future<void> setNewRoutePath(PolarisPath configuration) async => null;
 }
 
 class PolarisApp extends StatelessWidget {

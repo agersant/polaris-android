@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'dart:developer' as developer;
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/background/cache.dart' as cache;
 import 'package:polaris/shared/polaris.dart' as collection;
@@ -20,10 +19,7 @@ class Collection {
 
   final _imageJobs = Map<String, _ImageJob>();
 
-  Collection({@required this.hostManager, @required this.collectionAPI, @required this.cacheManager})
-      : assert(hostManager != null),
-        assert(collectionAPI != null),
-        assert(cacheManager != null);
+  Collection({required this.hostManager, required this.collectionAPI, required this.cacheManager});
 
   Future<List<CollectionFile>> browse(String path) async {
     return collectionAPI.browse(path);
@@ -37,7 +33,7 @@ class Collection {
     return collectionAPI.recent();
   }
 
-  Future<Stream<List<int>>> getAudio(String path) async {
+  Future<Stream<List<int>>?> getAudio(String path) async {
     // TODO cache support
     return collectionAPI
         .downloadAudio(path)
@@ -45,11 +41,11 @@ class Collection {
         .catchError((e) => developer.log('Error downloading song: $path', error: e));
   }
 
-  Future<Stream<List<int>>> getImage(String path) async {
-    if (path == null || path.isEmpty) {
+  Future<Stream<List<int>>?> getImage(String path) async {
+    if (path.isEmpty) {
       return null;
     }
-    final host = hostManager.url;
+    final host = hostManager.url!; // TODO Ideally we would never create a collection with a invalid host
     final cacheFile = await cacheManager.getImage(host, path);
     if (cacheFile != null) {
       return cacheFile.openRead();
@@ -71,9 +67,6 @@ class Collection {
         streamedResponse.then((r) => http.Response.fromStream(r)).then((r) {
           if (r.statusCode >= 300) {
             throw r.statusCode;
-          }
-          if (r.bodyBytes == null) {
-            throw "Empty image body";
           }
           return r.bodyBytes;
         }).catchError((e) {

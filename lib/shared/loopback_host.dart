@@ -9,10 +9,10 @@ class LoopbackHost extends ChangeNotifier implements host.Manager {
   host.State _state = host.State.unavailable;
   get state => _state;
 
-  int _port;
+  int? _port;
   get port => _port;
 
-  LoopbackHost({@required this.serviceManager}) : assert(serviceManager != null) {
+  LoopbackHost({required this.serviceManager}) {
     serviceManager.addListener(() async {
       await _updatePort();
     });

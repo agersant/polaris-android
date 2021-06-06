@@ -7,16 +7,16 @@ import 'package:polaris/foreground/ui/utils/fallback_artwork.dart';
 final getIt = GetIt.instance;
 
 class Thumbnail extends StatefulWidget {
-  final String path;
+  final String? path;
 
-  Thumbnail(this.path, {Key key}) : super(key: key);
+  Thumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   _ThumbnailState createState() => _ThumbnailState();
 }
 
 class _ThumbnailState extends State<Thumbnail> {
-  Future<Uint8List> futureImage;
+  Future<Uint8List>? futureImage;
 
   @override
   void initState() {
@@ -35,8 +35,11 @@ class _ThumbnailState extends State<Thumbnail> {
   }
 
   void _updateURL() {
-    if (widget.path != null) {
-      futureImage = getIt<polaris.API>().downloadImage(widget.path).then((r) => r.stream.toBytes());
+    String? path = widget.path;
+    if (path != null) {
+      futureImage = getIt<polaris.API>().downloadImage(path).then((r) => r.stream.toBytes());
+    } else {
+      futureImage = null;
     }
   }
 
@@ -56,20 +59,19 @@ class _ThumbnailState extends State<Thumbnail> {
               return FallbackArtwork();
             }
             return Image.memory(
-              snapshot.data,
+              snapshot.data!,
               fit: BoxFit.cover,
             );
         }
-        return FallbackArtwork();
       },
     );
   }
 }
 
 class LargeThumbnail extends StatelessWidget {
-  final String path;
+  final String? path;
 
-  LargeThumbnail(this.path, {Key key}) : super(key: key);
+  LargeThumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +86,9 @@ class LargeThumbnail extends StatelessWidget {
 }
 
 class ListThumbnail extends StatelessWidget {
-  final String path;
+  final String? path;
 
-  ListThumbnail(this.path, {Key key}) : super(key: key);
+  ListThumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

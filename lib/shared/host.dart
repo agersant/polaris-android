@@ -7,5 +7,5 @@ enum State {
 
 abstract class Manager extends ChangeNotifier {
   State get state;
-  String get url;
+  String? get url;
 }

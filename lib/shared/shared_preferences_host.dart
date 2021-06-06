@@ -8,20 +8,24 @@ class SharedPreferencesHost extends ChangeNotifier implements host.Manager {
   host.State _state = host.State.available;
   get state => _state;
 
-  String _url;
-  String get url => _url;
+  String? _url;
+  String? get url => _url;
 
-  set url(String newURL) {
+  set url(String? newURL) {
     if (newURL != null) {
-      newURL = newURL.trim();
-    }
-    if (!newURL.startsWith('http')) {
-      newURL = 'http://' + newURL;
-    }
-    while (newURL.endsWith('/')) {
-      newURL = newURL.substring(0, newURL.length - 1);
+      newURL = _cleanURL(newURL);
     }
     _url = newURL;
+  }
+
+  String _cleanURL(String url) {
+    if (!url.startsWith('http')) {
+      url = 'http://' + url;
+    }
+    while (url.endsWith('/')) {
+      url = url.substring(0, url.length - 1);
+    }
+    return url;
   }
 
   void onConnectionAttempt(String newURL) {
@@ -30,12 +34,15 @@ class SharedPreferencesHost extends ChangeNotifier implements host.Manager {
 
   Future<void> onSuccessfulConnection() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(preferenceKey, url);
+    String? currentURL = url;
+    if (currentURL != null) {
+      prefs.setString(preferenceKey, currentURL);
+    }
   }
 
   static Future<SharedPreferencesHost> create() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String url = prefs.getString(preferenceKey);
+    String? url = prefs.getString(preferenceKey);
     return SharedPreferencesHost(url);
   }
 

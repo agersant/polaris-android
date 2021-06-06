@@ -23,7 +23,6 @@ extension _ToAuthenticationError on polaris.APIError {
       case polaris.APIError.responseParseError:
         return Error.requestFailed;
     }
-    return Error.unknownError;
   }
 }
 
@@ -43,17 +42,14 @@ class Manager extends ChangeNotifier {
   State get state => _state;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
-  Stream<Error> _errorStream;
+  late Stream<Error> _errorStream = _errorStreamController.stream.asBroadcastStream();
   Stream<Error> get errorStream => _errorStream;
 
   Manager({
-    @required this.connectionManager,
-    @required this.tokenManager,
-    @required this.guestAPI,
-  })  : assert(connectionManager != null),
-        assert(tokenManager != null),
-        assert(guestAPI != null) {
-    _errorStream = _errorStreamController.stream.asBroadcastStream();
+    required this.connectionManager,
+    required this.tokenManager,
+    required this.guestAPI,
+  }) {
     connectionManager.addListener(() async => await _onConnectionStateChanged());
     _onConnectionStateChanged();
   }
@@ -75,7 +71,8 @@ class Manager extends ChangeNotifier {
 
   Future _reauthenticate() async {
     assert(_state == State.unauthenticated);
-    if (tokenManager.token == null || tokenManager.token.isEmpty) {
+    String? token = tokenManager.token;
+    if (token != null && token.isNotEmpty) {
       return;
     }
 

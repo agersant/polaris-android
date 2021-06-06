@@ -33,8 +33,6 @@ extension MethodToString on _Method {
         return 'GET';
       case _Method.post:
         return 'POST';
-      default:
-        return null;
     }
   }
 }
@@ -66,29 +64,27 @@ abstract class GuestAPI {
 
 abstract class _BaseHttpAPI extends ChangeNotifier {
   final host.Manager hostManager;
-  final token.Manager tokenManager;
+  final token.Manager? tokenManager;
   final Client client;
 
   _BaseHttpAPI({
-    @required this.client,
-    @required this.hostManager,
-    @required this.tokenManager,
-  })  : assert(client != null),
-        assert(hostManager != null);
+    required this.client,
+    required this.hostManager,
+    this.tokenManager,
+  });
 
   String makeURL(String endpoint) {
-    if (hostManager.url == null) {
-      throw APIError.unspecifiedHost;
-    }
-    return hostManager.url + endpoint;
+    // TODO Ideally we would never have a _BaseHTTPAPI constructed without a valid host
+    return hostManager.url ?? "" + endpoint;
   }
 
   Future<StreamedResponse> makeRequest(_Method method, String url, {dynamic body, bool authenticate = false}) async {
     Request request = Request(method.toHTTPMethod(), Uri.parse(url));
 
-    if (authenticate && tokenManager != null) {
-      if (tokenManager.token != null && tokenManager.token.isNotEmpty) {
-        request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + tokenManager.token;
+    if (authenticate) {
+      String? token = tokenManager?.token;
+      if (token != null && token.isNotEmpty) {
+        request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
       }
     }
 
@@ -123,13 +119,10 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
 
 class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
   HttpGuestAPI({
-    @required Client client,
-    @required host.Manager hostManager,
-    @required token.Manager tokenManager,
-  })  : assert(client != null),
-        assert(hostManager != null),
-        assert(tokenManager != null),
-        super(client: client, hostManager: hostManager, tokenManager: tokenManager);
+    required Client client,
+    required host.Manager hostManager,
+    required token.Manager tokenManager,
+  }) : super(client: client, hostManager: hostManager, tokenManager: tokenManager);
 
   @override
   Future<APIVersion> getAPIVersion() async {
@@ -157,7 +150,7 @@ class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
   @override
   Future<void> testConnection() async {
     final url = makeURL(browseEndpoint);
-    return await makeRequest(_Method.get, url, authenticate: true);
+    await makeRequest(_Method.get, url, authenticate: true);
   }
 }
 
@@ -165,10 +158,8 @@ class HttpAPI extends _BaseHttpAPI implements API {
   State _state = State.unavailable;
   get state => _state;
 
-  HttpAPI({@required Client client, @required token.Manager tokenManager, @required host.Manager hostManager})
-      : assert(client != null),
-        assert(hostManager != null),
-        super(client: client, hostManager: hostManager, tokenManager: tokenManager) {
+  HttpAPI({required Client client, required token.Manager? tokenManager, required host.Manager hostManager})
+      : super(client: client, hostManager: hostManager, tokenManager: tokenManager) {
     hostManager.addListener(_updateState);
     _updateState();
   }
@@ -230,10 +221,10 @@ class HttpAPI extends _BaseHttpAPI implements API {
 
   @override
   Uri getImageURI(String path) {
-    assert(path != null);
     String url = makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
-    if (tokenManager != null) {
-      url += '&auth_token=' + tokenManager.token;
+    String? token = tokenManager?.token;
+    if (token != null && token.isNotEmpty) {
+      url += '&auth_token=' + token;
     }
     return Uri.parse(url);
   }

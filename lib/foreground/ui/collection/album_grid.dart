@@ -13,9 +13,9 @@ const double _detailsSpacing = 8.0;
 
 class AlbumGrid extends StatelessWidget {
   final List<Directory> albums;
-  final Future<void> Function() onRefresh;
+  final Future<void> Function()? onRefresh;
 
-  AlbumGrid(this.albums, {this.onRefresh, Key key}) : super(key: key);
+  AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +33,8 @@ class AlbumGrid extends StatelessWidget {
             final crossAxisSpacing = 16.0;
             final padding = 24.0;
 
-            final titleStyle = Theme.of(context).textTheme.bodyText1;
-            final artistStyle = Theme.of(context).textTheme.caption;
+            final titleStyle = Theme.of(context).textTheme.bodyText1 ?? new TextStyle();
+            final artistStyle = Theme.of(context).textTheme.caption ?? new TextStyle();
             final titleStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: titleStyle.fontSize);
             final artistStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: artistStyle.fontSize);
 
@@ -78,12 +78,13 @@ class AlbumGrid extends StatelessWidget {
               }).toList(),
             );
 
-            if (onRefresh == null) {
+            Future<void> Function()? refresh = onRefresh;
+            if (refresh == null) {
               return gridView;
             } else {
               // TODO add some refresh functionality at the bottom?
               return RefreshIndicator(
-                onRefresh: onRefresh,
+                onRefresh: refresh,
                 child: gridView,
               );
             }
@@ -101,10 +102,13 @@ class Album extends StatelessWidget {
   final StrutStyle titleStrutStyle;
   final StrutStyle artistStrutStyle;
 
-  Album(this.album, {this.titleStyle, this.artistStyle, this.titleStrutStyle, this.artistStrutStyle, Key key})
-      : assert(titleStyle != null),
-        assert(artistStyle != null),
-        super(key: key);
+  Album(this.album,
+      {required this.titleStyle,
+      required this.artistStyle,
+      required this.titleStrutStyle,
+      required this.artistStrutStyle,
+      Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

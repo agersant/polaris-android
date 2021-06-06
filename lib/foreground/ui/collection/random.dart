@@ -14,8 +14,8 @@ class RandomAlbums extends StatefulWidget {
 }
 
 class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClientMixin {
-  List<Directory> _albums;
-  polaris.APIError _error;
+  List<Directory>? _albums;
+  polaris.APIError? _error;
 
   @override
   void initState() {
@@ -33,10 +33,11 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
         actionLabel: retryButtonLabel,
       );
     }
-    if (_albums == null) {
+    List<Directory>? albums = _albums;
+    if (albums == null) {
       return Center(child: CircularProgressIndicator());
     }
-    return AlbumGrid(_albums, onRefresh: _onRefresh);
+    return AlbumGrid(albums, onRefresh: _onRefresh);
   }
 
   Future _onRefresh() async {

@@ -41,7 +41,6 @@ class StartupPage extends StatelessWidget {
             }
         }
     }
-    return null;
   }
 
   Widget _buildWidgetForState(StartupState state) {
@@ -55,7 +54,6 @@ class StartupPage extends StatelessWidget {
       case StartupState.startingService:
         return CircularProgressIndicator();
     }
-    return null;
   }
 
   Widget _buildContent() {

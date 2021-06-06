@@ -19,7 +19,7 @@ class Harness {
   final client.Mock mockClient;
   Harness(this.mockClient);
 
-  static final Map<String, dynamic> reconnectPreferences = {
+  static final Map<String, Object> reconnectPreferences = {
     host.preferenceKey: client.goodHostURI,
     token.preferenceKey: 'auth-token',
   };
@@ -28,8 +28,8 @@ class Harness {
     return create(preferences: reconnectPreferences);
   }
 
-  static Future<Harness> create({Map<String, dynamic> preferences}) async {
-    SharedPreferences.setMockInitialValues(preferences ?? Map());
+  static Future<Harness> create({Map<String, Object>? preferences}) async {
+    SharedPreferences.setMockInitialValues(preferences ?? new Map());
 
     getIt.allowReassignment = true;
 

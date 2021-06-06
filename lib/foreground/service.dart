@@ -17,16 +17,12 @@ class Manager extends ChangeNotifier {
   bool isServiceRunning = false;
 
   Manager({
-    @required this.connectionManager,
-    @required this.authenticationManager,
-    @required this.hostManager,
-    @required this.tokenManager,
-    @required this.launcher,
-  })  : assert(connectionManager != null),
-        assert(authenticationManager != null),
-        assert(hostManager != null),
-        assert(tokenManager != null),
-        assert(launcher != null) {
+    required this.connectionManager,
+    required this.authenticationManager,
+    required this.hostManager,
+    required this.tokenManager,
+    required this.launcher,
+  }) {
     connectionManager.addListener(_updateService);
     authenticationManager.addListener(_updateService);
     _updateService();
@@ -50,7 +46,7 @@ class Manager extends ChangeNotifier {
     }
   }
 
-  Future<int> getPort() async {
+  Future<int?> getPort() async {
     return await launcher.getServicePort();
   }
 }
@@ -58,7 +54,7 @@ class Manager extends ChangeNotifier {
 abstract class Launcher {
   Future<void> start();
   Future<void> stop();
-  Future<int> getServicePort();
+  Future<int?> getServicePort();
 }
 
 class AudioServiceLauncher implements Launcher {

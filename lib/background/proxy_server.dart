@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:polaris/background/collection.dart';
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/polaris.dart';
@@ -12,9 +11,9 @@ class ProxyServer {
   static final String pathQueryParameter = 'path';
   final Collection collection;
 
-  ProxyServer({@required this.collection}) : assert(collection != null);
+  ProxyServer({required this.collection});
 
-  HttpServer _server;
+  late final HttpServer _server;
 
   static Future<ProxyServer> create(Collection collection) async {
     final mediaProxy = new ProxyServer(collection: collection);
@@ -60,17 +59,31 @@ class ProxyServer {
       } else if (request.uri.path.startsWith(thumbnailEndpoint)) {
         final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
         final data = await collection.getImage(path);
-        request.response
-          ..contentLength = -1
-          ..statusCode = HttpStatus.ok;
-        data.pipe(request.response);
+        if (data == null) {
+          request.response
+            ..contentLength = 0
+            ..statusCode = HttpStatus.internalServerError
+            ..close();
+        } else {
+          request.response
+            ..contentLength = -1
+            ..statusCode = HttpStatus.ok;
+          data.pipe(request.response);
+        }
       } else if (request.uri.path.startsWith(audioEndpoint)) {
-        final String path = request.uri.queryParameters[pathQueryParameter];
+        final String path = Uri.decodeComponent(request.uri.path.substring(audioEndpoint.length));
         final data = await collection.getAudio(path);
-        request.response
-          ..contentLength = -1
-          ..statusCode = HttpStatus.ok;
-        data.pipe(request.response);
+        if (data == null) {
+          request.response
+            ..contentLength = 0
+            ..statusCode = HttpStatus.internalServerError
+            ..close();
+        } else {
+          request.response
+            ..contentLength = -1
+            ..statusCode = HttpStatus.ok;
+          data.pipe(request.response);
+        }
       } else {
         request.response
           ..contentLength = 0
@@ -85,7 +98,7 @@ class ProxyServer {
     }
   }
 
-  int get port => _server?.port;
+  int get port => _server.port;
 
   Future stop() => _server.close();
 }

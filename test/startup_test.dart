@@ -103,7 +103,7 @@ void main() {
     await tester.pumpWidget(PolarisApp());
 
     final inputField = urlInputField.evaluate().single.widget as TextFormField;
-    expect(inputField.controller.text, equals(client.badHostURI));
+    expect(inputField.controller?.text, equals(client.badHostURI));
   });
 
   testWidgets('Disconnect returns to connect screen', (WidgetTester tester) async {

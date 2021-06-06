@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/background/entrypoint.dart';
 import 'package:polaris/background/proxy_server.dart';
@@ -9,16 +8,16 @@ import 'package:polaris/shared/media_item.dart';
 
 // https://pub.dev/documentation/audio_service/latest/audio_service/BackgroundAudioTask-class.html
 class AudioPlayerTask extends BackgroundAudioTask {
-  StreamSubscription<PlaybackEvent> _eventSubscription;
+  late StreamSubscription<PlaybackEvent> _eventSubscription;
   final _player = AudioPlayer();
   final _audioSource = ConcatenatingAudioSource(children: []);
   final int proxyServerPort;
 
-  AudioPlayerTask({@required this.proxyServerPort}) : assert(proxyServerPort != null);
+  AudioPlayerTask({required this.proxyServerPort});
 
   List<MediaItem> _queue = [];
-  int get index => _player.currentIndex;
-  MediaItem get mediaItem => index == null ? null : _queue[index];
+  int? get index => _player.currentIndex;
+  MediaItem? get mediaItem => index == null ? null : _queue[index!];
 
   @override
   Future<dynamic> onCustomAction(String name, dynamic arguments) async {
@@ -45,13 +44,18 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onSkipToNext() async {
     final mediaItem = AudioServiceBackground.mediaItem;
-    final queue = AudioServiceBackground.queue ?? [];
-    int currentIndex = queue.indexOf(mediaItem);
-    if (currentIndex == -1) {
+    if (mediaItem == null) {
       // TODO untested
       await _player.seek(Duration(milliseconds: 0), index: 0);
     } else {
-      await _player.seekToNext();
+      final queue = AudioServiceBackground.queue ?? [];
+      int currentIndex = queue.indexOf(mediaItem);
+      if (currentIndex == -1) {
+        // TODO untested
+        await _player.seek(Duration(milliseconds: 0), index: 0);
+      } else {
+        await _player.seekToNext();
+      }
     }
     await onPlay();
   }
@@ -59,11 +63,18 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onSkipToQueueItem(String mediaID) async {
     final queue = AudioServiceBackground.queue;
-    final currentIndex = queue.indexOf(AudioServiceBackground.mediaItem);
-    var newIndex = queue.indexWhere((mediaItem) => mediaItem.id == mediaID);
-    if (newIndex == -1 || newIndex == currentIndex) {
+    final mediaItem = AudioServiceBackground.mediaItem;
+
+    int currentIndex = -1;
+    if (mediaItem != null) {
+      currentIndex = queue?.indexOf(mediaItem) ?? -1;
+    }
+
+    var newIndex = queue?.indexWhere((mediaItem) => mediaItem.id == mediaID);
+    if (newIndex == null || newIndex == -1 || newIndex == currentIndex) {
       return;
     }
+
     await _player.seek(Duration(milliseconds: 0), index: newIndex);
     await onPlay();
   }
@@ -77,7 +88,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   @override
-  Future<void> onStart(Map<String, dynamic> params) async {
+  Future<void> onStart(Map<String, dynamic>? params) async {
     _player.currentIndexStream.listen((index) {
       // TODO https://github.com/ryanheise/just_audio/issues/392
       // This prevents player UI from showing up until one song is done playing
@@ -103,7 +114,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   Future<void> onAddNextQueueItem(MediaItem mediaItem) async {
-    int currentIndex = _player.currentIndex;
+    int? currentIndex = _player.currentIndex;
     if (currentIndex == null || currentIndex >= _queue.length) {
       return await onAddQueueItem(mediaItem);
     }
@@ -168,7 +179,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }
 
   Uri _getPlaybackURI(MediaItem mediaItem) {
-    final path = mediaItem.extras[extraKeyPath];
+    final path = mediaItem.extras![extraKeyPath];
     assert(path != null);
     final String host = InternetAddress.loopbackIPv4.host;
     final int port = proxyServerPort;

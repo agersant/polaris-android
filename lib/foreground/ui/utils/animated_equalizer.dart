@@ -8,18 +8,15 @@ class AnimatedEqualizer extends StatefulWidget {
   final Size size;
   final bool isPlaying;
 
-  AnimatedEqualizer(this.color, this.size, this.isPlaying)
-      : assert(color != null),
-        assert(size != null),
-        assert(isPlaying != null);
+  AnimatedEqualizer(this.color, this.size, this.isPlaying);
 
   @override
   _AnimatedEqualizerState createState() => _AnimatedEqualizerState();
 }
 
 class _AnimatedEqualizerState extends State<AnimatedEqualizer> with SingleTickerProviderStateMixin {
-  Animation<double> animation;
-  AnimationController controller;
+  late final Animation<double> animation;
+  late final AnimationController controller;
   Tween<double> t = Tween(begin: 0, end: 2 * pi);
 
   void initState() {

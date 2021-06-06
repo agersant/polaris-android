@@ -7,7 +7,7 @@ class Manager implements cache.Interface {
     return Manager();
   }
 
-  Future<File> getImage(String host, String path) async {
+  Future<File?> getImage(String host, String path) async {
     return null;
   }
 

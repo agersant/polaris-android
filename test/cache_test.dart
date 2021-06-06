@@ -24,8 +24,10 @@ void main() {
     final path = 'heron/aegeus/folder.png';
     await manager.putImage(host, path, imageData);
 
-    final File cacheFile = await manager.getImage(host, path);
-    assert(cacheFile != null);
+    final File? cacheFile = await manager.getImage(host, path);
+    if (cacheFile == null) {
+      throw "Image not found in cache";
+    }
     final Uint8List cacheFileContent = await cacheFile.readAsBytes();
     expect(cacheFileContent.buffer.asUint8List(), equals(imageData));
   });

@@ -21,14 +21,14 @@ List<String> splitPath(String path) {
 
 extension SongFormatting on Song {
   String formatTitle() {
-    if (title == null || title.isEmpty) {
+    if (title?.isEmpty ?? true) {
       return path.split(_pathSeparatorRegExp).last;
     }
-    return title;
+    return title!;
   }
 
   String formatTrackNumberAndTitle() {
-    if (title == null || title.isEmpty) {
+    if (title?.isEmpty ?? true) {
       return formatTitle();
     }
 
@@ -36,7 +36,7 @@ extension SongFormatting on Song {
     if (trackNumber != null) {
       components.add('$trackNumber');
     }
-    components.add(title);
+    components.add(title!);
     return components.join('. ');
   }
 

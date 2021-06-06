@@ -22,7 +22,6 @@ extension _ToConnectionError on polaris.APIError {
       case polaris.APIError.unspecifiedHost:
         return Error.networkError;
     }
-    return Error.unknownError;
   }
 }
 
@@ -40,23 +39,20 @@ class Manager extends ChangeNotifier {
   State _state = State.disconnected;
   State get state => _state;
 
-  State _previousState;
-  State get previousState => _previousState;
+  State? _previousState;
+  State? get previousState => _previousState;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
-  Stream<Error> _errorStream;
+  late final Stream<Error> _errorStream = _errorStreamController.stream.asBroadcastStream();
   Stream<Error> get errorStream => _errorStream;
 
-  Manager({@required this.guestAPI, @required this.hostManager})
-      : assert(guestAPI != null),
-        assert(hostManager != null) {
-    _errorStream = _errorStreamController.stream.asBroadcastStream();
+  Manager({required this.guestAPI, required this.hostManager}) {
     reconnect();
   }
 
   Future reconnect() async {
     assert(_state == State.disconnected);
-    if (hostManager.url == null || hostManager.url.isEmpty) {
+    if (hostManager.url?.isEmpty ?? true) {
       return;
     }
 

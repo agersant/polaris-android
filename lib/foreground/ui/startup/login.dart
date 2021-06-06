@@ -79,7 +79,7 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
 }
 
 mixin AuthenticationErrorHandler<T extends StatefulWidget> on State<T> {
-  StreamSubscription<authentication.Error> _authenticationErrorStream;
+  late StreamSubscription<authentication.Error> _authenticationErrorStream;
 
   @override
   void initState() {

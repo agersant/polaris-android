@@ -13,7 +13,7 @@ class MockServiceLauncher implements Launcher {
   }
 
   @override
-  Future<int> getServicePort() async {
+  Future<int?> getServicePort() async {
     return _started ? 8080 : null;
   }
 }

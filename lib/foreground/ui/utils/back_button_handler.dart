@@ -6,7 +6,7 @@ final getIt = GetIt.instance;
 
 class BackButtonHandler extends StatefulWidget {
   final Widget child;
-  BackButtonHandler(this.child) : assert(child != null);
+  BackButtonHandler(this.child);
 
   @override
   _BackButtonHandlerState createState() => _BackButtonHandlerState();
@@ -16,12 +16,12 @@ class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindi
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 

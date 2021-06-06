@@ -14,15 +14,14 @@ final String extraKeyArtwork = 'artwork';
 
 extension MediaItemConversions on Song {
   MediaItem toMediaItem(Uuid uuid, polaris.API polarisAPI) {
-    assert(polarisAPI != null);
     return MediaItem(
       id: uuid.v4(),
       playable: true,
-      album: album,
-      title: title,
+      album: album ?? "",
+      title: title ?? "",
       artist: formatArtist(),
-      duration: duration != null ? Duration(seconds: duration) : null,
-      artUri: artwork == null ? null : polarisAPI.getImageURI(artwork),
+      duration: duration != null ? Duration(seconds: duration!) : null,
+      artUri: artwork != null ? polarisAPI.getImageURI(artwork!) : null,
       extras: {
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,
@@ -37,16 +36,15 @@ extension MediaItemConversions on Song {
 
 extension DTOConversions on MediaItem {
   Song toSong() {
-    return new Song()
-      ..path = extras[extraKeyPath]
-      ..trackNumber = extras[extraKeyTrackNumber]
-      ..discNumber = extras[extraKeyDiscNumber]
+    return new Song(path: extras?[extraKeyPath])
+      ..trackNumber = extras?[extraKeyTrackNumber]
+      ..discNumber = extras?[extraKeyDiscNumber]
       ..title = title
-      ..artist = extras[extraKeyArtist]
-      ..albumArtist = extras[extraKeyAlbumArtist]
-      ..year = extras[extraKeyYear]
+      ..artist = extras?[extraKeyArtist]
+      ..albumArtist = extras?[extraKeyAlbumArtist]
+      ..year = extras?[extraKeyYear]
       ..album = album
-      ..artwork = extras[extraKeyArtwork]
+      ..artwork = extras?[extraKeyArtwork]
       ..duration = duration?.inSeconds;
   }
 }

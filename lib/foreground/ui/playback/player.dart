@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/main.dart';
 import 'package:polaris/foreground/ui/playback/queue.dart';
+import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/media_item.dart';
@@ -11,12 +12,12 @@ import 'package:rxdart/rxdart.dart';
 final getIt = GetIt.instance;
 
 class MediaState {
-  final MediaItem mediaItem;
+  final MediaItem? mediaItem;
   final Duration position;
   MediaState(this.mediaItem, this.position);
 }
 
-Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duration, MediaState>(
+Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem?, Duration, MediaState>(
     AudioService.currentMediaItemStream,
     AudioService.positionStream,
     (mediaItem, position) => MediaState(mediaItem, position));
@@ -24,7 +25,7 @@ Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem, Duratio
 class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<MediaItem>(
+    return StreamBuilder<MediaItem?>(
       stream: AudioService.currentMediaItemStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -36,12 +37,12 @@ class Player extends StatelessWidget {
             elevation: 8,
             child: InkWell(
               onTap: () {
-                globalNavigatorKey.currentState.push(
+                globalNavigatorKey.currentState!.push(
                   // TODO prevent opening multiple instances
                   MaterialPageRoute(builder: (context) => QueuePage()),
                 );
               },
-              child: playerContent(context, snapshot.data.toSong()),
+              child: playerContent(context, snapshot.data!.toSong()),
             ),
           ),
         );
@@ -82,14 +83,14 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    song.title,
-                    style: Theme.of(context).textTheme.subtitle2.copyWith(color: foregroundColor),
+                    song.formatTitle(),
+                    style: Theme.of(context).textTheme.subtitle2?.copyWith(color: foregroundColor),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
-                    song.artist,
-                    style: Theme.of(context).textTheme.caption.copyWith(color: foregroundColor.withOpacity(0.75)),
+                    song.formatArtist(),
+                    style: Theme.of(context).textTheme.caption?.copyWith(color: foregroundColor.withOpacity(0.75)),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -108,7 +109,7 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlaybackState>(
       builder: (context, snapshot) {
         bool playing = false;
         if (snapshot.hasData) {
-          playing = snapshot.data.playing && snapshot.data.processingState != AudioProcessingState.completed;
+          playing = snapshot.data!.playing && snapshot.data!.processingState != AudioProcessingState.completed;
         }
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -154,8 +155,8 @@ Widget _progressBar() => LayoutBuilder(
               builder: (context, snapshot) {
                 double progress = 0.0;
                 if (snapshot.hasData) {
-                  final int position = snapshot.data.position?.inMilliseconds;
-                  final int duration = snapshot.data.mediaItem?.duration?.inMilliseconds;
+                  final int? position = snapshot.data!.position.inMilliseconds;
+                  final int? duration = snapshot.data!.mediaItem?.duration?.inMilliseconds;
                   if (position != null && duration != null && duration > 0) {
                     progress = (position / duration).clamp(0.0, 1.0);
                   }

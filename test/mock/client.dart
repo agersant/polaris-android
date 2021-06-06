@@ -76,18 +76,17 @@ class Mock extends mockito.Mock implements http.Client {
 Map<String, List<CollectionFile>> _browseData = {
   '': [
     CollectionFile(Right(
-      Directory()..path = rootDirectoryPath,
+      Directory(path: rootDirectoryPath),
     ))
   ],
   rootDirectoryPath: [
     CollectionFile(Right(
-      Directory()..path = heronDirectoryPath,
+      Directory(path: heronDirectoryPath),
     ))
   ],
   heronDirectoryPath: [
     CollectionFile(Right(
-      Directory()
-        ..path = aegeusDirectoryPath
+      Directory(path: aegeusDirectoryPath)
         ..album = 'Aegeus'
         ..artist = 'Heron'
         ..year = 2016,
@@ -95,16 +94,14 @@ Map<String, List<CollectionFile>> _browseData = {
   ],
   aegeusDirectoryPath: [
     CollectionFile(Left(
-      Song()
-        ..path = labyrinthFilePath
+      Song(path: labyrinthFilePath)
         ..title = labyrinthSongName
         ..artist = heronDirectoryName
         ..trackNumber = 1
         ..album = aegeusDirectoryName,
     )),
     CollectionFile(Left(
-      Song()
-        ..path = fallInwardsFilePath
+      Song(path: fallInwardsFilePath)
         ..title = fallInwardsSongName
         ..artist = heronDirectoryName
         ..trackNumber = 2

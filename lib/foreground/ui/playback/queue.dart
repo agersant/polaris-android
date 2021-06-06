@@ -16,12 +16,12 @@ import 'package:rxdart/rxdart.dart';
 final getIt = GetIt.instance;
 
 class QueueState {
-  final List<MediaItem> queue;
-  MediaItem mediaItem;
+  final List<MediaItem>? queue;
+  MediaItem? mediaItem;
   QueueState(this.queue, this.mediaItem);
 }
 
-Stream<QueueState> get _queueStateStream => Rx.combineLatest2<List<MediaItem>, MediaItem, QueueState>(
+Stream<QueueState> get _queueStateStream => Rx.combineLatest2<List<MediaItem>?, MediaItem?, QueueState>(
     AudioService.queueStream, AudioService.currentMediaItemStream, (queue, mediaItem) => QueueState(queue, mediaItem));
 
 class QueuePage extends StatefulWidget {
@@ -32,8 +32,8 @@ class QueuePage extends StatefulWidget {
 class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMixin {
   // Keep a local copy of the queue so we can re-order without waiting for communication with background service
   // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
-  QueueState localState;
-  StreamSubscription<QueueState> stateSubscription;
+  late QueueState localState;
+  late StreamSubscription<QueueState> stateSubscription;
 
   @override
   void initState() {
@@ -63,25 +63,30 @@ class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMix
           // TODO number of songs and duration
           stream: AudioService.playbackStateStream,
           builder: (context, snapshot) {
-            return ReorderableListView(
-              // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
-              children: localState.queue.map((mediaItem) {
-                final bool isCurrent = mediaItem.id == localState.mediaItem.id;
-                final bool isPlaying = snapshot.data?.playing ?? false;
-                final onTap = () {
-                  localState.mediaItem = mediaItem;
+            List<MediaItem>? queue = localState.queue;
+            if (queue == null) {
+              return Container();
+            } else {
+              return ReorderableListView(
+                // TODO bounce physics (https://github.com/flutter/flutter/issues/66080)
+                children: queue.map((mediaItem) {
+                  final bool isCurrent = mediaItem.id == localState.mediaItem?.id;
+                  final bool isPlaying = snapshot.data?.playing ?? false;
+                  final onTap = () {
+                    localState.mediaItem = mediaItem;
+                    setState(() {});
+                    AudioService.skipToQueueItem(mediaItem.id);
+                  };
+                  return _songWidget(context, mediaItem, isCurrent, isPlaying, onTap);
+                }).toList(),
+                onReorder: (int oldIndex, int newIndex) {
+                  final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
+                  queue.insert(insertIndex, queue.removeAt(oldIndex));
                   setState(() {});
-                  AudioService.skipToQueueItem(mediaItem.id);
-                };
-                return _songWidget(context, mediaItem, isCurrent, isPlaying, onTap);
-              }).toList(),
-              onReorder: (int oldIndex, int newIndex) {
-                final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
-                localState.queue.insert(insertIndex, localState.queue.removeAt(oldIndex));
-                setState(() {});
-                AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
-              },
-            );
+                  AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
+                },
+              );
+            }
           }),
     );
   }

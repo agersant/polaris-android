@@ -16,7 +16,7 @@ class ConnectForm extends StatefulWidget {
 }
 
 class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
-  TextEditingController _textEditingController;
+  late TextEditingController _textEditingController;
   final connection.Manager _connectionManager = getIt<connection.Manager>();
   final host.Manager _hostManager = getIt<host.Manager>();
 
@@ -63,7 +63,7 @@ class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
 }
 
 mixin ConnectionErrorHandler<T extends StatefulWidget> on State<T> {
-  StreamSubscription<connection.Error> _connectionErrorStream;
+  late StreamSubscription<connection.Error> _connectionErrorStream;
 
   @override
   void initState() {

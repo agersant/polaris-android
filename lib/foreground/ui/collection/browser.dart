@@ -31,12 +31,12 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
     final PageTransitionsTheme transitionTheme = PageTransitionsTheme(
         builders: {TargetPlatform.android: sharedAxisTransition, TargetPlatform.iOS: sharedAxisTransition});
 
-    final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor ?? Colors.black;
+    final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor;
 
     return ChangeNotifierProvider.value(
       value: getIt<UIModel>(),
       child: Consumer<UIModel>(
-        builder: (BuildContext context, UIModel uiModel, Widget child) {
+        builder: (BuildContext context, UIModel uiModel, Widget? child) {
           return Theme(
             data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
             child: Column(
@@ -87,18 +87,16 @@ class BrowserLocation extends StatefulWidget {
   final void Function(dto.Directory) onDirectoryTapped;
   final void Function() navigateBack;
 
-  BrowserLocation(this.location, {@required this.onDirectoryTapped, @required this.navigateBack, Key key})
-      : assert(location != null),
-        assert(onDirectoryTapped != null),
-        super(key: key);
+  BrowserLocation(this.location, {required this.onDirectoryTapped, required this.navigateBack, Key? key})
+      : super(key: key);
 
   @override
   _BrowserLocationState createState() => _BrowserLocationState();
 }
 
 class _BrowserLocationState extends State<BrowserLocation> {
-  List<dto.CollectionFile> _files;
-  polaris.APIError _error;
+  List<dto.CollectionFile>? _files;
+  polaris.APIError? _error;
 
   @override
   initState() {
@@ -124,17 +122,18 @@ class _BrowserLocationState extends State<BrowserLocation> {
   }
 
   ViewMode _getViewMode() {
-    if (_files == null || _files.length == 0) {
+    List<dto.CollectionFile>? files = _files;
+    if (files == null || files.length == 0) {
       return ViewMode.explorer;
     }
 
     var onlyDirectories = true;
     var hasAnyPicture = false;
     var allHaveAlbums = true;
-    for (var file in _files) {
+    for (var file in files) {
       onlyDirectories &= file.isDirectory();
-      hasAnyPicture |= file.asDirectory()?.artwork != null;
-      allHaveAlbums &= file.asDirectory()?.album != null;
+      hasAnyPicture |= file.asDirectory().artwork != null;
+      allHaveAlbums &= file.asDirectory().album != null;
     }
 
     if (onlyDirectories && hasAnyPicture && allHaveAlbums) {
@@ -153,11 +152,12 @@ class _BrowserLocationState extends State<BrowserLocation> {
       );
     }
 
-    if (_files == null) {
+    List<dto.CollectionFile>? files = _files;
+    if (files == null) {
       return Center(child: CircularProgressIndicator());
     }
 
-    if (_files.length == 0) {
+    if (files.length == 0) {
       return ErrorMessage(
         emptyDirectory,
         action: widget.navigateBack,
@@ -166,14 +166,14 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
 
     if (_getViewMode() == ViewMode.discography) {
-      final albums = _files.map((f) => f.asDirectory()).toList();
+      final albums = files.map((f) => f.asDirectory()).toList();
       return AlbumGrid(albums);
     } else {
       return ListView.builder(
         physics: BouncingScrollPhysics(),
-        itemCount: _files.length,
+        itemCount: files.length,
         itemBuilder: (context, index) {
-          final file = _files[index];
+          final file = files[index];
           if (file.isDirectory()) {
             final directory = file.asDirectory();
             return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
@@ -189,11 +189,9 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
 class Directory extends StatelessWidget {
   final dto.Directory directory;
-  final GestureTapCallback onTap;
+  final GestureTapCallback? onTap;
 
-  Directory(this.directory, {this.onTap, Key key})
-      : assert(directory != null),
-        super(key: key);
+  Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
 
   Widget _getLeading() {
     if (directory.artwork != null || directory.album != null) {
@@ -202,14 +200,14 @@ class Directory extends StatelessWidget {
     return Icon(Icons.folder);
   }
 
-  Widget _getSubtitle() {
+  Widget? _getSubtitle() {
     if (directory.album != null) {
       return Text(directory.formatArtist());
     }
     return null;
   }
 
-  ListTile _buildTile({void Function() onTap}) {
+  ListTile _buildTile({void Function()? onTap}) {
     return ListTile(
       leading: _getLeading(),
       title: Text(directory.formatName()),
@@ -243,9 +241,7 @@ class Directory extends StatelessWidget {
 class Song extends StatelessWidget {
   final dto.Song song;
 
-  Song(this.song, {Key key})
-      : assert(song != null),
-        super(key: key);
+  Song(this.song, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -263,9 +259,7 @@ class Breadcrumbs extends StatefulWidget {
   final String path;
   final void Function(int) popLocations;
 
-  Breadcrumbs(this.path, this.popLocations, {Key key})
-      : assert(path != null),
-        super(key: key);
+  Breadcrumbs(this.path, this.popLocations, {Key? key}) : super(key: key);
 
   @override
   _BreadcrumbsState createState() => _BreadcrumbsState();
@@ -287,7 +281,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
   }
 
   void _scrollToEnd() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
       _scrollController.jumpTo(
         _scrollController.position.maxScrollExtent,
       );
@@ -329,7 +323,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
 class Chevron extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Color chevronColor = Theme.of(context).textTheme.caption.color;
+    final Color? chevronColor = Theme.of(context).textTheme.caption?.color;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
       child: Icon(
@@ -343,13 +337,10 @@ class Chevron extends StatelessWidget {
 
 class Breadcrumb extends StatelessWidget {
   final String name;
-  final TextStyle style;
+  final TextStyle? style;
   final void Function() onTap;
 
-  Breadcrumb({Key key, this.name, this.onTap, this.style})
-      : assert(name != null),
-        assert(onTap != null),
-        super(key: key);
+  Breadcrumb({Key? key, required this.name, required this.onTap, this.style}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

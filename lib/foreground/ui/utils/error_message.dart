@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class ErrorMessage extends StatelessWidget {
   final String message;
-  final String actionLabel;
-  final void Function() action;
+  final String? actionLabel;
+  final void Function()? action;
 
-  ErrorMessage(this.message, {this.action, this.actionLabel}) : assert(message != null);
+  ErrorMessage(this.message, {this.action, this.actionLabel});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class ErrorMessage extends StatelessWidget {
             Icon(
               Icons.error_outline,
               size: 24,
-              color: Theme.of(context).textTheme.caption.color,
+              color: Theme.of(context).textTheme.caption?.color,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
@@ -29,7 +29,7 @@ class ErrorMessage extends StatelessWidget {
         if (actionLabel != null && action != null)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: OutlinedButton(onPressed: action, child: Text(actionLabel)),
+            child: OutlinedButton(onPressed: action, child: Text(actionLabel!)),
           )
       ],
     );

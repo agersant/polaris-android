@@ -21,12 +21,11 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
     Tab(text: collectionTabRandomTitle),
     Tab(text: collectionTabRecentTitle),
   ];
-  TabController _tabController;
+  late final TabController _tabController = new TabController(vsync: this, length: tabs.length);
 
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: tabs.length);
     _tabController.addListener(_handleActiveTabChanged);
     _handleActiveTabChanged();
   }

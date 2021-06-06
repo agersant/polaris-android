@@ -16,7 +16,7 @@ final String customActionGetPort = 'getPort';
 final String customActionMoveQueueItem = 'moveQueueItem';
 final String customActionAddNextQueueItem = 'addNextQueueItem';
 
-ProxyServer _proxyServer;
+late ProxyServer _proxyServer;
 
 void entrypoint() async {
   WidgetsFlutterBinding.ensureInitialized();
