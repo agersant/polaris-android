@@ -13,6 +13,8 @@ import 'package:polaris/foreground/service.dart' as service;
 import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/collection/page.dart';
 import 'package:polaris/foreground/ui/playback/player.dart';
+import 'package:polaris/foreground/ui/playback/queue.dart';
+import 'package:polaris/foreground/ui/playback/queue_model.dart';
 import 'package:polaris/foreground/ui/startup/page.dart';
 import 'package:polaris/foreground/ui/utils/back_button_handler.dart';
 import 'package:provider/provider.dart';
@@ -71,6 +73,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<service.Manager>(serviceManager);
   getIt.registerSingleton<polaris.API>(polarisAPI);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
+  getIt.registerSingleton<QueueModel>(QueueModel());
   getIt.registerSingleton<Uuid>(Uuid());
 }
 
@@ -102,10 +105,12 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
         ChangeNotifierProvider.value(value: getIt<polaris.API>()),
+        ChangeNotifierProvider.value(value: getIt<QueueModel>()),
       ],
-      child: Consumer<polaris.API>(
-        builder: (context, polarisAPI, child) {
+      child: Consumer2<polaris.API, QueueModel>(
+        builder: (context, polarisAPI, queueModel, child) {
           final isStartupComplete = polarisAPI.state == polaris.State.available;
+          final showQueue = isStartupComplete && queueModel.isQueueOpen;
 
           return BackButtonHandler(
             AudioServiceWidget(
@@ -117,14 +122,16 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       pages: [
                         if (!isStartupComplete) MaterialPage(child: StartupPage()),
                         if (isStartupComplete) MaterialPage(child: CollectionPage()),
-                        // TODO Ideally queue page would be here, and so would album details
+                        // TODO Ideally album details would be here
                         // However, OpenContainer() can't be used with the pages API.
-                        // As a result, both album details and queue have to use Navigator.push
-                        // So they can be ordered correctly.
+                        if (showQueue) MaterialPage(child: QueuePage()),
                       ],
                       onPopPage: (route, result) {
                         if (!route.didPop(result)) {
                           return false;
+                        }
+                        if (queueModel.isQueueOpen) {
+                          queueModel.closeQueue();
                         }
                         return true;
                       },
