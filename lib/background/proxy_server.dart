@@ -71,7 +71,7 @@ class ProxyServer {
           data.pipe(request.response);
         }
       } else if (request.uri.path.startsWith(audioEndpoint)) {
-        final String path = Uri.decodeComponent(request.uri.path.substring(audioEndpoint.length));
+        final String path = request.uri.queryParameters[pathQueryParameter] ?? "";
         final data = await collection.getAudio(path);
         if (data == null) {
           request.response
