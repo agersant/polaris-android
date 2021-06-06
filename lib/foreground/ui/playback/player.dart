@@ -114,12 +114,19 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlaybackState>(
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // TODO add previous button
+            _previousButton(foregroundColor), // TODO grey out when cannot skip previous
             if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
             _nextButton(foregroundColor), // TODO grey out when cannot skip next
           ],
         );
       },
+    );
+
+IconButton _previousButton(Color color) => IconButton(
+      icon: Icon(Icons.skip_previous),
+      onPressed: AudioService.skipToPrevious,
+      iconSize: 24.0,
+      color: color,
     );
 
 IconButton _pauseButton(Color color) => IconButton(
