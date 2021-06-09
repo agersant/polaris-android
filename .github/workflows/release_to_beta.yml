@@ -30,9 +30,9 @@ jobs:
         with:
           ref: beta
       - name: Update version name in gradle build file
-        run: gawk -i inplace '/^[[:space:]]*versionName/ { $1 = "\t\t"$1; $2 = "\"${{ github.event.inputs.versionName }}\""; } 1' app/build.gradle
+        run: gawk -i inplace '/^[[:space:]]*versionName = / { $1 = "        "$1; $3 = "\"${{ github.event.inputs.versionName }}\""; } 1' app/build.gradle.kts
       - name: Increment version code in gradle build file
-        run: gawk -i inplace '/^[[:space:]]*versionCode/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' app/build.gradle
+        run: gawk -i inplace '/^[[:space:]]*versionCode = / { $1 = "        "$1; $3 = $3 + 1; } 1' app/build.gradle.kts
       - name: Read version code from gradle build file
         run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
       - name: Build APK
@@ -61,7 +61,7 @@ jobs:
         with:
           branch: beta
           message: 'Updated release notes, versionCode and versionName'
-          add: '*.txt *.gradle'
+          add: '*.txt *.gradle.kts'
           tag: 'google-play-beta --force'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
