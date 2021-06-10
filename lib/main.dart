@@ -92,11 +92,9 @@ class PolarisRouteInformationParser extends RouteInformationParser<PolarisPath> 
   }
 }
 
-final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
-
 class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<PolarisPath> {
-  final GlobalKey<NavigatorState> navigatorKey = globalNavigatorKey;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
