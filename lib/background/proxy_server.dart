@@ -32,58 +32,15 @@ class ProxyServer {
     // TODO handle errors from collection calls
     try {
       if (request.uri.path.startsWith(browseEndpoint)) {
-        final String path = Uri.decodeComponent(request.uri.path.substring(browseEndpoint.length));
-        final List<CollectionFile> results = await collection.browse(path);
-        final encoded = utf8.encode(jsonEncode(results));
-        request.response
-          ..contentLength = encoded.length
-          ..statusCode = HttpStatus.ok
-          ..add(encoded)
-          ..close();
+        _handleBrowseRequest(request);
       } else if (request.uri.path.startsWith(randomEndpoint)) {
-        final List<Directory> results = await collection.random();
-        final encoded = utf8.encode(jsonEncode(results));
-        request.response
-          ..contentLength = encoded.length
-          ..statusCode = HttpStatus.ok
-          ..add(encoded)
-          ..close();
+        _handleRandomRequest(request);
       } else if (request.uri.path.startsWith(recentEndpoint)) {
-        final List<Directory> results = await collection.recent();
-        final encoded = utf8.encode(jsonEncode(results));
-        request.response
-          ..contentLength = encoded.length
-          ..statusCode = HttpStatus.ok
-          ..add(encoded)
-          ..close();
+        _handleRecentRequest(request);
       } else if (request.uri.path.startsWith(thumbnailEndpoint)) {
-        final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
-        final data = await collection.getImage(path);
-        if (data == null) {
-          request.response
-            ..contentLength = 0
-            ..statusCode = HttpStatus.internalServerError
-            ..close();
-        } else {
-          request.response
-            ..contentLength = -1
-            ..statusCode = HttpStatus.ok;
-          data.pipe(request.response);
-        }
+        _handleThumbnailRequest(request);
       } else if (request.uri.path.startsWith(audioEndpoint)) {
-        final String path = request.uri.queryParameters[pathQueryParameter] ?? "";
-        final data = await collection.getAudio(path);
-        if (data == null) {
-          request.response
-            ..contentLength = 0
-            ..statusCode = HttpStatus.internalServerError
-            ..close();
-        } else {
-          request.response
-            ..contentLength = -1
-            ..statusCode = HttpStatus.ok;
-          data.pipe(request.response);
-        }
+        _handleAudioRequest(request);
       } else {
         request.response
           ..contentLength = 0
@@ -95,6 +52,69 @@ class ProxyServer {
       request.response
         ..statusCode = HttpStatus.internalServerError
         ..close();
+    }
+  }
+
+  void _handleBrowseRequest(HttpRequest request) async {
+    final String path = Uri.decodeComponent(request.uri.path.substring(browseEndpoint.length));
+    final List<CollectionFile> results = await collection.browse(path);
+    final encoded = utf8.encode(jsonEncode(results));
+    request.response
+      ..contentLength = encoded.length
+      ..statusCode = HttpStatus.ok
+      ..add(encoded)
+      ..close();
+  }
+
+  void _handleRandomRequest(HttpRequest request) async {
+    final List<Directory> results = await collection.random();
+    final encoded = utf8.encode(jsonEncode(results));
+    request.response
+      ..contentLength = encoded.length
+      ..statusCode = HttpStatus.ok
+      ..add(encoded)
+      ..close();
+  }
+
+  void _handleRecentRequest(HttpRequest request) async {
+    final List<Directory> results = await collection.recent();
+    final encoded = utf8.encode(jsonEncode(results));
+    request.response
+      ..contentLength = encoded.length
+      ..statusCode = HttpStatus.ok
+      ..add(encoded)
+      ..close();
+  }
+
+  void _handleThumbnailRequest(HttpRequest request) async {
+    final String path = Uri.decodeComponent(request.uri.path.substring(thumbnailEndpoint.length));
+    final data = await collection.getImage(path);
+    if (data == null) {
+      request.response
+        ..contentLength = 0
+        ..statusCode = HttpStatus.internalServerError
+        ..close();
+    } else {
+      request.response
+        ..contentLength = -1
+        ..statusCode = HttpStatus.ok;
+      data.pipe(request.response);
+    }
+  }
+
+  void _handleAudioRequest(HttpRequest request) async {
+    final String path = request.uri.queryParameters[pathQueryParameter] ?? "";
+    final data = await collection.getAudio(path);
+    if (data == null) {
+      request.response
+        ..contentLength = 0
+        ..statusCode = HttpStatus.internalServerError
+        ..close();
+    } else {
+      request.response
+        ..contentLength = -1
+        ..statusCode = HttpStatus.ok;
+      data.pipe(request.response);
     }
   }
 
