@@ -60,7 +60,7 @@ class Harness {
 
     final uuid = Uuid();
     final audioPlayer = AudioPlayer();
-    final playlist = Playlist(uuid: uuid, polarisAPI: collectionAPI);
+    final playlist = Playlist(uuid: uuid, polarisAPI: collectionAPI, audioPlayer: audioPlayer);
     audioPlayer.setAudioSource(playlist.audioSource);
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);

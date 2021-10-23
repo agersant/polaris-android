@@ -61,7 +61,7 @@ Future _registerSingletons() async {
   );
   final uuid = Uuid();
   final audioPlayer = AudioPlayer();
-  final playlist = Playlist(uuid: uuid, polarisAPI: polarisAPI);
+  final playlist = Playlist(uuid: uuid, polarisAPI: polarisAPI, audioPlayer: audioPlayer);
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);

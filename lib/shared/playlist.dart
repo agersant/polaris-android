@@ -8,24 +8,25 @@ class Playlist {
   final _audioSource = new ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final polaris.API polarisAPI;
+  final AudioPlayer audioPlayer;
 
   AudioSource get audioSource => _audioSource;
 
   Playlist({
     required this.uuid,
     required this.polarisAPI,
+    required this.audioPlayer,
   });
 
   Future queueLast(Song song) async {
-    final songURI = polarisAPI.getAudioURI(song.path);
-    final mediaItem = song.toMediaItem(uuid, polarisAPI);
-    return _audioSource.add(AudioSource.uri(songURI, tag: mediaItem));
+    final songAudioSource = _makeSongAudioSource(song);
+    return _audioSource.add(songAudioSource);
   }
 
   Future queueNext(Song song) async {
-    // TODO implement queueNext
-    // _audioSource.insert(getIt<AudioPlayer>, audioSource)
-    return queueLast(song);
+    final songAudioSource = _makeSongAudioSource(song);
+    final int insertIndex = 1 + (audioPlayer.currentIndex ?? -1);
+    return _audioSource.insert(insertIndex, songAudioSource);
   }
 
   Future moveSong(int oldIndex, int newIndex) async {
@@ -38,5 +39,11 @@ class Playlist {
     }
     final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
     return _audioSource.move(oldIndex, insertIndex);
+  }
+
+  AudioSource _makeSongAudioSource(Song song) {
+    final songURI = polarisAPI.getAudioURI(song.path);
+    final mediaItem = song.toMediaItem(uuid, polarisAPI);
+    return AudioSource.uri(songURI, tag: mediaItem);
   }
 }
