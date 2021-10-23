@@ -16,19 +16,19 @@ class Playlist {
     required this.polarisAPI,
   });
 
-  Future<void> queueLast(Song song) async {
+  Future queueLast(Song song) async {
     final songURI = polarisAPI.getAudioURI(song.path);
     final mediaItem = song.toMediaItem(uuid, polarisAPI);
     return _audioSource.add(AudioSource.uri(songURI, tag: mediaItem));
   }
 
-  Future<void> queueNext(Song song) async {
+  Future queueNext(Song song) async {
     // TODO implement queueNext
     // _audioSource.insert(getIt<AudioPlayer>, audioSource)
     return queueLast(song);
   }
 
-  Future<void> moveSong(int oldIndex, int newIndex) async {
+  Future moveSong(int oldIndex, int newIndex) async {
     if (oldIndex == newIndex ||
         oldIndex < 0 ||
         oldIndex >= _audioSource.length ||

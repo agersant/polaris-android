@@ -1,3 +1,4 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
@@ -61,7 +62,6 @@ Future _registerSingletons() async {
   final uuid = Uuid();
   final audioPlayer = AudioPlayer();
   final playlist = Playlist(uuid: uuid, polarisAPI: polarisAPI);
-  audioPlayer.setAudioSource(playlist.audioSource);
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
@@ -77,10 +77,15 @@ Future _registerSingletons() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _registerSingletons();
+
   await JustAudioBackground.init(
     androidNotificationChannelName: 'Polaris Audio Playback',
     androidNotificationOngoing: true,
   );
+  final session = await AudioSession.instance;
+  await session.configure(AudioSessionConfiguration.music());
+  await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
+
   runApp(PolarisApp());
 }
 
@@ -148,7 +153,12 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
   Future<void> setNewRoutePath(PolarisPath configuration) async => null;
 }
 
-class PolarisApp extends StatelessWidget {
+class PolarisApp extends StatefulWidget {
+  @override
+  _PolarisAppState createState() => _PolarisAppState();
+}
+
+class _PolarisAppState extends State<PolarisApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -158,5 +168,19 @@ class PolarisApp extends StatelessWidget {
       routeInformationParser: PolarisRouteInformationParser(),
       routerDelegate: PolarisRouterDelegate(),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {}
+
+  @override
+  void dispose() {
+    getIt<AudioPlayer>().dispose();
+    super.dispose();
   }
 }
