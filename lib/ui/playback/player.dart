@@ -5,8 +5,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:polaris/ui/playback/queue_model.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
-import 'package:polaris/shared/dto.dart';
-import 'package:polaris/shared/media_item.dart';
+import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/media_item.dart';
 import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;

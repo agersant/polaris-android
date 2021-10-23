@@ -8,8 +8,8 @@ import 'package:polaris/ui/utils/animated_equalizer.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/strings.dart';
-import 'package:polaris/shared/dto.dart' as dto;
-import 'package:polaris/shared/media_item.dart';
+import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/media_item.dart';
 
 final getIt = GetIt.instance;
 

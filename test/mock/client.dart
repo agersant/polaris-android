@@ -3,7 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
-import 'package:polaris/shared/dto.dart';
+import 'package:polaris/core/dto.dart';
 import 'package:polaris/shared/polaris.dart';
 
 final goodHost = 'my-polaris-server';

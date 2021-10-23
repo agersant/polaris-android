@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:polaris/shared/dto.dart';
+import 'package:polaris/core/dto.dart';
 
 class BrowserModel extends ChangeNotifier {
   List<String> _browserStack = const [''];

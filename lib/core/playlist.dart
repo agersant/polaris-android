@@ -1,6 +1,6 @@
 import 'package:just_audio/just_audio.dart';
-import 'package:polaris/shared/dto.dart';
-import 'package:polaris/shared/media_item.dart';
+import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/media_item.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
-import 'package:polaris/shared/dto.dart';
+import 'package:polaris/core/dto.dart';
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/token.dart' as token;
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
-import 'package:polaris/shared/dto.dart' as dto;
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
