@@ -2,9 +2,9 @@ import 'harness.dart';
 import 'mock/client.dart' as client;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/main.dart';
-import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';
 
@@ -80,7 +80,7 @@ void main() {
   });
 
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
-    await Harness.create(preferences: {host.preferenceKey: client.goodHostURI});
+    await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -89,7 +89,7 @@ void main() {
   });
 
   testWidgets('Failed reconnect shows connect screen', (WidgetTester tester) async {
-    await Harness.create(preferences: {host.preferenceKey: client.badHostURI});
+    await Harness.create(preferences: {connection.hostPreferenceKey: client.badHostURI});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -98,7 +98,7 @@ void main() {
   });
 
   testWidgets('Failed reconnect shows attempted URL screen', (WidgetTester tester) async {
-    await Harness.create(preferences: {host.preferenceKey: client.badHostURI});
+    await Harness.create(preferences: {connection.hostPreferenceKey: client.badHostURI});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -122,8 +122,8 @@ void main() {
   });
 
   testWidgets('Login screen rejects bad credentials', (WidgetTester tester) async {
-    Harness harness = await Harness.create(preferences: {host.preferenceKey: client.goodHostURI});
-    harness.mockClient.mockBadLogin();
+    Harness harness = await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
+    harness.mockHTTPClient.mockBadLogin();
 
     await tester.pumpWidget(PolarisApp());
 
@@ -136,7 +136,7 @@ void main() {
   });
 
   testWidgets('Login screen golden path', (WidgetTester tester) async {
-    await Harness.create(preferences: {host.preferenceKey: client.goodHostURI});
+    await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
 
     await tester.pumpWidget(PolarisApp());
 
@@ -149,7 +149,7 @@ void main() {
 
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
     await Harness.create(
-        preferences: {host.preferenceKey: client.goodHostURI, authentication.tokenPreferenceKey: 'auth-token'});
+        preferences: {connection.hostPreferenceKey: client.goodHostURI, authentication.tokenPreferenceKey: 'auth-token'});
 
     await tester.pumpWidget(PolarisApp());
     expect(startupPage, findsNothing);

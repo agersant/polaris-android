@@ -1,15 +1,13 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/core/polaris.dart' as polaris;
-import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/playback/player.dart';
@@ -36,23 +34,15 @@ final darkTheme = ThemeData(
 );
 
 Future _registerSingletons() async {
-  final hostManager = await SharedPreferencesHost.create();
-  final client = Client();
-  final guestAPI = polaris.HttpGuestClient(
-    hostManager: hostManager,
-    httpClient: client,
-  );
-  final connectionManager = connection.Manager(
-    hostManager: hostManager,
-    guestAPI: guestAPI,
-  );
+  final httpClient = http.Client();
+  final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
+    httpClient: httpClient,
     connectionManager: connectionManager,
-    guestAPI: guestAPI,
   );
   final polarisClient = polaris.HttpClient(
-    httpClient: client,
-    hostManager: hostManager,
+    httpClient: httpClient,
+    connectionManager: connectionManager,
     authenticationManager: authenticationManager,
   );
   final uuid = Uuid();
@@ -61,7 +51,6 @@ Future _registerSingletons() async {
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
-  getIt.registerSingleton<host.Manager>(hostManager);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<polaris.Client>(polarisClient);

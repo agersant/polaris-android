@@ -1,10 +1,8 @@
-import 'mock/client.dart' as client;
+import 'mock/client.dart' as httpClient;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
-import 'package:polaris/shared/host.dart' as host;
-import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/collection/browser_model.dart';
@@ -15,11 +13,11 @@ import 'package:uuid/uuid.dart';
 final getIt = GetIt.instance;
 
 class Harness {
-  final client.Mock mockClient;
-  Harness(this.mockClient);
+  final httpClient.Mock mockHTTPClient;
+  Harness(this.mockHTTPClient);
 
   static final Map<String, Object> reconnectPreferences = {
-    host.preferenceKey: client.goodHostURI,
+    connection.hostPreferenceKey: httpClient.goodHostURI,
     authentication.tokenPreferenceKey: 'auth-token',
   };
 
@@ -32,24 +30,15 @@ class Harness {
 
     getIt.allowReassignment = true;
 
-    final hostManager = await host.SharedPreferencesHost.create();
-    final mockClient = client.Mock();
-    final guestAPI = polaris.HttpGuestClient(
-      hostManager: hostManager,
-      httpClient: mockClient,
-    );
-
-    final connectionManager = connection.Manager(
-      hostManager: hostManager,
-      guestAPI: guestAPI,
-    );
+    final mockHttpClient = httpClient.Mock();
+    final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
+      httpClient: mockHttpClient,
       connectionManager: connectionManager,
-      guestAPI: guestAPI,
     );
     final polarisClient = polaris.HttpClient(
-      httpClient: mockClient,
-      hostManager: hostManager,
+      httpClient: mockHttpClient,
+      connectionManager: connectionManager,
       authenticationManager: authenticationManager,
     );
 
@@ -60,7 +49,6 @@ class Harness {
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
     getIt.registerSingleton<Playlist>(playlist);
-    getIt.registerSingleton<host.Manager>(hostManager);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);
@@ -68,6 +56,6 @@ class Harness {
     getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(uuid);
 
-    return Harness(mockClient);
+    return Harness(mockHttpClient);
   }
 }

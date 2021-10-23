@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
@@ -36,8 +37,8 @@ enum State {
 }
 
 class Manager extends ChangeNotifier {
+  final http.Client httpClient;
   final connection.Manager connectionManager;
-  final polaris.GuestClient guestAPI;
 
   State _state = State.unauthenticated;
   State get state => _state;
@@ -49,8 +50,8 @@ class Manager extends ChangeNotifier {
   Stream<Error> get errorStream => _errorStream;
 
   Manager({
+    required this.httpClient,
     required this.connectionManager,
-    required this.guestAPI,
   }) {
     connectionManager.addListener(() async => await _onConnectionStateChanged());
     _onConnectionStateChanged();
@@ -81,6 +82,7 @@ class Manager extends ChangeNotifier {
 
     _setState(State.reauthenticating);
     try {
+      final guestAPI = polaris.HttpGuestClient(connectionManager: this.connectionManager, httpClient: this.httpClient);
       await guestAPI.testConnection(_token);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
@@ -104,6 +106,7 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticating);
     Authorization authorization;
     try {
+      final guestAPI = polaris.HttpGuestClient(connectionManager: this.connectionManager, httpClient: this.httpClient);
       authorization = await guestAPI.login(username, password);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);

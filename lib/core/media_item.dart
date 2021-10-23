@@ -13,7 +13,7 @@ final String extraKeyYear = 'year';
 final String extraKeyArtwork = 'artwork';
 
 extension MediaItemConversions on Song {
-  MediaItem toMediaItem(Uuid uuid, polaris.Client polarisAPI) {
+  MediaItem toMediaItem(Uuid uuid, polaris.Client polarisClient) {
     return MediaItem(
       id: uuid.v4(),
       playable: true,
@@ -21,7 +21,7 @@ extension MediaItemConversions on Song {
       title: title ?? "",
       artist: formatArtist(),
       duration: duration != null ? Duration(seconds: duration!) : null,
-      artUri: artwork != null ? polarisAPI.getImageURI(artwork!) : null,
+      artUri: artwork != null ? polarisClient.getImageURI(artwork!) : null,
       extras: {
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,

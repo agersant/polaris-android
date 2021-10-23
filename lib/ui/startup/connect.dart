@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
 
@@ -18,12 +17,11 @@ class ConnectForm extends StatefulWidget {
 class _ConnectFormState extends State<ConnectForm> with ConnectionErrorHandler {
   late TextEditingController _textEditingController;
   final connection.Manager _connectionManager = getIt<connection.Manager>();
-  final host.Manager _hostManager = getIt<host.Manager>();
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = new TextEditingController(text: _hostManager.url);
+    _textEditingController = new TextEditingController(text: _connectionManager.url);
   }
 
   @override

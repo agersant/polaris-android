@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
-import 'package:polaris/shared/host.dart' as host;
 
 final apiVersionEndpoint = '/api/version/';
 final browseEndpoint = '/api/browse/';
@@ -57,17 +57,17 @@ abstract class GuestClient {
 }
 
 abstract class _BaseHttpClient {
-  final host.Manager hostManager;
   final http.Client httpClient;
+  final connection.Manager connectionManager;
 
   _BaseHttpClient({
     required this.httpClient,
-    required this.hostManager,
+    required this.connectionManager,
   });
 
   String makeURL(String endpoint) {
     // TODO Ideally we would never have a _BaseHTTPAPI constructed without a valid host
-    return (hostManager.url ?? "") + endpoint;
+    return (connectionManager.url ?? "") + endpoint;
   }
 
   Future<http.StreamedResponse> makeRequest(_Method method, String url,
@@ -110,8 +110,8 @@ abstract class _BaseHttpClient {
 class HttpGuestClient extends _BaseHttpClient implements GuestClient {
   HttpGuestClient({
     required http.Client httpClient,
-    required host.Manager hostManager,
-  }) : super(httpClient: httpClient, hostManager: hostManager);
+    required connection.Manager connectionManager,
+  }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
   @override
   Future<APIVersion> getAPIVersion() async {
@@ -147,8 +147,8 @@ class HttpGuestClient extends _BaseHttpClient implements GuestClient {
 class HttpClient extends _BaseHttpClient implements Client {
   final authentication.Manager authenticationManager;
 
-  HttpClient({required http.Client httpClient, required host.Manager hostManager, required this.authenticationManager})
-      : super(httpClient: httpClient, hostManager: hostManager);
+  HttpClient({required http.Client httpClient, required connection.Manager connectionManager, required this.authenticationManager})
+      : super(httpClient: httpClient, connectionManager: connectionManager);
 
   @override
   Future<List<CollectionFile>> browse(String path) async {
