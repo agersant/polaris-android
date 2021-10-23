@@ -27,7 +27,7 @@ class Player extends StatelessWidget {
       builder: (context, snapshot) {
         final MediaItem? mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
         if (mediaItem == null) {
-          return Container(); // TODO animate the whole thing out when no data
+          return Container(); // TODO animate the whole thing in/out
         }
         return SizedBox(
           height: 64,
@@ -110,9 +110,9 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _previousButton(foregroundColor), // TODO grey out when cannot skip previous
+            _previousButton(foregroundColor),
             if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
-            _nextButton(foregroundColor), // TODO grey out when cannot skip next
+            _nextButton(foregroundColor),
           ],
         );
       },
@@ -120,7 +120,7 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
 
 IconButton _previousButton(Color color) => IconButton(
       icon: Icon(Icons.skip_previous),
-      onPressed: getIt<AudioPlayer>().seekToPrevious,
+      onPressed: getIt<AudioPlayer>().hasPrevious ? getIt<AudioPlayer>().seekToPrevious : null,
       iconSize: 24.0,
       color: color,
     );
@@ -141,7 +141,7 @@ IconButton _playButton(Color color) => IconButton(
 
 IconButton _nextButton(Color color) => IconButton(
       icon: Icon(Icons.skip_next),
-      onPressed: getIt<AudioPlayer>().seekToNext,
+      onPressed: getIt<AudioPlayer>().hasNext ? getIt<AudioPlayer>().seekToNext : null,
       iconSize: 24.0,
       color: color,
     );
