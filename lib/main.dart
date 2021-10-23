@@ -8,7 +8,7 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/shared/host.dart' as host;
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
@@ -38,9 +38,9 @@ final darkTheme = ThemeData(
 Future _registerSingletons() async {
   final hostManager = await SharedPreferencesHost.create();
   final client = Client();
-  final guestAPI = polaris.HttpGuestAPI(
+  final guestAPI = polaris.HttpGuestClient(
     hostManager: hostManager,
-    client: client,
+    httpClient: client,
   );
   final connectionManager = connection.Manager(
     hostManager: hostManager,
@@ -50,21 +50,21 @@ Future _registerSingletons() async {
     connectionManager: connectionManager,
     guestAPI: guestAPI,
   );
-  final polarisAPI = polaris.HttpAPI(
-    client: client,
+  final polarisClient = polaris.HttpClient(
+    httpClient: client,
     hostManager: hostManager,
     authenticationManager: authenticationManager,
   );
   final uuid = Uuid();
   final audioPlayer = AudioPlayer();
-  final playlist = Playlist(uuid: uuid, polarisAPI: polarisAPI, audioPlayer: audioPlayer);
+  final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<host.Manager>(hostManager);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
-  getIt.registerSingleton<polaris.API>(polarisAPI);
+  getIt.registerSingleton<polaris.Client>(polarisClient);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
   getIt.registerSingleton<QueueModel>(QueueModel());
   getIt.registerSingleton<Uuid>(uuid);
@@ -104,7 +104,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       providers: [
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<polaris.API>()),
+        ChangeNotifierProvider.value(value: getIt<polaris.Client>()),
         ChangeNotifierProvider.value(value: getIt<QueueModel>()),
       ],
       child: Consumer2<authentication.Manager, QueueModel>(

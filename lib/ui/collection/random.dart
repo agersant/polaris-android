@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
@@ -45,7 +45,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
       _error = null;
     });
     try {
-      final albums = await getIt<polaris.API>().random();
+      final albums = await getIt<polaris.Client>().random();
       setState(() {
         _albums = albums;
       });

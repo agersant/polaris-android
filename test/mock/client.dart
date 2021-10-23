@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:polaris/core/dto.dart';
-import 'package:polaris/shared/polaris.dart';
+import 'package:polaris/core/polaris.dart';
 
 final goodHost = 'my-polaris-server';
 final badHost = 'not-a-polaris-server';

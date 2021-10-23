@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
@@ -37,7 +37,7 @@ class _ThumbnailState extends State<Thumbnail> {
   void _updateURL() {
     String? path = widget.path;
     if (path != null) {
-      futureImage = getIt<polaris.API>().downloadImage(path).then((r) => r.stream.toBytes());
+      futureImage = getIt<polaris.Client>().downloadImage(path).then((r) => r.stream.toBytes());
     } else {
       futureImage = null;
     }

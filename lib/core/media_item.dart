@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:polaris/core/dto.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/utils/format.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,7 +13,7 @@ final String extraKeyYear = 'year';
 final String extraKeyArtwork = 'artwork';
 
 extension MediaItemConversions on Song {
-  MediaItem toMediaItem(Uuid uuid, polaris.API polarisAPI) {
+  MediaItem toMediaItem(Uuid uuid, polaris.Client polarisAPI) {
     return MediaItem(
       id: uuid.v4(),
       playable: true,

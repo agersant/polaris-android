@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -44,7 +44,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      final files = await getIt<polaris.API>().browse(widget.album.path);
+      final files = await getIt<polaris.Client>().browse(widget.album.path);
       final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
         _songs = songs;

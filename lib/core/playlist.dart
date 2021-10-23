@@ -1,20 +1,20 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/media_item.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
 class Playlist {
   final _audioSource = new ConcatenatingAudioSource(children: []);
   final Uuid uuid;
-  final polaris.API polarisAPI;
+  final polaris.Client polarisClient;
   final AudioPlayer audioPlayer;
 
   AudioSource get audioSource => _audioSource;
 
   Playlist({
     required this.uuid,
-    required this.polarisAPI,
+    required this.polarisClient,
     required this.audioPlayer,
   });
 
@@ -42,8 +42,8 @@ class Playlist {
   }
 
   AudioSource _makeSongAudioSource(Song song) {
-    final songURI = polarisAPI.getAudioURI(song.path);
-    final mediaItem = song.toMediaItem(uuid, polarisAPI);
+    final songURI = polarisClient.getAudioURI(song.path);
+    final mediaItem = song.toMediaItem(uuid, polarisClient);
     return AudioSource.uri(songURI, tag: mediaItem);
   }
 }

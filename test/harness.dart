@@ -2,7 +2,7 @@ import 'mock/client.dart' as client;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/core/authentication.dart' as authentication;
@@ -34,9 +34,9 @@ class Harness {
 
     final hostManager = await host.SharedPreferencesHost.create();
     final mockClient = client.Mock();
-    final guestAPI = polaris.HttpGuestAPI(
+    final guestAPI = polaris.HttpGuestClient(
       hostManager: hostManager,
-      client: mockClient,
+      httpClient: mockClient,
     );
 
     final connectionManager = connection.Manager(
@@ -47,15 +47,15 @@ class Harness {
       connectionManager: connectionManager,
       guestAPI: guestAPI,
     );
-    final collectionAPI = polaris.HttpAPI(
-      client: mockClient,
+    final polarisClient = polaris.HttpClient(
+      httpClient: mockClient,
       hostManager: hostManager,
       authenticationManager: authenticationManager,
     );
 
     final uuid = Uuid();
     final audioPlayer = AudioPlayer();
-    final playlist = Playlist(uuid: uuid, polarisAPI: collectionAPI, audioPlayer: audioPlayer);
+    final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
     audioPlayer.setAudioSource(playlist.audioSource);
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
@@ -63,7 +63,7 @@ class Harness {
     getIt.registerSingleton<host.Manager>(hostManager);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
-    getIt.registerSingleton<polaris.API>(collectionAPI);
+    getIt.registerSingleton<polaris.Client>(polarisClient);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
     getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(uuid);

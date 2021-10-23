@@ -2,7 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
@@ -110,7 +110,7 @@ class _BrowserLocationState extends State<BrowserLocation> {
       _error = null;
     });
     try {
-      final files = await getIt<polaris.API>().browse(widget.location);
+      final files = await getIt<polaris.Client>().browse(widget.location);
       setState(() {
         _files = files;
       });

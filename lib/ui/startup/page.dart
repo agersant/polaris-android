@@ -3,7 +3,7 @@ import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
@@ -57,7 +57,7 @@ class StartupPage extends StatelessWidget {
   }
 
   Widget _buildContent() {
-    return Consumer3<connection.Manager, authentication.Manager, polaris.API>(
+    return Consumer3<connection.Manager, authentication.Manager, polaris.Client>(
       builder: (context, connectionManager, authenticationManager, polarisAPI, child) {
         final state = _computeState(connectionManager.state, authenticationManager.state, polarisAPI.state);
         final widget = _buildWidgetForState(state);

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String tokenPreferenceKey = "polaris_auth_token";
@@ -37,7 +37,7 @@ enum State {
 
 class Manager extends ChangeNotifier {
   final connection.Manager connectionManager;
-  final polaris.GuestAPI guestAPI;
+  final polaris.GuestClient guestAPI;
 
   State _state = State.unauthenticated;
   State get state => _state;

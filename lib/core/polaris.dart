@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/shared/host.dart' as host;
@@ -45,7 +45,7 @@ enum APIError {
   requestFailed,
 }
 
-abstract class API extends ChangeNotifier {
+abstract class Client extends ChangeNotifier {
   State get state;
   Future<List<CollectionFile>> browse(String path);
   Future<List<Song>> flatten(String path);
@@ -53,22 +53,22 @@ abstract class API extends ChangeNotifier {
   Future<List<Directory>> recent();
   Uri getImageURI(String path);
   Uri getAudioURI(String path);
-  Future<StreamedResponse> downloadImage(String path);
-  Future<StreamedResponse> downloadAudio(String path);
+  Future<http.StreamedResponse> downloadImage(String path);
+  Future<http.StreamedResponse> downloadAudio(String path);
 }
 
-abstract class GuestAPI {
+abstract class GuestClient {
   Future<APIVersion> getAPIVersion();
   Future<Authorization> login(String username, String password);
   Future<void> testConnection(String? authenticationToken);
 }
 
-abstract class _BaseHttpAPI extends ChangeNotifier {
+abstract class _BaseHttpClient extends ChangeNotifier {
   final host.Manager hostManager;
-  final Client client;
+  final http.Client httpClient;
 
-  _BaseHttpAPI({
-    required this.client,
+  _BaseHttpClient({
+    required this.httpClient,
     required this.hostManager,
   });
 
@@ -77,8 +77,9 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
     return (hostManager.url ?? "") + endpoint;
   }
 
-  Future<StreamedResponse> makeRequest(_Method method, String url, {dynamic body, String? authenticationToken}) async {
-    Request request = Request(method.toHTTPMethod(), Uri.parse(url));
+  Future<http.StreamedResponse> makeRequest(_Method method, String url,
+      {dynamic body, String? authenticationToken}) async {
+    http.Request request = http.Request(method.toHTTPMethod(), Uri.parse(url));
 
     if (authenticationToken != null) {
       request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + authenticationToken;
@@ -89,9 +90,9 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
       request.body = jsonEncode(body);
     }
 
-    Future<StreamedResponse> response;
+    Future<http.StreamedResponse> response;
     try {
-      response = client.send(request);
+      response = httpClient.send(request);
     } catch (e) {
       throw APIError.networkError;
     }
@@ -113,11 +114,11 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
   }
 }
 
-class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
-  HttpGuestAPI({
-    required Client client,
+class HttpGuestClient extends _BaseHttpClient implements GuestClient {
+  HttpGuestClient({
+    required http.Client httpClient,
     required host.Manager hostManager,
-  }) : super(client: client, hostManager: hostManager);
+  }) : super(httpClient: httpClient, hostManager: hostManager);
 
   @override
   Future<APIVersion> getAPIVersion() async {
@@ -150,13 +151,13 @@ class HttpGuestAPI extends _BaseHttpAPI implements GuestAPI {
   }
 }
 
-class HttpAPI extends _BaseHttpAPI implements API {
+class HttpClient extends _BaseHttpClient implements Client {
   State _state = State.unavailable;
   get state => _state;
   final authentication.Manager authenticationManager;
 
-  HttpAPI({required Client client, required host.Manager hostManager, required this.authenticationManager})
-      : super(client: client, hostManager: hostManager) {
+  HttpClient({required http.Client httpClient, required host.Manager hostManager, required this.authenticationManager})
+      : super(httpClient: httpClient, hostManager: hostManager) {
     hostManager.addListener(_updateState);
     _updateState();
   }
@@ -211,7 +212,7 @@ class HttpAPI extends _BaseHttpAPI implements API {
   }
 
   @override
-  Future<StreamedResponse> downloadImage(String path) {
+  Future<http.StreamedResponse> downloadImage(String path) {
     final uri = getImageURI(path);
     return makeRequest(_Method.get, uri.toString());
   }
@@ -227,7 +228,7 @@ class HttpAPI extends _BaseHttpAPI implements API {
   }
 
   @override
-  Future<StreamedResponse> downloadAudio(String path) {
+  Future<http.StreamedResponse> downloadAudio(String path) {
     final uri = getAudioURI(path);
     return makeRequest(_Method.get, uri.toString());
   }

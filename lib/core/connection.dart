@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/shared/polaris.dart' as polaris;
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/shared/shared_preferences_host.dart';
 
 enum Error {
@@ -33,7 +33,7 @@ enum State {
 }
 
 class Manager extends ChangeNotifier {
-  final polaris.GuestAPI guestAPI;
+  final polaris.GuestClient guestAPI;
   final SharedPreferencesHost hostManager;
 
   State _state = State.disconnected;
