@@ -52,6 +52,7 @@ abstract class API extends ChangeNotifier {
   Future<List<Directory>> random();
   Future<List<Directory>> recent();
   Uri getImageURI(String path);
+  Uri getAudioURI(String path);
   Future<StreamedResponse> downloadImage(String path);
   Future<StreamedResponse> downloadAudio(String path);
 }
@@ -64,13 +65,13 @@ abstract class GuestAPI {
 
 abstract class _BaseHttpAPI extends ChangeNotifier {
   final host.Manager hostManager;
-  final token.Manager? tokenManager;
+  final token.Manager tokenManager;
   final Client client;
 
   _BaseHttpAPI({
     required this.client,
     required this.hostManager,
-    this.tokenManager,
+    required this.tokenManager,
   });
 
   String makeURL(String endpoint) {
@@ -82,7 +83,7 @@ abstract class _BaseHttpAPI extends ChangeNotifier {
     Request request = Request(method.toHTTPMethod(), Uri.parse(url));
 
     if (authenticate) {
-      String? token = tokenManager?.token;
+      String? token = tokenManager.token;
       if (token != null && token.isNotEmpty) {
         request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + token;
       }
@@ -159,7 +160,7 @@ class HttpAPI extends _BaseHttpAPI implements API {
   State _state = State.unavailable;
   get state => _state;
 
-  HttpAPI({required Client client, required token.Manager? tokenManager, required host.Manager hostManager})
+  HttpAPI({required Client client, required token.Manager tokenManager, required host.Manager hostManager})
       : super(client: client, hostManager: hostManager, tokenManager: tokenManager) {
     hostManager.addListener(_updateState);
     _updateState();
@@ -223,7 +224,7 @@ class HttpAPI extends _BaseHttpAPI implements API {
   @override
   Uri getImageURI(String path) {
     String url = makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
-    String? token = tokenManager?.token;
+    String? token = tokenManager.token;
     if (token != null && token.isNotEmpty) {
       url += '&auth_token=' + token;
     }
@@ -232,7 +233,17 @@ class HttpAPI extends _BaseHttpAPI implements API {
 
   @override
   Future<StreamedResponse> downloadAudio(String path) {
-    final url = makeURL(audioEndpoint + Uri.encodeComponent(path));
-    return makeRequest(_Method.get, url, authenticate: true);
+    final uri = getAudioURI(path);
+    return makeRequest(_Method.get, uri.toString());
+  }
+
+  @override
+  Uri getAudioURI(String path) {
+    String url = makeURL(audioEndpoint + Uri.encodeComponent(path));
+    String? token = tokenManager.token;
+    if (token != null && token.isNotEmpty) {
+      url += '?auth_token=' + token;
+    }
+    return Uri.parse(url);
   }
 }

@@ -44,19 +44,33 @@ packages:
     source: hosted
     version: "2.5.0"
   audio_service:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: audio_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.17.0"
+    version: "0.18.1"
+  audio_service_platform_interface:
+    dependency: transitive
+    description:
+      name: audio_service_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
+  audio_service_web:
+    dependency: transitive
+    description:
+      name: audio_service_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   audio_session:
     dependency: transitive
     description:
       name: audio_session
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.0"
+    version: "0.1.6+1"
   boolean_selector:
     dependency: transitive
     description:
@@ -160,13 +174,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
-  flutter_isolate:
-    dependency: transitive
-    description:
-      name: flutter_isolate
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -246,21 +253,28 @@ packages:
       name: just_audio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.4"
+    version: "0.9.14"
+  just_audio_background:
+    dependency: "direct main"
+    description:
+      name: just_audio_background
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1-beta.1"
   just_audio_platform_interface:
     dependency: transitive
     description:
       name: just_audio_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.0"
   just_audio_web:
     dependency: transitive
     description:
       name: just_audio_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.1"
+    version: "0.4.2"
   logging:
     dependency: transitive
     description:
@@ -681,4 +695,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.12.0 <3.0.0"
-  flutter: ">=1.24.0-10"
+  flutter: ">=2.0.0"

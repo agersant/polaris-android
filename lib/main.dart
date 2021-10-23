@@ -1,15 +1,15 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:polaris/shared/loopback_host.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/shared/playlist.dart';
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/shared_preferences_host.dart';
 import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
-import 'package:polaris/foreground/service.dart' as service;
 import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/collection/page.dart';
 import 'package:polaris/foreground/ui/playback/player.dart';
@@ -53,33 +53,34 @@ Future _registerSingletons() async {
     tokenManager: tokenManager,
     guestAPI: guestAPI,
   );
-  final serviceManager = service.Manager(
-    hostManager: hostManager,
-    tokenManager: tokenManager,
-    connectionManager: connectionManager,
-    authenticationManager: authenticationManager,
-    launcher: service.AudioServiceLauncher(),
-  );
-  final loopbackHost = LoopbackHost(serviceManager: serviceManager);
   final polarisAPI = polaris.HttpAPI(
     client: client,
-    hostManager: loopbackHost,
-    tokenManager: null,
+    hostManager: hostManager,
+    tokenManager: tokenManager,
   );
+  final uuid = Uuid();
+  final audioPlayer = AudioPlayer();
+  final playlist = Playlist(uuid: uuid, polarisAPI: polarisAPI);
+  audioPlayer.setAudioSource(playlist.audioSource);
 
+  getIt.registerSingleton<AudioPlayer>(audioPlayer);
+  getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<host.Manager>(hostManager);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
-  getIt.registerSingleton<service.Manager>(serviceManager);
   getIt.registerSingleton<polaris.API>(polarisAPI);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
   getIt.registerSingleton<QueueModel>(QueueModel());
-  getIt.registerSingleton<Uuid>(Uuid());
+  getIt.registerSingleton<Uuid>(uuid);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _registerSingletons();
+  await JustAudioBackground.init(
+    androidNotificationChannelName: 'Polaris Audio Playback',
+    androidNotificationOngoing: true,
+  );
   runApp(PolarisApp());
 }
 
@@ -105,39 +106,37 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         ChangeNotifierProvider.value(value: getIt<polaris.API>()),
         ChangeNotifierProvider.value(value: getIt<QueueModel>()),
       ],
-      child: Consumer2<polaris.API, QueueModel>(
-        builder: (context, polarisAPI, queueModel, child) {
-          final isStartupComplete = polarisAPI.state == polaris.State.available;
+      child: Consumer2<authentication.Manager, QueueModel>(
+        builder: (context, authenticationManager, queueModel, child) {
+          final isStartupComplete = authenticationManager.state == authentication.State.authenticated;
           final showQueue = isStartupComplete && queueModel.isQueueOpen;
 
           return BackButtonHandler(
-            AudioServiceWidget(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Navigator(
-                      key: navigatorKey,
-                      pages: [
-                        if (!isStartupComplete) MaterialPage(child: StartupPage()),
-                        if (isStartupComplete) MaterialPage(child: CollectionPage()),
-                        // TODO Ideally album details would be here
-                        // However, OpenContainer() can't be used with the pages API.
-                        if (showQueue) MaterialPage(child: QueuePage()),
-                      ],
-                      onPopPage: (route, result) {
-                        if (!route.didPop(result)) {
-                          return false;
-                        }
-                        if (queueModel.isQueueOpen) {
-                          queueModel.closeQueue();
-                        }
-                        return true;
-                      },
-                    ),
+            Column(
+              children: [
+                Expanded(
+                  child: Navigator(
+                    key: navigatorKey,
+                    pages: [
+                      if (!isStartupComplete) MaterialPage(child: StartupPage()),
+                      if (isStartupComplete) MaterialPage(child: CollectionPage()),
+                      // TODO Ideally album details would be here
+                      // However, OpenContainer() can't be used with the pages API.
+                      if (showQueue) MaterialPage(child: QueuePage()),
+                    ],
+                    onPopPage: (route, result) {
+                      if (!route.didPop(result)) {
+                        return false;
+                      }
+                      if (queueModel.isQueueOpen) {
+                        queueModel.closeQueue();
+                      }
+                      return true;
+                    },
                   ),
-                  if (isStartupComplete) Player(),
-                ],
-              ),
+                ),
+                if (isStartupComplete) Player(),
+              ],
             ),
           );
         },

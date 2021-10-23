@@ -1,16 +1,13 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/background/entrypoint.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/dto.dart' as dto;
-import 'package:polaris/shared/media_item.dart';
+import 'package:polaris/shared/playlist.dart';
 import 'package:polaris/foreground/ui/strings.dart';
 import 'package:polaris/foreground/ui/utils/error_message.dart';
 import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
-import 'package:uuid/uuid.dart';
 
 final getIt = GetIt.instance;
 
@@ -290,11 +287,9 @@ class Song extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uuid = getIt<Uuid>();
-    final polarisAPI = getIt<polaris.API>();
     return Material(
       child: InkWell(
-        onTap: () => AudioService.addQueueItem(song.toMediaItem(uuid, polarisAPI)),
+        onTap: () => getIt<Playlist>().queueLast(song),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
@@ -314,13 +309,13 @@ enum SongAction {
 
 _songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
       onSelected: (SongAction result) {
-        final MediaItem mediaItem = song.toMediaItem(getIt<Uuid>(), getIt<polaris.API>());
+        final Playlist playlist = getIt<Playlist>();
         switch (result) {
           case SongAction.queueLast:
-            AudioService.addQueueItem(mediaItem);
+            playlist.queueLast(song);
             break;
           case SongAction.queueNext:
-            AudioService.customAction(customActionAddNextQueueItem, [mediaItem.toJson()]);
+            playlist.queueNext(song);
             break;
           default:
             break;

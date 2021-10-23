@@ -1,131 +1,90 @@
-import 'dart:async';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/background/entrypoint.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:polaris/foreground/ui/utils/animated_equalizer.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
 import 'package:polaris/shared/dto.dart' as dto;
 import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/strings.dart';
 import 'package:polaris/shared/media_item.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:polaris/shared/playlist.dart';
 
 final getIt = GetIt.instance;
 
-class QueueState {
-  final List<MediaItem>? queue;
-  MediaItem? mediaItem;
-  QueueState(this.queue, this.mediaItem);
-}
-
-Stream<QueueState> get _queueStateStream => Rx.combineLatest2<List<MediaItem>?, MediaItem?, QueueState>(
-    AudioService.queueStream, AudioService.currentMediaItemStream, (queue, mediaItem) => QueueState(queue, mediaItem));
-
-class QueuePage extends StatefulWidget {
-  @override
-  _QueuePageState createState() => _QueuePageState();
-}
-
-class _QueuePageState extends State<QueuePage> with SingleTickerProviderStateMixin {
-  // Keep a local copy of the queue so we can re-order without waiting for communication with background service
-  // Directly reflecting AudioService.queueStream in the UI leads to flicker when finishing a drag and drop
-  late QueueState localState;
-  late StreamSubscription<QueueState> stateSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    stateSubscription = _queueStateStream.listen((newState) {
-      setState(() {
-        localState = newState;
-      });
-    });
-    localState = QueueState(AudioService.queue, AudioService.currentMediaItem);
-    // TODO autoscroll to current song
-  }
-
-  @override
-  void dispose() {
-    stateSubscription.cancel();
-    super.dispose();
-  }
-
+class QueuePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AudioPlayer audioPlayer = getIt<AudioPlayer>();
+
+    // TODO autoscroll to current song
+    // TODO display number of songs and total duration
+
+    // TODO there is a visual bug when re-ordering songs in a way that shifts the currently playing song.
+    // It is caused by just_audio updating the sequenceState partially through the re-order operation
+
     return Scaffold(
       appBar: AppBar(
         title: Text(queueTitle),
       ),
-      body: StreamBuilder<PlaybackState>(
-          // TODO display number of songs and total duration
-          stream: AudioService.playbackStateStream,
-          builder: (context, snapshot) {
-            List<MediaItem>? queue = localState.queue;
-            if (queue == null) {
-              return Container();
-            } else {
-              return ReorderableListView.builder(
-                itemBuilder: (context, index) {
-                  final MediaItem mediaItem = queue[index];
-                  final AudioProcessingState processingState =
-                      snapshot.data?.processingState ?? AudioProcessingState.none;
-                  final bool isCurrent = mediaItem.id == localState.mediaItem?.id;
-                  final bool isPlaying = snapshot.data?.playing ?? false;
-
-                  final onTap = () {
-                    localState.mediaItem = mediaItem;
-                    setState(() {});
-                    AudioService.skipToQueueItem(mediaItem.id);
-                  };
-                  return _songWidget(context, mediaItem, isCurrent, isPlaying, processingState, onTap);
-                },
-                itemCount: queue.length,
-                onReorder: (int oldIndex, int newIndex) {
-                  final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
-                  queue.insert(insertIndex, queue.removeAt(oldIndex));
-                  setState(() {});
-                  AudioService.customAction(customActionMoveQueueItem, [oldIndex, newIndex]);
-                },
-                physics: BouncingScrollPhysics(),
-              );
-            }
-          }),
+      body: StreamBuilder<SequenceState?>(
+        stream: audioPlayer.sequenceStateStream,
+        builder: (context, snapshot) {
+          return ReorderableListView.builder(
+            itemBuilder: (context, index) {
+              final SequenceState sequenceState = snapshot.data!;
+              final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
+              final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
+              final onTap = () {
+                getIt<AudioPlayer>().seek(null, index: index);
+              };
+              return _songWidget(context, mediaItem, isCurrent, onTap);
+            },
+            itemCount: snapshot.data?.sequence.length ?? 0,
+            onReorder: (int oldIndex, int newIndex) {
+              getIt<Playlist>().moveSong(oldIndex, newIndex);
+            },
+            physics: BouncingScrollPhysics(),
+          );
+        },
+      ),
     );
   }
 }
 
-Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, bool isPlaying,
-    AudioProcessingState state, Function() onTap) {
-  final dto.Song song = mediaItem.toSong();
+Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Function() onTap) =>
+    StreamBuilder<PlayerState>(
+        key: Key(mediaItem.id),
+        stream: getIt<AudioPlayer>().playerStateStream,
+        builder: (context, snapshot) {
+          final dto.Song song = mediaItem.toSong();
+          final isPlaying = snapshot.data?.playing ?? false;
+          final ProcessingState state = snapshot.data?.processingState ?? ProcessingState.idle;
+          return Material(
+            child: InkWell(
+              onTap: onTap,
+              child: ListTile(
+                leading: ListThumbnail(song.artwork),
+                title: Row(
+                  children: [
+                    if (isCurrent && state != ProcessingState.completed)
+                      Padding(
+                          padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                          child: _currentSongIcon(context, isPlaying, state)),
+                    Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+                subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
+                dense: true,
+              ),
+            ),
+          );
+        });
 
-  return Material(
-    key: Key(mediaItem.id),
-    child: InkWell(
-      onTap: onTap,
-      child: ListTile(
-        leading: ListThumbnail(song.artwork),
-        title: Row(
-          children: [
-            if (isCurrent && state != AudioProcessingState.completed)
-              Padding(
-                  padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                  child: _currentSongIcon(context, isPlaying, state)),
-            Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
-          ],
-        ),
-        subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
-        dense: true,
-      ),
-    ),
-  );
-}
-
-Widget _currentSongIcon(BuildContext context, bool isPlaying, AudioProcessingState state) {
+Widget _currentSongIcon(BuildContext context, bool isPlaying, ProcessingState state) {
   final Color color = Theme.of(context).colorScheme.primary;
-  final bool isBuffering = state != AudioProcessingState.ready && state != AudioProcessingState.completed;
+  final bool isBuffering = state != ProcessingState.ready && state != ProcessingState.completed;
 
   if (isBuffering) {
     return Padding(

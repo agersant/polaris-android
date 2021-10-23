@@ -1,14 +1,14 @@
+import 'package:just_audio/just_audio.dart';
+import 'package:polaris/shared/playlist.dart';
+
 import 'mock/client.dart' as client;
-import 'mock/service.dart' as service show MockServiceLauncher;
 import 'package:get_it/get_it.dart';
-import 'package:polaris/shared/loopback_host.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
-import 'package:polaris/foreground/service.dart' as service;
 import 'package:polaris/foreground/ui/collection/browser_model.dart';
 import 'package:polaris/foreground/ui/playback/queue_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -52,28 +52,26 @@ class Harness {
       tokenManager: tokenManager,
       guestAPI: guestAPI,
     );
-    final serviceManager = service.Manager(
-      hostManager: hostManager,
-      tokenManager: tokenManager,
-      connectionManager: connectionManager,
-      authenticationManager: authenticationManager,
-      launcher: service.MockServiceLauncher(),
-    );
-    final loopbackHost = LoopbackHost(serviceManager: serviceManager);
     final collectionAPI = polaris.HttpAPI(
       client: mockClient,
-      hostManager: loopbackHost,
-      tokenManager: null,
+      hostManager: hostManager,
+      tokenManager: tokenManager,
     );
 
+    final uuid = Uuid();
+    final audioPlayer = AudioPlayer();
+    final playlist = Playlist(uuid: uuid, polarisAPI: collectionAPI);
+    audioPlayer.setAudioSource(playlist.audioSource);
+
+    getIt.registerSingleton<AudioPlayer>(audioPlayer);
+    getIt.registerSingleton<Playlist>(playlist);
     getIt.registerSingleton<host.Manager>(hostManager);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
-    getIt.registerSingleton<service.Manager>(serviceManager);
     getIt.registerSingleton<polaris.API>(collectionAPI);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
     getIt.registerSingleton<QueueModel>(QueueModel());
-    getIt.registerSingleton<Uuid>(Uuid());
+    getIt.registerSingleton<Uuid>(uuid);
 
     return Harness(mockClient);
   }

@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:polaris/foreground/ui/playback/queue_model.dart';
 import 'package:polaris/foreground/ui/utils/format.dart';
 import 'package:polaris/foreground/ui/utils/thumbnail.dart';
@@ -11,23 +12,21 @@ import 'package:rxdart/rxdart.dart';
 final getIt = GetIt.instance;
 
 class MediaState {
-  final MediaItem? mediaItem;
+  final SequenceState? sequenceState;
   final Duration position;
-  MediaState(this.mediaItem, this.position);
+  MediaState(this.sequenceState, this.position);
 }
-
-Stream<MediaState> get _mediaStateStream => Rx.combineLatest2<MediaItem?, Duration, MediaState>(
-    AudioService.currentMediaItemStream,
-    AudioService.positionStream,
-    (mediaItem, position) => MediaState(mediaItem, position));
 
 class Player extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<MediaItem?>(
-      stream: AudioService.currentMediaItemStream,
+    final audioPlayer = getIt<AudioPlayer>();
+
+    return StreamBuilder<SequenceState?>(
+      stream: audioPlayer.sequenceStateStream,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        final MediaItem? mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
+        if (mediaItem == null) {
           return Container(); // TODO animate the whole thing out when no data
         }
         return SizedBox(
@@ -39,7 +38,7 @@ class Player extends StatelessWidget {
                 QueueModel queueModel = getIt<QueueModel>();
                 queueModel.openQueue();
               },
-              child: playerContent(context, snapshot.data!.toSong()),
+              child: playerContent(context, mediaItem.toSong()),
             ),
           ),
         );
@@ -101,12 +100,12 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
       },
     );
 
-Widget _controls(Color foregroundColor) => StreamBuilder<PlaybackState>(
-      stream: AudioService.playbackStateStream,
+Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
+      stream: getIt<AudioPlayer>().playerStateStream,
       builder: (context, snapshot) {
         bool playing = false;
         if (snapshot.hasData) {
-          playing = snapshot.data!.playing && snapshot.data!.processingState != AudioProcessingState.completed;
+          playing = snapshot.data!.playing && snapshot.data!.processingState != ProcessingState.completed;
         }
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -121,46 +120,53 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlaybackState>(
 
 IconButton _previousButton(Color color) => IconButton(
       icon: Icon(Icons.skip_previous),
-      onPressed: AudioService.skipToPrevious,
+      onPressed: getIt<AudioPlayer>().seekToPrevious,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _pauseButton(Color color) => IconButton(
       icon: Icon(Icons.pause),
-      onPressed: AudioService.pause,
+      onPressed: getIt<AudioPlayer>().pause,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _playButton(Color color) => IconButton(
       icon: Icon(Icons.play_arrow),
-      onPressed: AudioService.play,
+      onPressed: getIt<AudioPlayer>().play,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _nextButton(Color color) => IconButton(
       icon: Icon(Icons.skip_next),
-      onPressed: AudioService.skipToNext,
+      onPressed: getIt<AudioPlayer>().seekToNext,
       iconSize: 24.0,
       color: color,
     );
 
 Widget _progressBar() => LayoutBuilder(
       builder: (context, size) {
+        final player = getIt<AudioPlayer>();
+        final Stream<MediaState> mediaStateStream = Rx.combineLatest2<SequenceState?, Duration, MediaState>(
+            player.sequenceStateStream,
+            player.positionStream,
+            (sequenceState, position) => MediaState(sequenceState, position));
+
         final Color backgroundColor = Theme.of(context).backgroundColor;
         final Color foregroundColor = Theme.of(context).accentColor;
         return Stack(
           children: [
             Container(color: backgroundColor),
             StreamBuilder<MediaState>(
-              stream: _mediaStateStream,
+              stream: mediaStateStream,
               builder: (context, snapshot) {
                 double progress = 0.0;
                 if (snapshot.hasData) {
                   final int? position = snapshot.data!.position.inMilliseconds;
-                  final int? duration = snapshot.data!.mediaItem?.duration?.inMilliseconds;
+                  final MediaItem? mediaItem = snapshot.data!.sequenceState?.currentSource?.tag as MediaItem;
+                  final int? duration = mediaItem?.duration?.inMilliseconds;
                   if (position != null && duration != null && duration > 0) {
                     progress = (position / duration).clamp(0.0, 1.0);
                   }

@@ -25,11 +25,11 @@ dependencies:
     sdk: flutter
 
   animations: ^2.0.0
-  audio_service: ^0.17.0
   dartz: ^0.10.0-nullsafety.1
   flutter_svg: ^0.22.0
   get_it: ^6.1.1
-  just_audio: ^0.7.4
+  just_audio: ^0.9.14
+  just_audio_background: ^0.0.1-beta.1
   http: ^0.13.1
   path_provider: ^2.0.1
   provider: ^5.0.0

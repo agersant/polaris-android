@@ -37,7 +37,9 @@ class _AnimatedEqualizerState extends State<AnimatedEqualizer> with SingleTicker
         }
       });
 
-    controller.forward();
+    if (widget.isPlaying) {
+      controller.forward();
+    }
   }
 
   @override
