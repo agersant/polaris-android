@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/connection.dart' as connection;
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';

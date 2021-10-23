@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/authentication.dart' as authentication;
-import 'package:polaris/foreground/connection.dart' as connection;
+import 'package:polaris/core/authentication.dart' as authentication;
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
 
