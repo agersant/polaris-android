@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
-import 'package:polaris/background/cache.dart' as cache;
+import 'package:polaris/core/cache.dart' as cache;
 import 'package:polaris/shared/polaris.dart' as collection;
 import 'package:polaris/shared/dto.dart';
 import 'package:polaris/shared/host.dart' as host;

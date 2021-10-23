@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:polaris/background/cache.dart' as cache;
+import 'package:polaris/core/cache.dart' as cache;
 
 class Manager implements cache.Interface {
   static Future<Manager> create() async {
