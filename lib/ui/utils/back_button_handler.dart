@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/foreground/ui/collection/browser_model.dart';
+import 'package:polaris/ui/collection/browser_model.dart';
 
 final getIt = GetIt.instance;
 

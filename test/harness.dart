@@ -9,8 +9,8 @@ import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
-import 'package:polaris/foreground/ui/collection/browser_model.dart';
-import 'package:polaris/foreground/ui/playback/queue_model.dart';
+import 'package:polaris/ui/collection/browser_model.dart';
+import 'package:polaris/ui/playback/queue_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 

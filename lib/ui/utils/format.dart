@@ -1,5 +1,5 @@
 import 'package:polaris/shared/dto.dart';
-import 'package:polaris/foreground/ui/strings.dart';
+import 'package:polaris/ui/strings.dart';
 
 final _pathSeparatorRegExp = RegExp(r'[/\\]');
 

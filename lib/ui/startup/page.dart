@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polaris/foreground/authentication.dart' as authentication;
 import 'package:polaris/foreground/connection.dart' as connection;
 import 'package:polaris/shared/polaris.dart' as polaris;
-import 'package:polaris/foreground/ui/startup/connect.dart';
-import 'package:polaris/foreground/ui/startup/login.dart';
+import 'package:polaris/ui/startup/connect.dart';
+import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
 
 enum StartupState {

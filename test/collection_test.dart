@@ -2,7 +2,7 @@ import 'harness.dart';
 import 'mock/client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/main.dart';
-import 'package:polaris/foreground/ui/collection/browser.dart';
+import 'package:polaris/ui/collection/browser.dart';
 
 final rootDirectory = find.text(rootDirectoryName);
 final heronDirectory = find.text(heronDirectoryName);

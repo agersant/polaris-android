@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:polaris/foreground/ui/utils/animated_equalizer.dart';
-import 'package:polaris/foreground/ui/utils/thumbnail.dart';
+import 'package:polaris/ui/utils/animated_equalizer.dart';
+import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/shared/dto.dart' as dto;
-import 'package:polaris/foreground/ui/utils/format.dart';
-import 'package:polaris/foreground/ui/strings.dart';
+import 'package:polaris/ui/utils/format.dart';
+import 'package:polaris/ui/strings.dart';
 import 'package:polaris/shared/media_item.dart';
 import 'package:polaris/shared/playlist.dart';
 
