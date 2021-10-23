@@ -1,8 +1,7 @@
-import 'package:just_audio/just_audio.dart';
-import 'package:polaris/shared/playlist.dart';
-
 import 'mock/client.dart' as client;
+import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/playlist.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
