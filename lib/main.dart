@@ -104,7 +104,6 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       providers: [
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<polaris.Client>()),
         ChangeNotifierProvider.value(value: getIt<QueueModel>()),
       ],
       child: Consumer2<authentication.Manager, QueueModel>(

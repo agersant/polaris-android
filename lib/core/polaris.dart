@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/dto.dart';
@@ -15,11 +14,6 @@ final recentEndpoint = '/api/recent/';
 final loginEndpoint = '/api/auth/';
 final thumbnailEndpoint = '/api/thumbnail/';
 final audioEndpoint = '/api/audio/';
-
-enum State {
-  available,
-  unavailable,
-}
 
 enum _Method {
   get,
@@ -45,8 +39,7 @@ enum APIError {
   requestFailed,
 }
 
-abstract class Client extends ChangeNotifier {
-  State get state;
+abstract class Client {
   Future<List<CollectionFile>> browse(String path);
   Future<List<Song>> flatten(String path);
   Future<List<Directory>> random();
@@ -63,7 +56,7 @@ abstract class GuestClient {
   Future<void> testConnection(String? authenticationToken);
 }
 
-abstract class _BaseHttpClient extends ChangeNotifier {
+abstract class _BaseHttpClient {
   final host.Manager hostManager;
   final http.Client httpClient;
 
@@ -152,20 +145,10 @@ class HttpGuestClient extends _BaseHttpClient implements GuestClient {
 }
 
 class HttpClient extends _BaseHttpClient implements Client {
-  State _state = State.unavailable;
-  get state => _state;
   final authentication.Manager authenticationManager;
 
   HttpClient({required http.Client httpClient, required host.Manager hostManager, required this.authenticationManager})
-      : super(httpClient: httpClient, hostManager: hostManager) {
-    hostManager.addListener(_updateState);
-    _updateState();
-  }
-
-  void _updateState() {
-    _state = hostManager.state == host.State.available ? State.available : State.unavailable;
-    notifyListeners();
-  }
+      : super(httpClient: httpClient, hostManager: hostManager);
 
   @override
   Future<List<CollectionFile>> browse(String path) async {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
 import 'package:provider/provider.dart';
@@ -12,14 +11,12 @@ enum StartupState {
   reconnecting,
   connect,
   login,
-  startingService,
 }
 
 class StartupPage extends StatelessWidget {
   final Widget _logo = SvgPicture.asset('assets/images/logo.svg', semanticsLabel: 'Polaris logo');
 
-  StartupState _computeState(
-      connection.State connectionState, authentication.State authenticationState, polaris.State serviceState) {
+  StartupState _computeState(connection.State connectionState, authentication.State authenticationState) {
     switch (connectionState) {
       case connection.State.reconnecting:
         return StartupState.reconnecting;
@@ -32,13 +29,8 @@ class StartupPage extends StatelessWidget {
             return StartupState.reconnecting;
           case authentication.State.authenticating:
           case authentication.State.unauthenticated:
-            return StartupState.login;
           case authentication.State.authenticated:
-            switch (serviceState) {
-              case polaris.State.unavailable:
-              case polaris.State.available:
-                return StartupState.startingService;
-            }
+            return StartupState.login;
         }
     }
   }
@@ -51,15 +43,13 @@ class StartupPage extends StatelessWidget {
         return ConnectForm();
       case StartupState.login:
         return LoginForm();
-      case StartupState.startingService:
-        return CircularProgressIndicator();
     }
   }
 
   Widget _buildContent() {
-    return Consumer3<connection.Manager, authentication.Manager, polaris.Client>(
-      builder: (context, connectionManager, authenticationManager, polarisAPI, child) {
-        final state = _computeState(connectionManager.state, authenticationManager.state, polarisAPI.state);
+    return Consumer2<connection.Manager, authentication.Manager>(
+      builder: (context, connectionManager, authenticationManager, child) {
+        final state = _computeState(connectionManager.state, authenticationManager.state);
         final widget = _buildWidgetForState(state);
         return PageTransitionSwitcher(
             reverse: state == StartupState.connect,
