@@ -7,7 +7,6 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/polaris.dart' as polaris;
 import 'package:polaris/shared/shared_preferences_host.dart';
@@ -38,10 +37,8 @@ final darkTheme = ThemeData(
 
 Future _registerSingletons() async {
   final hostManager = await SharedPreferencesHost.create();
-  final tokenManager = await token.Manager.create();
   final client = Client();
   final guestAPI = polaris.HttpGuestAPI(
-    tokenManager: tokenManager,
     hostManager: hostManager,
     client: client,
   );
@@ -51,13 +48,12 @@ Future _registerSingletons() async {
   );
   final authenticationManager = authentication.Manager(
     connectionManager: connectionManager,
-    tokenManager: tokenManager,
     guestAPI: guestAPI,
   );
   final polarisAPI = polaris.HttpAPI(
     client: client,
     hostManager: hostManager,
-    tokenManager: tokenManager,
+    authenticationManager: authenticationManager,
   );
   final uuid = Uuid();
   final audioPlayer = AudioPlayer();

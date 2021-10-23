@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
-import 'package:polaris/shared/token.dart' as token;
+import 'package:shared_preferences/shared_preferences.dart';
+
+const String tokenPreferenceKey = "polaris_auth_token";
 
 enum Error {
   authenticationAlreadyInProgress,
@@ -35,11 +37,12 @@ enum State {
 
 class Manager extends ChangeNotifier {
   final connection.Manager connectionManager;
-  final token.Manager tokenManager;
   final polaris.GuestAPI guestAPI;
 
   State _state = State.unauthenticated;
   State get state => _state;
+  String? _token;
+  String? get token => _token;
 
   final StreamController<Error> _errorStreamController = StreamController<Error>();
   late Stream<Error> _errorStream = _errorStreamController.stream.asBroadcastStream();
@@ -47,7 +50,6 @@ class Manager extends ChangeNotifier {
 
   Manager({
     required this.connectionManager,
-    required this.tokenManager,
     required this.guestAPI,
   }) {
     connectionManager.addListener(() async => await _onConnectionStateChanged());
@@ -63,7 +65,7 @@ class Manager extends ChangeNotifier {
           await _reauthenticate();
         } catch (e) {}
       } else {
-        tokenManager.token = null;
+        _setToken(null);
         _setState(State.unauthenticated);
       }
     }
@@ -71,14 +73,15 @@ class Manager extends ChangeNotifier {
 
   Future _reauthenticate() async {
     assert(_state == State.unauthenticated);
-    String? token = tokenManager.token;
-    if (token == null || token.isEmpty) {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    _token = preferences.getString(tokenPreferenceKey);
+    if (_token?.isEmpty ?? true) {
       return;
     }
 
     _setState(State.reauthenticating);
     try {
-      await guestAPI.testConnection();
+      await guestAPI.testConnection(_token);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
       _emitError(e.toAuthenticationError());
@@ -112,8 +115,7 @@ class Manager extends ChangeNotifier {
       return;
     }
 
-    tokenManager.token = authorization.token;
-    tokenManager.persist();
+    _setToken(authorization.token);
     _setState(State.authenticated);
   }
 
@@ -128,5 +130,15 @@ class Manager extends ChangeNotifier {
     }
     _state = newState;
     notifyListeners();
+  }
+
+  Future _setToken(String? newToken) async {
+    _token = newToken;
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (_token != null) {
+      preferences.setString(tokenPreferenceKey, _token!);
+    } else {
+      preferences.remove(tokenPreferenceKey);
+    }
   }
 }

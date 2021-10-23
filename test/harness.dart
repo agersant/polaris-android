@@ -3,7 +3,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/shared/polaris.dart' as polaris;
-import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/host.dart' as host;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/core/authentication.dart' as authentication;
@@ -21,7 +20,7 @@ class Harness {
 
   static final Map<String, Object> reconnectPreferences = {
     host.preferenceKey: client.goodHostURI,
-    token.preferenceKey: 'auth-token',
+    authentication.tokenPreferenceKey: 'auth-token',
   };
 
   static Future<Harness> reconnect() async {
@@ -34,10 +33,8 @@ class Harness {
     getIt.allowReassignment = true;
 
     final hostManager = await host.SharedPreferencesHost.create();
-    final tokenManager = await token.Manager.create();
     final mockClient = client.Mock();
     final guestAPI = polaris.HttpGuestAPI(
-      tokenManager: tokenManager,
       hostManager: hostManager,
       client: mockClient,
     );
@@ -48,13 +45,12 @@ class Harness {
     );
     final authenticationManager = authentication.Manager(
       connectionManager: connectionManager,
-      tokenManager: tokenManager,
       guestAPI: guestAPI,
     );
     final collectionAPI = polaris.HttpAPI(
       client: mockClient,
       hostManager: hostManager,
-      tokenManager: tokenManager,
+      authenticationManager: authenticationManager,
     );
 
     final uuid = Uuid();

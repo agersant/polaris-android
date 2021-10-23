@@ -2,8 +2,8 @@ import 'harness.dart';
 import 'mock/client.dart' as client;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/main.dart';
-import 'package:polaris/shared/token.dart' as token;
 import 'package:polaris/shared/shared_preferences_host.dart' as host;
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';
@@ -148,7 +148,8 @@ void main() {
   });
 
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
-    await Harness.create(preferences: {host.preferenceKey: client.goodHostURI, token.preferenceKey: 'auth-token'});
+    await Harness.create(
+        preferences: {host.preferenceKey: client.goodHostURI, authentication.tokenPreferenceKey: 'auth-token'});
 
     await tester.pumpWidget(PolarisApp());
     expect(startupPage, findsNothing);
