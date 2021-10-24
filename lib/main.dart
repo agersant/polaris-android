@@ -43,6 +43,7 @@ Future _registerSingletons() async {
   );
   final cacheManager = await cache.Manager.create();
   final polarisClient = polaris.Client(
+    cacheManager: cacheManager,
     offlineClient: polaris.OfflineClient(
       connectionManager: connectionManager,
       cacheManager: cacheManager,

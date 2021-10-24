@@ -199,18 +199,18 @@ class HttpClient extends _BaseHttpClient {
 
 class OfflineClient {
   final connection.Manager connectionManager;
-  final cache.Manager cacheManager;
+  final cache.Interface cacheManager;
 
   OfflineClient({required this.connectionManager, required this.cacheManager});
 
-  Future<Stream<Uint8List>?> getImage(String path) async {
+  Future<Uint8List?> getImage(String path) async {
     final String? host = connectionManager.url;
     if (host == null) {
-      return Future.error("Unspecified host");
+      throw "Unspecified host";
     }
     final cacheFile = await cacheManager.getImage(host, path);
     if (cacheFile != null) {
-      return cacheFile.openRead().map((list) => Uint8List.fromList(list));
+      return cacheFile.readAsBytes();
     }
     return null;
   }
@@ -219,11 +219,13 @@ class OfflineClient {
 class Client {
   final HttpClient _httpClient;
   final OfflineClient _offlineClient;
+  final cache.Interface _cacheManager;
   final connection.Manager _connectionManager;
 
-  Client({required httpClient, required offlineClient, required connectionManager})
+  Client({required httpClient, required offlineClient, required cacheManager, required connectionManager})
       : _httpClient = httpClient,
         _offlineClient = offlineClient,
+        _cacheManager = cacheManager,
         _connectionManager = connectionManager;
 
   HttpClient? get httpClient {
@@ -265,17 +267,21 @@ class Client {
     return Uri.parse("");
   }
 
-  Future<Stream<Uint8List>?> getImage(String path) async {
-    // TODO use cache if available even in online mode
+  Future<Uint8List?> getImage(String path) async {
+    final content = await _offlineClient.getImage(path);
+    if (content != null) {
+      return content;
+    }
+
     if (_connectionManager.state == connection.State.connected) {
       try {
         final http.StreamedResponse response = await _httpClient.getImage(path);
-        return response.stream.map((list) => Uint8List.fromList(list));
-      } catch (e) {
-        return null;
-      }
-    } else {
-      return _offlineClient.getImage(path);
+        final content = await response.stream.toBytes();
+        _cacheManager.putImage(_connectionManager.url!, path, content);
+        return content;
+      } catch (e) {}
     }
+
+    return null;
   }
 }

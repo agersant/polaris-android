@@ -42,6 +42,7 @@ class Manager implements Interface {
     final file = new File(fullPath);
     try {
       if (await file.exists()) {
+        developer.log('Found image in cache: $path');
         return file;
       }
     } catch (e) {

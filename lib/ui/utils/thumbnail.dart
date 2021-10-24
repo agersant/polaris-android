@@ -18,7 +18,7 @@ class Thumbnail extends StatefulWidget {
 }
 
 class _ThumbnailState extends State<Thumbnail> {
-  Future<Uint8List>? futureImage;
+  Future<Uint8List?>? futureImage;
 
   @override
   void initState() {
@@ -39,17 +39,7 @@ class _ThumbnailState extends State<Thumbnail> {
   void _fetchImage() {
     String? path = widget.path;
     if (path != null) {
-      final completer = Completer<Uint8List>();
-      final sink = ByteConversionSink.withCallback((bytes) => completer.complete(Uint8List.fromList(bytes)));
-      final byteStreamFuture = getIt<polaris.Client>().getImage(path);
-      byteStreamFuture.then((byteStream) {
-        if (byteStream != null) {
-          byteStream.listen(sink.add, onError: completer.completeError, onDone: sink.close, cancelOnError: true);
-        } else {
-          completer.completeError("No image byte stream available");
-        }
-      });
-      futureImage = completer.future;
+      futureImage = getIt<polaris.Client>().getImage(path);
     } else {
       futureImage = null;
     }
@@ -57,7 +47,7 @@ class _ThumbnailState extends State<Thumbnail> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Uint8List>(
+    return FutureBuilder<Uint8List?>(
       future: futureImage,
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -67,7 +57,7 @@ class _ThumbnailState extends State<Thumbnail> {
           case ConnectionState.active:
             return Container();
           case ConnectionState.done:
-            if (!snapshot.hasData) {
+            if (!snapshot.hasData || snapshot.data == null) {
               return FallbackArtwork();
             }
             return Image.memory(
