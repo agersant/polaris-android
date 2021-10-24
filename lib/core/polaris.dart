@@ -66,7 +66,6 @@ abstract class _BaseHttpClient {
   });
 
   String makeURL(String endpoint) {
-    // TODO Ideally we would never have a _BaseHTTPAPI constructed without a valid host
     return (connectionManager.url ?? "") + endpoint;
   }
 
