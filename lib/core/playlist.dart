@@ -19,14 +19,22 @@ class Playlist {
   });
 
   Future queueLast(Song song) async {
+    final bool wasEmpty = _audioSource.sequence.isEmpty;
     final songAudioSource = _makeSongAudioSource(song);
-    return _audioSource.add(songAudioSource);
+    await _audioSource.add(songAudioSource);
+    if (wasEmpty) {
+      audioPlayer.play();
+    }
   }
 
   Future queueNext(Song song) async {
+    final bool wasEmpty = _audioSource.sequence.isEmpty;
     final songAudioSource = _makeSongAudioSource(song);
     final int insertIndex = 1 + (audioPlayer.currentIndex ?? -1);
-    return _audioSource.insert(insertIndex, songAudioSource);
+    await _audioSource.insert(insertIndex, songAudioSource);
+    if (wasEmpty) {
+      audioPlayer.play();
+    }
   }
 
   Future moveSong(int oldIndex, int newIndex) async {
