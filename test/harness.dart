@@ -1,6 +1,7 @@
 import 'mock/client.dart' as httpClient;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache.dart' as cache;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/authentication.dart' as authentication;
@@ -36,12 +37,19 @@ class Harness {
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
     );
-    final polarisClient = polaris.HttpClient(
-      httpClient: mockHttpClient,
+    final cacheManager = await cache.Manager.create();
+    final polarisClient = polaris.Client(
+      offlineClient: polaris.OfflineClient(
+        connectionManager: connectionManager,
+        cacheManager: cacheManager,
+      ),
+      httpClient: polaris.HttpClient(
+        httpClient: mockHttpClient,
+        connectionManager: connectionManager,
+        authenticationManager: authenticationManager,
+      ),
       connectionManager: connectionManager,
-      authenticationManager: authenticationManager,
     );
-
     final uuid = Uuid();
     final audioPlayer = AudioPlayer();
     final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);

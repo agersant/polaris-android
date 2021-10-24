@@ -36,7 +36,6 @@ enum State {
 }
 
 class Manager extends ChangeNotifier {
-
   http.Client httpClient;
 
   State _state = State.disconnected;
@@ -90,7 +89,8 @@ class Manager extends ChangeNotifier {
 
     var apiVersion;
     try {
-      polaris.GuestClient guestClient = polaris.HttpGuestClient(httpClient: this.httpClient, connectionManager: this);
+      polaris.HttpGuestClient guestClient =
+          polaris.HttpGuestClient(httpClient: this.httpClient, connectionManager: this);
       apiVersion = await guestClient.getAPIVersion();
     } on polaris.APIError catch (e) {
       _setState(State.disconnected);

@@ -45,10 +45,13 @@ class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClie
       _error = null;
     });
     try {
-      final albums = await getIt<polaris.Client>().recent();
-      setState(() {
-        _albums = albums;
-      });
+      final polaris.HttpClient? client = getIt<polaris.Client>().httpClient;
+      if (client != null) {
+        final albums = await client.recent();
+        setState(() {
+          _albums = albums;
+        });
+      }
     } on polaris.APIError catch (e) {
       setState(() {
         _albums = null;

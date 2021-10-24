@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -21,7 +23,7 @@ class _ThumbnailState extends State<Thumbnail> {
   @override
   void initState() {
     super.initState();
-    _updateURL();
+    _fetchImage();
   }
 
   @override
@@ -29,15 +31,25 @@ class _ThumbnailState extends State<Thumbnail> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.path != widget.path) {
       setState(() {
-        _updateURL();
+        _fetchImage();
       });
     }
   }
 
-  void _updateURL() {
+  void _fetchImage() {
     String? path = widget.path;
     if (path != null) {
-      futureImage = getIt<polaris.Client>().downloadImage(path).then((r) => r.stream.toBytes());
+      final completer = Completer<Uint8List>();
+      final sink = ByteConversionSink.withCallback((bytes) => completer.complete(Uint8List.fromList(bytes)));
+      final byteStreamFuture = getIt<polaris.Client>().getImage(path);
+      byteStreamFuture.then((byteStream) {
+        if (byteStream != null) {
+          byteStream.listen(sink.add, onError: completer.completeError, onDone: sink.close, cancelOnError: true);
+        } else {
+          completer.completeError("No image byte stream available");
+        }
+      });
+      futureImage = completer.future;
     } else {
       futureImage = null;
     }

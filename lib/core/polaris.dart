@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
+import 'package:polaris/core/cache.dart' as cache;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
 
@@ -37,23 +38,6 @@ enum APIError {
   unauthorized,
   responseParseError,
   requestFailed,
-}
-
-abstract class Client {
-  Future<List<CollectionFile>> browse(String path);
-  Future<List<Song>> flatten(String path);
-  Future<List<Directory>> random();
-  Future<List<Directory>> recent();
-  Uri getImageURI(String path);
-  Uri getAudioURI(String path);
-  Future<http.StreamedResponse> downloadImage(String path);
-  Future<http.StreamedResponse> downloadAudio(String path);
-}
-
-abstract class GuestClient {
-  Future<APIVersion> getAPIVersion();
-  Future<Authorization> login(String username, String password);
-  Future<void> testConnection(String? authenticationToken);
 }
 
 abstract class _BaseHttpClient {
@@ -106,13 +90,12 @@ abstract class _BaseHttpClient {
   }
 }
 
-class HttpGuestClient extends _BaseHttpClient implements GuestClient {
+class HttpGuestClient extends _BaseHttpClient {
   HttpGuestClient({
     required http.Client httpClient,
     required connection.Manager connectionManager,
   }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
-  @override
   Future<APIVersion> getAPIVersion() async {
     final url = makeURL(apiVersionEndpoint);
     final responseBody = await completeRequest(_Method.get, url);
@@ -124,7 +107,6 @@ class HttpGuestClient extends _BaseHttpClient implements GuestClient {
     }
   }
 
-  @override
   Future<Authorization> login(String username, String password) async {
     final url = makeURL(loginEndpoint);
     final credentials = Credentials(username: username, password: password).toJson();
@@ -136,20 +118,21 @@ class HttpGuestClient extends _BaseHttpClient implements GuestClient {
     }
   }
 
-  @override
   Future<void> testConnection(String? authenticationToken) async {
     final url = makeURL(browseEndpoint);
     await makeRequest(_Method.get, url, authenticationToken: authenticationToken);
   }
 }
 
-class HttpClient extends _BaseHttpClient implements Client {
+class HttpClient extends _BaseHttpClient {
   final authentication.Manager authenticationManager;
 
-  HttpClient({required http.Client httpClient, required connection.Manager connectionManager, required this.authenticationManager})
+  HttpClient(
+      {required http.Client httpClient,
+      required connection.Manager connectionManager,
+      required this.authenticationManager})
       : super(httpClient: httpClient, connectionManager: connectionManager);
 
-  @override
   Future<List<CollectionFile>> browse(String path) async {
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -160,7 +143,6 @@ class HttpClient extends _BaseHttpClient implements Client {
     }
   }
 
-  @override
   Future<List<Song>> flatten(String path) async {
     final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -171,7 +153,6 @@ class HttpClient extends _BaseHttpClient implements Client {
     }
   }
 
-  @override
   Future<List<Directory>> random() async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -182,7 +163,6 @@ class HttpClient extends _BaseHttpClient implements Client {
     }
   }
 
-  @override
   Future<List<Directory>> recent() async {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -193,13 +173,11 @@ class HttpClient extends _BaseHttpClient implements Client {
     }
   }
 
-  @override
-  Future<http.StreamedResponse> downloadImage(String path) {
+  Future<http.StreamedResponse> getImage(String path) {
     final uri = getImageURI(path);
     return makeRequest(_Method.get, uri.toString());
   }
 
-  @override
   Uri getImageURI(String path) {
     String url = makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
     String? token = authenticationManager.token;
@@ -209,13 +187,6 @@ class HttpClient extends _BaseHttpClient implements Client {
     return Uri.parse(url);
   }
 
-  @override
-  Future<http.StreamedResponse> downloadAudio(String path) {
-    final uri = getAudioURI(path);
-    return makeRequest(_Method.get, uri.toString());
-  }
-
-  @override
   Uri getAudioURI(String path) {
     String url = makeURL(audioEndpoint + Uri.encodeComponent(path));
     String? token = authenticationManager.token;
@@ -223,5 +194,88 @@ class HttpClient extends _BaseHttpClient implements Client {
       url += '?auth_token=' + token;
     }
     return Uri.parse(url);
+  }
+}
+
+class OfflineClient {
+  final connection.Manager connectionManager;
+  final cache.Manager cacheManager;
+
+  OfflineClient({required this.connectionManager, required this.cacheManager});
+
+  Future<Stream<Uint8List>?> getImage(String path) async {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      return Future.error("Unspecified host");
+    }
+    final cacheFile = await cacheManager.getImage(host, path);
+    if (cacheFile != null) {
+      return cacheFile.openRead().map((list) => Uint8List.fromList(list));
+    }
+    return null;
+  }
+}
+
+class Client {
+  final HttpClient _httpClient;
+  final OfflineClient _offlineClient;
+  final connection.Manager _connectionManager;
+
+  Client({required httpClient, required offlineClient, required connectionManager})
+      : _httpClient = httpClient,
+        _offlineClient = offlineClient,
+        _connectionManager = connectionManager;
+
+  HttpClient? get httpClient {
+    if (_connectionManager.state == connection.State.connected) {
+      return _httpClient;
+    }
+    return null;
+  }
+
+  Future<List<CollectionFile>> browse(String path) async {
+    if (_connectionManager.state == connection.State.connected) {
+      return _httpClient.browse(path);
+    }
+    // TODO implement offline browse
+    return [];
+  }
+
+  Future<List<Song>> flatten(String path) async {
+    if (_connectionManager.state == connection.State.connected) {
+      return _httpClient.flatten(path);
+    }
+    // TODO implement offline flatten
+    return [];
+  }
+
+  Uri getImageURI(String path) {
+    if (_connectionManager.state == connection.State.connected) {
+      return _httpClient.getImageURI(path);
+    }
+    // TODO implement offline getImageURI
+    return Uri.parse("");
+  }
+
+  Uri getAudioURI(String path) {
+    if (_connectionManager.state == connection.State.connected) {
+      return _httpClient.getAudioURI(path);
+    }
+    // TODO implement offline getAudioURI if needed
+    return Uri.parse("");
+  }
+
+  Future<Stream<Uint8List>?> getImage(String path) async {
+    // TODO use cache if available even in online mode
+    if (_connectionManager.state == connection.State.connected) {
+      try {
+        final http.StreamedResponse response = await _httpClient.getImage(path);
+        return response.stream.map((list) => Uint8List.fromList(list));
+      } catch (e) {
+        return null;
+      }
+    } else {
+      return _offlineClient.getImage(path);
+    }
   }
 }

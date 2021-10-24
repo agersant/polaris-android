@@ -16,6 +16,7 @@ class CollectionPage extends StatefulWidget {
 
 class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
   final _browserModel = getIt<BrowserModel>();
+  // TODO remove random/recent tabs in offline mode
   final List<Tab> tabs = <Tab>[
     Tab(text: collectionTabBrowseTitle),
     Tab(text: collectionTabRandomTitle),
