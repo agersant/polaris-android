@@ -14,6 +14,8 @@ import 'package:polaris/core/media_item.dart';
 final getIt = GetIt.instance;
 
 class QueuePage extends StatelessWidget {
+  const QueuePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final AudioPlayer audioPlayer = getIt<AudioPlayer>();
@@ -26,7 +28,7 @@ class QueuePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(queueTitle),
+        title: const Text(queueTitle),
       ),
       body: StreamBuilder<SequenceState?>(
         stream: audioPlayer.sequenceStateStream,
@@ -36,16 +38,14 @@ class QueuePage extends StatelessWidget {
               final SequenceState sequenceState = snapshot.data!;
               final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
               final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
-              final onTap = () {
-                getIt<AudioPlayer>().seek(null, index: index);
-              };
+              onTap() => getIt<AudioPlayer>().seek(null, index: index);
               return _songWidget(context, mediaItem, isCurrent, onTap);
             },
             itemCount: snapshot.data?.sequence.length ?? 0,
             onReorder: (int oldIndex, int newIndex) {
               getIt<Playlist>().moveSong(oldIndex, newIndex);
             },
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
           );
         },
       ),
@@ -97,11 +97,11 @@ Widget _currentSongIcon(BuildContext context, bool isPlaying, ProcessingState st
                 aspectRatio: 1.0,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: new AlwaysStoppedAnimation<Color>(color),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
               ),
             )));
   } else {
-    return AnimatedEqualizer(color, Size(16, 12), isPlaying);
+    return AnimatedEqualizer(color, const Size(16, 12), isPlaying);
   }
 }

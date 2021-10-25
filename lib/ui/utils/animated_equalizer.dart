@@ -8,7 +8,7 @@ class AnimatedEqualizer extends StatefulWidget {
   final Size size;
   final bool isPlaying;
 
-  AnimatedEqualizer(this.color, this.size, this.isPlaying);
+  const AnimatedEqualizer(this.color, this.size, this.isPlaying, {Key? key}) : super(key: key);
 
   @override
   _AnimatedEqualizerState createState() => _AnimatedEqualizerState();
@@ -19,12 +19,13 @@ class _AnimatedEqualizerState extends State<AnimatedEqualizer> with SingleTicker
   late final AnimationController controller;
   Tween<double> t = Tween(begin: 0, end: 2 * pi);
 
+  @override
   void initState() {
     super.initState();
 
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
     );
 
     animation = t.animate(controller)
@@ -76,8 +77,8 @@ class AnimatedEqualizerPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double gutterSize = 1;
-    final double numBars = 4;
+    const double gutterSize = 1;
+    const double numBars = 4;
     final double barWidth = (size.width - max(0, (numBars - 1)) * gutterSize) / numBars;
     final Paint paint = Paint()..color = color;
 

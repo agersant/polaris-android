@@ -4,7 +4,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
 class Playlist {
-  final _audioSource = new ConcatenatingAudioSource(children: []);
+  final _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final polaris.Client polarisClient;
   final AudioPlayer audioPlayer;

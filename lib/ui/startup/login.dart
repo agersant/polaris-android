@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
@@ -9,11 +8,13 @@ import 'package:provider/provider.dart';
 final getIt = GetIt.instance;
 
 class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
+
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
+class _LoginFormState extends State<LoginForm> {
   final _usernameEditingController = TextEditingController();
   final _passwordEditingController = TextEditingController();
   final authentication.Manager _authenticationManager = getIt<authentication.Manager>();
@@ -25,7 +26,7 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
         children: [
           TextFormField(
             controller: _usernameEditingController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               icon: Icon(Icons.person),
               labelText: usernameFieldLabel,
             ),
@@ -35,22 +36,22 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               icon: Icon(Icons.lock),
               labelText: passwordFieldLabel,
             ),
           ),
           Padding(
-              padding: EdgeInsets.only(top: 32),
+              padding: const EdgeInsets.only(top: 32),
               child: Consumer<authentication.Manager>(builder: (context, authenticationManager, child) {
                 if (authenticationManager.state != authentication.State.unauthenticated) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 }
                 return Row(
                   children: [
-                    TextButton(onPressed: _onDisconnectPressed, child: Text(disconnectButtonLabel)),
-                    Spacer(),
-                    ElevatedButton(onPressed: _onLoginPressed, child: Text(loginButtonLabel)),
+                    TextButton(onPressed: _onDisconnectPressed, child: const Text(disconnectButtonLabel)),
+                    const Spacer(),
+                    ElevatedButton(onPressed: _onLoginPressed, child: const Text(loginButtonLabel)),
                   ],
                 );
               })),
@@ -64,49 +65,36 @@ class _LoginFormState extends State<LoginForm> with AuthenticationErrorHandler {
   }
 
   _onLoginPressed() async {
+    final username = _usernameEditingController.text;
+    final password = _passwordEditingController.text;
     try {
-      final username = _usernameEditingController.text;
-      final password = _passwordEditingController.text;
       await _authenticationManager.authenticate(username, password);
-    } catch (e) {}
+    } on authentication.Error catch (e) {
+      _handleError(e);
+    }
+  }
+
+  void _handleError(authentication.Error error) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    switch (error) {
+      case authentication.Error.authenticationAlreadyInProgress:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorAlreadyAuthenticating)));
+        break;
+      case authentication.Error.incorrectCredentials:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorIncorrectCredentials)));
+        break;
+      case authentication.Error.requestFailed:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorRequestFailed)));
+        break;
+      case authentication.Error.unknownError:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorUnknown)));
+        break;
+    }
   }
 
   @override
   void dispose() {
     _usernameEditingController.dispose();
-    super.dispose();
-  }
-}
-
-mixin AuthenticationErrorHandler<T extends StatefulWidget> on State<T> {
-  late StreamSubscription<authentication.Error> _authenticationErrorStream;
-
-  @override
-  void initState() {
-    super.initState();
-    _authenticationErrorStream = getIt<authentication.Manager>().errorStream.listen((e) => handleError(e));
-  }
-
-  void handleError(authentication.Error error) {
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    switch (error) {
-      case authentication.Error.authenticationAlreadyInProgress:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorAlreadyAuthenticating)));
-        break;
-      case authentication.Error.incorrectCredentials:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorIncorrectCredentials)));
-        break;
-      case authentication.Error.requestFailed:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorRequestFailed)));
-        break;
-      case authentication.Error.unknownError:
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorUnknown)));
-        break;
-    }
-  }
-
-  void dispose() {
-    _authenticationErrorStream.cancel();
     super.dispose();
   }
 }

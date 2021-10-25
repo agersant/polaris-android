@@ -18,6 +18,8 @@ class MediaState {
 }
 
 class Player extends StatelessWidget {
+  const Player({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final audioPlayer = getIt<AudioPlayer>();
@@ -119,28 +121,28 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
     );
 
 IconButton _previousButton(Color color) => IconButton(
-      icon: Icon(Icons.skip_previous),
+      icon: const Icon(Icons.skip_previous),
       onPressed: getIt<AudioPlayer>().hasPrevious ? getIt<AudioPlayer>().seekToPrevious : null,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _pauseButton(Color color) => IconButton(
-      icon: Icon(Icons.pause),
+      icon: const Icon(Icons.pause),
       onPressed: getIt<AudioPlayer>().pause,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _playButton(Color color) => IconButton(
-      icon: Icon(Icons.play_arrow),
+      icon: const Icon(Icons.play_arrow),
       onPressed: getIt<AudioPlayer>().play,
       iconSize: 24.0,
       color: color,
     );
 
 IconButton _nextButton(Color color) => IconButton(
-      icon: Icon(Icons.skip_next),
+      icon: const Icon(Icons.skip_next),
       onPressed: getIt<AudioPlayer>().hasNext ? getIt<AudioPlayer>().seekToNext : null,
       iconSize: 24.0,
       color: color,

@@ -21,12 +21,12 @@ class _AudioJob {
 }
 
 class Manager {
-  final cache.Manager _cacheManager;
+  final cache.Interface _cacheManager;
   final connection.Manager _connectionManager;
   final polaris.HttpClient _httpClient;
 
-  final _imageJobs = Map<String, _ImageJob>();
-  final _audioJobs = Map<String, _AudioJob>();
+  final Map<String, _ImageJob> _imageJobs = {};
+  final Map<String, _AudioJob> _audioJobs = {};
 
   Manager({
     required cacheManager,

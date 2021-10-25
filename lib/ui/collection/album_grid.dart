@@ -15,12 +15,12 @@ class AlbumGrid extends StatelessWidget {
   final List<Directory> albums;
   final Future<void> Function()? onRefresh;
 
-  AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
+  const AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (albums.length == 0) {
-      return ErrorMessage(emptyAlbumList);
+    if (albums.isEmpty) {
+      return const ErrorMessage(emptyAlbumList);
     }
 
     return OrientationBuilder(
@@ -29,12 +29,12 @@ class AlbumGrid extends StatelessWidget {
           builder: (context, constraints) {
             final screenWidth = constraints.maxWidth;
             final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
-            final mainAxisSpacing = 24.0;
-            final crossAxisSpacing = 16.0;
-            final padding = 24.0;
+            const mainAxisSpacing = 24.0;
+            const crossAxisSpacing = 16.0;
+            const padding = 24.0;
 
-            final titleStyle = Theme.of(context).textTheme.bodyText1 ?? new TextStyle();
-            final artistStyle = Theme.of(context).textTheme.caption ?? new TextStyle();
+            final titleStyle = Theme.of(context).textTheme.bodyText1 ?? const TextStyle();
+            final artistStyle = Theme.of(context).textTheme.caption ?? const TextStyle();
             final titleStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: titleStyle.fontSize);
             final artistStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: artistStyle.fontSize);
 
@@ -63,7 +63,7 @@ class AlbumGrid extends StatelessWidget {
             final gridView = GridView.count(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               crossAxisCount: crossAxisCount,
-              padding: EdgeInsets.all(padding),
+              padding: const EdgeInsets.all(padding),
               mainAxisSpacing: mainAxisSpacing,
               crossAxisSpacing: crossAxisSpacing,
               childAspectRatio: childAspectRatio,
@@ -102,7 +102,7 @@ class Album extends StatelessWidget {
   final StrutStyle titleStrutStyle;
   final StrutStyle artistStrutStyle;
 
-  Album(this.album,
+  const Album(this.album,
       {required this.titleStyle,
       required this.artistStyle,
       required this.titleStrutStyle,
@@ -157,9 +157,7 @@ class Album extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.more_vert,
-                      ),
+                      const Icon(Icons.more_vert),
                     ],
                   ),
                 ],

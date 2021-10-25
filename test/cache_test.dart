@@ -20,8 +20,8 @@ void main() {
       0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, //
     ]);
 
-    final host = 'http://www.polaris.org';
-    final path = 'heron/aegeus/folder.png';
+    const host = 'http://www.polaris.org';
+    const path = 'heron/aegeus/folder.png';
     await manager.putImage(host, path, imageData);
 
     final File? cacheFile = await manager.getImage(host, path);

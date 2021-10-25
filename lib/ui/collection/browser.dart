@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 final getIt = GetIt.instance;
 
 class Browser extends StatefulWidget {
+  const Browser({Key? key}) : super(key: key);
+
   @override
   _BrowserState createState() => _BrowserState();
 }
@@ -87,7 +89,7 @@ class BrowserLocation extends StatefulWidget {
   final void Function(dto.Directory) onDirectoryTapped;
   final void Function() navigateBack;
 
-  BrowserLocation(this.location, {required this.onDirectoryTapped, required this.navigateBack, Key? key})
+  const BrowserLocation(this.location, {required this.onDirectoryTapped, required this.navigateBack, Key? key})
       : super(key: key);
 
   @override
@@ -123,7 +125,7 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
   ViewMode _getViewMode() {
     List<dto.CollectionFile>? files = _files;
-    if (files == null || files.length == 0) {
+    if (files == null || files.isEmpty) {
       return ViewMode.explorer;
     }
 
@@ -154,10 +156,10 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
     List<dto.CollectionFile>? files = _files;
     if (files == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (files.length == 0) {
+    if (files.isEmpty) {
       return ErrorMessage(
         emptyDirectory,
         action: widget.navigateBack,
@@ -170,7 +172,7 @@ class _BrowserLocationState extends State<BrowserLocation> {
       return AlbumGrid(albums);
     } else {
       return ListView.builder(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemCount: files.length,
         itemBuilder: (context, index) {
           final file = files[index];
@@ -191,13 +193,13 @@ class Directory extends StatelessWidget {
   final dto.Directory directory;
   final GestureTapCallback? onTap;
 
-  Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
+  const Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
 
   Widget _getLeading() {
     if (directory.artwork != null || directory.album != null) {
       return ListThumbnail(directory.artwork);
     }
-    return Icon(Icons.folder);
+    return const Icon(Icons.folder);
   }
 
   Widget? _getSubtitle() {
@@ -212,7 +214,7 @@ class Directory extends StatelessWidget {
       leading: _getLeading(),
       title: Text(directory.formatName()),
       subtitle: _getSubtitle(),
-      trailing: Icon(Icons.more_vert),
+      trailing: const Icon(Icons.more_vert),
       dense: true,
       onTap: onTap,
     );
@@ -241,7 +243,7 @@ class Directory extends StatelessWidget {
 class Song extends StatelessWidget {
   final dto.Song song;
 
-  Song(this.song, {Key? key}) : super(key: key);
+  const Song(this.song, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -249,7 +251,7 @@ class Song extends StatelessWidget {
       leading: ListThumbnail(song.artwork),
       title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
-      trailing: Icon(Icons.more_vert),
+      trailing: const Icon(Icons.more_vert),
       dense: true,
     );
   }
@@ -259,7 +261,7 @@ class Breadcrumbs extends StatefulWidget {
   final String path;
   final void Function(int) popLocations;
 
-  Breadcrumbs(this.path, this.popLocations, {Key? key}) : super(key: key);
+  const Breadcrumbs(this.path, this.popLocations, {Key? key}) : super(key: key);
 
   @override
   _BreadcrumbsState createState() => _BreadcrumbsState();
@@ -302,7 +304,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
         onTap: () => widget.popLocations(segments.length - 1 - index),
       );
     });
-    List<Widget> children = breadcrumbs.expand((breadcrumb) => [Chevron(), breadcrumb]).skip(1).toList();
+    List<Widget> children = breadcrumbs.expand((breadcrumb) => [const Chevron(), breadcrumb]).skip(1).toList();
 
     return SizedBox(
       height: 24,
@@ -321,6 +323,8 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
 }
 
 class Chevron extends StatelessWidget {
+  const Chevron({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final Color? chevronColor = Theme.of(context).textTheme.caption?.color;
@@ -340,7 +344,7 @@ class Breadcrumb extends StatelessWidget {
   final TextStyle? style;
   final void Function() onTap;
 
-  Breadcrumb({Key? key, required this.name, required this.onTap, this.style}) : super(key: key);
+  const Breadcrumb({Key? key, required this.name, required this.onTap, this.style}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

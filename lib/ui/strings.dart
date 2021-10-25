@@ -1,40 +1,40 @@
-final appName = 'Polaris';
+const appName = 'Polaris';
 
 // Errors
-final errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
-final errorNetwork = 'The Polaris server could not be reached.';
-final errorRequestFailed = 'The Polaris server sent an unexpected response.';
-final errorUnknown = 'An unknown error occured.';
-final errorAlreadyConnecting = 'Please wait while the connection is being established.';
-final errorAlreadyAuthenticating = 'Please wait while the authentication is in progress.';
-final errorIncorrectCredentials = 'Incorrect username or password.';
-final retryButtonLabel = 'RETRY';
+const errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
+const errorNetwork = 'The Polaris server could not be reached.';
+const errorRequestFailed = 'The Polaris server sent an unexpected response.';
+const errorUnknown = 'An unknown error occured.';
+const errorAlreadyConnecting = 'Please wait while the connection is being established.';
+const errorAlreadyAuthenticating = 'Please wait while the authentication is in progress.';
+const errorIncorrectCredentials = 'Incorrect username or password.';
+const retryButtonLabel = 'RETRY';
 
 // Startup
-final serverURLFieldLabel = 'Server URL';
-final usernameFieldLabel = 'Username';
-final passwordFieldLabel = 'Password';
-final connectButtonLabel = 'CONNECT';
-final disconnectButtonLabel = 'DISCONNECT';
-final loginButtonLabel = 'LOGIN';
+const serverURLFieldLabel = 'Server URL';
+const usernameFieldLabel = 'Username';
+const passwordFieldLabel = 'Password';
+const connectButtonLabel = 'CONNECT';
+const disconnectButtonLabel = 'DISCONNECT';
+const loginButtonLabel = 'LOGIN';
 
 // Collection
-final collectionTitle = 'Collection';
-final collectionTabBrowseTitle = 'BROWSE';
-final collectionTabRandomTitle = 'RANDOM';
-final collectionTabRecentTitle = 'RECENT';
-final unknownAlbum = 'Unknown Album';
-final unknownArtist = 'Unknown Artist';
-final emptyDirectory = 'There is nothing in this directory.';
-final emptyAlbumList = 'There are no albums to display.';
-final emptyAlbum = 'There are no songs on this album.';
-final browseError = 'There was an error while reading this directory.';
-final randomError = 'There was an error while listing albums.';
-final recentError = 'There was an error while listing albums.';
-final albumDetailsError = 'There was an error while reading this album.';
-final goBackButtonLabel = 'GO BACK';
-final queueLast = 'Play Last';
-final queueNext = 'Play Next';
+const collectionTitle = 'Collection';
+const collectionTabBrowseTitle = 'BROWSE';
+const collectionTabRandomTitle = 'RANDOM';
+const collectionTabRecentTitle = 'RECENT';
+const unknownAlbum = 'Unknown Album';
+const unknownArtist = 'Unknown Artist';
+const emptyDirectory = 'There is nothing in this directory.';
+const emptyAlbumList = 'There are no albums to display.';
+const emptyAlbum = 'There are no songs on this album.';
+const browseError = 'There was an error while reading this directory.';
+const randomError = 'There was an error while listing albums.';
+const recentError = 'There was an error while listing albums.';
+const albumDetailsError = 'There was an error while reading this album.';
+const goBackButtonLabel = 'GO BACK';
+const queueLast = 'Play Last';
+const queueNext = 'Play Next';
 
 // Playback
-final queueTitle = "Queue";
+const queueTitle = "Queue";

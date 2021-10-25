@@ -16,6 +16,8 @@ enum StartupState {
 class StartupPage extends StatelessWidget {
   final Widget _logo = SvgPicture.asset('assets/images/logo.svg', semanticsLabel: 'Polaris logo');
 
+  StartupPage({Key? key}) : super(key: key);
+
   StartupState _computeState(connection.State connectionState, authentication.State authenticationState) {
     switch (connectionState) {
       case connection.State.reconnecting:
@@ -38,11 +40,11 @@ class StartupPage extends StatelessWidget {
   Widget _buildWidgetForState(StartupState state) {
     switch (state) {
       case StartupState.reconnecting:
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       case StartupState.connect:
-        return ConnectForm();
+        return const ConnectForm();
       case StartupState.login:
-        return LoginForm();
+        return const LoginForm();
     }
   }
 
@@ -85,14 +87,14 @@ class StartupPage extends StatelessWidget {
           direction: direction,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Spacer(flex: 40),
+            const Spacer(flex: 40),
             Expanded(flex: 50, child: _logo),
-            Spacer(flex: 20),
+            const Spacer(flex: 20),
             Expanded(
               flex: 100,
               child: IntrinsicHeight(child: _buildContent()),
             ),
-            Spacer(flex: 40),
+            const Spacer(flex: 40),
           ],
         ),
       );

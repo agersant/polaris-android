@@ -15,14 +15,14 @@ final aegeusBreadcrumb = find.widgetWithText(Breadcrumb, aegeusDirectoryName);
 void main() {
   testWidgets('Shows browse tab on start', (WidgetTester tester) async {
     await Harness.reconnect();
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
     await tester.pumpAndSettle();
     expect(rootDirectory, findsOneWidget);
   });
 
   testWidgets('Can open browser directories', (WidgetTester tester) async {
     await Harness.reconnect();
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.pumpAndSettle();
     expect(rootDirectory, findsOneWidget);
@@ -41,7 +41,7 @@ void main() {
 
   testWidgets('Browser shows breadcrumbs', (WidgetTester tester) async {
     await Harness.reconnect();
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
     await tester.pumpAndSettle();
 
     await tester.tap(rootDirectory);
@@ -59,7 +59,7 @@ void main() {
 
   testWidgets('Can navigate backwards using browser breadcrumbs', (WidgetTester tester) async {
     await Harness.reconnect();
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
     await tester.pumpAndSettle();
 
     await tester.tap(rootDirectory);

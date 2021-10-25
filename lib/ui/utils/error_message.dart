@@ -5,7 +5,7 @@ class ErrorMessage extends StatelessWidget {
   final String? actionLabel;
   final void Function()? action;
 
-  ErrorMessage(this.message, {this.action, this.actionLabel});
+  const ErrorMessage(this.message, {this.action, this.actionLabel, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -6,29 +6,29 @@ import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/polaris.dart';
 
-final goodHost = 'my-polaris-server';
-final badHost = 'not-a-polaris-server';
-final incompatibleHost = 'incompatible-polaris-server';
-final goodHostURI = 'http://' + goodHost;
-final badHostURI = 'http://' + badHost;
-final incompatibleHostURI = 'http://' + incompatibleHost;
-final trailingSlashHostURI = goodHostURI + '/';
+const goodHost = 'my-polaris-server';
+const badHost = 'not-a-polaris-server';
+const incompatibleHost = 'incompatible-polaris-server';
+const goodHostURI = 'http://' + goodHost;
+const badHostURI = 'http://' + badHost;
+const incompatibleHostURI = 'http://' + incompatibleHost;
+const trailingSlashHostURI = goodHostURI + '/';
 
-final compatibleAPIVersion = '{"major": 6, "minor": 0}';
-final incompatibleAPIVersion = '{"major": 5, "minor": 0}';
-final authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admin": false}';
+const compatibleAPIVersion = '{"major": 6, "minor": 0}';
+const incompatibleAPIVersion = '{"major": 5, "minor": 0}';
+const authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admin": false}';
 
-final rootDirectoryName = 'root';
-final heronDirectoryName = 'Heron';
-final aegeusDirectoryName = 'Aegeus';
-final rootDirectoryPath = rootDirectoryName;
-final heronDirectoryPath = rootDirectoryName + '/' + heronDirectoryName;
-final aegeusDirectoryPath = heronDirectoryPath + '/' + aegeusDirectoryName;
+const rootDirectoryName = 'root';
+const heronDirectoryName = 'Heron';
+const aegeusDirectoryName = 'Aegeus';
+const rootDirectoryPath = rootDirectoryName;
+const heronDirectoryPath = rootDirectoryName + '/' + heronDirectoryName;
+const aegeusDirectoryPath = heronDirectoryPath + '/' + aegeusDirectoryName;
 
-final labyrinthSongName = 'Labyrinth';
-final fallInwardsSongName = 'Falling Inwards';
-final labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
-final fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
+const labyrinthSongName = 'Labyrinth';
+const fallInwardsSongName = 'Falling Inwards';
+const labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
+const fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
 
 class Mock extends mocktail.Mock implements http.Client {
   bool _failLogin = false;
@@ -38,9 +38,9 @@ class Mock extends mocktail.Mock implements http.Client {
   }
 
   Mock() {
-    mocktail.registerFallbackValue(new http.Request("", new Uri()));
+    mocktail.registerFallbackValue(http.Request("", Uri()));
 
-    mocktail.when(() => this.send(mocktail.any())).thenAnswer((Invocation invocation) async {
+    mocktail.when(() => send(mocktail.any())).thenAnswer((Invocation invocation) async {
       final Request request = invocation.positionalArguments[0];
       final String endpoint = request.url.path;
 

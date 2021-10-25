@@ -10,6 +10,8 @@ import '../strings.dart';
 final getIt = GetIt.instance;
 
 class CollectionPage extends StatefulWidget {
+  const CollectionPage({Key? key}) : super(key: key);
+
   @override
   _CollectionPageState createState() => _CollectionPageState();
 }
@@ -17,12 +19,12 @@ class CollectionPage extends StatefulWidget {
 class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
   final _browserModel = getIt<BrowserModel>();
   // TODO remove random/recent tabs in offline mode
-  final List<Tab> tabs = <Tab>[
+  final List<Tab> tabs = const <Tab>[
     Tab(text: collectionTabBrowseTitle),
     Tab(text: collectionTabRandomTitle),
     Tab(text: collectionTabRecentTitle),
   ];
-  late final TabController _tabController = new TabController(vsync: this, length: tabs.length);
+  late final TabController _tabController = TabController(vsync: this, length: tabs.length);
 
   @override
   void initState() {
@@ -45,12 +47,12 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(collectionTitle),
+        title: const Text(collectionTitle),
         bottom: TabBar(tabs: tabs, controller: _tabController),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
+        children: const [
           Browser(),
           RandomAlbums(),
           RecentAlbums(),

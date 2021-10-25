@@ -1,4 +1,4 @@
-import 'mock/client.dart' as httpClient;
+import 'mock/client.dart' as http_client;
 import 'mock/cache.dart' as cache;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
@@ -15,11 +15,11 @@ import 'package:uuid/uuid.dart';
 final getIt = GetIt.instance;
 
 class Harness {
-  final httpClient.Mock mockHTTPClient;
+  final http_client.Mock mockHTTPClient;
   Harness(this.mockHTTPClient);
 
   static final Map<String, Object> reconnectPreferences = {
-    connection.hostPreferenceKey: httpClient.goodHostURI,
+    connection.hostPreferenceKey: http_client.goodHostURI,
     authentication.tokenPreferenceKey: 'auth-token',
   };
 
@@ -28,12 +28,12 @@ class Harness {
   }
 
   static Future<Harness> create({Map<String, Object>? preferences}) async {
-    SharedPreferences.setMockInitialValues(preferences ?? new Map());
+    SharedPreferences.setMockInitialValues(preferences ?? {});
 
     getIt.allowReassignment = true;
 
-    final uuid = Uuid();
-    final mockHttpClient = httpClient.Mock();
+    const uuid = Uuid();
+    final mockHttpClient = http_client.Mock();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
       httpClient: mockHttpClient,

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,10 +49,6 @@ class Manager extends ChangeNotifier {
   State? _previousState;
   State? get previousState => _previousState;
 
-  final StreamController<Error> _errorStreamController = StreamController<Error>();
-  late final Stream<Error> _errorStream = _errorStreamController.stream.asBroadcastStream();
-  Stream<Error> get errorStream => _errorStream;
-
   Manager({required this.httpClient}) {
     reconnect();
   }
@@ -66,13 +64,14 @@ class Manager extends ChangeNotifier {
     _setState(State.reconnecting);
     try {
       await _tryConnect();
-    } catch (e) {}
+    } catch (e) {
+      developer.log("Error during reconnect", error: e);
+    }
   }
 
   Future connect(String newURL) async {
     if (_state != State.disconnected) {
-      _emitError(Error.connectionAlreadyInProgress);
-      return;
+      throw Error.connectionAlreadyInProgress;
     }
 
     _setURL(newURL);
@@ -87,25 +86,21 @@ class Manager extends ChangeNotifier {
   Future _tryConnect() async {
     assert(state == State.connecting || state == State.reconnecting);
 
-    var apiVersion;
+    dto.APIVersion apiVersion;
     try {
-      polaris.HttpGuestClient guestClient =
-          polaris.HttpGuestClient(httpClient: this.httpClient, connectionManager: this);
+      polaris.HttpGuestClient guestClient = polaris.HttpGuestClient(httpClient: httpClient, connectionManager: this);
       apiVersion = await guestClient.getAPIVersion();
     } on polaris.APIError catch (e) {
       _setState(State.disconnected);
-      _emitError(e.toConnectionError());
-      return;
+      throw e.toConnectionError();
     } catch (e) {
       _setState(State.disconnected);
-      _emitError(Error.unknownError);
-      return;
+      throw Error.unknownError;
     }
 
     if (apiVersion.major != 6) {
       _setState(State.disconnected);
-      _emitError(Error.unsupportedAPIVersion);
-      return;
+      throw Error.unsupportedAPIVersion;
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -115,11 +110,6 @@ class Manager extends ChangeNotifier {
     }
 
     _setState(State.connected);
-  }
-
-  _emitError(Error error) {
-    _errorStreamController.add(error);
-    throw error;
   }
 
   _setState(State newState) {

@@ -22,7 +22,7 @@ void main() {
   testWidgets('Connect screen shows error when failing to connect', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.badHostURI);
     await tester.tap(connectButton);
@@ -33,7 +33,7 @@ void main() {
   testWidgets('Connect screen shows error when connecting to incompatible server', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.incompatibleHostURI);
     await tester.tap(connectButton);
@@ -46,7 +46,7 @@ void main() {
   testWidgets('Connect screen golden path', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.goodHostURI);
     await tester.tap(connectButton);
@@ -58,7 +58,7 @@ void main() {
   testWidgets('Connect screens works without HTTP prefix in host URL', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.goodHost);
     await tester.tap(connectButton);
@@ -70,7 +70,7 @@ void main() {
   testWidgets('Connect screens works with trailing slash in host URL', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.trailingSlashHostURI);
     await tester.tap(connectButton);
@@ -82,7 +82,7 @@ void main() {
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     expect(connectButton, findsNothing);
     expect(disconnectButton, findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
   testWidgets('Failed reconnect shows connect screen', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.badHostURI});
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     expect(connectButton, findsOneWidget);
     expect(disconnectButton, findsNothing);
@@ -100,7 +100,7 @@ void main() {
   testWidgets('Failed reconnect shows attempted URL screen', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.badHostURI});
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     final inputField = urlInputField.evaluate().single.widget as TextFormField;
     expect(inputField.controller?.text, equals(client.badHostURI));
@@ -109,7 +109,7 @@ void main() {
   testWidgets('Disconnect returns to connect screen', (WidgetTester tester) async {
     await Harness.create();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(urlInputField, client.goodHostURI);
     await tester.tap(connectButton);
@@ -125,7 +125,7 @@ void main() {
     Harness harness = await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
     harness.mockHTTPClient.mockBadLogin();
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(usernameInputField, 'bad-username');
     await tester.enterText(passwordInputField, 'bad-password');
@@ -138,7 +138,7 @@ void main() {
   testWidgets('Login screen golden path', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
 
     await tester.enterText(usernameInputField, 'good-username');
     await tester.enterText(passwordInputField, 'good-password');
@@ -148,10 +148,12 @@ void main() {
   });
 
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
-    await Harness.create(
-        preferences: {connection.hostPreferenceKey: client.goodHostURI, authentication.tokenPreferenceKey: 'auth-token'});
+    await Harness.create(preferences: {
+      connection.hostPreferenceKey: client.goodHostURI,
+      authentication.tokenPreferenceKey: 'auth-token'
+    });
 
-    await tester.pumpWidget(PolarisApp());
+    await tester.pumpWidget(const PolarisApp());
     expect(startupPage, findsNothing);
   });
 }

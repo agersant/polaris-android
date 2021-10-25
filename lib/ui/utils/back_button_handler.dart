@@ -6,7 +6,7 @@ final getIt = GetIt.instance;
 
 class BackButtonHandler extends StatefulWidget {
   final Widget child;
-  BackButtonHandler(this.child);
+  const BackButtonHandler(this.child, {Key? key}) : super(key: key);
 
   @override
   _BackButtonHandlerState createState() => _BackButtonHandlerState();

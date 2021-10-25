@@ -34,7 +34,7 @@ final darkTheme = ThemeData(
 );
 
 Future _registerSingletons() async {
-  final uuid = Uuid();
+  const uuid = Uuid();
   final httpClient = http.Client();
   final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
@@ -84,10 +84,10 @@ void main() async {
     androidNotificationOngoing: true,
   );
   final session = await AudioSession.instance;
-  await session.configure(AudioSessionConfiguration.music());
+  await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
 
-  runApp(PolarisApp());
+  runApp(const PolarisApp());
 }
 
 class PolarisPath {}
@@ -101,6 +101,7 @@ class PolarisRouteInformationParser extends RouteInformationParser<PolarisPath> 
 
 class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<PolarisPath> {
+  @override
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
@@ -124,10 +125,10 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     key: navigatorKey,
                     pages: [
                       if (!isStartupComplete) MaterialPage(child: StartupPage()),
-                      if (isStartupComplete) MaterialPage(child: CollectionPage()),
+                      if (isStartupComplete) const MaterialPage(child: CollectionPage()),
                       // TODO Ideally album details would be here
                       // However, OpenContainer() can't be used with the pages API.
-                      if (showQueue) MaterialPage(child: QueuePage()),
+                      if (showQueue) const MaterialPage(child: QueuePage()),
                     ],
                     onPopPage: (route, result) {
                       if (!route.didPop(result)) {
@@ -140,7 +141,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     },
                   ),
                 ),
-                if (isStartupComplete) Player(),
+                if (isStartupComplete) const Player(),
               ],
             ),
           );
@@ -150,10 +151,12 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
   }
 
   @override
-  Future<void> setNewRoutePath(PolarisPath configuration) async => null;
+  Future<void> setNewRoutePath(PolarisPath configuration) async {}
 }
 
 class PolarisApp extends StatefulWidget {
+  const PolarisApp({Key? key}) : super(key: key);
+
   @override
   _PolarisAppState createState() => _PolarisAppState();
 }

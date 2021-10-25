@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class FallbackArtwork extends StatelessWidget {
+  const FallbackArtwork({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
@@ -43,12 +45,12 @@ class FallbackArtworkPainter extends CustomPainter {
     // Draw error icon
     if (drawIcon) {
       final IconData icon = Icons.error;
-      final TextSpan span = new TextSpan(
+      final TextSpan span = TextSpan(
           text: String.fromCharCode(icon.codePoint),
           style: TextStyle(fontFamily: icon.fontFamily, fontSize: 2 * iconRadius, color: iconColor));
       final TextPainter textPainter =
-          new TextPainter(text: span, textDirection: TextDirection.ltr, textAlign: TextAlign.center)..layout();
-      textPainter.paint(canvas, new Offset((w - textPainter.size.width) / 2, (h - textPainter.size.height) / 2));
+          TextPainter(text: span, textDirection: TextDirection.ltr, textAlign: TextAlign.center)..layout();
+      textPainter.paint(canvas, Offset((w - textPainter.size.width) / 2, (h - textPainter.size.height) / 2));
     }
   }
 

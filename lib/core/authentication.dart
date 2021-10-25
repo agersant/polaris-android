@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/connection.dart' as connection;
@@ -45,10 +46,6 @@ class Manager extends ChangeNotifier {
   String? _token;
   String? get token => _token;
 
-  final StreamController<Error> _errorStreamController = StreamController<Error>();
-  late Stream<Error> _errorStream = _errorStreamController.stream.asBroadcastStream();
-  Stream<Error> get errorStream => _errorStream;
-
   Manager({
     required this.httpClient,
     required this.connectionManager,
@@ -64,7 +61,9 @@ class Manager extends ChangeNotifier {
       if (previousConnectionState == connection.State.reconnecting) {
         try {
           await _reauthenticate();
-        } catch (e) {}
+        } catch (e) {
+          developer.log("Error during reauthentication", error: e);
+        }
       } else {
         _setToken(null);
         _setState(State.unauthenticated);
@@ -82,16 +81,14 @@ class Manager extends ChangeNotifier {
 
     _setState(State.reauthenticating);
     try {
-      final guestAPI = polaris.HttpGuestClient(connectionManager: this.connectionManager, httpClient: this.httpClient);
+      final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
       await guestAPI.testConnection(_token);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
-      _emitError(e.toAuthenticationError());
-      return;
+      throw e.toAuthenticationError();
     } catch (e) {
       _setState(State.unauthenticated);
-      _emitError(Error.unknownError);
-      return;
+      throw Error.unknownError;
     }
 
     _setState(State.authenticated);
@@ -99,32 +96,24 @@ class Manager extends ChangeNotifier {
 
   Future authenticate(String username, password) async {
     if (_state != State.unauthenticated) {
-      _emitError(Error.authenticationAlreadyInProgress);
-      return;
+      throw Error.authenticationAlreadyInProgress;
     }
 
     _setState(State.authenticating);
     Authorization authorization;
     try {
-      final guestAPI = polaris.HttpGuestClient(connectionManager: this.connectionManager, httpClient: this.httpClient);
+      final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
       authorization = await guestAPI.login(username, password);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
-      _emitError(e.toAuthenticationError());
-      return;
+      throw e.toAuthenticationError();
     } catch (e) {
       _setState(State.unauthenticated);
-      _emitError(Error.unknownError);
-      return;
+      throw Error.unknownError;
     }
 
     _setToken(authorization.token);
     _setState(State.authenticated);
-  }
-
-  _emitError(Error error) {
-    _errorStreamController.add(error);
-    throw error;
   }
 
   _setState(State newState) {

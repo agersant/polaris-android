@@ -9,6 +9,8 @@ import 'package:polaris/ui/utils/error_message.dart';
 final getIt = GetIt.instance;
 
 class RandomAlbums extends StatefulWidget {
+  const RandomAlbums({Key? key}) : super(key: key);
+
   @override
   _RandomAlbumsState createState() => _RandomAlbumsState();
 }
@@ -35,7 +37,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
     }
     List<Directory>? albums = _albums;
     if (albums == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
     return AlbumGrid(albums, onRefresh: _onRefresh);
   }

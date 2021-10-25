@@ -14,7 +14,7 @@ final getIt = GetIt.instance;
 class AlbumDetails extends StatefulWidget {
   final dto.Directory album;
 
-  AlbumDetails(this.album, {Key? key}) : super(key: key);
+  const AlbumDetails(this.album, {Key? key}) : super(key: key);
 
   @override
   _AlbumDetailsState createState() => _AlbumDetailsState();
@@ -71,7 +71,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     if (_error != null || songs == null) {
       return [
         Padding(
-            padding: EdgeInsets.only(top: 64),
+            padding: const EdgeInsets.only(top: 64),
             child: ErrorMessage(
               albumDetailsError,
               action: _fetchData,
@@ -81,10 +81,10 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     }
 
     final discs = _splitIntoDiscs(songs);
-    if (discs.length == 0) {
+    if (discs.isEmpty) {
       return [
         Padding(
-            padding: EdgeInsets.only(top: 64),
+            padding: const EdgeInsets.only(top: 64),
             child: ErrorMessage(
               emptyAlbum,
               actionLabel: goBackButtonLabel,
@@ -110,7 +110,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       expandedHeight: 128,
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
-        stretchModes: <StretchMode>[
+        stretchModes: const <StretchMode>[
           StretchMode.zoomBackground,
           StretchMode.fadeTitle,
         ],
@@ -149,7 +149,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     )));
 
     if (_songs == null && _error == null) {
-      slivers.add(SliverFillRemaining(
+      slivers.add(const SliverFillRemaining(
         child: Center(child: CircularProgressIndicator()),
       ));
     } else {
@@ -158,7 +158,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 
     return Scaffold(
       body: CustomScrollView(
-        physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: slivers,
       ),
     );
@@ -181,19 +181,19 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 
     Widget rightColumn;
     if (_songs == null && _error == null) {
-      rightColumn = Center(child: CircularProgressIndicator());
+      rightColumn = const Center(child: CircularProgressIndicator());
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
         child: ListView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           children: _getMainContent(),
         ),
       );
     }
 
     final body = Padding(
-      padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -234,7 +234,7 @@ class Disc extends StatelessWidget {
   final int discCount;
   final String? albumArtwork;
 
-  Disc(this.discData, {required this.discCount, this.albumArtwork, Key? key}) : super(key: key);
+  const Disc(this.discData, {required this.discCount, this.albumArtwork, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +253,7 @@ class Disc extends StatelessWidget {
                 'Disc $discNumberLabel',
                 style: Theme.of(context).textTheme.bodyText2,
               ),
-              Divider(),
+              const Divider(),
             ],
           ),
         ),
@@ -273,7 +273,7 @@ class Song extends StatelessWidget {
   final String? albumArtwork;
   final dto.Song song;
 
-  Song(this.song, this.albumArtwork, {Key? key}) : super(key: key);
+  const Song(this.song, this.albumArtwork, {Key? key}) : super(key: key);
 
   String getSubtitle() {
     final artist = song.formatArtist();
@@ -321,7 +321,7 @@ _songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
             break;
         }
       },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<SongAction>>[
+      itemBuilder: (BuildContext context) => const <PopupMenuEntry<SongAction>>[
         PopupMenuItem<SongAction>(
           value: SongAction.queueLast,
           child: Text(queueLast),

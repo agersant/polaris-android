@@ -10,7 +10,7 @@ final getIt = GetIt.instance;
 class Thumbnail extends StatefulWidget {
   final String? path;
 
-  Thumbnail(this.path, {Key? key}) : super(key: key);
+  const Thumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   _ThumbnailState createState() => _ThumbnailState();
@@ -51,13 +51,13 @@ class _ThumbnailState extends State<Thumbnail> {
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
-            return FallbackArtwork();
+            return const FallbackArtwork();
           case ConnectionState.waiting:
           case ConnectionState.active:
             return Container();
           case ConnectionState.done:
             if (!snapshot.hasData || snapshot.data == null) {
-              return FallbackArtwork();
+              return const FallbackArtwork();
             }
             return Image.memory(
               snapshot.data!,
@@ -72,7 +72,7 @@ class _ThumbnailState extends State<Thumbnail> {
 class LargeThumbnail extends StatelessWidget {
   final String? path;
 
-  LargeThumbnail(this.path, {Key? key}) : super(key: key);
+  const LargeThumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +89,7 @@ class LargeThumbnail extends StatelessWidget {
 class ListThumbnail extends StatelessWidget {
   final String? path;
 
-  ListThumbnail(this.path, {Key? key}) : super(key: key);
+  const ListThumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

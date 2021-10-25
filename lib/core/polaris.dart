@@ -10,14 +10,14 @@ import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/media_item.dart';
 
-final apiVersionEndpoint = '/api/version/';
-final browseEndpoint = '/api/browse/';
-final flattenEndpoint = '/api/flatten/';
-final randomEndpoint = '/api/random/';
-final recentEndpoint = '/api/recent/';
-final loginEndpoint = '/api/auth/';
-final thumbnailEndpoint = '/api/thumbnail/';
-final audioEndpoint = '/api/audio/';
+const apiVersionEndpoint = '/api/version/';
+const browseEndpoint = '/api/browse/';
+const flattenEndpoint = '/api/flatten/';
+const randomEndpoint = '/api/random/';
+const recentEndpoint = '/api/recent/';
+const loginEndpoint = '/api/auth/';
+const thumbnailEndpoint = '/api/thumbnail/';
+const audioEndpoint = '/api/audio/';
 
 enum _Method {
   get,
