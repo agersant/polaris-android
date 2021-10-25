@@ -32,6 +32,7 @@ class Harness {
 
     getIt.allowReassignment = true;
 
+    final uuid = Uuid();
     final mockHttpClient = httpClient.Mock();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
@@ -59,7 +60,6 @@ class Harness {
       downloadManager: downloadManager,
       connectionManager: connectionManager,
     );
-    final uuid = Uuid();
     final audioPlayer = AudioPlayer();
     final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
     audioPlayer.setAudioSource(playlist.audioSource);

@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache.dart' as cache;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/download.dart' as download;
+import 'package:polaris/core/media_item.dart';
 
 final apiVersionEndpoint = '/api/version/';
 final browseEndpoint = '/api/browse/';
@@ -265,24 +267,21 @@ class Client {
     return Uri.parse("");
   }
 
-  Uri getAudioURI(String path) {
+  Future<AudioSource?> getAudio(Song song, String id) async {
+    final mediaItem = song.toMediaItem(id, getImageURI(song.path));
     if (_connectionManager.state == connection.State.connected) {
-      return _httpClient.getAudioURI(path);
+      return await _downloadManager.getAudio(song.path, mediaItem);
+    } else {
+      // TODO implement offline getAudio
+      return null;
     }
-    // TODO implement offline getAudioURI if needed
-    return Uri.parse("");
   }
 
   Future<Uint8List?> getImage(String path) async {
-    final content = await _offlineClient.getImage(path);
-    if (content != null) {
-      return content;
-    }
-
     if (_connectionManager.state == connection.State.connected) {
-      return await _downloadManager.downloadImage(path);
+      return await _downloadManager.getImage(path);
+    } else {
+      return await _offlineClient.getImage(path);
     }
-
-    return null;
   }
 }

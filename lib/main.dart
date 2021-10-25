@@ -36,6 +36,7 @@ final darkTheme = ThemeData(
 );
 
 Future _registerSingletons() async {
+  final uuid = Uuid();
   final httpClient = http.Client();
   final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
@@ -63,7 +64,6 @@ Future _registerSingletons() async {
     downloadManager: downloadManager,
     connectionManager: connectionManager,
   );
-  final uuid = Uuid();
   final audioPlayer = AudioPlayer();
   final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
 

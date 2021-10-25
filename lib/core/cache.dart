@@ -51,6 +51,24 @@ class Manager implements Interface {
     return null;
   }
 
+  File getAudioLocation(String host, String path) {
+    final fullPath = _generateAudioPath(host, path);
+    return new File(fullPath);
+  }
+
+  Future<File?> getAudio(String host, String path) async {
+    final file = getAudioLocation(host, path);
+    try {
+      if (await file.exists()) {
+        developer.log('Found audio in cache: $path');
+        return file;
+      }
+    } catch (e) {
+      developer.log('Error while accessing audio from cache: $path', error: e);
+    }
+    return null;
+  }
+
   putImage(String host, String path, Uint8List bytes) async {
     developer.log('Adding image to disk cache: $path');
     final fullPath = _generateImagePath(host, path);
@@ -62,13 +80,15 @@ class Manager implements Interface {
     }
   }
 
-  String _generateImageKey(String host, String path) {
-    host = host.replaceAll(_slashRegExp, '-');
-    path = path.replaceAll(_slashRegExp, '-');
-    return host + '__polaris__image__' + path;
+  String _sanitize(String input) {
+    return input.replaceAll(_slashRegExp, '-');
   }
 
   String _generateImagePath(String host, String path) {
-    return p.join(_root.path, _generateImageKey(host, path));
+    return p.join(_root.path, _sanitize(host + '__polaris__image__' + path));
+  }
+
+  String _generateAudioPath(String host, String path) {
+    return p.join(_root.path, _sanitize(host + '__polaris__audio__' + path));
   }
 }
