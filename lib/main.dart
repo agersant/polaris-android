@@ -7,6 +7,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/cache.dart' as cache;
+import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
@@ -41,18 +42,21 @@ Future _registerSingletons() async {
     httpClient: httpClient,
     connectionManager: connectionManager,
   );
+  final polarisHttpClient = polaris.HttpClient(
+    httpClient: httpClient,
+    connectionManager: connectionManager,
+    authenticationManager: authenticationManager,
+  );
   final cacheManager = await cache.Manager.create();
+  final downloadManager = download.Manager(httpClient: polarisHttpClient);
   final polarisClient = polaris.Client(
     cacheManager: cacheManager,
     offlineClient: polaris.OfflineClient(
       connectionManager: connectionManager,
       cacheManager: cacheManager,
     ),
-    httpClient: polaris.HttpClient(
-      httpClient: httpClient,
-      connectionManager: connectionManager,
-      authenticationManager: authenticationManager,
-    ),
+    httpClient: polarisHttpClient,
+    downloadManager: downloadManager,
     connectionManager: connectionManager,
   );
   final uuid = Uuid();

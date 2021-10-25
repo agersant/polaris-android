@@ -6,6 +6,7 @@ import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
+import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/playback/queue_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,18 +38,21 @@ class Harness {
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
     );
+    final polarisHttpClient = polaris.HttpClient(
+      httpClient: mockHttpClient,
+      connectionManager: connectionManager,
+      authenticationManager: authenticationManager,
+    );
     final cacheManager = await cache.Manager.create();
+    final downloadManager = download.Manager(httpClient: polarisHttpClient);
     final polarisClient = polaris.Client(
       cacheManager: cacheManager,
       offlineClient: polaris.OfflineClient(
         connectionManager: connectionManager,
         cacheManager: cacheManager,
       ),
-      httpClient: polaris.HttpClient(
-        httpClient: mockHttpClient,
-        connectionManager: connectionManager,
-        authenticationManager: authenticationManager,
-      ),
+      httpClient: polarisHttpClient,
+      downloadManager: downloadManager,
       connectionManager: connectionManager,
     );
     final uuid = Uuid();

@@ -6,6 +6,7 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache.dart' as cache;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/download.dart' as download;
 
 final apiVersionEndpoint = '/api/version/';
 final browseEndpoint = '/api/browse/';
@@ -220,12 +221,19 @@ class Client {
   final HttpClient _httpClient;
   final OfflineClient _offlineClient;
   final cache.Interface _cacheManager;
+  final download.Manager _downloadManager;
   final connection.Manager _connectionManager;
 
-  Client({required httpClient, required offlineClient, required cacheManager, required connectionManager})
+  Client(
+      {required httpClient,
+      required offlineClient,
+      required cacheManager,
+      required connectionManager,
+      required downloadManager})
       : _httpClient = httpClient,
         _offlineClient = offlineClient,
         _cacheManager = cacheManager,
+        _downloadManager = downloadManager,
         _connectionManager = connectionManager;
 
   HttpClient? get httpClient {
@@ -274,12 +282,11 @@ class Client {
     }
 
     if (_connectionManager.state == connection.State.connected) {
-      try {
-        final http.StreamedResponse response = await _httpClient.getImage(path);
-        final content = await response.stream.toBytes();
+      final content = await _downloadManager.downloadImage(path);
+      if (content != null) {
         _cacheManager.putImage(_connectionManager.url!, path, content);
-        return content;
-      } catch (e) {}
+      }
+      return content;
     }
 
     return null;
