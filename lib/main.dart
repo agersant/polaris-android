@@ -30,9 +30,7 @@ final lightTheme = ThemeData(
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
-  // Colors below are a workaround for https://github.com/flutter/flutter/issues/19089
-  toggleableActiveColor: Colors.blue[200],
-  accentColor: Colors.blue[200],
+  indicatorColor: Colors.blue,
 );
 
 Future _registerSingletons() async {

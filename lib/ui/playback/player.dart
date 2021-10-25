@@ -155,7 +155,7 @@ Widget _progressBar() => LayoutBuilder(
             (sequenceState, position) => MediaState(sequenceState, position));
 
         final Color backgroundColor = Theme.of(context).backgroundColor;
-        final Color foregroundColor = Theme.of(context).accentColor;
+        final Color foregroundColor = Theme.of(context).colorScheme.primary;
         return Stack(
           children: [
             Container(color: backgroundColor),

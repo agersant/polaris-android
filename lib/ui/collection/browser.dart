@@ -295,7 +295,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
     final breadcrumbs = segments.asMap().entries.map((entry) {
       final int index = entry.key;
       final String value = entry.value;
-      final style = index == segments.length - 1 ? TextStyle(color: Theme.of(context).accentColor) : null;
+      final style = index == segments.length - 1 ? TextStyle(color: Theme.of(context).colorScheme.primary) : null;
       return Breadcrumb(
         name: value,
         style: style,
