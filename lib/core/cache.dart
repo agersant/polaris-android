@@ -46,7 +46,7 @@ class Manager implements Interface {
         return file;
       }
     } catch (e) {
-      developer.log('Error accessing image from cache: $path', error: e);
+      developer.log('Error while accessing image from cache: $path', error: e);
     }
     return null;
   }
@@ -58,7 +58,7 @@ class Manager implements Interface {
     try {
       await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
     } catch (e) {
-      developer.log('Error saving image: $path', error: e);
+      developer.log('Error while saving image: $path', error: e);
     }
   }
 

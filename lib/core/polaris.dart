@@ -220,7 +220,6 @@ class OfflineClient {
 class Client {
   final HttpClient _httpClient;
   final OfflineClient _offlineClient;
-  final cache.Interface _cacheManager;
   final download.Manager _downloadManager;
   final connection.Manager _connectionManager;
 
@@ -232,7 +231,6 @@ class Client {
       required downloadManager})
       : _httpClient = httpClient,
         _offlineClient = offlineClient,
-        _cacheManager = cacheManager,
         _downloadManager = downloadManager,
         _connectionManager = connectionManager;
 
@@ -282,11 +280,7 @@ class Client {
     }
 
     if (_connectionManager.state == connection.State.connected) {
-      final content = await _downloadManager.downloadImage(path);
-      if (content != null) {
-        _cacheManager.putImage(_connectionManager.url!, path, content);
-      }
-      return content;
+      return await _downloadManager.downloadImage(path);
     }
 
     return null;

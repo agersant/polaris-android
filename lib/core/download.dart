@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
+import 'package:polaris/core/cache.dart' as cache;
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/polaris.dart' as polaris;
 
 class _ImageJob {
@@ -10,10 +12,16 @@ class _ImageJob {
 }
 
 class Manager {
-  final _imageJobs = Map<String, _ImageJob>();
+  final cache.Manager _cacheManager;
+  final connection.Manager _connectionManager;
   final polaris.HttpClient _httpClient;
 
-  Manager({required httpClient}) : _httpClient = httpClient;
+  final _imageJobs = Map<String, _ImageJob>();
+
+  Manager({required cacheManager, required connectionManager, required httpClient})
+      : _cacheManager = cacheManager,
+        _connectionManager = connectionManager,
+        _httpClient = httpClient;
 
   Future<Uint8List?> downloadImage(String path) {
     final _ImageJob? existingJob = _imageJobs[path];
@@ -21,13 +29,20 @@ class Manager {
       return existingJob.imageData;
     }
 
+    final host = _connectionManager.url;
+    if (host == null) {
+      return Future.value(null);
+    }
+
+    developer.log('Downloading image: $path');
     final imageData = _httpClient.getImage(path).then((r) => http.Response.fromStream(r)).then((r) {
       if (r.statusCode >= 300) {
         throw r.statusCode;
       }
+      _cacheManager.putImage(host, path, r.bodyBytes);
       return r.bodyBytes;
     }).catchError((e) {
-      developer.log('Error downloading image: $path', error: e);
+      developer.log('Error while downloading image: $path', error: e);
       throw e;
     });
 

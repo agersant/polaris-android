@@ -44,7 +44,11 @@ class Harness {
       authenticationManager: authenticationManager,
     );
     final cacheManager = await cache.Manager.create();
-    final downloadManager = download.Manager(httpClient: polarisHttpClient);
+    final downloadManager = download.Manager(
+      cacheManager: cacheManager,
+      connectionManager: connectionManager,
+      httpClient: polarisHttpClient,
+    );
     final polarisClient = polaris.Client(
       cacheManager: cacheManager,
       offlineClient: polaris.OfflineClient(
