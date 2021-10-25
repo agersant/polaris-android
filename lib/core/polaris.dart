@@ -259,7 +259,7 @@ class Client {
     return [];
   }
 
-  Uri getImageURI(String path) {
+  Uri _getImageURI(String path) {
     if (_connectionManager.state == connection.State.connected) {
       return _httpClient.getImageURI(path);
     }
@@ -268,7 +268,13 @@ class Client {
   }
 
   Future<AudioSource?> getAudio(Song song, String id) async {
-    final mediaItem = song.toMediaItem(id, getImageURI(song.path));
+    String? artwork;
+    Uri? artworkUri;
+    if (artwork != null) {
+      artworkUri = _getImageURI(artwork);
+    }
+    final mediaItem = song.toMediaItem(id, artworkUri);
+
     if (_connectionManager.state == connection.State.connected) {
       return await _downloadManager.getAudio(song.path, mediaItem);
     } else {
