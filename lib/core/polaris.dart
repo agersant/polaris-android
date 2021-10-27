@@ -284,10 +284,14 @@ class Client {
   }
 
   Future<Uint8List?> getImage(String path) async {
-    if (_connectionManager.state == connection.State.connected) {
-      return await _downloadManager.getImage(path);
-    } else {
-      return await _offlineClient.getImage(path);
+    try {
+      if (_connectionManager.state == connection.State.connected) {
+        return await _downloadManager.getImage(path);
+      } else {
+        return await _offlineClient.getImage(path);
+      }
+    } catch (e) {
+      return null;
     }
   }
 }

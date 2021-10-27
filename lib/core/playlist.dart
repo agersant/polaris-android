@@ -17,26 +17,18 @@ class Playlist {
     required this.audioPlayer,
   });
 
-  Future queueLast(Song song) async {
+  Future queueLast(List<Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
-    final songAudioSource = await polarisClient.getAudio(song, uuid.v4());
-    if (songAudioSource == null) {
-      return;
-    }
-    await _audioSource.add(songAudioSource);
+    await _audioSource.addAll(await _makeAudioSources(songs));
     if (wasEmpty) {
       audioPlayer.play();
     }
   }
 
-  Future queueNext(Song song) async {
+  Future queueNext(List<Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
-    final songAudioSource = await polarisClient.getAudio(song, uuid.v4());
-    if (songAudioSource == null) {
-      return;
-    }
     final int insertIndex = 1 + (audioPlayer.currentIndex ?? -1);
-    await _audioSource.insert(insertIndex, songAudioSource);
+    await _audioSource.insertAll(insertIndex, await _makeAudioSources(songs));
     if (wasEmpty) {
       audioPlayer.play();
     }
@@ -52,5 +44,10 @@ class Playlist {
     }
     final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
     return _audioSource.move(oldIndex, insertIndex);
+  }
+
+  Future<List<AudioSource>> _makeAudioSources(List<Song> songs) async {
+    final futureAudioSources = songs.map((s) async => await polarisClient.getAudio(s, uuid.v4()));
+    return (await Future.wait(futureAudioSources)).whereType<AudioSource>().toList();
   }
 }

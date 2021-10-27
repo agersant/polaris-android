@@ -2,8 +2,9 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/playlist.dart';
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
@@ -214,7 +215,7 @@ class Directory extends StatelessWidget {
       leading: _getLeading(),
       title: Text(directory.formatName()),
       subtitle: _getSubtitle(),
-      trailing: const Icon(Icons.more_vert),
+      trailing: _directoryContextMenu(directory),
       dense: true,
       onTap: onTap,
     );
@@ -240,10 +241,46 @@ class Directory extends StatelessWidget {
   }
 }
 
+enum DirectoryAction {
+  queueLast,
+  queueNext,
+}
+
+_directoryContextMenu(dto.Directory directory) => PopupMenuButton<DirectoryAction>(
+      onSelected: (DirectoryAction result) async {
+        final Playlist playlist = getIt<Playlist>();
+        final polaris.Client client = getIt<polaris.Client>();
+        // TODO show some kind of UI while this is in progress (+ confirm)
+        final List<dto.Song> songs = await client.flatten(directory.path);
+        switch (result) {
+          case DirectoryAction.queueLast:
+            playlist.queueLast(songs);
+            break;
+          case DirectoryAction.queueNext:
+            playlist.queueNext(songs);
+            break;
+          default:
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) => const <PopupMenuEntry<DirectoryAction>>[
+        PopupMenuItem<DirectoryAction>(
+          value: DirectoryAction.queueLast,
+          child: Text(queueLast),
+        ),
+        PopupMenuItem<DirectoryAction>(
+          value: DirectoryAction.queueNext,
+          child: Text(queueNext),
+        ),
+      ],
+    );
+
 class Song extends StatelessWidget {
   final dto.Song song;
 
   const Song(this.song, {Key? key}) : super(key: key);
+
+  // TODO interactions
 
   @override
   Widget build(BuildContext context) {

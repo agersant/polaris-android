@@ -289,7 +289,7 @@ class Song extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () => getIt<Playlist>().queueLast(song),
+        onTap: () => getIt<Playlist>().queueLast([song]),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
@@ -312,10 +312,10 @@ _songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
         final Playlist playlist = getIt<Playlist>();
         switch (result) {
           case SongAction.queueLast:
-            playlist.queueLast(song);
+            playlist.queueLast([song]);
             break;
           case SongAction.queueNext:
-            playlist.queueNext(song);
+            playlist.queueNext([song]);
             break;
           default:
             break;
