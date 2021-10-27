@@ -13,6 +13,7 @@ abstract class Interface {
   Future<File?> getImage(String host, String path);
   putImage(String host, String path, Uint8List bytes);
   Future<File?> getAudio(String host, String path);
+  File getAudioLocation(String host, String path);
 }
 
 class Manager implements Interface {
@@ -53,6 +54,7 @@ class Manager implements Interface {
     return null;
   }
 
+  @override
   File getAudioLocation(String host, String path) {
     final fullPath = _buildAudioPath(host, path);
     return File(fullPath);

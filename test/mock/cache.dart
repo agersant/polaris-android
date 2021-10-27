@@ -17,4 +17,9 @@ class Manager implements cache.Interface {
 
   @override
   Future<File?> getAudio(String host, String path) async {}
+
+  @override
+  File getAudioLocation(String host, String path) {
+    return File("");
+  }
 }
