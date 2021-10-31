@@ -169,8 +169,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          // TODO ideally this would line up with the list of songs on the left,
-          // but the top padding built-in the ListTile makes it impossible :(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: LargeThumbnail(widget.album.artwork),
         ),
@@ -185,6 +183,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
+        // TODO ideally this would line up with the artwork on the right,
+        // but the top padding built-in the ListTile makes it difficult
         child: ListView(
           physics: const BouncingScrollPhysics(),
           children: _getMainContent(),
@@ -193,12 +193,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     }
 
     final body = Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      padding: const EdgeInsets.fromLTRB(24, 24, 0, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(flex: 25, child: leftColumn),
-          Expanded(flex: 75, child: rightColumn),
+          Expanded(flex: 20, child: leftColumn),
+          Expanded(flex: 80, child: rightColumn),
         ],
       ),
     );
