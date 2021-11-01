@@ -80,11 +80,18 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    song.formatTitle(),
-                    style: Theme.of(context).textTheme.subtitle2?.copyWith(color: foregroundColor),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  Row(
+                    children: [
+                      _streamingIndicator(),
+                      Expanded(
+                        child: Text(
+                          song.formatTitle(),
+                          style: Theme.of(context).textTheme.subtitle2?.copyWith(color: foregroundColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      )
+                    ],
                   ),
                   Text(
                     song.formatArtist(),
@@ -96,7 +103,6 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
               ),
             ),
             _controls(foregroundColor),
-            // TODO Buffering indicator
           ],
         );
       },
@@ -116,6 +122,30 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
             if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
             _nextButton(foregroundColor),
           ],
+        );
+      },
+    );
+
+Widget _streamingIndicator() => StreamBuilder<PlayerState>(
+      stream: getIt<AudioPlayer>().playerStateStream,
+      builder: (context, snapshot) {
+        final bool isBuffering = snapshot.data?.processingState != ProcessingState.ready &&
+            snapshot.data?.processingState != ProcessingState.completed;
+        if (!isBuffering) {
+          return Container();
+        }
+        return const Padding(
+          padding: EdgeInsets.only(right: 8, bottom: 2),
+          child: SizedBox(
+            width: 10,
+            height: 10,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
         );
       },
     );
