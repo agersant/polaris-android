@@ -1,9 +1,11 @@
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
@@ -294,41 +296,10 @@ class Song extends StatelessWidget {
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
           subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
-          trailing: _songContextMenu(song),
+          trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Left(song))),
           dense: true,
         ),
       ),
     );
   }
 }
-
-enum SongAction {
-  queueLast,
-  queueNext,
-}
-
-_songContextMenu(dto.Song song) => PopupMenuButton<SongAction>(
-      onSelected: (SongAction result) {
-        final Playlist playlist = getIt<Playlist>();
-        switch (result) {
-          case SongAction.queueLast:
-            playlist.queueLast([song]);
-            break;
-          case SongAction.queueNext:
-            playlist.queueNext([song]);
-            break;
-          default:
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => const <PopupMenuEntry<SongAction>>[
-        PopupMenuItem<SongAction>(
-          value: SongAction.queueLast,
-          child: Text(queueLast),
-        ),
-        PopupMenuItem<SongAction>(
-          value: SongAction.queueNext,
-          child: Text(queueNext),
-        ),
-      ],
-    );

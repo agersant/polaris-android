@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
@@ -8,6 +9,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
+import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
@@ -135,8 +137,12 @@ class _BrowserLocationState extends State<BrowserLocation> {
     var allHaveAlbums = true;
     for (var file in files) {
       onlyDirectories &= file.isDirectory();
-      hasAnyPicture |= file.asDirectory().artwork != null;
-      allHaveAlbums &= file.asDirectory().album != null;
+      if (file.isDirectory()) {
+        hasAnyPicture |= file.asDirectory().artwork != null;
+        allHaveAlbums &= file.asDirectory().album != null;
+      } else {
+        allHaveAlbums = false;
+      }
     }
 
     if (onlyDirectories && hasAnyPicture && allHaveAlbums) {
@@ -215,7 +221,7 @@ class Directory extends StatelessWidget {
       leading: _getLeading(),
       title: Text(directory.formatName()),
       subtitle: _getSubtitle(),
-      trailing: _directoryContextMenu(directory),
+      trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Right(directory))),
       dense: true,
       onTap: onTap,
     );
@@ -241,46 +247,10 @@ class Directory extends StatelessWidget {
   }
 }
 
-enum DirectoryAction {
-  queueLast,
-  queueNext,
-}
-
-_directoryContextMenu(dto.Directory directory) => PopupMenuButton<DirectoryAction>(
-      onSelected: (DirectoryAction result) async {
-        final Playlist playlist = getIt<Playlist>();
-        final polaris.Client client = getIt<polaris.Client>();
-        // TODO show some kind of UI while this is in progress (+ confirm)
-        final List<dto.Song> songs = await client.flatten(directory.path);
-        switch (result) {
-          case DirectoryAction.queueLast:
-            playlist.queueLast(songs);
-            break;
-          case DirectoryAction.queueNext:
-            playlist.queueNext(songs);
-            break;
-          default:
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => const <PopupMenuEntry<DirectoryAction>>[
-        PopupMenuItem<DirectoryAction>(
-          value: DirectoryAction.queueLast,
-          child: Text(queueLast),
-        ),
-        PopupMenuItem<DirectoryAction>(
-          value: DirectoryAction.queueNext,
-          child: Text(queueNext),
-        ),
-      ],
-    );
-
 class Song extends StatelessWidget {
   final dto.Song song;
 
   const Song(this.song, {Key? key}) : super(key: key);
-
-  // TODO interactions
 
   @override
   Widget build(BuildContext context) {
@@ -288,9 +258,15 @@ class Song extends StatelessWidget {
       leading: ListThumbnail(song.artwork),
       title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
-      trailing: const Icon(Icons.more_vert),
+      trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Left(song))),
       dense: true,
+      onTap: _onTap,
     );
+  }
+
+  _onTap() {
+    final Playlist playlist = getIt<Playlist>();
+    playlist.queueLast([song]);
   }
 }
 
