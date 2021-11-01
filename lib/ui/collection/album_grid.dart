@@ -1,11 +1,11 @@
 import 'dart:math';
 import 'package:animations/animations.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/album_details.dart';
+import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -127,10 +127,6 @@ class Album extends StatelessWidget {
         return AlbumDetails(album);
       },
       closedBuilder: (context, action) {
-        // Mimic logic from ListTile._iconColor
-        final theme = Theme.of(context);
-        final iconColor = theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
-
         return Align(
           alignment: Alignment.topCenter,
           child: Material(
@@ -166,7 +162,10 @@ class Album extends StatelessWidget {
                           ],
                         ),
                       ),
-                      _albumContextMenu(album, iconColor),
+                      CollectionFileContextMenuButton(
+                        file: dto.CollectionFile(dartz.Right(album)),
+                        compact: true,
+                      ),
                     ],
                   ),
                 ],
@@ -178,39 +177,3 @@ class Album extends StatelessWidget {
     );
   }
 }
-
-enum AlbumAction {
-  queueLast,
-  queueNext,
-}
-
-_albumContextMenu(dto.Directory directory, Color? color) => PopupMenuButton<AlbumAction>(
-      // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
-      child: Icon(Icons.adaptive.more, color: color),
-      onSelected: (AlbumAction result) async {
-        final Playlist playlist = getIt<Playlist>();
-        final polaris.Client client = getIt<polaris.Client>();
-        // TODO show some kind of UI while this is in progress (+ confirm)
-        final List<dto.Song> songs = await client.flatten(directory.path);
-        switch (result) {
-          case AlbumAction.queueLast:
-            playlist.queueLast(songs);
-            break;
-          case AlbumAction.queueNext:
-            playlist.queueNext(songs);
-            break;
-          default:
-            break;
-        }
-      },
-      itemBuilder: (BuildContext context) => const <PopupMenuEntry<AlbumAction>>[
-        PopupMenuItem<AlbumAction>(
-          value: AlbumAction.queueLast,
-          child: Text(queueLast),
-        ),
-        PopupMenuItem<AlbumAction>(
-          value: AlbumAction.queueNext,
-          child: Text(queueNext),
-        ),
-      ],
-    );

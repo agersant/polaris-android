@@ -14,12 +14,19 @@ enum CollectionFileAction {
 
 class CollectionFileContextMenuButton extends StatelessWidget {
   final dto.CollectionFile file;
+  final bool compact;
 
-  const CollectionFileContextMenuButton({required this.file, Key? key}) : super(key: key);
+  const CollectionFileContextMenuButton({required this.file, this.compact = false, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Mimic logic from ListTile._iconColor
+    final iconColor = theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
+
     return PopupMenuButton<CollectionFileAction>(
+      // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
+      child: compact ? Icon(Icons.adaptive.more, color: iconColor) : null,
       onSelected: (CollectionFileAction result) async {
         final Playlist playlist = getIt<Playlist>();
         final polaris.Client client = getIt<polaris.Client>();
