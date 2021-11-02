@@ -120,35 +120,50 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ),
     ));
 
-    slivers.add(SliverToBoxAdapter(
+    slivers.add(
+      SliverToBoxAdapter(
         child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            widget.album.album ?? unknownAlbum,
-            style: Theme.of(context).textTheme.headline5,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.album.artist ?? unknownArtist,
-                style: Theme.of(context).textTheme.bodyText2,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.album.album ?? unknownAlbum,
+                      style: Theme.of(context).textTheme.headline5,
+                      softWrap: true,
+                    ),
+                  ),
+                  CollectionFileContextMenuButton(
+                    file: dto.CollectionFile(dartz.Right(widget.album)),
+                    children: _songs,
+                    icon: Icons.menu,
+                  ),
+                ],
               ),
-              Text(
-                widget.album.year?.toString() ?? '',
-                style: Theme.of(context).textTheme.caption,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.album.artist ?? unknownArtist,
+                    style: Theme.of(context).textTheme.bodyText2,
+                  ),
+                  Text(
+                    widget.album.year?.toString() ?? '',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    )));
+      ),
+    );
 
     if (_songs == null && _error == null) {
       slivers.add(const SliverFillRemaining(
@@ -174,8 +189,33 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           padding: const EdgeInsets.only(bottom: 8.0),
           child: LargeThumbnail(widget.album.artwork),
         ),
-        Text(widget.album.formatName(), style: Theme.of(context).textTheme.bodyText1),
-        Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.caption),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.album.formatName(),
+                    style: Theme.of(context).textTheme.bodyText1,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.caption),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: CollectionFileContextMenuButton(
+                file: dto.CollectionFile(dartz.Right(widget.album)),
+                children: _songs,
+                icon: Icons.menu,
+                compact: true,
+              ),
+            ),
+          ],
+        ),
       ],
     );
 

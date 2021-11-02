@@ -14,30 +14,51 @@ enum CollectionFileAction {
 
 class CollectionFileContextMenuButton extends StatelessWidget {
   final dto.CollectionFile file;
+  final List<dto.Song>? children;
+  final IconData icon;
   final bool compact;
 
-  const CollectionFileContextMenuButton({required this.file, this.compact = false, Key? key}) : super(key: key);
+  const CollectionFileContextMenuButton(
+      {required this.file, this.children, this.compact = false, this.icon = Icons.more_vert, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     // Mimic logic from ListTile._iconColor
-    final iconColor = theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
+    const iconSize = 20.0;
+    final theme = Theme.of(context);
+    final ListTileTheme tileTheme = ListTileTheme.of(context);
+    var iconColor = tileTheme.iconColor;
+    iconColor ??= theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
+
+    final icon = Icon(
+      this.icon,
+      color: iconColor,
+      size: iconSize,
+    );
 
     return PopupMenuButton<CollectionFileAction>(
       // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
-      child: compact ? Icon(Icons.adaptive.more, color: iconColor) : null,
+      child: compact ? icon : null,
+      icon: compact ? null : icon,
+      iconSize: iconSize,
       onSelected: (CollectionFileAction result) async {
         final Playlist playlist = getIt<Playlist>();
         final polaris.Client client = getIt<polaris.Client>();
 
         late List<dto.Song> songs;
+        final knownSongs = children;
         if (file.isDirectory()) {
-          // TODO show some kind of UI while this is in progress (+ confirm)
-          songs = await client.flatten(file.asDirectory().path);
+          if (knownSongs == null) {
+            // TODO show some kind of UI while this is in progress (+ confirm)
+            songs = await client.flatten(file.asDirectory().path);
+          } else {
+            songs = knownSongs;
+          }
         } else {
           songs = [file.asSong()];
         }
+
         switch (result) {
           case CollectionFileAction.queueLast:
             playlist.queueLast(songs);
