@@ -4,7 +4,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
 class Playlist {
-  final _audioSource = ConcatenatingAudioSource(children: []);
+  ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final polaris.Client polarisClient;
   final AudioPlayer audioPlayer;
@@ -44,6 +44,11 @@ class Playlist {
     }
     final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
     return _audioSource.move(oldIndex, insertIndex);
+  }
+
+  Future clear() async {
+    _audioSource = ConcatenatingAudioSource(children: []);
+    await audioPlayer.setAudioSource(_audioSource);
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<Song> songs) async {

@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 class ErrorMessage extends StatelessWidget {
   final String message;
   final String? actionLabel;
+  final IconData icon;
   final void Function()? action;
 
-  const ErrorMessage(this.message, {this.action, this.actionLabel, Key? key}) : super(key: key);
+  const ErrorMessage(
+    this.message, {
+    this.icon = Icons.error_outline,
+    this.action,
+    this.actionLabel,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +23,7 @@ class ErrorMessage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.error_outline,
+              icon,
               size: 24,
               color: Theme.of(context).textTheme.caption?.color,
             ),

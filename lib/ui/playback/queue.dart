@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/utils/animated_equalizer.dart';
+import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/strings.dart';
@@ -26,14 +27,15 @@ class QueuePage extends StatelessWidget {
     // TODO there is a visual bug when re-ordering songs in a way that shifts the currently playing song.
     // It is caused by just_audio updating the sequenceState partially through the re-order operation
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(queueTitle),
-      ),
-      body: StreamBuilder<SequenceState?>(
-        stream: audioPlayer.sequenceStateStream,
-        builder: (context, snapshot) {
-          return ReorderableListView.builder(
+    return StreamBuilder<SequenceState?>(
+      stream: audioPlayer.sequenceStateStream,
+      builder: (context, snapshot) {
+        Widget body;
+        final isEmpty = snapshot.data?.sequence.isEmpty ?? true;
+        if (isEmpty) {
+          body = const ErrorMessage(queueEmpty);
+        } else {
+          body = ReorderableListView.builder(
             itemBuilder: (context, index) {
               final SequenceState sequenceState = snapshot.data!;
               final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
@@ -47,9 +49,24 @@ class QueuePage extends StatelessWidget {
             },
             physics: const BouncingScrollPhysics(),
           );
-        },
-      ),
+        }
+
+        final clearAction = isEmpty ? null : _clearQueue;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(queueTitle),
+            actions: [IconButton(onPressed: clearAction, icon: const Icon(Icons.delete))],
+          ),
+          body: body,
+        );
+      },
     );
+  }
+
+  _clearQueue() {
+    final playlist = getIt<Playlist>();
+    playlist.clear();
   }
 }
 

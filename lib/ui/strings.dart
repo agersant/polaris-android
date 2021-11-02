@@ -38,3 +38,4 @@ const queueNext = 'Play Next';
 
 // Playback
 const queueTitle = "Queue";
+const queueEmpty = "There are no songs in the queue.";
