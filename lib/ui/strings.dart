@@ -36,6 +36,14 @@ const goBackButtonLabel = 'GO BACK';
 const queueLast = 'Play Last';
 const queueNext = 'Play Next';
 
+// Collection drawer
+const drawerSettings = 'Settings';
+const drawerOfflineMusic = 'Offline music';
+const drawerOfflineMode = 'Offline mode';
+const drawerLogOut = 'LogOut';
+const unknownUser = 'Unknown User';
+const unknownHost = 'Unknown Host';
+
 // Playback
 const queueTitle = "Queue";
 const queueEmpty = "There are no songs in the queue.";

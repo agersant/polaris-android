@@ -112,9 +112,11 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
         ChangeNotifierProvider.value(value: getIt<QueueModel>()),
       ],
-      child: Consumer2<authentication.Manager, QueueModel>(
-        builder: (context, authenticationManager, queueModel, child) {
-          final isStartupComplete = authenticationManager.state == authentication.State.authenticated;
+      child: Consumer3<connection.Manager, authentication.Manager, QueueModel>(
+        builder: (context, connectionManager, authenticationManager, queueModel, child) {
+          final connectionComplete = connectionManager.state == connection.State.connected;
+          final authenticationComplete = authenticationManager.state == authentication.State.authenticated;
+          final isStartupComplete = connectionComplete && authenticationComplete;
           final showQueue = isStartupComplete && queueModel.isQueueOpen;
 
           return BackButtonHandler(
@@ -126,8 +128,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     pages: [
                       if (!isStartupComplete) MaterialPage(child: StartupPage()),
                       if (isStartupComplete) const MaterialPage(child: CollectionPage()),
-                      // TODO Ideally album details would be here
-                      // However, OpenContainer() can't be used with the pages API.
+                      // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
                       if (showQueue) const MaterialPage(child: QueuePage()),
                     ],
                     onPopPage: (route, result) {

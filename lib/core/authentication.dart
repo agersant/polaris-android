@@ -8,6 +8,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String tokenPreferenceKey = "polaris_auth_token";
+const String usernamePreferenceKey = "polaris_auth_username";
 
 enum Error {
   authenticationAlreadyInProgress,
@@ -45,6 +46,8 @@ class Manager extends ChangeNotifier {
   State get state => _state;
   String? _token;
   String? get token => _token;
+  String? _username;
+  String? get username => _username;
 
   Manager({
     required this.httpClient,
@@ -66,6 +69,7 @@ class Manager extends ChangeNotifier {
         }
       } else {
         _setToken(null);
+        _setUsername(null);
         _setState(State.unauthenticated);
       }
     }
@@ -75,7 +79,10 @@ class Manager extends ChangeNotifier {
     assert(_state == State.unauthenticated);
     SharedPreferences preferences = await SharedPreferences.getInstance();
     _token = preferences.getString(tokenPreferenceKey);
-    if (_token?.isEmpty ?? true) {
+    _username = preferences.getString(usernamePreferenceKey);
+    final hasToken = _token?.isNotEmpty ?? false;
+    final hasUsername = _username?.isNotEmpty ?? false;
+    if (!hasToken || !hasUsername) {
       return;
     }
 
@@ -94,7 +101,7 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticated);
   }
 
-  Future authenticate(String username, password) async {
+  Future authenticate(String newUsername, password) async {
     if (_state != State.unauthenticated) {
       throw Error.authenticationAlreadyInProgress;
     }
@@ -103,7 +110,7 @@ class Manager extends ChangeNotifier {
     Authorization authorization;
     try {
       final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
-      authorization = await guestAPI.login(username, password);
+      authorization = await guestAPI.login(newUsername, password);
     } on polaris.APIError catch (e) {
       _setState(State.unauthenticated);
       throw e.toAuthenticationError();
@@ -112,6 +119,7 @@ class Manager extends ChangeNotifier {
       throw Error.unknownError;
     }
 
+    _setUsername(newUsername);
     _setToken(authorization.token);
     _setState(State.authenticated);
   }
@@ -131,6 +139,16 @@ class Manager extends ChangeNotifier {
       preferences.setString(tokenPreferenceKey, _token!);
     } else {
       preferences.remove(tokenPreferenceKey);
+    }
+  }
+
+  Future _setUsername(String? newUsername) async {
+    _username = newUsername;
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (_username != null) {
+      preferences.setString(usernamePreferenceKey, _username!);
+    } else {
+      preferences.remove(usernamePreferenceKey);
     }
   }
 }
