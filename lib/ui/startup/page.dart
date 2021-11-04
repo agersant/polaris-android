@@ -26,6 +26,7 @@ class StartupPage extends StatelessWidget {
       case connection.State.connecting:
         return StartupState.connect;
       case connection.State.connected:
+      case connection.State.offlineMode:
         switch (authenticationState) {
           case authentication.State.reauthenticating:
             return StartupState.reconnecting;

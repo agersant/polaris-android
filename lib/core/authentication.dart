@@ -67,7 +67,7 @@ class Manager extends ChangeNotifier {
         } catch (e) {
           developer.log("Error during reauthentication", error: e);
         }
-      } else {
+      } else if (previousConnectionState == connection.State.connecting) {
         _setToken(null);
         _setUsername(null);
         _setState(State.unauthenticated);

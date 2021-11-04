@@ -81,13 +81,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
             leading: Icon(Icons.offline_pin),
             title: Text(drawerOfflineMusic),
           ),
-          // TODO implement offline mode toggle
-          SwitchListTile(
-            title: const Text(drawerOfflineMode),
-            value: false,
-            onChanged: (bool? value) {},
-            secondary: const Icon(Icons.cloud_off),
-          ),
+          _buildOfflineModeToggle(),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text(drawerLogOut),
@@ -136,6 +130,21 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildOfflineModeToggle() {
+    return Consumer<connection.Manager>(
+      builder: (context, connectionManager, child) {
+        return SwitchListTile(
+          title: const Text(drawerOfflineMode),
+          value: connectionManager.state == connection.State.offlineMode,
+          onChanged: (bool? value) {
+            connectionManager.toggleOfflineMode();
+          },
+          secondary: const Icon(Icons.cloud_off),
+        );
+      },
     );
   }
 }

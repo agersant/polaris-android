@@ -35,6 +35,7 @@ enum State {
   connecting,
   reconnecting,
   connected,
+  offlineMode,
 }
 
 class Manager extends ChangeNotifier {
@@ -81,6 +82,14 @@ class Manager extends ChangeNotifier {
 
   disconnect() {
     _setState(State.disconnected);
+  }
+
+  toggleOfflineMode() {
+    if (state == State.connected) {
+      _setState(State.offlineMode);
+    } else if (state == State.offlineMode) {
+      _setState(State.connected);
+    }
   }
 
   Future _tryConnect() async {

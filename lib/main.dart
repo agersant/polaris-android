@@ -114,7 +114,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       ],
       child: Consumer3<connection.Manager, authentication.Manager, QueueModel>(
         builder: (context, connectionManager, authenticationManager, queueModel, child) {
-          final connectionComplete = connectionManager.state == connection.State.connected;
+          final connectionComplete = connectionManager.state == connection.State.connected ||
+              connectionManager.state == connection.State.offlineMode;
           final authenticationComplete = authenticationManager.state == authentication.State.authenticated;
           final isStartupComplete = connectionComplete && authenticationComplete;
           final showQueue = isStartupComplete && queueModel.isQueueOpen;
