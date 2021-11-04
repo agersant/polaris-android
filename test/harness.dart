@@ -21,6 +21,7 @@ class Harness {
   static final Map<String, Object> reconnectPreferences = {
     connection.hostPreferenceKey: http_client.goodHostURI,
     authentication.tokenPreferenceKey: 'auth-token',
+    authentication.usernamePreferenceKey: 'good-username'
   };
 
   static Future<Harness> reconnect() async {

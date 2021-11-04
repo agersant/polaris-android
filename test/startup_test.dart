@@ -150,7 +150,8 @@ void main() {
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
     await Harness.create(preferences: {
       connection.hostPreferenceKey: client.goodHostURI,
-      authentication.tokenPreferenceKey: 'auth-token'
+      authentication.tokenPreferenceKey: 'auth-token',
+      authentication.usernamePreferenceKey: 'good-username'
     });
 
     await tester.pumpWidget(const PolarisApp());
