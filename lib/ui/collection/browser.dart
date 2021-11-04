@@ -32,7 +32,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
 
     final Color fillColor = Theme.of(context).scaffoldBackgroundColor;
     final sharedAxisTransition =
-        SharedAxisPageTransitionsBuilder(transitionType: SharedAxisTransitionType.scaled, fillColor: fillColor);
+        SharedAxisPageTransitionsBuilder(transitionType: SharedAxisTransitionType.horizontal, fillColor: fillColor);
     final PageTransitionsTheme transitionTheme = PageTransitionsTheme(
         builders: {TargetPlatform.android: sharedAxisTransition, TargetPlatform.iOS: sharedAxisTransition});
 
