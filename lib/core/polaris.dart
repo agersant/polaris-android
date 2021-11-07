@@ -4,9 +4,10 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
-import 'package:polaris/core/cache.dart' as cache;
+import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/media_item.dart';
 
@@ -41,6 +42,7 @@ enum APIError {
   unauthorized,
   responseParseError,
   requestFailed,
+  unexpectedCacheMiss,
 }
 
 abstract class _BaseHttpClient {
@@ -99,23 +101,23 @@ class HttpGuestClient extends _BaseHttpClient {
     required connection.Manager connectionManager,
   }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
-  Future<APIVersion> getAPIVersion() async {
+  Future<dto.APIVersion> getAPIVersion() async {
     final url = makeURL(apiVersionEndpoint);
     final responseBody = await completeRequest(_Method.get, url);
     try {
       String body = utf8.decode(responseBody);
-      return APIVersion.fromJson(jsonDecode(body));
+      return dto.APIVersion.fromJson(jsonDecode(body));
     } catch (e) {
       throw APIError.responseParseError;
     }
   }
 
-  Future<Authorization> login(String username, String password) async {
+  Future<dto.Authorization> login(String username, String password) async {
     final url = makeURL(loginEndpoint);
-    final credentials = Credentials(username: username, password: password).toJson();
+    final credentials = dto.Credentials(username: username, password: password).toJson();
     final responseBody = await completeRequest(_Method.post, url, body: credentials);
     try {
-      return Authorization.fromJson(jsonDecode(utf8.decode(responseBody)));
+      return dto.Authorization.fromJson(jsonDecode(utf8.decode(responseBody)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -136,41 +138,41 @@ class HttpClient extends _BaseHttpClient {
       required this.authenticationManager})
       : super(httpClient: httpClient, connectionManager: connectionManager);
 
-  Future<List<CollectionFile>> browse(String path) async {
+  Future<List<dto.CollectionFile>> browse(String path) async {
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((c) => CollectionFile.fromJson(c)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((c) => dto.CollectionFile.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
   }
 
-  Future<List<Song>> flatten(String path) async {
+  Future<List<dto.Song>> flatten(String path) async {
     final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((c) => Song.fromJson(c)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((c) => dto.Song.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
   }
 
-  Future<List<Directory>> random() async {
+  Future<List<dto.Directory>> random() async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((d) => dto.Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
   }
 
-  Future<List<Directory>> recent() async {
+  Future<List<dto.Directory>> recent() async {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((d) => Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((d) => dto.Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -202,16 +204,31 @@ class HttpClient extends _BaseHttpClient {
 
 class OfflineClient {
   final connection.Manager connectionManager;
-  final cache.Interface cacheManager;
+  final MediaCacheInterface mediaCache;
+  final CollectionCache collectionCache;
 
-  OfflineClient({required this.connectionManager, required this.cacheManager});
+  OfflineClient({required this.connectionManager, required this.mediaCache, required this.collectionCache});
+
+  List<dto.CollectionFile> browse(String path) {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+    // TODO filter out songs that don't have cached audio
+    // TODO filter out directories that dont lead to any song with cached audio
+    final cachedContent = collectionCache.getDirectory(host, path);
+    if (cachedContent == null) {
+      throw throw APIError.unexpectedCacheMiss;
+    }
+    return cachedContent;
+  }
 
   Future<Uint8List?> getImage(String path) async {
     final String? host = connectionManager.url;
     if (host == null) {
-      throw "Unspecified host";
+      throw APIError.unspecifiedHost;
     }
-    final cacheFile = await cacheManager.getImage(host, path);
+    final cacheFile = await mediaCache.getImage(host, path);
     if (cacheFile != null) {
       return cacheFile.readAsBytes();
     }
@@ -221,38 +238,49 @@ class OfflineClient {
 
 class Client {
   final HttpClient _httpClient;
-  final OfflineClient _offlineClient;
-  final download.Manager _downloadManager;
-  final connection.Manager _connectionManager;
+  final OfflineClient offlineClient;
+  final download.Manager downloadManager;
+  final connection.Manager connectionManager;
+  final CollectionCache collectionCache;
 
   Client(
       {required httpClient,
-      required offlineClient,
-      required cacheManager,
-      required connectionManager,
-      required downloadManager})
-      : _httpClient = httpClient,
-        _offlineClient = offlineClient,
-        _downloadManager = downloadManager,
-        _connectionManager = connectionManager;
+      required this.offlineClient,
+      required this.connectionManager,
+      required this.downloadManager,
+      required this.collectionCache})
+      : _httpClient = httpClient;
 
   HttpClient? get httpClient {
-    if (_connectionManager.state == connection.State.connected) {
+    if (connectionManager.state == connection.State.connected) {
       return _httpClient;
     }
     return null;
   }
 
-  Future<List<CollectionFile>> browse(String path) async {
-    if (_connectionManager.state == connection.State.connected) {
-      return _httpClient.browse(path);
+  Future<List<dto.CollectionFile>> browse(String path) async {
+    if (connectionManager.state != connection.State.connected) {
+      return offlineClient.browse(path);
     }
-    // TODO implement offline browse
-    return [];
+
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+
+    final cachedContent = collectionCache.getDirectory(host, path);
+    if (cachedContent != null) {
+      return cachedContent;
+    }
+
+    return _httpClient.browse(path).then((content) {
+      collectionCache.putDirectory(host, path, content);
+      return content;
+    });
   }
 
-  Future<List<Song>> flatten(String path) async {
-    if (_connectionManager.state == connection.State.connected) {
+  Future<List<dto.Song>> flatten(String path) async {
+    if (connectionManager.state == connection.State.connected) {
       return _httpClient.flatten(path);
     }
     // TODO implement offline flatten
@@ -260,14 +288,14 @@ class Client {
   }
 
   Uri _getImageURI(String path) {
-    if (_connectionManager.state == connection.State.connected) {
+    if (connectionManager.state == connection.State.connected) {
       return _httpClient.getImageURI(path);
     }
     // TODO implement offline getImageURI
     return Uri.parse("");
   }
 
-  Future<AudioSource?> getAudio(Song song, String id) async {
+  Future<AudioSource?> getAudio(dto.Song song, String id) async {
     String? artwork;
     Uri? artworkUri;
     if (artwork != null) {
@@ -275,8 +303,8 @@ class Client {
     }
     final mediaItem = song.toMediaItem(id, artworkUri);
 
-    if (_connectionManager.state == connection.State.connected) {
-      return await _downloadManager.getAudio(song.path, mediaItem);
+    if (connectionManager.state == connection.State.connected) {
+      return await downloadManager.getAudio(song.path, mediaItem);
     } else {
       // TODO implement offline getAudio
       return null;
@@ -285,10 +313,10 @@ class Client {
 
   Future<Uint8List?> getImage(String path) async {
     try {
-      if (_connectionManager.state == connection.State.connected) {
-        return await _downloadManager.getImage(path);
+      if (connectionManager.state == connection.State.connected) {
+        return await downloadManager.getImage(path);
       } else {
-        return await _offlineClient.getImage(path);
+        return await offlineClient.getImage(path);
       }
     } catch (e) {
       return null;

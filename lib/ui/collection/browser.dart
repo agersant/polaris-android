@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
+// TODO allow pull to refresh (ie. skip cache)
 class Browser extends StatefulWidget {
   const Browser({Key? key}) : super(key: key);
 

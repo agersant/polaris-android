@@ -4,7 +4,7 @@ import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:polaris/core/cache.dart' as cache;
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/polaris.dart' as polaris;
 
@@ -21,7 +21,7 @@ class _AudioJob {
 }
 
 class Manager {
-  final cache.Interface _cacheManager;
+  final MediaCacheInterface _mediaCache;
   final connection.Manager _connectionManager;
   final polaris.HttpClient _httpClient;
 
@@ -29,10 +29,10 @@ class Manager {
   final Map<String, _AudioJob> _audioJobs = {};
 
   Manager({
-    required cacheManager,
+    required mediaCache,
     required connectionManager,
     required httpClient,
-  })  : _cacheManager = cacheManager,
+  })  : _mediaCache = mediaCache,
         _connectionManager = connectionManager,
         _httpClient = httpClient;
 
@@ -42,7 +42,7 @@ class Manager {
       return Future.value(null);
     }
 
-    final cacheHit = await _cacheManager.getImage(host, path);
+    final cacheHit = await _mediaCache.getImage(host, path);
     if (cacheHit != null) {
       return cacheHit.readAsBytes();
     }
@@ -57,7 +57,7 @@ class Manager {
       if (r.statusCode >= 300) {
         throw r.statusCode;
       }
-      _cacheManager.putImage(host, path, r.bodyBytes);
+      _mediaCache.putImage(host, path, r.bodyBytes);
       return r.bodyBytes;
     }).catchError((e) {
       developer.log('Error while downloading image: $path', error: e);
@@ -77,15 +77,15 @@ class Manager {
       return null;
     }
 
-    final File? cacheHit = await _cacheManager.getAudio(host, path);
+    final File? cacheHit = await _mediaCache.getAudio(host, path);
     if (cacheHit != null) {
       return AudioSource.uri(cacheHit.uri, tag: mediaItem);
     }
 
     final _AudioJob? existingJob = _audioJobs[path];
     if (existingJob != null) {
-      // TODO.important when songs are duped in the playlist, this may return an audiosource
-      // with a mediaItem.id that doesn't match what the caller requested.
+      // TODO.important when songs are duped in the playlist, this may return an
+      // audiosource with a mediaItem.id that doesn't match what the caller requested.
       return existingJob.audioSource;
     }
 

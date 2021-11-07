@@ -1,16 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:polaris/core/cache.dart' as cache;
+import 'package:polaris/core/cache/media.dart';
 
 void main() {
   test('Missing image returns null', () async {
-    final manager = await cache.Manager.create();
+    final manager = await MediaCache.create();
     assert(await manager.getImage('polaris.org', 'some image') == null);
   });
 
   test('Save and read image', () async {
-    final manager = await cache.Manager.create();
+    final manager = await MediaCache.create();
 
     final imageData = Uint8List.fromList(const <int>[
       0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, //

@@ -22,6 +22,7 @@ extension _ToConnectionError on polaris.APIError {
       case polaris.APIError.unauthorized:
       case polaris.APIError.requestFailed:
       case polaris.APIError.responseParseError:
+      case polaris.APIError.unexpectedCacheMiss:
         return Error.requestFailed;
       case polaris.APIError.networkError:
       case polaris.APIError.unspecifiedHost:

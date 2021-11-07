@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:io';
+import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -9,21 +9,21 @@ final _slashRegExp = RegExp(r'[:/\.\\]');
 const _firstVersion = 1;
 const _currentVersion = 4;
 
-abstract class Interface {
-  Future<File?> getImage(String host, String path);
+abstract class MediaCacheInterface {
+  Future<io.File?> getImage(String host, String path);
   putImage(String host, String path, Uint8List bytes);
-  Future<File?> getAudio(String host, String path);
-  File getAudioLocation(String host, String path);
+  Future<io.File?> getAudio(String host, String path);
+  io.File getAudioLocation(String host, String path);
 }
 
-class Manager implements Interface {
-  final Directory _root;
+class MediaCache implements MediaCacheInterface {
+  final io.Directory _root;
 
-  Manager(this._root);
+  MediaCache(this._root);
 
-  static Future<Manager> create() async {
+  static Future<MediaCache> create() async {
     final temporaryDirectory = await getTemporaryDirectory();
-    makeRoot(int version) => Directory(p.join(temporaryDirectory.path, 'collection', 'v$version'));
+    makeRoot(int version) => io.Directory(p.join(temporaryDirectory.path, 'media', 'v$version'));
 
     for (int version = _firstVersion; version < _currentVersion; version++) {
       final oldRoot = makeRoot(version);
@@ -36,13 +36,14 @@ class Manager implements Interface {
 
     final root = makeRoot(_currentVersion);
     await root.create(recursive: true);
-    return Manager(root);
+
+    return MediaCache(root);
   }
 
   @override
-  Future<File?> getImage(String host, String path) async {
+  Future<io.File?> getImage(String host, String path) async {
     final fullPath = _buildImagePath(host, path);
-    final file = File(fullPath);
+    final file = io.File(fullPath);
     try {
       if (await file.exists()) {
         developer.log('Found image in cache: $path');
@@ -55,13 +56,13 @@ class Manager implements Interface {
   }
 
   @override
-  File getAudioLocation(String host, String path) {
+  io.File getAudioLocation(String host, String path) {
     final fullPath = _buildAudioPath(host, path);
-    return File(fullPath);
+    return io.File(fullPath);
   }
 
   @override
-  Future<File?> getAudio(String host, String path) async {
+  Future<io.File?> getAudio(String host, String path) async {
     final file = getAudioLocation(host, path);
     try {
       if (await file.exists()) {
@@ -78,9 +79,9 @@ class Manager implements Interface {
   putImage(String host, String path, Uint8List bytes) async {
     developer.log('Adding image to disk cache: $path');
     final fullPath = _buildImagePath(host, path);
-    final file = File(fullPath);
+    final file = io.File(fullPath);
     try {
-      await file.writeAsBytes(bytes, mode: FileMode.writeOnly, flush: true);
+      await file.writeAsBytes(bytes, mode: io.FileMode.writeOnly, flush: true);
     } catch (e) {
       developer.log('Error while saving image: $path', error: e);
     }
