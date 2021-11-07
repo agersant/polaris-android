@@ -40,17 +40,22 @@ class Collection {
 
   populateDirectory(String host, String path, List<dto.CollectionFile> content) {
     final parent = _findOrCreateDirectory(host, path);
+    final Set<String> childrenToKeep = {};
     for (dto.CollectionFile file in content) {
       if (file.isSong()) {
         final name = p.basename(file.asSong().path);
         parent._children[name] = File(Left(Song(file.asSong())));
+        childrenToKeep.add(name);
       } else {
         final name = p.basename(file.asDirectory().path);
         if (parent._children[name]?.isDirectory() != true) {
-          parent._children[name] = File(Right(Directory(data: file.asDirectory())));
+          parent._children[name] = File(Right(Directory()));
         }
+        parent._children[name]!.asDirectory().data = file.asDirectory();
+        childrenToKeep.add(name);
       }
     }
+    parent._children.removeWhere((key, value) => !childrenToKeep.contains(key));
     parent.populated = true;
   }
 

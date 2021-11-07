@@ -18,7 +18,6 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
-// TODO allow pull to refresh (ie. skip cache)
 class Browser extends StatefulWidget {
   const Browser({Key? key}) : super(key: key);
 
@@ -59,11 +58,12 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                     child: Navigator(
                       pages: browserModel.browserStack.map((location) {
                         return MaterialPage(
-                            child: BrowserLocation(
-                          location,
-                          onDirectoryTapped: browserModel.pushBrowserLocation,
-                          navigateBack: browserModel.popBrowserLocation,
-                        ));
+                          child: BrowserLocation(
+                            location,
+                            onDirectoryTapped: browserModel.pushBrowserLocation,
+                            navigateBack: browserModel.popBrowserLocation,
+                          ),
+                        );
                       }).toList(),
                       onPopPage: (route, result) {
                         return route.didPop(result);
@@ -110,13 +110,13 @@ class _BrowserLocationState extends State<BrowserLocation> {
     _fetchData();
   }
 
-  void _fetchData() async {
+  Future _fetchData({bool useCache = true}) async {
     setState(() {
       _files = null;
       _error = null;
     });
     try {
-      final files = await getIt<polaris.Client>().browse(widget.location);
+      final files = await getIt<polaris.Client>().browse(widget.location, useCache: useCache);
       setState(() {
         _files = files;
       });
@@ -175,12 +175,13 @@ class _BrowserLocationState extends State<BrowserLocation> {
       );
     }
 
+    late Widget content;
     if (_getViewMode() == ViewMode.discography) {
       final albums = files.map((f) => f.asDirectory()).toList();
-      return AlbumGrid(albums);
+      content = AlbumGrid(albums);
     } else {
-      return ListView.builder(
-        physics: const BouncingScrollPhysics(),
+      content = ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         itemCount: files.length,
         itemBuilder: (context, index) {
           final file = files[index];
@@ -194,6 +195,11 @@ class _BrowserLocationState extends State<BrowserLocation> {
         },
       );
     }
+
+    return RefreshIndicator(
+      onRefresh: () => _fetchData(useCache: false),
+      child: content,
+    );
   }
 }
 

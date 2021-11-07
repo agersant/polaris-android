@@ -68,6 +68,50 @@ void main() {
     assert(listEquals(p.split(cachedContent![0].asDirectory().path), ['root', 'Heron']));
   });
 
+  test('Preserves directory content when updating its metadata', () async {
+    final cache = CollectionCache();
+    final aegeusDirectory = dto.CollectionFile(Right(dto.Directory(path: 'root/Heron/Aegeus')));
+    cache.putDirectory('host', 'root/Heron', [aegeusDirectory]);
+
+    final heronDTODirectory = dto.Directory(path: 'root/Heron');
+    heronDTODirectory.artwork = 'some-artwork';
+    final heronDirectory = dto.CollectionFile(Right(heronDTODirectory));
+    cache.putDirectory('host', 'root', [heronDirectory]);
+
+    {
+      final cachedContent = cache.getDirectory('host', 'root');
+      assert(cachedContent != null);
+      assert(cachedContent!.isNotEmpty);
+      assert(cachedContent![0].isDirectory());
+      assert(cachedContent![0].asDirectory().path == 'root/Heron');
+      assert(cachedContent![0].asDirectory().artwork == 'some-artwork');
+    }
+
+    {
+      final cachedContent = cache.getDirectory('host', 'root/Heron');
+      assert(cachedContent != null);
+      assert(cachedContent!.isNotEmpty);
+      assert(cachedContent![0].isDirectory());
+      assert(cachedContent![0].asDirectory().path == 'root/Heron/Aegeus');
+    }
+  });
+
+  test('Removes deleted content when populating', () async {
+    final cache = CollectionCache();
+    final aegeusDirectory = dto.CollectionFile(Right(dto.Directory(path: 'root/Heron/Aegeus')));
+    final bonusTrack = dto.CollectionFile(Left(dto.Song(path: 'root/Heron/bonus-track.mp3')));
+    cache.putDirectory('host', 'root/Heron', [aegeusDirectory, bonusTrack]);
+
+    final eonsDirectory = dto.CollectionFile(Right(dto.Directory(path: 'root/Heron/Eons')));
+    cache.putDirectory('host', 'root/Heron', [eonsDirectory]);
+
+    final cachedContent = cache.getDirectory('host', 'root/Heron');
+    assert(cachedContent != null);
+    assert(cachedContent!.isNotEmpty);
+    assert(cachedContent![0].isDirectory());
+    assert(cachedContent![0].asDirectory().path == 'root/Heron/Eons');
+  });
+
   test('Cannot flatten a missing directory', () async {
     final cache = CollectionCache();
     assert(cache.flattenDirectory('', '') == null);

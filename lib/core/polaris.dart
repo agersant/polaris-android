@@ -260,7 +260,7 @@ class Client {
     return null;
   }
 
-  Future<List<dto.CollectionFile>> browse(String path) async {
+  Future<List<dto.CollectionFile>> browse(String path, {bool useCache = true}) async {
     if (connectionManager.state != connection.State.connected) {
       return offlineClient.browse(path);
     }
@@ -270,7 +270,7 @@ class Client {
       throw APIError.unspecifiedHost;
     }
 
-    if (collectionCache.hasPopulatedDirectory(host, path)) {
+    if (useCache && collectionCache.hasPopulatedDirectory(host, path)) {
       final cachedContent = collectionCache.getDirectory(host, path);
       if (cachedContent != null) {
         return cachedContent;
