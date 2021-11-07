@@ -214,12 +214,14 @@ class OfflineClient {
     if (host == null) {
       throw APIError.unspecifiedHost;
     }
-    // TODO filter out songs that don't have cached audio
-    // TODO filter out directories that dont lead to any song with cached audio
     final cachedContent = collectionCache.getDirectory(host, path);
     if (cachedContent == null) {
       throw throw APIError.unexpectedCacheMiss;
     }
+    // TODO filter out songs that don't have cached audio
+    // TODO filter out directories that dont lead to any song with cached audio
+    cachedContent.removeWhere((dto.CollectionFile file) =>
+        file.isDirectory() && collectionCache.flattenDirectory(host, file.asDirectory().path)?.isEmpty == true);
     return cachedContent;
   }
 
@@ -268,9 +270,11 @@ class Client {
       throw APIError.unspecifiedHost;
     }
 
-    final cachedContent = collectionCache.getDirectory(host, path);
-    if (cachedContent != null) {
-      return cachedContent;
+    if (collectionCache.hasPopulatedDirectory(host, path)) {
+      final cachedContent = collectionCache.getDirectory(host, path);
+      if (cachedContent != null) {
+        return cachedContent;
+      }
     }
 
     return _httpClient.browse(path).then((content) {

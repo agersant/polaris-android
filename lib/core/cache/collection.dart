@@ -8,11 +8,12 @@ class CollectionCache {
   List<dto.CollectionFile>? getDirectory(String host, String path) {
     return _collection
         .readDirectory(host, path)
-        ?.map((name, file) {
+        ?.children
+        .map((name, file) {
           if (file.isSong()) {
             return MapEntry(name, dto.CollectionFile(Left(file.asSong().data)));
           } else {
-            final directory = file.asDirectory().data ?? dto.Directory(path: name);
+            final directory = file.asDirectory().data ?? dto.Directory(path: p.join(path, name));
             return MapEntry(name, dto.CollectionFile(Right(directory)));
           }
         })
@@ -20,8 +21,17 @@ class CollectionCache {
         .toList(); // TODO sort
   }
 
+  bool hasPopulatedDirectory(String host, String path) {
+    final directory = _collection.readDirectory(host, path);
+    return directory?.populated == true;
+  }
+
   putDirectory(String host, String path, List<dto.CollectionFile> content) {
     _collection.populateDirectory(host, path, content);
+  }
+
+  List<dto.Song>? flattenDirectory(String host, String path) {
+    return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList(); // TODO sort
   }
 }
 
@@ -44,15 +54,30 @@ class Collection {
     parent.populated = true;
   }
 
-  Map<String, File>? readDirectory(String host, String path) {
+  Directory? readDirectory(String host, String path) {
     if (!_directoryExists(host, path)) {
       return null;
     }
-    Directory directory = _findOrCreateDirectory(host, path);
-    if (!directory.populated) {
+    return _findOrCreateDirectory(host, path);
+  }
+
+  List<Song>? flattenDirectory(String host, String path) {
+    if (!_directoryExists(host, path)) {
       return null;
     }
-    return directory.children;
+    final Directory directory = _findOrCreateDirectory(host, path);
+    final List<File> exploreList = [];
+    final List<Song> songs = [];
+    exploreList.addAll(directory._children.values);
+    while (exploreList.isNotEmpty) {
+      final candidate = exploreList.removeLast();
+      if (candidate.isSong()) {
+        songs.add(candidate.asSong());
+      } else {
+        exploreList.addAll(candidate.asDirectory()._children.values);
+      }
+    }
+    return songs;
   }
 
   bool _directoryExists(String host, String path) {
@@ -87,10 +112,8 @@ class Collection {
       final component = components.removeAt(0);
       final parent = file!.asDirectory();
       file = parent._children[component];
-      if (file == null) {
+      if (file == null || !file.isDirectory()) {
         file = parent._children[component] = File(Right(Directory()));
-      } else if (file.isSong()) {
-        throw "Found unexpected song";
       }
     }
     return file!.asDirectory();
