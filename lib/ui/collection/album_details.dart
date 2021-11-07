@@ -11,6 +11,8 @@ import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
+// TODO add a way to refresh
+
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
