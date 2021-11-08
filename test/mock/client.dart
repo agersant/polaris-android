@@ -33,7 +33,7 @@ const fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.
 class Mock extends mocktail.Mock implements http.Client {
   bool _failLogin = false;
 
-  mockBadLogin() {
+  void mockBadLogin() {
     _failLogin = true;
   }
 

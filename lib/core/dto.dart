@@ -27,7 +27,7 @@ class Authorization {
 class Credentials {
   String username, password;
   Credentials({required this.username, required this.password});
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => <String, String>{
         'username': username,
         'password': password,
       };
@@ -52,7 +52,7 @@ class Directory {
       ..dateAdded = json['date_added'];
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'path': path,
         'artist': artist,
         'year': year,
@@ -89,7 +89,7 @@ class Song {
       ..duration = json['duration'];
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'path': path,
         'track_number': trackNumber,
         'disc_number': discNumber,
@@ -135,7 +135,7 @@ class CollectionFile {
   }
 
   Map<String, dynamic> toJson() => content.fold(
-        (song) => {'Song': song},
-        (directory) => {'Directory': directory},
+        (song) => <String, dynamic>{'Song': song.toJson()},
+        (directory) => <String, dynamic>{'Directory': directory.toJson()},
       );
 }

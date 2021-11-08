@@ -78,7 +78,7 @@ abstract class _BaseHttpClient {
       throw APIError.networkError;
     }
 
-    return response.catchError((e) => throw APIError.networkError).then((r) {
+    return response.catchError((dynamic e) => throw APIError.networkError).then((r) {
       if (r.statusCode == 401) {
         throw APIError.unauthorized;
       }
@@ -91,7 +91,7 @@ abstract class _BaseHttpClient {
 
   Future<Uint8List> completeRequest(_Method method, String url, {dynamic body, String? authenticationToken}) async {
     final streamedResponse = makeRequest(method, url, body: body, authenticationToken: authenticationToken);
-    return streamedResponse.then((r) => r.stream.toBytes().catchError((e) => throw APIError.networkError));
+    return streamedResponse.then((r) => r.stream.toBytes().catchError((dynamic e) => throw APIError.networkError));
   }
 }
 
@@ -142,7 +142,9 @@ class HttpClient extends _BaseHttpClient {
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((c) => dto.CollectionFile.fromJson(c)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List)
+          .map((dynamic c) => dto.CollectionFile.fromJson(c))
+          .toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -152,7 +154,7 @@ class HttpClient extends _BaseHttpClient {
     final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((c) => dto.Song.fromJson(c)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto.Song.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -162,7 +164,7 @@ class HttpClient extends _BaseHttpClient {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((d) => dto.Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -172,7 +174,7 @@ class HttpClient extends _BaseHttpClient {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((d) => dto.Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.Directory.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -246,7 +248,7 @@ class Client {
   final CollectionCache collectionCache;
 
   Client(
-      {required httpClient,
+      {required HttpClient httpClient,
       required this.offlineClient,
       required this.connectionManager,
       required this.downloadManager,

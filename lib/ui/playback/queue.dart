@@ -64,7 +64,7 @@ class QueuePage extends StatelessWidget {
     );
   }
 
-  _clearQueue() {
+  void _clearQueue() {
     final playlist = getIt<Playlist>();
     playlist.clear();
   }

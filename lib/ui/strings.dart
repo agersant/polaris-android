@@ -17,6 +17,7 @@ const passwordFieldLabel = 'Password';
 const connectButtonLabel = 'CONNECT';
 const disconnectButtonLabel = 'DISCONNECT';
 const loginButtonLabel = 'LOGIN';
+const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
 // Collection
 const collectionTitle = 'Collection';
@@ -41,7 +42,7 @@ const drawerSettings = 'Settings';
 const drawerOfflineMusic = 'Offline music';
 const drawerOfflineMode = 'Offline mode';
 const drawerLogOut = 'LogOut';
-const unknownUser = 'Unknown User';
+const unknownUser = 'Offline User';
 const unknownHost = 'Unknown Host';
 
 // Playback

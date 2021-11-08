@@ -21,28 +21,26 @@ class _AudioJob {
 }
 
 class Manager {
-  final MediaCacheInterface _mediaCache;
-  final connection.Manager _connectionManager;
-  final polaris.HttpClient _httpClient;
+  final MediaCacheInterface mediaCache;
+  final connection.Manager connectionManager;
+  final polaris.HttpClient httpClient;
 
   final Map<String, _ImageJob> _imageJobs = {};
   final Map<String, _AudioJob> _audioJobs = {};
 
   Manager({
-    required mediaCache,
-    required connectionManager,
-    required httpClient,
-  })  : _mediaCache = mediaCache,
-        _connectionManager = connectionManager,
-        _httpClient = httpClient;
+    required this.mediaCache,
+    required this.connectionManager,
+    required this.httpClient,
+  });
 
   Future<Uint8List?> getImage(String path) async {
-    final host = _connectionManager.url;
+    final host = connectionManager.url;
     if (host == null) {
       return Future.value(null);
     }
 
-    final cacheHit = await _mediaCache.getImage(host, path);
+    final cacheHit = await mediaCache.getImage(host, path);
     if (cacheHit != null) {
       return cacheHit.readAsBytes();
     }
@@ -53,13 +51,13 @@ class Manager {
     }
 
     developer.log('Downloading image: $path');
-    final imageData = _httpClient.getImage(path).then((r) => http.Response.fromStream(r)).then((r) {
+    final imageData = httpClient.getImage(path).then((r) => http.Response.fromStream(r)).then((r) {
       if (r.statusCode >= 300) {
         throw r.statusCode;
       }
-      _mediaCache.putImage(host, path, r.bodyBytes);
+      mediaCache.putImage(host, path, r.bodyBytes);
       return r.bodyBytes;
-    }).catchError((e) {
+    }).catchError((dynamic e) {
       developer.log('Error while downloading image: $path', error: e);
       throw e;
     });
@@ -72,12 +70,12 @@ class Manager {
   }
 
   Future<AudioSource?> getAudio(String path, MediaItem mediaItem) async {
-    final host = _connectionManager.url;
+    final host = connectionManager.url;
     if (host == null) {
       return null;
     }
 
-    final File? cacheHit = await _mediaCache.getAudio(host, path);
+    final File? cacheHit = await mediaCache.getAudio(host, path);
     if (cacheHit != null) {
       return AudioSource.uri(cacheHit.uri, tag: mediaItem);
     }
@@ -89,7 +87,7 @@ class Manager {
       return existingJob.audioSource;
     }
 
-    final uri = _httpClient.getAudioURI(path);
+    final uri = httpClient.getAudioURI(path);
     // TODO.important https://github.com/ryanheise/just_audio/issues/569
     // TODO.important https://github.com/ryanheise/just_audio/issues/570
     // final cacheFile = _cacheManager.getAudioLocation(host, path);

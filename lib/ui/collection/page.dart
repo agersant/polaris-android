@@ -37,7 +37,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
     _handleActiveTabChanged();
   }
 
-  _handleActiveTabChanged() {
+  void _handleActiveTabChanged() {
     _browserModel.isBrowserActive = _tabController.index == 0;
   }
 
@@ -87,7 +87,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
             title: const Text(drawerLogOut),
             onTap: () async {
               final connectionManager = getIt<connection.Manager>();
-              await connectionManager.disconnect();
+              connectionManager.disconnect();
             },
           ),
         ],
@@ -136,12 +136,18 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
   Widget _buildOfflineModeToggle() {
     return Consumer<connection.Manager>(
       builder: (context, connectionManager, child) {
+        final Function(bool)? onChanged;
+        if (connectionManager.canToggleOfflineMode()) {
+          onChanged = (bool? value) {
+            connectionManager.toggleOfflineMode();
+          };
+        } else {
+          onChanged = null;
+        }
         return SwitchListTile(
           title: const Text(drawerOfflineMode),
           value: connectionManager.state == connection.State.offlineMode,
-          onChanged: (bool? value) {
-            connectionManager.toggleOfflineMode();
-          },
+          onChanged: onChanged,
           secondary: const Icon(Icons.cloud_off),
         );
       },

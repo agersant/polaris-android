@@ -57,7 +57,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                     clipBehavior: Clip.hardEdge,
                     child: Navigator(
                       pages: browserModel.browserStack.map((location) {
-                        return MaterialPage(
+                        return MaterialPage<dynamic>(
                           child: BrowserLocation(
                             location,
                             onDirectoryTapped: browserModel.pushBrowserLocation,
@@ -65,7 +65,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                           ),
                         );
                       }).toList(),
-                      onPopPage: (route, result) {
+                      onPopPage: (route, dynamic result) {
                         return route.didPop(result);
                       },
                     ),
@@ -271,7 +271,7 @@ class Song extends StatelessWidget {
     );
   }
 
-  _onTap() {
+  void _onTap() {
     final Playlist playlist = getIt<Playlist>();
     playlist.queueLast([song]);
   }

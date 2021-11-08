@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,7 @@ class _ConnectFormState extends State<ConnectForm> {
     );
   }
 
-  _onConnectPressed() async {
+  Future _onConnectPressed() async {
     try {
       await _connectionManager.connect(_textEditingController.text);
     } on connection.Error catch (e) {
@@ -58,23 +59,51 @@ class _ConnectFormState extends State<ConnectForm> {
 
   void _handleError(connection.Error error) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
+
+    final collectionCache = getIt<CollectionCache>();
+    final connectionManager = getIt<connection.Manager>();
+    // TODO require some cached audio, not just collection cache
+    final hasOfflineData = collectionCache.flattenDirectory(connectionManager.url ?? '', '')?.isNotEmpty == true;
+
+    final SnackBarAction? offlineModeAction;
+    if (hasOfflineData) {
+      offlineModeAction = SnackBarAction(
+        label: offlineModeButtonLabel,
+        onPressed: connectionManager.startOffline,
+      );
+    } else {
+      offlineModeAction = null;
+    }
+
+    final SnackBarAction? action;
+    final String errorText;
     switch (error) {
       case connection.Error.unsupportedAPIVersion:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorAPIVersion)));
+        errorText = errorAPIVersion;
+        action = offlineModeAction;
         break;
       case connection.Error.connectionAlreadyInProgress:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorAlreadyConnecting)));
+        errorText = errorAlreadyConnecting;
+        action = null;
         break;
       case connection.Error.networkError:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorNetwork)));
+        errorText = errorNetwork;
+        action = offlineModeAction;
         break;
       case connection.Error.requestFailed:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorRequestFailed)));
+        errorText = errorRequestFailed;
+        action = offlineModeAction;
         break;
       case connection.Error.unknownError:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorUnknown)));
+        errorText = errorUnknown;
+        action = null;
         break;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(errorText),
+      action: action,
+    ));
   }
 
   @override

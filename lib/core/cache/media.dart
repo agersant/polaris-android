@@ -11,7 +11,7 @@ const _currentVersion = 4;
 
 abstract class MediaCacheInterface {
   Future<io.File?> getImage(String host, String path);
-  putImage(String host, String path, Uint8List bytes);
+  Future putImage(String host, String path, Uint8List bytes);
   Future<io.File?> getAudio(String host, String path);
   io.File getAudioLocation(String host, String path);
 }

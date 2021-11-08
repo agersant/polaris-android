@@ -20,7 +20,7 @@ extension MediaItemConversions on Song {
       artist: formatArtist(),
       duration: duration != null ? Duration(seconds: duration!) : null,
       artUri: artworkUri,
-      extras: {
+      extras: <String, dynamic>{
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,
         extraKeyDiscNumber: discNumber,

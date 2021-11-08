@@ -60,11 +60,11 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  _onDisconnectPressed() async {
+  Future _onDisconnectPressed() async {
     getIt<connection.Manager>().disconnect();
   }
 
-  _onLoginPressed() async {
+  Future _onLoginPressed() async {
     final username = _usernameEditingController.text;
     final password = _passwordEditingController.text;
     try {

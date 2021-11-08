@@ -47,7 +47,7 @@ class Harness {
       authenticationManager: authenticationManager,
     );
     final mediaCache = await MediaCache.create();
-    final collectionCache = CollectionCache();
+    final collectionCache = CollectionCache(Collection());
     final downloadManager = download.Manager(
       mediaCache: mediaCache,
       connectionManager: connectionManager,
@@ -70,6 +70,7 @@ class Harness {
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
     getIt.registerSingleton<Playlist>(playlist);
+    getIt.registerSingleton<CollectionCache>(collectionCache);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);

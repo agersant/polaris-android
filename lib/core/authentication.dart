@@ -58,7 +58,7 @@ class Manager extends ChangeNotifier {
     _onConnectionStateChanged();
   }
 
-  _onConnectionStateChanged() async {
+  Future _onConnectionStateChanged() async {
     final previousConnectionState = connectionManager.previousState;
     final connectionState = connectionManager.state;
     if (connectionState == connection.State.connected) {
@@ -102,7 +102,7 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticated);
   }
 
-  Future authenticate(String newUsername, password) async {
+  Future authenticate(String newUsername, String password) async {
     if (_state != State.unauthenticated) {
       throw Error.authenticationAlreadyInProgress;
     }
@@ -125,7 +125,7 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticated);
   }
 
-  _setState(State newState) {
+  void _setState(State newState) {
     if (_state == newState) {
       return;
     }

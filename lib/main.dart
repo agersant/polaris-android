@@ -48,7 +48,7 @@ Future _registerSingletons() async {
     authenticationManager: authenticationManager,
   );
   final mediaCache = await MediaCache.create();
-  final collectionCache = CollectionCache();
+  final collectionCache = await CollectionCache.create();
   final downloadManager = download.Manager(
     mediaCache: mediaCache,
     connectionManager: connectionManager,
@@ -70,6 +70,7 @@ Future _registerSingletons() async {
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
+  getIt.registerSingleton<CollectionCache>(collectionCache);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<polaris.Client>(polarisClient);
@@ -117,10 +118,10 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       ],
       child: Consumer3<connection.Manager, authentication.Manager, QueueModel>(
         builder: (context, connectionManager, authenticationManager, queueModel, child) {
-          final connectionComplete = connectionManager.state == connection.State.connected ||
-              connectionManager.state == connection.State.offlineMode;
+          final isOfflineMode = connectionManager.state == connection.State.offlineMode;
+          final connectionComplete = connectionManager.state == connection.State.connected;
           final authenticationComplete = authenticationManager.state == authentication.State.authenticated;
-          final isStartupComplete = connectionComplete && authenticationComplete;
+          final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showQueue = isStartupComplete && queueModel.isQueueOpen;
 
           return BackButtonHandler(
@@ -130,12 +131,12 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: Navigator(
                     key: navigatorKey,
                     pages: [
-                      if (!isStartupComplete) MaterialPage(child: StartupPage()),
-                      if (isStartupComplete) const MaterialPage(child: CollectionPage()),
+                      if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
+                      if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
                       // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
-                      if (showQueue) const MaterialPage(child: QueuePage()),
+                      if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
                     ],
-                    onPopPage: (route, result) {
+                    onPopPage: (route, dynamic result) {
                       if (!route.didPop(result)) {
                         return false;
                       }

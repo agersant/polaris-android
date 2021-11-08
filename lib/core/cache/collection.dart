@@ -1,9 +1,59 @@
+import 'dart:convert';
+import 'dart:developer' as developer;
+import 'dart:io' as io;
 import 'package:dartz/dartz.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
 
+const _firstVersion = 1;
+const _currentVersion = 1;
+
 class CollectionCache {
-  final _collection = Collection(); // TODO read collection from disk
+  final Collection _collection;
+
+  CollectionCache(this._collection);
+
+  static Future<io.File> _getCollectionFile(int version) async {
+    final temporaryDirectory = await getTemporaryDirectory();
+    return io.File(p.join(temporaryDirectory.path, 'collection', 'v$version.cache'));
+  }
+
+  static Future<CollectionCache> create() async {
+    for (int version = _firstVersion; version < _currentVersion; version++) {
+      final oldCacheFile = await _getCollectionFile(version);
+      oldCacheFile.exists().then((exists) {
+        if (exists) {
+          oldCacheFile.delete(recursive: true);
+        }
+      });
+    }
+
+    Collection collection = Collection();
+    final currentCacheFile = await _getCollectionFile(_currentVersion);
+    try {
+      if (await currentCacheFile.exists()) {
+        final cacheData = await currentCacheFile.readAsBytes();
+        collection = Collection.fromBytes(cacheData);
+        developer.log('Read collection cache from: $currentCacheFile');
+      }
+    } catch (e) {
+      developer.log('Error while reading collection from disk: ', error: e);
+    }
+
+    return CollectionCache(collection);
+  }
+
+  Future saveToDisk() async {
+    try {
+      final cacheFile = await _getCollectionFile(_currentVersion);
+      final serializedData = _collection.toBytes();
+      await cacheFile.writeAsBytes(serializedData, flush: true);
+      developer.log('Wrote collection cache to: $cacheFile');
+    } catch (e) {
+      developer.log('Error while writing collection to disk: ', error: e);
+    }
+  }
 
   List<dto.CollectionFile>? getDirectory(String host, String path) {
     return _collection
@@ -26,8 +76,9 @@ class CollectionCache {
     return directory?.populated == true;
   }
 
-  putDirectory(String host, String path, List<dto.CollectionFile> content) {
+  void putDirectory(String host, String path, List<dto.CollectionFile> content) {
     _collection.populateDirectory(host, path, content);
+    saveToDisk();
   }
 
   List<dto.Song>? flattenDirectory(String host, String path) {
@@ -36,9 +87,29 @@ class CollectionCache {
 }
 
 class Collection {
-  Map<String, Directory> servers = {};
+  final Map<String, Directory> servers = {};
 
-  populateDirectory(String host, String path, List<dto.CollectionFile> content) {
+  Collection();
+
+  factory Collection.fromBytes(List<int> bytes) {
+    return Collection.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
+  }
+
+  List<int> toBytes() {
+    return io.gzip.encode(utf8.encode(jsonEncode(this)));
+  }
+
+  Collection.fromJson(Map<String, dynamic> json) {
+    json['servers'].forEach((String k, dynamic v) {
+      servers[k] = Directory.fromJson(v);
+    });
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'servers': servers.map((k, v) => MapEntry(k, v.toJson())),
+      };
+
+  void populateDirectory(String host, String path, List<dto.CollectionFile> content) {
     final parent = _findOrCreateDirectory(host, path);
     final Set<String> childrenToKeep = {};
     for (dto.CollectionFile file in content) {
@@ -149,20 +220,53 @@ class File {
   Directory asDirectory() {
     return content.fold((song) => throw "cache.File is not a directory", (directory) => directory);
   }
+
+  factory File.fromJson(Map<String, dynamic> json) {
+    if (json['song'] != null) {
+      return File(Left(Song.fromJson(json['song'])));
+    }
+    if (json['directory'] != null) {
+      return File(Right(Directory.fromJson(json['directory'])));
+    }
+    throw ArgumentError("Malformed cache file Json");
+  }
+
+  Map<String, dynamic> toJson() => content.fold(
+        (song) => <String, dynamic>{'song': song.toJson()},
+        (directory) => <String, dynamic>{'directory': directory.toJson()},
+      );
 }
 
 class Directory {
   dto.Directory? data;
-  final Map<String, File> _children = {};
+  final Map<String, File> _children;
   bool populated = false;
+
   Map<String, File> get children => {..._children};
 
-  Directory({this.data});
+  Directory({this.data, Map<String, File>? children}) : _children = children ?? {};
+
+  Directory.fromJson(Map<String, dynamic> json) : _children = {} {
+    populated = json['populated'] as bool;
+    if (json['data'] != null) {
+      data = dto.Directory.fromJson(json['data']);
+    }
+    json['children'].forEach((String k, dynamic v) {
+      _children[k] = File.fromJson(v);
+    });
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'data': data?.toJson(),
+        'children': _children.map((key, value) => MapEntry(key, value.toJson())),
+        'populated': populated,
+      };
 }
 
 class Song {
   final dto.Song data;
-  int lastUsed = 0;
-
   Song(this.data);
+
+  Song.fromJson(Map<String, dynamic> json) : data = dto.Song.fromJson(json['data']);
+  Map<String, dynamic> toJson() => <String, dynamic>{'data': data.toJson()};
 }

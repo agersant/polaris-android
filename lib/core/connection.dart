@@ -81,11 +81,24 @@ class Manager extends ChangeNotifier {
     return await _tryConnect();
   }
 
-  disconnect() {
+  void disconnect() {
     _setState(State.disconnected);
   }
 
-  toggleOfflineMode() {
+  void startOffline() {
+    if (state == State.disconnected) {
+      _setState(State.offlineMode);
+    }
+  }
+
+  bool canToggleOfflineMode() {
+    return state == State.connected || (state == State.offlineMode && _previousState == State.connected);
+  }
+
+  void toggleOfflineMode() {
+    if (!canToggleOfflineMode()) {
+      return;
+    }
     if (state == State.connected) {
       _setState(State.offlineMode);
     } else if (state == State.offlineMode) {
@@ -122,7 +135,7 @@ class Manager extends ChangeNotifier {
     _setState(State.connected);
   }
 
-  _setState(State newState) {
+  void _setState(State newState) {
     if (_state == newState) {
       return;
     }
@@ -131,7 +144,7 @@ class Manager extends ChangeNotifier {
     notifyListeners();
   }
 
-  _setURL(String? newURL) {
+  void _setURL(String? newURL) {
     if (newURL != null) {
       newURL = _cleanURL(newURL);
     }
