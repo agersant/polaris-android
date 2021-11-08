@@ -212,10 +212,7 @@ class OfflineClient {
   OfflineClient({required this.connectionManager, required this.mediaCache, required this.collectionCache});
 
   List<dto.CollectionFile> browse(String path) {
-    final String? host = connectionManager.url;
-    if (host == null) {
-      throw APIError.unspecifiedHost;
-    }
+    final String host = _getHost();
     final cachedContent = collectionCache.getDirectory(host, path);
     if (cachedContent == null) {
       throw throw APIError.unexpectedCacheMiss;
@@ -227,16 +224,30 @@ class OfflineClient {
     return cachedContent;
   }
 
-  Future<Uint8List?> getImage(String path) async {
-    final String? host = connectionManager.url;
-    if (host == null) {
-      throw APIError.unspecifiedHost;
+  Future<List<dto.Song>> flatten(String host, String path) async {
+    final cachedContent = collectionCache.flattenDirectory(host, path);
+    // TODO filter out songs that don't have cached audio
+    if (cachedContent == null) {
+      throw throw APIError.unexpectedCacheMiss;
     }
+    return cachedContent;
+  }
+
+  Future<Uint8List?> getImage(String path) async {
+    final String host = _getHost();
     final cacheFile = await mediaCache.getImage(host, path);
     if (cacheFile != null) {
       return cacheFile.readAsBytes();
     }
     return null;
+  }
+
+  String _getHost() {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+    return host;
   }
 }
 
@@ -267,10 +278,7 @@ class Client {
       return offlineClient.browse(path);
     }
 
-    final String? host = connectionManager.url;
-    if (host == null) {
-      throw APIError.unspecifiedHost;
-    }
+    final String host = _getHost();
 
     if (useCache && collectionCache.hasPopulatedDirectory(host, path)) {
       final cachedContent = collectionCache.getDirectory(host, path);
@@ -289,8 +297,8 @@ class Client {
     if (connectionManager.state == connection.State.connected) {
       return _httpClient.flatten(path);
     }
-    // TODO implement offline flatten
-    return [];
+    final String host = _getHost();
+    return offlineClient.flatten(host, path);
   }
 
   Uri _getImageURI(String path) {
@@ -327,5 +335,13 @@ class Client {
     } catch (e) {
       return null;
     }
+  }
+
+  String _getHost() {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+    return host;
   }
 }
