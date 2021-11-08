@@ -152,6 +152,7 @@ class Manager extends ChangeNotifier {
   }
 
   String _cleanURL(String url) {
+    url = url.trim();
     if (!url.startsWith('http')) {
       url = 'http://' + url;
     }
