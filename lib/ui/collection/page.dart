@@ -20,21 +20,31 @@ class CollectionPage extends StatefulWidget {
   _CollectionPageState createState() => _CollectionPageState();
 }
 
-class _CollectionPageState extends State<CollectionPage> with SingleTickerProviderStateMixin {
+class _CollectionPageState extends State<CollectionPage> with TickerProviderStateMixin {
+  final _connectionManager = getIt<connection.Manager>();
   final _browserModel = getIt<BrowserModel>();
-  // TODO remove random/recent tabs in offline mode
-  final List<Tab> tabs = const <Tab>[
-    Tab(text: collectionTabBrowseTitle),
-    Tab(text: collectionTabRandomTitle),
-    Tab(text: collectionTabRecentTitle),
-  ];
-  late final TabController _tabController = TabController(vsync: this, length: tabs.length);
+  late TabController _tabController = TabController(vsync: this, length: 0);
+  late bool isOnline;
 
   @override
   void initState() {
     super.initState();
-    _tabController.addListener(_handleActiveTabChanged);
-    _handleActiveTabChanged();
+    _connectionManager.addListener(_handleConnectionStateChanged);
+    _handleConnectionStateChanged();
+  }
+
+  void _handleConnectionStateChanged() {
+    setState(() {
+      isOnline = _connectionManager.state == connection.State.connected;
+
+      _tabController.dispose();
+      _tabController = TabController(vsync: this, length: isOnline ? 3 : 1);
+      if (!isOnline) {
+        _tabController.index = 0;
+      }
+      _tabController.addListener(_handleActiveTabChanged);
+      _handleActiveTabChanged();
+    });
   }
 
   void _handleActiveTabChanged() {
@@ -43,6 +53,7 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
 
   @override
   void dispose() {
+    _connectionManager.removeListener(_handleConnectionStateChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -52,15 +63,19 @@ class _CollectionPageState extends State<CollectionPage> with SingleTickerProvid
     return Scaffold(
       appBar: AppBar(
         title: const Text(collectionTitle),
-        bottom: TabBar(tabs: tabs, controller: _tabController),
+        bottom: TabBar(tabs: <Tab>[
+          const Tab(text: collectionTabBrowseTitle),
+          if (isOnline) const Tab(text: collectionTabRandomTitle),
+          if (isOnline) const Tab(text: collectionTabRecentTitle),
+        ], controller: _tabController),
       ),
       drawer: _buildDrawer(context),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          Browser(),
-          RandomAlbums(),
-          RecentAlbums(),
+        children: [
+          const Browser(),
+          if (isOnline) const RandomAlbums(),
+          if (isOnline) const RecentAlbums(),
         ],
       ),
     );
