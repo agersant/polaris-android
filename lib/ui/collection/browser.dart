@@ -236,6 +236,8 @@ class Directory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO use collectionCache to infer directories that are albums even if we never got directory data
+    // This is useful when offline-browsing to an album that had previously only been reached via random/recent
     final isAlbum = directory.album != null;
     final tile = _buildTile(onTap: isAlbum ? null : onTap);
     if (!isAlbum) {
