@@ -7,8 +7,6 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
-// TODO allow bypassing connection + auth for offline mode
-
 class ConnectForm extends StatefulWidget {
   const ConnectForm({Key? key}) : super(key: key);
 
