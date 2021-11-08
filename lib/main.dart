@@ -31,7 +31,8 @@ final lightTheme = ThemeData(
 final darkTheme = ThemeData(
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
-  indicatorColor: Colors.blue,
+  indicatorColor: Colors.blue, // TabBar current tab highlight
+  toggleableActiveColor: Colors.blue, // SwitchListTile color
 );
 
 Future _registerSingletons() async {
