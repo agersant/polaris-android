@@ -1,9 +1,11 @@
 import 'harness.dart';
 import 'mock/client.dart' as client;
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/authentication.dart' as authentication;
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/main.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';
@@ -97,7 +99,7 @@ void main() {
     expect(disconnectButton, findsNothing);
   });
 
-  testWidgets('Failed reconnect shows attempted URL screen', (WidgetTester tester) async {
+  testWidgets('Failed reconnect shows attempted URL', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.badHostURI});
 
     await tester.pumpWidget(const PolarisApp());
@@ -155,6 +157,24 @@ void main() {
     });
 
     await tester.pumpWidget(const PolarisApp());
+    expect(startupPage, findsNothing);
+  });
+
+  testWidgets('Failed connection offers offline mode', (WidgetTester tester) async {
+    final harness = await Harness.create();
+
+    final song = dto.CollectionFile(Left(dto.Song(path: client.labyrinthFilePath)));
+    harness.collectionCache.putDirectory(client.badHostURI, client.aegeusDirectoryPath, [song]);
+
+    await tester.pumpWidget(const PolarisApp());
+    await tester.enterText(urlInputField, client.badHostURI);
+    await tester.tap(connectButton);
+    await tester.pumpAndSettle();
+
+    final offlineModeButton = find.widgetWithText(SnackBarAction, offlineModeButtonLabel);
+    expect(offlineModeButton, findsOneWidget);
+    await tester.tap(offlineModeButton);
+    await tester.pumpAndSettle();
     expect(startupPage, findsNothing);
   });
 }

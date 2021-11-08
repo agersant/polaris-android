@@ -17,7 +17,9 @@ final getIt = GetIt.instance;
 
 class Harness {
   final http_client.Mock mockHTTPClient;
-  Harness(this.mockHTTPClient);
+  final CollectionCache collectionCache;
+
+  Harness(this.mockHTTPClient, this.collectionCache);
 
   static final Map<String, Object> reconnectPreferences = {
     connection.hostPreferenceKey: http_client.goodHostURI,
@@ -78,6 +80,6 @@ class Harness {
     getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(uuid);
 
-    return Harness(mockHttpClient);
+    return Harness(mockHttpClient, collectionCache);
   }
 }
