@@ -38,6 +38,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       isOnline = _connectionManager.state == connection.State.connected;
 
       _tabController.dispose();
+      // TODO slightly buggy due to https://github.com/flutter/flutter/issues/93237
       _tabController = TabController(vsync: this, length: isOnline ? 3 : 1);
       if (!isOnline) {
         _tabController.index = 0;
