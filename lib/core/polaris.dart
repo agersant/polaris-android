@@ -310,7 +310,7 @@ class Client {
   }
 
   Future<AudioSource?> getAudio(dto.Song song, String id) async {
-    String? artwork;
+    final String? artwork = song.artwork;
     Uri? artworkUri;
     if (artwork != null) {
       artworkUri = _getImageURI(artwork);
