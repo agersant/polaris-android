@@ -11,8 +11,6 @@ import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
-// TODO add a way to refresh
-
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
@@ -42,13 +40,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     }
   }
 
-  void _fetchData() async {
+  void _fetchData({bool useCache = true}) async {
     setState(() {
       _songs = null;
       _error = null;
     });
     try {
-      final files = await getIt<polaris.Client>().browse(widget.album.path);
+      final files = await getIt<polaris.Client>().browse(widget.album.path, useCache: useCache);
       final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
         _songs = songs;
@@ -140,6 +138,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   ),
                   CollectionFileContextMenuButton(
                     file: dto.CollectionFile(dartz.Right(widget.album)),
+                    actions: const [
+                      CollectionFileAction.queueLast,
+                      CollectionFileAction.queueNext,
+                      CollectionFileAction.refresh,
+                    ],
+                    onRefresh: () => _fetchData(useCache: false),
                     children: _songs,
                     icon: Icons.menu,
                   ),
@@ -211,6 +215,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               padding: const EdgeInsets.only(left: 8),
               child: CollectionFileContextMenuButton(
                 file: dto.CollectionFile(dartz.Right(widget.album)),
+                actions: const [
+                  CollectionFileAction.queueLast,
+                  CollectionFileAction.queueNext,
+                  CollectionFileAction.refresh,
+                ],
+                onRefresh: () => _fetchData(useCache: false),
                 children: _songs,
                 icon: Icons.menu,
                 compact: true,
@@ -338,7 +348,10 @@ class Song extends StatelessWidget {
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
           subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
-          trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Left(song))),
+          trailing: CollectionFileContextMenuButton(
+            file: dto.CollectionFile(dartz.Left(song)),
+            actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+          ),
           dense: true,
         ),
       ),

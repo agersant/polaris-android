@@ -228,7 +228,10 @@ class Directory extends StatelessWidget {
       leading: _getLeading(),
       title: Text(directory.formatName()),
       subtitle: _getSubtitle(),
-      trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Right(directory))),
+      trailing: CollectionFileContextMenuButton(
+        file: dto.CollectionFile(dartz.Right(directory)),
+        actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+      ),
       dense: true,
       onTap: onTap,
     );
@@ -267,7 +270,10 @@ class Song extends StatelessWidget {
       leading: ListThumbnail(song.artwork),
       title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
       subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
-      trailing: CollectionFileContextMenuButton(file: dto.CollectionFile(dartz.Left(song))),
+      trailing: CollectionFileContextMenuButton(
+        file: dto.CollectionFile(dartz.Left(song)),
+        actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+      ),
       dense: true,
       onTap: _onTap,
     );

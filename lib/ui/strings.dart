@@ -36,6 +36,7 @@ const albumDetailsError = 'There was an error while reading this album.';
 const goBackButtonLabel = 'GO BACK';
 const queueLast = 'Play Last';
 const queueNext = 'Play Next';
+const refresh = 'Refresh';
 
 // Collection drawer
 const drawerSettings = 'Settings';

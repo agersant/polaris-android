@@ -7,9 +7,12 @@ import 'package:polaris/ui/strings.dart';
 
 final getIt = GetIt.instance;
 
+void noop() {}
+
 enum CollectionFileAction {
   queueLast,
   queueNext,
+  refresh,
 }
 
 class CollectionFileContextMenuButton extends StatelessWidget {
@@ -17,9 +20,17 @@ class CollectionFileContextMenuButton extends StatelessWidget {
   final List<dto.Song>? children;
   final IconData icon;
   final bool compact;
+  final List<CollectionFileAction> actions;
+  final void Function() onRefresh;
 
   const CollectionFileContextMenuButton(
-      {required this.file, this.children, this.compact = false, this.icon = Icons.more_vert, Key? key})
+      {required this.file,
+      required this.actions,
+      this.children,
+      this.compact = false,
+      this.icon = Icons.more_vert,
+      this.onRefresh = noop,
+      Key? key})
       : super(key: key);
 
   @override
@@ -66,19 +77,29 @@ class CollectionFileContextMenuButton extends StatelessWidget {
           case CollectionFileAction.queueNext:
             playlist.queueNext(songs);
             break;
+          case CollectionFileAction.refresh:
+            onRefresh();
+            break;
           default:
             break;
         }
       },
-      itemBuilder: (BuildContext context) => const <PopupMenuEntry<CollectionFileAction>>[
-        PopupMenuItem<CollectionFileAction>(
-          value: CollectionFileAction.queueLast,
-          child: Text(queueLast),
-        ),
-        PopupMenuItem<CollectionFileAction>(
-          value: CollectionFileAction.queueNext,
-          child: Text(queueNext),
-        ),
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<CollectionFileAction>>[
+        if (actions.contains(CollectionFileAction.queueLast))
+          const PopupMenuItem<CollectionFileAction>(
+            value: CollectionFileAction.queueLast,
+            child: Text(queueLast),
+          ),
+        if (actions.contains(CollectionFileAction.queueNext))
+          const PopupMenuItem<CollectionFileAction>(
+            value: CollectionFileAction.queueNext,
+            child: Text(queueNext),
+          ),
+        if (actions.contains(CollectionFileAction.refresh))
+          const PopupMenuItem<CollectionFileAction>(
+            value: CollectionFileAction.refresh,
+            child: Text(refresh),
+          ),
       ],
     );
   }
