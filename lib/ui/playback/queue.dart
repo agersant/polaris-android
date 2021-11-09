@@ -89,7 +89,7 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Fu
                       Padding(
                           padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
                           child: _currentSongIcon(context, isPlaying, state)),
-                    Text(song.formatTitle(), overflow: TextOverflow.ellipsis),
+                    Expanded(child: Text(song.formatTitle(), overflow: TextOverflow.ellipsis)),
                   ],
                 ),
                 subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
