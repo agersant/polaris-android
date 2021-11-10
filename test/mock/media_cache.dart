@@ -8,16 +8,26 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
+  Future<bool> hasImage(String host, String path) async => false;
+
+  @override
   Future<File?> getImage(String host, String path) async => null;
+
+  @override
+  File getImageLocation(String host, String path) => File("");
 
   @override
   putImage(String host, String path, Uint8List bytes) async {}
 
   @override
+  Future<bool> hasAudio(String host, String path) async => false;
+
+  @override
+  bool hasAudioSync(String host, String path) => false;
+
+  @override
   Future<File?> getAudio(String host, String path) async {}
 
   @override
-  File getAudioLocation(String host, String path) {
-    return File("");
-  }
+  File getAudioLocation(String host, String path) => File("");
 }

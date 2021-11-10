@@ -13,8 +13,12 @@ const _currentVersion = 4;
 // TODO periodic cache cleanup
 
 abstract class MediaCacheInterface {
+  Future<bool> hasImage(String host, String path);
   Future<io.File?> getImage(String host, String path);
+  io.File getImageLocation(String host, String path);
   Future putImage(String host, String path, Uint8List bytes);
+  Future<bool> hasAudio(String host, String path);
+  bool hasAudioSync(String host, String path);
   Future<io.File?> getAudio(String host, String path);
   io.File getAudioLocation(String host, String path);
 }
@@ -44,6 +48,12 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
+  Future<bool> hasImage(String host, String path) async {
+    final file = getImageLocation(host, path);
+    return file.exists();
+  }
+
+  @override
   Future<io.File?> getImage(String host, String path) async {
     final fullPath = _buildImagePath(host, path);
     final file = io.File(fullPath);
@@ -59,9 +69,27 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
+  io.File getImageLocation(String host, String path) {
+    final fullPath = _buildImagePath(host, path);
+    return io.File(fullPath);
+  }
+
+  @override
   io.File getAudioLocation(String host, String path) {
     final fullPath = _buildAudioPath(host, path);
     return io.File(fullPath);
+  }
+
+  @override
+  Future<bool> hasAudio(String host, String path) async {
+    final file = getAudioLocation(host, path);
+    return file.exists();
+  }
+
+  @override
+  bool hasAudioSync(String host, String path) {
+    final file = getAudioLocation(host, path);
+    return file.existsSync();
   }
 
   @override

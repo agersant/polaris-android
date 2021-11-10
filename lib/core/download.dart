@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
-import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/polaris.dart' as polaris;
 
 class _ImageJob {
@@ -24,7 +23,6 @@ class _AudioJob {
 
 class Manager {
   final MediaCacheInterface mediaCache;
-  final connection.Manager connectionManager;
   final polaris.HttpClient httpClient;
 
   final Map<String, _ImageJob> _imageJobs = {};
@@ -32,16 +30,10 @@ class Manager {
 
   Manager({
     required this.mediaCache,
-    required this.connectionManager,
     required this.httpClient,
   });
 
-  Future<Uint8List?> getImage(String path) async {
-    final host = connectionManager.url;
-    if (host == null) {
-      return Future.value(null);
-    }
-
+  Future<Uint8List?> getImage(String host, String path) async {
     final cacheHit = await mediaCache.getImage(host, path);
     if (cacheHit != null) {
       return cacheHit.readAsBytes();
@@ -71,12 +63,7 @@ class Manager {
     return job.imageData;
   }
 
-  Future<AudioSource?> getAudio(String path, MediaItem mediaItem) async {
-    final host = connectionManager.url;
-    if (host == null) {
-      return null;
-    }
-
+  Future<AudioSource?> getAudio(String host, String path, MediaItem mediaItem) async {
     final File? cacheHit = await mediaCache.getAudio(host, path);
     if (cacheHit != null) {
       return AudioSource.uri(cacheHit.uri, tag: mediaItem);

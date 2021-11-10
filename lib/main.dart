@@ -52,12 +52,10 @@ Future _registerSingletons() async {
   final collectionCache = await CollectionCache.create();
   final downloadManager = download.Manager(
     mediaCache: mediaCache,
-    connectionManager: connectionManager,
     httpClient: polarisHttpClient,
   );
   final polarisClient = polaris.Client(
     offlineClient: polaris.OfflineClient(
-      connectionManager: connectionManager,
       mediaCache: mediaCache,
       collectionCache: collectionCache,
     ),
@@ -65,6 +63,7 @@ Future _registerSingletons() async {
     downloadManager: downloadManager,
     connectionManager: connectionManager,
     collectionCache: collectionCache,
+    mediaCache: mediaCache,
   );
   final audioPlayer = AudioPlayer();
   final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);

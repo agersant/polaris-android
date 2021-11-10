@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
@@ -205,49 +206,46 @@ class HttpClient extends _BaseHttpClient {
 }
 
 class OfflineClient {
-  final connection.Manager connectionManager;
   final MediaCacheInterface mediaCache;
   final CollectionCache collectionCache;
 
-  OfflineClient({required this.connectionManager, required this.mediaCache, required this.collectionCache});
+  OfflineClient({required this.mediaCache, required this.collectionCache});
 
-  List<dto.CollectionFile> browse(String path) {
-    final String host = _getHost();
+  Future<List<dto.CollectionFile>> browse(String host, String path) async {
     final cachedContent = collectionCache.getDirectory(host, path);
     if (cachedContent == null) {
       throw throw APIError.unexpectedCacheMiss;
     }
-    // TODO filter out songs that don't have cached audio
-    // TODO filter out directories that dont lead to any song with cached audio
-    cachedContent.removeWhere((dto.CollectionFile file) =>
-        file.isDirectory() && collectionCache.flattenDirectory(host, file.asDirectory().path)?.isEmpty == true);
-    return cachedContent;
+
+    return cachedContent.where((file) {
+      if (file.isSong()) {
+        return mediaCache.hasAudioSync(host, file.asSong().path);
+      } else {
+        final flattened = collectionCache.flattenDirectory(host, file.asDirectory().path);
+        return flattened?.any((song) => mediaCache.hasAudioSync(host, song.path)) ?? false;
+      }
+    }).toList();
   }
 
   Future<List<dto.Song>> flatten(String host, String path) async {
     final cachedContent = collectionCache.flattenDirectory(host, path);
-    // TODO filter out songs that don't have cached audio
     if (cachedContent == null) {
-      throw throw APIError.unexpectedCacheMiss;
+      throw APIError.unexpectedCacheMiss;
     }
-    return cachedContent;
+    return cachedContent.where((s) => mediaCache.hasAudioSync(host, s.path)).toList();
   }
 
-  Future<Uint8List?> getImage(String path) async {
-    final String host = _getHost();
+  Future<Uint8List?> getImage(String host, String path) async {
     final cacheFile = await mediaCache.getImage(host, path);
-    if (cacheFile != null) {
-      return cacheFile.readAsBytes();
-    }
-    return null;
+    return cacheFile?.readAsBytes();
   }
 
-  String _getHost() {
-    final String? host = connectionManager.url;
-    if (host == null) {
-      throw APIError.unspecifiedHost;
+  Future<AudioSource?> getAudio(String host, String path, MediaItem mediaItem) async {
+    final cacheFile = await mediaCache.getAudio(host, path);
+    if (cacheFile == null) {
+      return null;
     }
-    return host;
+    return AudioSource.uri(cacheFile.uri, tag: mediaItem);
   }
 }
 
@@ -257,14 +255,16 @@ class Client {
   final download.Manager downloadManager;
   final connection.Manager connectionManager;
   final CollectionCache collectionCache;
+  final MediaCacheInterface mediaCache;
 
-  Client(
-      {required HttpClient httpClient,
-      required this.offlineClient,
-      required this.connectionManager,
-      required this.downloadManager,
-      required this.collectionCache})
-      : _httpClient = httpClient;
+  Client({
+    required HttpClient httpClient,
+    required this.offlineClient,
+    required this.connectionManager,
+    required this.downloadManager,
+    required this.collectionCache,
+    required this.mediaCache,
+  }) : _httpClient = httpClient;
 
   HttpClient? get httpClient {
     if (connectionManager.state == connection.State.connected) {
@@ -274,11 +274,11 @@ class Client {
   }
 
   Future<List<dto.CollectionFile>> browse(String path, {bool useCache = true}) async {
-    if (connectionManager.state != connection.State.connected) {
-      return offlineClient.browse(path);
-    }
-
     final String host = _getHost();
+
+    if (connectionManager.state != connection.State.connected) {
+      return offlineClient.browse(host, path);
+    }
 
     if (useCache && collectionCache.hasPopulatedDirectory(host, path)) {
       final cachedContent = collectionCache.getDirectory(host, path);
@@ -301,36 +301,40 @@ class Client {
     return offlineClient.flatten(host, path);
   }
 
-  Uri _getImageURI(String path) {
+  Future<Uri?> _getImageURI(String path) async {
+    final String host = _getHost();
+    if (await mediaCache.hasImage(host, path)) {
+      return mediaCache.getImageLocation(host, path).uri;
+    }
     if (connectionManager.state == connection.State.connected) {
       return _httpClient.getImageURI(path);
     }
-    // TODO implement offline getImageURI
-    return Uri.parse("");
+    return null;
   }
 
   Future<AudioSource?> getAudio(dto.Song song, String id) async {
     final String? artwork = song.artwork;
     Uri? artworkUri;
     if (artwork != null) {
-      artworkUri = _getImageURI(artwork);
+      artworkUri = await _getImageURI(artwork);
     }
     final mediaItem = song.toMediaItem(id, artworkUri);
 
+    final String host = _getHost();
     if (connectionManager.state == connection.State.connected) {
-      return await downloadManager.getAudio(song.path, mediaItem);
+      return await downloadManager.getAudio(host, song.path, mediaItem);
     } else {
-      // TODO implement offline getAudio
-      return null;
+      return await offlineClient.getAudio(host, song.path, mediaItem);
     }
   }
 
   Future<Uint8List?> getImage(String path) async {
     try {
+      final String host = _getHost();
       if (connectionManager.state == connection.State.connected) {
-        return await downloadManager.getImage(path);
+        return await downloadManager.getImage(host, path);
       } else {
-        return await offlineClient.getImage(path);
+        return await offlineClient.getImage(host, path);
       }
     } catch (e) {
       return null;
