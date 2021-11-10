@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io' as io;
 import 'dart:typed_data';
+import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-final _slashRegExp = RegExp(r'[:/\.\\]');
 const _firstVersion = 1;
 const _currentVersion = 4;
 
@@ -90,14 +91,14 @@ class MediaCache implements MediaCacheInterface {
   }
 
   String _sanitize(String input) {
-    return input.replaceAll(_slashRegExp, '-');
+    return sha256.convert(utf8.encode(input)).toString();
   }
 
   String _buildImagePath(String host, String path) {
-    return p.join(_root.path, _sanitize(host + '__polaris__image__' + path));
+    return p.join(_root.path, 'image_' + _sanitize(host + '::' + path));
   }
 
   String _buildAudioPath(String host, String path) {
-    return p.join(_root.path, _sanitize(host + '__polaris__audio__' + path));
+    return p.join(_root.path, 'audio_' + _sanitize(host + '::' + path));
   }
 }
