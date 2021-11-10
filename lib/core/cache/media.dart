@@ -9,6 +9,8 @@ final _slashRegExp = RegExp(r'[:/\.\\]');
 const _firstVersion = 1;
 const _currentVersion = 4;
 
+// TODO periodic cache cleanup
+
 abstract class MediaCacheInterface {
   Future<io.File?> getImage(String host, String path);
   Future putImage(String host, String path, Uint8List bytes);

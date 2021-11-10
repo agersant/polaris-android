@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:developer' as developer;
@@ -17,7 +18,8 @@ class _ImageJob {
 class _AudioJob {
   String path;
   AudioSource audioSource;
-  _AudioJob(this.path, this.audioSource);
+  Stream<double> progressStream;
+  _AudioJob(this.path, this.audioSource, this.progressStream);
 }
 
 class Manager {
@@ -84,20 +86,29 @@ class Manager {
     if (existingJob != null) {
       // TODO.important when songs are duped in the playlist, this may return an
       // audiosource with a mediaItem.id that doesn't match what the caller requested.
+      // We also can't make a new audio source because it will fight for access to the
+      // cache file (and dupe the download).
       return existingJob.audioSource;
     }
 
     final uri = httpClient.getAudioURI(path);
-    // TODO.important https://github.com/ryanheise/just_audio/issues/569
-    // TODO.important https://github.com/ryanheise/just_audio/issues/570
-    // final cacheFile = _cacheManager.getAudioLocation(host, path);
-    // final audioSource = LockCachingAudioSource(uri, cacheFile: cacheFile, tag: mediaItem);
-    final audioSource = AudioSource.uri(uri, tag: mediaItem);
+    final cacheFile = mediaCache.getAudioLocation(host, path);
+    final audioSource = LockCachingAudioSource(uri, cacheFile: cacheFile, tag: mediaItem);
+    final progressStream = audioSource.downloadProgressStream.asBroadcastStream();
+    final job = _AudioJob(path, audioSource, progressStream);
 
-    final job = _AudioJob(path, audioSource);
+    late StreamSubscription progressSubscription;
+    progressSubscription = progressStream.listen((progress) {
+      if (progress >= 1.0) {
+        developer.log('Downloaded audio: $cacheFile');
+        progressSubscription.cancel();
+        _audioJobs.remove(path);
+      }
+    });
+
     _audioJobs[path] = job;
 
-    // TODO eventually remove the job from _audioJobs (some combination of no longer in playlist, being played, being pre-fetched, fully downloaded)
+    // TODO remove outdated jobs from _audioJobs (some combination of no longer in playlist, not being pending pin)
 
     return job.audioSource;
   }
