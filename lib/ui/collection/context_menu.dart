@@ -51,6 +51,18 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       size: iconSize,
     );
 
+    PopupMenuItem<CollectionFileAction> buildButton(CollectionFileAction action, IconData icon, String label) {
+      return PopupMenuItem<CollectionFileAction>(
+        value: action,
+        child: Row(
+          children: [
+            Padding(padding: const EdgeInsets.only(right: 16.0), child: Icon(icon)),
+            Text(label),
+          ],
+        ),
+      );
+    }
+
     return PopupMenuButton<CollectionFileAction>(
       // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
       child: compact ? icon : null,
@@ -92,25 +104,13 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<CollectionFileAction>>[
         if (actions.contains(CollectionFileAction.queueLast))
-          const PopupMenuItem<CollectionFileAction>(
-            value: CollectionFileAction.queueLast,
-            child: Text(queueLast),
-          ),
+          buildButton(CollectionFileAction.queueLast, Icons.playlist_add, queueLast),
         if (actions.contains(CollectionFileAction.queueNext))
-          const PopupMenuItem<CollectionFileAction>(
-            value: CollectionFileAction.queueNext,
-            child: Text(queueNext),
-          ),
+          buildButton(CollectionFileAction.queueNext, Icons.playlist_play, queueNext),
         if (actions.contains(CollectionFileAction.refresh))
-          const PopupMenuItem<CollectionFileAction>(
-            value: CollectionFileAction.refresh,
-            child: Text(refresh),
-          ),
+          buildButton(CollectionFileAction.refresh, Icons.refresh, refresh),
         if (actions.contains(CollectionFileAction.removeFromQueue))
-          const PopupMenuItem<CollectionFileAction>(
-            value: CollectionFileAction.removeFromQueue,
-            child: Text(removeFromQueue),
-          ),
+          buildButton(CollectionFileAction.removeFromQueue, Icons.clear, removeFromQueue),
       ],
     );
   }
