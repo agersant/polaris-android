@@ -43,6 +43,16 @@ extension SongFormatting on Song {
   String formatArtist() {
     return artist ?? albumArtist ?? unknownArtist;
   }
+
+  String formatArtistAndDuration() {
+    final artist = formatArtist();
+    List<String> components = [artist];
+    int? songDuration = duration;
+    if (songDuration != null) {
+      components.add(formatDuration(Duration(seconds: songDuration)));
+    }
+    return components.join(' · ');
+  }
 }
 
 extension DirectoryFormatting on Directory {

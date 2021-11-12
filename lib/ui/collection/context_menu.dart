@@ -13,6 +13,7 @@ enum CollectionFileAction {
   queueLast,
   queueNext,
   refresh,
+  removeFromQueue,
 }
 
 class CollectionFileContextMenuButton extends StatelessWidget {
@@ -22,6 +23,7 @@ class CollectionFileContextMenuButton extends StatelessWidget {
   final bool compact;
   final List<CollectionFileAction> actions;
   final void Function() onRefresh;
+  final void Function() onRemoveFromQueue;
 
   const CollectionFileContextMenuButton(
       {required this.file,
@@ -30,6 +32,7 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       this.compact = false,
       this.icon = Icons.more_vert,
       this.onRefresh = noop,
+      this.onRemoveFromQueue = noop,
       Key? key})
       : super(key: key);
 
@@ -80,6 +83,9 @@ class CollectionFileContextMenuButton extends StatelessWidget {
           case CollectionFileAction.refresh:
             onRefresh();
             break;
+          case CollectionFileAction.removeFromQueue:
+            onRemoveFromQueue();
+            break;
           default:
             break;
         }
@@ -99,6 +105,11 @@ class CollectionFileContextMenuButton extends StatelessWidget {
           const PopupMenuItem<CollectionFileAction>(
             value: CollectionFileAction.refresh,
             child: Text(refresh),
+          ),
+        if (actions.contains(CollectionFileAction.removeFromQueue))
+          const PopupMenuItem<CollectionFileAction>(
+            value: CollectionFileAction.removeFromQueue,
+            child: Text(removeFromQueue),
           ),
       ],
     );

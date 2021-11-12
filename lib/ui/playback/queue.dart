@@ -1,9 +1,11 @@
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/playlist.dart';
+import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/utils/animated_equalizer.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -41,7 +43,7 @@ class QueuePage extends StatelessWidget {
               final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
               final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
               onTap() => getIt<AudioPlayer>().seek(null, index: index);
-              return _songWidget(context, mediaItem, isCurrent, onTap);
+              return _songWidget(context, index, mediaItem, isCurrent, onTap);
             },
             itemCount: snapshot.data?.sequence.length ?? 0,
             onReorder: (int oldIndex, int newIndex) {
@@ -70,7 +72,7 @@ class QueuePage extends StatelessWidget {
   }
 }
 
-Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Function() onTap) =>
+Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool isCurrent, Function() onTap) =>
     StreamBuilder<PlayerState>(
         key: Key(mediaItem.id),
         stream: getIt<AudioPlayer>().playerStateStream,
@@ -92,7 +94,14 @@ Widget _songWidget(BuildContext context, MediaItem mediaItem, bool isCurrent, Fu
                     Expanded(child: Text(song.formatTitle(), overflow: TextOverflow.ellipsis)),
                   ],
                 ),
-                subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
+                subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
+                trailing: CollectionFileContextMenuButton(
+                  file: dto.CollectionFile(dartz.Left(song)),
+                  actions: const [CollectionFileAction.removeFromQueue],
+                  onRemoveFromQueue: () {
+                    getIt<Playlist>().removeSong(index);
+                  },
+                ),
                 dense: true,
               ),
             ),

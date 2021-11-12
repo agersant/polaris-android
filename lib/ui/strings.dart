@@ -49,3 +49,4 @@ const unknownHost = 'Unknown Host';
 // Playback
 const queueTitle = "Queue";
 const queueEmpty = "There are no songs in the queue.";
+const removeFromQueue = "Remove";

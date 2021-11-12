@@ -329,16 +329,6 @@ class Song extends StatelessWidget {
 
   const Song(this.song, this.albumArtwork, {Key? key}) : super(key: key);
 
-  String getSubtitle() {
-    final artist = song.formatArtist();
-    List<String> components = [artist];
-    int? duration = song.duration;
-    if (duration != null) {
-      components.add(formatDuration(Duration(seconds: duration)));
-    }
-    return components.join(' · ');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -347,7 +337,7 @@ class Song extends StatelessWidget {
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
-          subtitle: Text(getSubtitle(), overflow: TextOverflow.ellipsis),
+          subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
           trailing: CollectionFileContextMenuButton(
             file: dto.CollectionFile(dartz.Left(song)),
             actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],

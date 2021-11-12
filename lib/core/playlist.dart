@@ -27,7 +27,7 @@ class Playlist {
 
   Future queueNext(List<Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
-    final int insertIndex = 1 + (audioPlayer.currentIndex ?? -1);
+    final int insertIndex = wasEmpty ? 0 : 1 + (audioPlayer.currentIndex ?? -1);
     await _audioSource.insertAll(insertIndex, await _makeAudioSources(songs));
     if (wasEmpty) {
       audioPlayer.play();
@@ -46,7 +46,12 @@ class Playlist {
     return _audioSource.move(oldIndex, insertIndex);
   }
 
+  Future removeSong(int index) async {
+    await _audioSource.removeAt(index);
+  }
+
   Future clear() async {
+    // TODO after using this, calling queueLast or queueNext somehow always skips a song
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
   }
