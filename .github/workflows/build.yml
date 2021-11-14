@@ -16,7 +16,11 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "2.0.5"
-      - run: flutter test
+      - name: Run tests
+        run: flutter test --coverage
+      - name: Upload test coverage results to codecov
+        run: curl -s https://codecov.io/bash
+        shell: bash
 
   build:
     name: Build Android App Bundle
