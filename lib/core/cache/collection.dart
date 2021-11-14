@@ -81,6 +81,11 @@ class CollectionCache {
     saveToDisk();
   }
 
+  void putSongs(String host, List<dto.Song> songs) {
+    _collection.addSongs(host, songs);
+    saveToDisk();
+  }
+
   List<dto.Song>? flattenDirectory(String host, String path) {
     return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList(); // TODO sort
   }
@@ -114,11 +119,11 @@ class Collection {
     final Set<String> childrenToKeep = {};
     for (dto.CollectionFile file in content) {
       if (file.isSong()) {
-        final name = p.basename(file.asSong().path);
+        final name = _basename(file.asSong().path);
         parent._children[name] = File(Left(Song(file.asSong())));
         childrenToKeep.add(name);
       } else {
-        final name = p.basename(file.asDirectory().path);
+        final name = _basename(file.asDirectory().path);
         if (parent._children[name]?.isDirectory() != true) {
           parent._children[name] = File(Right(Directory()));
         }
@@ -128,6 +133,15 @@ class Collection {
     }
     parent._children.removeWhere((key, value) => !childrenToKeep.contains(key));
     parent.populated = true;
+  }
+
+  void addSongs(String host, List<dto.Song> songs) {
+    for (dto.Song song in songs) {
+      final directoryPath = _dirname(song.path);
+      final name = _basename(song.path);
+      final parent = _findOrCreateDirectory(host, directoryPath);
+      parent._children[name] = File(Left(Song(song)));
+    }
   }
 
   Directory? readDirectory(String host, String path) {
@@ -198,6 +212,16 @@ class Collection {
   static List<String> _splitPath(String path) {
     // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
     return p.split(path);
+  }
+
+  static String _dirname(String path) {
+    // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
+    return p.dirname(path);
+  }
+
+  static String _basename(String path) {
+    // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
+    return p.basename(path);
   }
 }
 

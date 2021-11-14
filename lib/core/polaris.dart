@@ -294,10 +294,13 @@ class Client {
   }
 
   Future<List<dto.Song>> flatten(String path) async {
-    if (connectionManager.state == connection.State.connected) {
-      return _httpClient.flatten(path);
-    }
     final String host = _getHost();
+    if (connectionManager.state == connection.State.connected) {
+      return _httpClient.flatten(path).then((songs) {
+        collectionCache.putSongs(host, songs);
+        return songs;
+      });
+    }
     return offlineClient.flatten(host, path);
   }
 
