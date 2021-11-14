@@ -8,6 +8,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
+import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/playback/queue_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,6 +69,12 @@ class Harness {
     final audioPlayer = AudioPlayer();
     final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
     audioPlayer.setAudioSource(playlist.audioSource);
+    final prefetchManager = prefetch.Manager(
+      connectionManager: connectionManager,
+      downloadManager: downloadManager,
+      mediaCache: mediaCache,
+      playlist: playlist,
+    );
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
     getIt.registerSingleton<Playlist>(playlist);
@@ -75,6 +82,7 @@ class Harness {
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);
+    getIt.registerSingleton<prefetch.Manager>(prefetchManager);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
     getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(uuid);
