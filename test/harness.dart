@@ -67,7 +67,12 @@ class Harness {
       mediaCache: mediaCache,
     );
     final audioPlayer = AudioPlayer();
-    final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
+    final playlist = Playlist(
+      uuid: uuid,
+      connectionManager: connectionManager,
+      polarisClient: polarisClient,
+      audioPlayer: audioPlayer,
+    );
     audioPlayer.setAudioSource(playlist.audioSource);
     final prefetchManager = prefetch.Manager(
       connectionManager: connectionManager,

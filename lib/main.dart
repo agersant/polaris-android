@@ -67,7 +67,12 @@ Future _registerSingletons() async {
     mediaCache: mediaCache,
   );
   final audioPlayer = AudioPlayer();
-  final playlist = Playlist(uuid: uuid, polarisClient: polarisClient, audioPlayer: audioPlayer);
+  final playlist = Playlist(
+    uuid: uuid,
+    connectionManager: connectionManager,
+    polarisClient: polarisClient,
+    audioPlayer: audioPlayer,
+  );
   final prefetchManager = prefetch.Manager(
     connectionManager: connectionManager,
     downloadManager: downloadManager,

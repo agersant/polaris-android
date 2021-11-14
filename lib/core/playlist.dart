@@ -1,5 +1,6 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
@@ -8,6 +9,7 @@ import 'package:uuid/uuid.dart';
 class Playlist {
   ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
+  final connection.Manager connectionManager;
   final polaris.Client polarisClient;
   final AudioPlayer audioPlayer;
 
@@ -18,9 +20,16 @@ class Playlist {
 
   Playlist({
     required this.uuid,
+    required this.connectionManager,
     required this.polarisClient,
     required this.audioPlayer,
-  });
+  }) {
+    connectionManager.addListener(() {
+      if (connectionManager.state == connection.State.disconnected) {
+        clear();
+      }
+    });
+  }
 
   Future queueLast(List<dto.Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
