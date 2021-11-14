@@ -30,7 +30,7 @@ jobs:
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "1.22.5"
+          flutter-version: "2.5.3"
       - name: Update version name in gradle build file
         run: gawk -i inplace '/^[[:space:]]*versionName/ { $1 = "\t\t"$1; $2 = "\"${{ github.event.inputs.versionName }}\""; } 1' android/app/build.gradle
       - name: Increment version code in gradle build file
