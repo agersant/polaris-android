@@ -26,6 +26,9 @@ class Manager {
     required this.playlist,
   }) {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (connectionManager.state != connection.State.connected) {
+        return;
+      }
       _prefetchPlaylist();
     });
   }
