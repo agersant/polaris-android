@@ -119,7 +119,7 @@ class MediaCache implements MediaCacheInterface {
   }
 
   String _sanitize(String input) {
-    return sha256.convert(utf8.encode(input)).toString();
+    return sha1.convert(utf8.encode(input)).toString();
   }
 
   String _buildImagePath(String host, String path) {
