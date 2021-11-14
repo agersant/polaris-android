@@ -19,8 +19,9 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
       - name: Upload test coverage results to codecov
-        run: curl -s https://codecov.io/bash
-        shell: bash
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
 
   build:
     name: Build Android App Bundle
