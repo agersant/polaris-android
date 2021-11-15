@@ -75,8 +75,8 @@ class Playlist {
     return (await Future.wait(futureAudioSources)).whereType<AudioSource>().toList();
   }
 
-  LockCachingAudioSource getAudioSourceAt(int index) {
-    return audioSource.sequence[index] as LockCachingAudioSource;
+  StreamAudioSource getAudioSourceAt(int index) {
+    return audioSource.sequence[index] as StreamAudioSource;
   }
 
   List<dto.Song> _getSongs() {

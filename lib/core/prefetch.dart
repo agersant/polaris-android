@@ -17,7 +17,7 @@ class Manager {
   final Playlist playlist;
   late Timer _timer;
 
-  LockCachingAudioSource? _playlistSongBeingFetched;
+  StreamAudioSource? _playlistSongBeingFetched;
 
   Manager({
     required this.connectionManager,
@@ -54,7 +54,7 @@ class Manager {
       }
     }
 
-    LockCachingAudioSource? playlistSongToFetch = await _pickPlaylistSongToFetch(host);
+    StreamAudioSource? playlistSongToFetch = await _pickPlaylistSongToFetch(host);
     if (playlistSongToFetch != null && playlistSongToFetch != _playlistSongBeingFetched) {
       final MediaItem mediaItem = playlistSongToFetch.tag;
       final String path = mediaItem.toSong().path;
@@ -74,7 +74,7 @@ class Manager {
     }
   }
 
-  Future<LockCachingAudioSource?> _pickPlaylistSongToFetch(String host) async {
+  Future<StreamAudioSource?> _pickPlaylistSongToFetch(String host) async {
     final List<dto.Song> upcomingSongs = playlist.songs;
     final int currentIndex = playlist.currentIndex ?? -1;
     const int maxSongsToPreload = 5; // TODO Make this configurable in settings screen

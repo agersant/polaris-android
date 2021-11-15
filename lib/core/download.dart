@@ -16,7 +16,8 @@ class _ImageJob {
 
 class _AudioJob {
   String path;
-  AudioSource audioSource;
+  LockCachingAudioSource audioSource;
+  Map<String, AudioSource> dupeAudioSources = {};
   Stream<double> progressStream;
   _AudioJob(this.path, this.audioSource, this.progressStream);
 }
@@ -71,11 +72,16 @@ class Manager {
 
     final _AudioJob? existingJob = _audioJobs[path];
     if (existingJob != null) {
-      // TODO.important when songs are duped in the playlist, this may return an
-      // audiosource with a mediaItem.id that doesn't match what the caller requested.
-      // We also can't make a new audio source because it will fight for access to the
-      // cache file (and dupe the download).
-      return existingJob.audioSource;
+      final MediaItem canonicalMediaItem = existingJob.audioSource.tag;
+      if (canonicalMediaItem.id == mediaItem.id) {
+        return existingJob.audioSource;
+      }
+      if (existingJob.dupeAudioSources.containsKey(mediaItem.id)) {
+        return existingJob.dupeAudioSources[mediaItem.id];
+      }
+      final newAudioSource = DupeCachingAudioSource(existingJob.audioSource, mediaItem);
+      existingJob.dupeAudioSources[mediaItem.id] = newAudioSource;
+      return newAudioSource;
     }
 
     final uri = httpClient.getAudioURI(path);
@@ -98,5 +104,16 @@ class Manager {
     // TODO remove outdated jobs from _audioJobs (some combination of no longer in playlist, not being pending pin)
 
     return job.audioSource;
+  }
+}
+
+class DupeCachingAudioSource extends StreamAudioSource {
+  LockCachingAudioSource originalAudioSource;
+
+  DupeCachingAudioSource(this.originalAudioSource, dynamic tag) : super(tag: tag);
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    return originalAudioSource.request(start, end);
   }
 }
