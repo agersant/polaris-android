@@ -47,6 +47,7 @@ class CollectionCache {
   Future saveToDisk() async {
     try {
       final cacheFile = await _getCollectionFile(_currentVersion);
+      await cacheFile.create(recursive: true);
       final serializedData = _collection.toBytes();
       await cacheFile.writeAsBytes(serializedData, flush: true);
       developer.log('Wrote collection cache to: $cacheFile');
@@ -76,14 +77,14 @@ class CollectionCache {
     return directory?.populated == true;
   }
 
-  void putDirectory(String host, String path, List<dto.CollectionFile> content) {
+  Future putDirectory(String host, String path, List<dto.CollectionFile> content) async {
     _collection.populateDirectory(host, path, content);
-    saveToDisk();
+    await saveToDisk();
   }
 
-  void putSongs(String host, List<dto.Song> songs) {
+  Future putSongs(String host, List<dto.Song> songs) async {
     _collection.addSongs(host, songs);
-    saveToDisk();
+    await saveToDisk();
   }
 
   List<dto.Song>? flattenDirectory(String host, String path) {
