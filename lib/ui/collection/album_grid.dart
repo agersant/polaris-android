@@ -164,7 +164,11 @@ class Album extends StatelessWidget {
                       ),
                       CollectionFileContextMenuButton(
                         file: dto.CollectionFile(dartz.Right(album)),
-                        actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+                        actions: const [
+                          CollectionFileAction.queueLast,
+                          CollectionFileAction.queueNext,
+                          CollectionFileAction.togglePin,
+                        ],
                         compact: true,
                       ),
                     ],

@@ -1,13 +1,14 @@
 import 'mock/client.dart' as http_client;
 import 'mock/media_cache.dart';
+import 'mock/pin.dart' as pin;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
-import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
+import 'package:polaris/core/playlist.dart';
+import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/playback/queue_model.dart';
@@ -74,6 +75,7 @@ class Harness {
       audioPlayer: audioPlayer,
     );
     audioPlayer.setAudioSource(playlist.audioSource);
+    final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(
       connectionManager: connectionManager,
       downloadManager: downloadManager,
@@ -88,6 +90,7 @@ class Harness {
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);
     getIt.registerSingleton<prefetch.Manager>(prefetchManager);
+    getIt.registerSingleton<pin.Manager>(pinManager);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
     getIt.registerSingleton<QueueModel>(QueueModel());
     getIt.registerSingleton<Uuid>(uuid);

@@ -230,7 +230,11 @@ class Directory extends StatelessWidget {
       subtitle: _getSubtitle(),
       trailing: CollectionFileContextMenuButton(
         file: dto.CollectionFile(dartz.Right(directory)),
-        actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+        actions: const [
+          CollectionFileAction.queueLast,
+          CollectionFileAction.queueNext,
+          CollectionFileAction.togglePin,
+        ],
       ),
       dense: true,
       onTap: onTap,
@@ -272,7 +276,11 @@ class Song extends StatelessWidget {
       subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
       trailing: CollectionFileContextMenuButton(
         file: dto.CollectionFile(dartz.Left(song)),
-        actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+        actions: const [
+          CollectionFileAction.queueLast,
+          CollectionFileAction.queueNext,
+          CollectionFileAction.togglePin,
+        ],
       ),
       dense: true,
       onTap: _onTap,

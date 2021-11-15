@@ -97,7 +97,10 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
                 subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
                 trailing: CollectionFileContextMenuButton(
                   file: dto.CollectionFile(dartz.Left(song)),
-                  actions: const [CollectionFileAction.removeFromQueue],
+                  actions: const [
+                    CollectionFileAction.removeFromQueue,
+                    CollectionFileAction.togglePin,
+                  ],
                   onRemoveFromQueue: () {
                     getIt<Playlist>().removeSong(index);
                   },

@@ -9,6 +9,7 @@ import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
+import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
@@ -73,6 +74,7 @@ Future _registerSingletons() async {
     polarisClient: polarisClient,
     audioPlayer: audioPlayer,
   );
+  final pinManager = await pin.Manager.create();
   final prefetchManager = prefetch.Manager(
     connectionManager: connectionManager,
     downloadManager: downloadManager,
@@ -87,6 +89,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<polaris.Client>(polarisClient);
   getIt.registerSingleton<prefetch.Manager>(prefetchManager);
+  getIt.registerSingleton<pin.Manager>(pinManager);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
   getIt.registerSingleton<QueueModel>(QueueModel());
   getIt.registerSingleton<Uuid>(uuid);

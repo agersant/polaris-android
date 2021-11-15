@@ -141,6 +141,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     actions: const [
                       CollectionFileAction.queueLast,
                       CollectionFileAction.queueNext,
+                      CollectionFileAction.togglePin,
                       CollectionFileAction.refresh,
                     ],
                     onRefresh: () => _fetchData(useCache: false),
@@ -218,6 +219,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 actions: const [
                   CollectionFileAction.queueLast,
                   CollectionFileAction.queueNext,
+                  CollectionFileAction.togglePin,
                   CollectionFileAction.refresh,
                 ],
                 onRefresh: () => _fetchData(useCache: false),
@@ -340,7 +342,11 @@ class Song extends StatelessWidget {
           subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
           trailing: CollectionFileContextMenuButton(
             file: dto.CollectionFile(dartz.Left(song)),
-            actions: const [CollectionFileAction.queueLast, CollectionFileAction.queueNext],
+            actions: const [
+              CollectionFileAction.queueLast,
+              CollectionFileAction.queueNext,
+              CollectionFileAction.togglePin,
+            ],
           ),
           dense: true,
         ),

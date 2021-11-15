@@ -37,6 +37,8 @@ const goBackButtonLabel = 'GO BACK';
 const queueLast = 'Play Last';
 const queueNext = 'Play Next';
 const refresh = 'Refresh';
+const pinFile = 'Add to Offline Music';
+const unpinFile = 'Remove from Offline Music';
 
 // Collection drawer
 const drawerSettings = 'Settings';
