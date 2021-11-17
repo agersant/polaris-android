@@ -64,7 +64,7 @@ class Manager {
     return job.imageData;
   }
 
-  Future<AudioSource?> getAudio(String host, String path, MediaItem mediaItem) async {
+  Future<AudioSource> getAudio(String host, String path, MediaItem mediaItem) async {
     final File? cacheHit = await mediaCache.getAudio(host, path);
     if (cacheHit != null) {
       return AudioSource.uri(cacheHit.uri, tag: mediaItem);
@@ -76,8 +76,9 @@ class Manager {
       if (canonicalMediaItem.id == mediaItem.id) {
         return existingJob.audioSource;
       }
-      if (existingJob.dupeAudioSources.containsKey(mediaItem.id)) {
-        return existingJob.dupeAudioSources[mediaItem.id];
+      final existingAudioSource = existingJob.dupeAudioSources[mediaItem.id];
+      if (existingAudioSource != null) {
+        return existingAudioSource;
       }
       final newAudioSource = DupeCachingAudioSource(existingJob.audioSource, mediaItem);
       existingJob.dupeAudioSources[mediaItem.id] = newAudioSource;

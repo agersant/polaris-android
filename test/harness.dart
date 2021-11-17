@@ -77,9 +77,11 @@ class Harness {
     audioPlayer.setAudioSource(playlist.audioSource);
     final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(
+      uuid: uuid,
       connectionManager: connectionManager,
       downloadManager: downloadManager,
       mediaCache: mediaCache,
+      pinManager: pinManager,
       playlist: playlist,
     );
 

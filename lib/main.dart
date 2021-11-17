@@ -76,9 +76,11 @@ Future _registerSingletons() async {
   );
   final pinManager = await pin.Manager.create();
   final prefetchManager = prefetch.Manager(
+    uuid: uuid,
     connectionManager: connectionManager,
     downloadManager: downloadManager,
     mediaCache: mediaCache,
+    pinManager: pinManager,
     playlist: playlist,
   );
 

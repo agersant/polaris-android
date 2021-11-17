@@ -8,7 +8,11 @@ import 'package:polaris/core/dto.dart' as dto;
 const _firstVersion = 1;
 const _currentVersion = 1;
 
-class Manager {
+abstract class ManagerInterface {
+  Set<dto.Song>? getSongs(String host);
+}
+
+class Manager implements ManagerInterface {
   final Pins _pins;
 
   Manager(this._pins);
@@ -52,6 +56,7 @@ class Manager {
         .toSet();
   }
 
+  @override
   Set<dto.Song>? getSongs(String host) {
     return _pins._servers[host]?.values.where((file) => file.isSong()).map<dto.Song>((file) => file.asSong()).toSet();
   }
