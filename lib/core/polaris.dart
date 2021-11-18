@@ -76,7 +76,7 @@ abstract class _BaseHttpClient {
     try {
       response = httpClient.send(request);
     } catch (e) {
-      throw APIError.networkError;
+      return Future.error(APIError.networkError);
     }
 
     return response.catchError((dynamic e) => throw APIError.networkError).then((r) {
@@ -133,11 +133,11 @@ class HttpGuestClient extends _BaseHttpClient {
 class HttpClient extends _BaseHttpClient {
   final authentication.Manager authenticationManager;
 
-  HttpClient(
-      {required http.Client httpClient,
-      required connection.Manager connectionManager,
-      required this.authenticationManager})
-      : super(httpClient: httpClient, connectionManager: connectionManager);
+  HttpClient({
+    required http.Client httpClient,
+    required connection.Manager connectionManager,
+    required this.authenticationManager,
+  }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
   Future<List<dto.CollectionFile>> browse(String path) async {
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
