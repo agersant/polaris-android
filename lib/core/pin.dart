@@ -1,21 +1,30 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/polaris.dart' as polaris;
 
 const _firstVersion = 1;
 const _currentVersion = 1;
 
-abstract class ManagerInterface {
+abstract class ManagerInterface extends ChangeNotifier {
   Set<dto.Song>? getSongs(String host);
+  Set<dto.Directory>? getDirectories(String host);
+  Future<Set<dto.Song>> getAllSongs(String host);
 }
 
-class Manager implements ManagerInterface {
+class Manager extends ChangeNotifier implements ManagerInterface {
+  final polaris.HttpClient polarisHttpClient;
   final Pins _pins;
+  final Map<String, Map<String, Set<dto.Song>>> _flattenCache = {};
 
-  Manager(this._pins);
+  Manager(
+    this._pins, {
+    required this.polarisHttpClient,
+  });
 
   Set<String> get hosts => _pins._servers.keys.toSet();
 
@@ -24,7 +33,7 @@ class Manager implements ManagerInterface {
     return io.File(p.join(temporaryDirectory.path, 'pins', 'v$version.cache'));
   }
 
-  static Future<Manager> create() async {
+  static Future<Manager> create(polaris.HttpClient polarisHttpClient) async {
     for (int version = _firstVersion; version < _currentVersion; version++) {
       final oldCacheFile = await _getPinsFile(version);
       oldCacheFile.exists().then((exists) {
@@ -46,28 +55,51 @@ class Manager implements ManagerInterface {
       developer.log('Error while reading pins list from disk: ', error: e);
     }
 
-    return Manager(pins);
-  }
-
-  Set<dto.Directory>? getDirectories(String host) {
-    return _pins._servers[host]?.values
-        .where((file) => file.isDirectory())
-        .map<dto.Directory>((file) => file.asDirectory())
-        .toSet();
+    return Manager(pins, polarisHttpClient: polarisHttpClient);
   }
 
   @override
-  Set<dto.Song>? getSongs(String host) {
-    return _pins._servers[host]?.values.where((file) => file.isSong()).map<dto.Song>((file) => file.asSong()).toSet();
+  Set<dto.Directory> getDirectories(String host) {
+    final server = _pins._servers[host];
+    if (server == null) {
+      return {};
+    }
+    return server.values.where((file) => file.isDirectory()).map<dto.Directory>((file) => file.asDirectory()).toSet();
+  }
+
+  @override
+  Set<dto.Song> getSongs(String host) {
+    final server = _pins._servers[host];
+    if (server == null) {
+      return {};
+    }
+    return server.values.where((file) => file.isSong()).map<dto.Song>((file) => file.asSong()).toSet();
+  }
+
+  @override
+  Future<Set<dto.Song>> getAllSongs(String host) async {
+    final allSongs = getSongs(host);
+    final directories = getDirectories(host);
+    for (dto.Directory directory in directories) {
+      Set<dto.Song>? songs = _flattenCache[host]?[directory.path];
+      if (songs == null) {
+        songs = (await polarisHttpClient.flatten(directory.path)).toSet();
+        _flattenCache.putIfAbsent(host, () => {})[directory.path] = songs;
+      }
+      allSongs.addAll(songs);
+    }
+    return allSongs;
   }
 
   void pin(String host, dto.CollectionFile file) async {
     _pins.add(host, file);
+    notifyListeners();
     await saveToDisk();
   }
 
   void unpin(String host, dto.CollectionFile file) async {
     _pins.remove(host, file);
+    notifyListeners();
     await saveToDisk();
   }
 

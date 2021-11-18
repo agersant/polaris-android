@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/connection.dart' as connection;
@@ -6,7 +7,7 @@ import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
-class Playlist {
+class Playlist extends ChangeNotifier {
   ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final connection.Manager connectionManager;
@@ -34,6 +35,7 @@ class Playlist {
   Future queueLast(List<dto.Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     await _audioSource.addAll(await _makeAudioSources(songs));
+    notifyListeners();
     if (wasEmpty) {
       audioPlayer.play();
     }
@@ -43,6 +45,7 @@ class Playlist {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     final int insertIndex = wasEmpty ? 0 : 1 + (audioPlayer.currentIndex ?? -1);
     await _audioSource.insertAll(insertIndex, await _makeAudioSources(songs));
+    notifyListeners();
     if (wasEmpty) {
       audioPlayer.play();
     }
@@ -57,17 +60,20 @@ class Playlist {
       return;
     }
     final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
-    return _audioSource.move(oldIndex, insertIndex);
+    await _audioSource.move(oldIndex, insertIndex);
+    notifyListeners();
   }
 
   Future removeSong(int index) async {
     await _audioSource.removeAt(index);
+    notifyListeners();
   }
 
   Future clear() async {
     // TODO after using this, calling queueLast or queueNext somehow always skips a song
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
+    notifyListeners();
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<dto.Song> songs) async {

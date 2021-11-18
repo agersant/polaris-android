@@ -23,6 +23,7 @@ class Manager {
   StreamAudioSource? _playlistSongBeingFetched;
   StreamAudioSource? _pinSongBeingFetched;
   late RestartableTimer _timer;
+  bool _working = false;
 
   Manager({
     required this.uuid,
@@ -32,6 +33,9 @@ class Manager {
     required this.pinManager,
     required this.playlist,
   }) {
+    pinManager.addListener(_wake);
+    playlist.addListener(_wake);
+    // TODO we need tp call _wake when current playlist song changes (as this may prompt us to load more upcoming songs)
     _timer = RestartableTimer(const Duration(seconds: 5), _doWork);
   }
 
@@ -39,29 +43,52 @@ class Manager {
     _timer.cancel();
   }
 
-  void _doWork() async {
-    await _prefetchPlaylist();
-    await _prefetchPins();
-    _timer.reset();
+  void _wake() {
+    if (!_timer.isActive) {
+      _doWork();
+    }
   }
 
-  Future _prefetchPlaylist() async {
+  void _doWork() async {
+    if (_working) {
+      _timer.reset();
+      return;
+    }
+
+    _working = true;
+
+    bool allDone = await _prefetchPlaylist();
+    allDone |= await _prefetchPins();
+    if (!allDone) {
+      _timer.reset();
+    }
+
+    _working = false;
+  }
+
+  Future<bool> _prefetchPlaylist() async {
     final String? host = connectionManager.url;
     if (host == null) {
-      return;
+      return false;
     }
 
     if (_playlistSongBeingFetched != null) {
-      return;
+      return false;
     }
 
     StreamAudioSource? songToFetch = await _pickPlaylistSongToFetch(host);
-    if (songToFetch != null && songToFetch != _playlistSongBeingFetched) {
-      _playlistSongBeingFetched = songToFetch;
-      _prefetch(songToFetch)
-          .then((value) => _playlistSongBeingFetched = null)
-          .catchError((dynamic error) => _playlistSongBeingFetched = null);
+    if (songToFetch == null) {
+      return true;
     }
+
+    _playlistSongBeingFetched = songToFetch;
+
+    _prefetch(songToFetch).then((value) {
+      _playlistSongBeingFetched = null;
+      _wake();
+    });
+
+    return false;
   }
 
   Future<StreamAudioSource?> _pickPlaylistSongToFetch(String host) async {
@@ -83,30 +110,39 @@ class Manager {
     }
   }
 
-  Future _prefetchPins() async {
+  Future<bool> _prefetchPins() async {
     final String? host = connectionManager.url;
     if (host == null) {
-      return;
+      return false;
     }
 
     if (_pinSongBeingFetched != null) {
-      return;
+      return false;
     }
 
-    StreamAudioSource? songToFetch = await _pickPinSongToFetch(host);
-    if (songToFetch != null && songToFetch != _pinSongBeingFetched) {
-      _pinSongBeingFetched = songToFetch;
-      _prefetch(songToFetch)
-          .then((value) => _pinSongBeingFetched = null)
-          .catchError((dynamic error) => _pinSongBeingFetched = null);
+    StreamAudioSource? songToFetch;
+    try {
+      songToFetch = await _pickPinSongToFetch(host);
+    } catch (e) {
+      developer.log("Error while looking for a pinned song to prefetch: $e");
+      return false;
     }
+
+    if (songToFetch == null) {
+      return true;
+    }
+
+    _pinSongBeingFetched = songToFetch;
+    _prefetch(songToFetch).then((value) {
+      _pinSongBeingFetched = null;
+      _wake();
+    });
+
+    return false;
   }
 
   Future<StreamAudioSource?> _pickPinSongToFetch(String host) async {
-    final songs = pinManager.getSongs(host);
-    if (songs == null) {
-      return null;
-    }
+    final songs = await pinManager.getAllSongs(host);
     for (dto.Song song in songs) {
       if (await mediaCache.hasAudio(host, song.path)) {
         continue;
@@ -117,9 +153,10 @@ class Manager {
         return audioSource;
       }
     }
-    // TODO look at pinned directories
+    return null;
   }
 
+  // TODO This can deadlock. See https://github.com/ryanheise/just_audio/issues/594
   Future<void> _prefetch(StreamAudioSource audioSource) async {
     final MediaItem mediaItem = audioSource.tag;
     final String path = mediaItem.toSong().path;
@@ -132,7 +169,6 @@ class Manager {
       developer.log("Finished prefetching song: $path");
     } catch (e) {
       developer.log("Error ($e) while prefetching song: $path");
-      rethrow;
     }
   }
 }

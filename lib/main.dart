@@ -74,7 +74,7 @@ Future _registerSingletons() async {
     polarisClient: polarisClient,
     audioPlayer: audioPlayer,
   );
-  final pinManager = await pin.Manager.create();
+  final pinManager = await pin.Manager.create(polarisHttpClient);
   final prefetchManager = prefetch.Manager(
     uuid: uuid,
     connectionManager: connectionManager,
