@@ -1,13 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
-class Playlist extends ChangeNotifier {
+class Playlist {
   ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final connection.Manager connectionManager;
@@ -15,9 +12,6 @@ class Playlist extends ChangeNotifier {
   final AudioPlayer audioPlayer;
 
   ConcatenatingAudioSource get audioSource => _audioSource;
-
-  List<dto.Song> get songs => _getSongs();
-  int? get currentIndex => audioPlayer.currentIndex;
 
   Playlist({
     required this.uuid,
@@ -35,7 +29,6 @@ class Playlist extends ChangeNotifier {
   Future queueLast(List<dto.Song> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     await _audioSource.addAll(await _makeAudioSources(songs));
-    notifyListeners();
     if (wasEmpty) {
       audioPlayer.play();
     }
@@ -45,7 +38,6 @@ class Playlist extends ChangeNotifier {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     final int insertIndex = wasEmpty ? 0 : 1 + (audioPlayer.currentIndex ?? -1);
     await _audioSource.insertAll(insertIndex, await _makeAudioSources(songs));
-    notifyListeners();
     if (wasEmpty) {
       audioPlayer.play();
     }
@@ -61,34 +53,20 @@ class Playlist extends ChangeNotifier {
     }
     final int insertIndex = oldIndex > newIndex ? newIndex : newIndex - 1;
     await _audioSource.move(oldIndex, insertIndex);
-    notifyListeners();
   }
 
   Future removeSong(int index) async {
     await _audioSource.removeAt(index);
-    notifyListeners();
   }
 
   Future clear() async {
     // TODO after using this, calling queueLast or queueNext somehow always skips a song
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
-    notifyListeners();
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<dto.Song> songs) async {
     final futureAudioSources = songs.map((s) async => await polarisClient.getAudio(s, uuid.v4()));
     return (await Future.wait(futureAudioSources)).whereType<AudioSource>().toList();
-  }
-
-  StreamAudioSource getAudioSourceAt(int index) {
-    return audioSource.sequence[index] as StreamAudioSource;
-  }
-
-  List<dto.Song> _getSongs() {
-    return audioSource.sequence.map((IndexedAudioSource source) {
-      final MediaItem mediaItem = source.tag;
-      return mediaItem.toSong();
-    }).toList();
   }
 }

@@ -9,7 +9,6 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
-import 'package:polaris/core/playlist.dart';
 import 'package:uuid/uuid.dart';
 
 class Manager {
@@ -18,7 +17,7 @@ class Manager {
   final download.Manager downloadManager;
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
-  final Playlist playlist;
+  final AudioPlayer audioPlayer;
 
   StreamAudioSource? _playlistSongBeingFetched;
   StreamAudioSource? _pinSongBeingFetched;
@@ -31,11 +30,10 @@ class Manager {
     required this.downloadManager,
     required this.mediaCache,
     required this.pinManager,
-    required this.playlist,
+    required this.audioPlayer,
   }) {
     pinManager.addListener(_wake);
-    playlist.addListener(_wake);
-    // TODO we need tp call _wake when current playlist song changes (as this may prompt us to load more upcoming songs)
+    audioPlayer.sequenceStateStream.listen((e) => _wake());
     _timer = RestartableTimer(const Duration(seconds: 5), _doWork);
   }
 
@@ -57,7 +55,8 @@ class Manager {
 
     _working = true;
 
-    bool allDone = await _prefetchPlaylist();
+    bool allDone = false;
+    allDone |= await _prefetchPlaylist();
     allDone |= await _prefetchPins();
     if (!allDone) {
       _timer.reset();
@@ -92,22 +91,26 @@ class Manager {
   }
 
   Future<StreamAudioSource?> _pickPlaylistSongToFetch(String host) async {
-    final List<dto.Song> upcomingSongs = playlist.songs;
-    final int currentIndex = playlist.currentIndex ?? -1;
+    final SequenceState? sequenceState = audioPlayer.sequenceState;
+    final List<IndexedAudioSource> audioSources = sequenceState?.sequence ?? [];
+    final int currentIndex = sequenceState?.currentIndex ?? -1;
     const int maxSongsToPreload = 5; // TODO Make this configurable in settings screen
-    for (int index = 0; index < upcomingSongs.length; index++) {
+    for (int index = 0; index < audioSources.length; index++) {
       if (index <= currentIndex) {
         continue;
       }
       if ((index - currentIndex) > maxSongsToPreload) {
         return null;
       }
-      final dto.Song song = upcomingSongs[index];
+      final audioSource = audioSources[index];
+      final MediaItem mediaItem = audioSource.tag;
+      final dto.Song song = mediaItem.toSong();
       final bool hasAudio = await mediaCache.hasAudio(host, song.path);
-      if (!hasAudio) {
-        return playlist.getAudioSourceAt(index);
+      if (!hasAudio && audioSource is StreamAudioSource) {
+        return audioSource;
       }
     }
+    return null;
   }
 
   Future<bool> _prefetchPins() async {

@@ -81,7 +81,7 @@ Future _registerSingletons() async {
     downloadManager: downloadManager,
     mediaCache: mediaCache,
     pinManager: pinManager,
-    playlist: playlist,
+    audioPlayer: audioPlayer,
   );
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);

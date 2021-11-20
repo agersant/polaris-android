@@ -82,7 +82,7 @@ class Harness {
       downloadManager: downloadManager,
       mediaCache: mediaCache,
       pinManager: pinManager,
-      playlist: playlist,
+      audioPlayer: audioPlayer,
     );
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
