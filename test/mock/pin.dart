@@ -8,6 +8,9 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   @override
+  Set<String> get hosts => {};
+
+  @override
   Set<dto.Song>? getSongs(String host) => {};
 
   @override

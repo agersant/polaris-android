@@ -11,6 +11,7 @@ const _firstVersion = 1;
 const _currentVersion = 1;
 
 abstract class ManagerInterface extends ChangeNotifier {
+  Set<String> get hosts;
   Set<dto.Song>? getSongs(String host);
   Set<dto.Directory>? getDirectories(String host);
   Future<Set<dto.Song>> getAllSongs(String host);
@@ -26,6 +27,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     required this.polarisHttpClient,
   });
 
+  @override
   Set<String> get hosts => _pins._servers.keys.toSet();
 
   static Future<io.File> _getPinsFile(int version) async {

@@ -30,4 +30,7 @@ class MediaCache implements MediaCacheInterface {
 
   @override
   File getAudioLocation(String host, String path) => File("");
+
+  @override
+  Future<void> purge(Map<String, Set<String>> songsToPreserve, Map<String, Set<String>> imagesToPreserve) async {}
 }

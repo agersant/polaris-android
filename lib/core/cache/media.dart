@@ -10,8 +10,6 @@ import 'package:path_provider/path_provider.dart';
 const _firstVersion = 1;
 const _currentVersion = 4;
 
-// TODO periodic cache cleanup
-
 abstract class MediaCacheInterface {
   Future<bool> hasImage(String host, String path);
   Future<io.File?> getImage(String host, String path);
@@ -21,6 +19,7 @@ abstract class MediaCacheInterface {
   bool hasAudioSync(String host, String path);
   Future<io.File?> getAudio(String host, String path);
   io.File getAudioLocation(String host, String path);
+  Future<void> purge(Map<String, Set<String>> songsToPreserve, Map<String, Set<String>> imagesToPreserve);
 }
 
 class MediaCache implements MediaCacheInterface {
@@ -115,6 +114,37 @@ class MediaCache implements MediaCacheInterface {
       await file.writeAsBytes(bytes, mode: io.FileMode.writeOnly, flush: true);
     } catch (e) {
       developer.log('Error while saving image: $path', error: e);
+    }
+  }
+
+  @override
+  Future<void> purge(Map<String, Set<String>> songsToPreserve, Map<String, Set<String>> imagesToPreserve) async {
+    developer.log('Purging unused files from disk cache');
+
+    final Set<String> filesToPreserve = {};
+    songsToPreserve.forEach((host, songs) {
+      filesToPreserve.addAll(songs.map((path) => _buildAudioPath(host, path)));
+    });
+    imagesToPreserve.forEach((host, images) {
+      filesToPreserve.addAll(images.map((path) => _buildImagePath(host, path)));
+    });
+
+    // TODO use LRU policy to preserve some amount of cached content
+
+    try {
+      int numDeleted = 0;
+      final cacheContent = _root.list();
+      await for (final file in cacheContent) {
+        if (!filesToPreserve.contains(file.path)) {
+          final fileToDelete = io.File(file.path);
+          developer.log('Deleting $file from disk cache');
+          await fileToDelete.delete();
+          numDeleted += 1;
+        }
+      }
+      developer.log('Purged $numDeleted files from disk cache');
+    } catch (e) {
+      developer.log('Error while purging unused files from disk cache', error: e);
     }
   }
 

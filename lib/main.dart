@@ -7,6 +7,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/cleanup.dart' as cleanup;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/pin.dart' as pin;
@@ -83,6 +84,12 @@ Future _registerSingletons() async {
     pinManager: pinManager,
     audioPlayer: audioPlayer,
   );
+  final cleanupManager = cleanup.Manager(
+    connectionManager: connectionManager,
+    mediaCache: mediaCache,
+    pinManager: pinManager,
+    audioPlayer: audioPlayer,
+  );
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
@@ -92,6 +99,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<polaris.Client>(polarisClient);
   getIt.registerSingleton<prefetch.Manager>(prefetchManager);
   getIt.registerSingleton<pin.Manager>(pinManager);
+  getIt.registerSingleton<cleanup.Manager>(cleanupManager);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
   getIt.registerSingleton<QueueModel>(QueueModel());
   getIt.registerSingleton<Uuid>(uuid);
