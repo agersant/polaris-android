@@ -13,7 +13,7 @@ import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/ui/collection/browser_model.dart';
-import 'package:polaris/ui/playback/queue_model.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -104,7 +104,7 @@ class Harness {
     getIt.registerSingleton<pin.Manager>(pinManager);
     getIt.registerSingleton<cleanup.Manager>(cleanupManager);
     getIt.registerSingleton<BrowserModel>(BrowserModel());
-    getIt.registerSingleton<QueueModel>(QueueModel());
+    getIt.registerSingleton<PagesModel>(PagesModel());
     getIt.registerSingleton<Uuid>(uuid);
 
     return Harness(mockHttpClient, collectionCache);

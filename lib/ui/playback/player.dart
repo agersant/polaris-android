@@ -2,7 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:polaris/ui/playback/queue_model.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/core/dto.dart';
@@ -36,10 +36,7 @@ class Player extends StatelessWidget {
           child: Material(
             elevation: 8,
             child: InkWell(
-              onTap: () {
-                QueueModel queueModel = getIt<QueueModel>();
-                queueModel.openQueue();
-              },
+              onTap: getIt<PagesModel>().openQueue,
               child: playerContent(context, mediaItem.toSong()),
             ),
           ),

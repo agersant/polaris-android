@@ -8,6 +8,7 @@ import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/random.dart';
 import 'package:polaris/ui/collection/recent.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:provider/provider.dart';
 import '../strings.dart';
 
@@ -93,9 +94,13 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
             title: Text(drawerSettings),
           ),
           // TODO implement offline music
-          const ListTile(
-            leading: Icon(Icons.offline_pin),
-            title: Text(drawerOfflineMusic),
+          ListTile(
+            leading: const Icon(Icons.offline_pin),
+            title: const Text(drawerOfflineMusic),
+            onTap: () {
+              Navigator.pop(context);
+              getIt<PagesModel>().openOfflineMusic();
+            },
           ),
           _buildOfflineModeToggle(),
           ListTile(

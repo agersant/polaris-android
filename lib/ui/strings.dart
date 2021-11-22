@@ -44,7 +44,7 @@ const unpinFile = 'Remove from Offline Music';
 const drawerSettings = 'Settings';
 const drawerOfflineMusic = 'Offline music';
 const drawerOfflineMode = 'Offline mode';
-const drawerLogOut = 'LogOut';
+const drawerLogOut = 'Log Out';
 const unknownUser = 'Offline User';
 const unknownHost = 'Unknown Host';
 
@@ -52,3 +52,6 @@ const unknownHost = 'Unknown Host';
 const queueTitle = "Queue";
 const queueEmpty = "There are no songs in the queue.";
 const removeFromQueue = "Remove";
+
+// Offline music
+const offlineMusicTitle = "Offline Music";

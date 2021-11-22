@@ -16,9 +16,10 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
+import 'package:polaris/ui/offline_music/page.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/playback/queue.dart';
-import 'package:polaris/ui/playback/queue_model.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/utils/back_button_handler.dart';
 import 'package:provider/provider.dart';
@@ -102,7 +103,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<pin.Manager>(pinManager);
   getIt.registerSingleton<cleanup.Manager>(cleanupManager);
   getIt.registerSingleton<BrowserModel>(BrowserModel());
-  getIt.registerSingleton<QueueModel>(QueueModel());
+  getIt.registerSingleton<PagesModel>(PagesModel());
   getIt.registerSingleton<Uuid>(uuid);
 }
 
@@ -141,15 +142,16 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
       providers: [
         ChangeNotifierProvider.value(value: getIt<connection.Manager>()),
         ChangeNotifierProvider.value(value: getIt<authentication.Manager>()),
-        ChangeNotifierProvider.value(value: getIt<QueueModel>()),
+        ChangeNotifierProvider.value(value: getIt<PagesModel>()),
       ],
-      child: Consumer3<connection.Manager, authentication.Manager, QueueModel>(
-        builder: (context, connectionManager, authenticationManager, queueModel, child) {
+      child: Consumer3<connection.Manager, authentication.Manager, PagesModel>(
+        builder: (context, connectionManager, authenticationManager, pagesModel, child) {
           final isOfflineMode = connectionManager.state == connection.State.offlineMode;
           final connectionComplete = connectionManager.state == connection.State.connected;
           final authenticationComplete = authenticationManager.state == authentication.State.authenticated;
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
-          final showQueue = isStartupComplete && queueModel.isQueueOpen;
+          final showQueue = isStartupComplete && pagesModel.isQueueOpen;
+          final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
 
           return BackButtonHandler(
             Column(
@@ -160,6 +162,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     pages: [
                       if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
                       if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
+                      if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
                       // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
                       if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
                     ],
@@ -167,8 +170,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       if (!route.didPop(result)) {
                         return false;
                       }
-                      if (queueModel.isQueueOpen) {
-                        queueModel.closeQueue();
+                      if (pagesModel.isQueueOpen) {
+                        pagesModel.closeQueue();
                       }
                       return true;
                     },
