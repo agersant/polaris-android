@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'package:async/async.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
@@ -9,6 +8,7 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
+import 'package:polaris/core/unique_timer.dart';
 import 'package:uuid/uuid.dart';
 
 class Manager {
@@ -21,8 +21,7 @@ class Manager {
 
   StreamAudioSource? _playlistSongBeingFetched;
   StreamAudioSource? _pinSongBeingFetched;
-  late RestartableTimer _timer;
-  bool _working = false;
+  late UniqueTimer _timer;
 
   Manager({
     required this.uuid,
@@ -32,37 +31,22 @@ class Manager {
     required this.pinManager,
     required this.audioPlayer,
   }) {
-    pinManager.addListener(_wake);
-    audioPlayer.sequenceStateStream.listen((e) => _wake());
-    _timer = RestartableTimer(const Duration(seconds: 5), _doWork);
+    _timer = UniqueTimer(duration: const Duration(seconds: 5), callback: _doWork);
+    pinManager.addListener(_timer.wake);
+    audioPlayer.sequenceStateStream.listen((e) => _timer.wake());
   }
 
   void dispose() {
     _timer.cancel();
   }
 
-  void _wake() {
-    if (!_timer.isActive) {
-      _doWork();
-    }
-  }
-
-  void _doWork() async {
-    if (_working) {
-      _timer.reset();
-      return;
-    }
-
-    _working = true;
-
+  Future<void> _doWork() async {
     bool allDone = false;
     allDone |= await _prefetchPlaylist();
     allDone |= await _prefetchPins();
     if (!allDone) {
       _timer.reset();
     }
-
-    _working = false;
   }
 
   Future<bool> _prefetchPlaylist() async {
@@ -84,7 +68,7 @@ class Manager {
 
     _prefetch(songToFetch).then((value) {
       _playlistSongBeingFetched = null;
-      _wake();
+      _timer.wake();
     });
 
     return false;
@@ -138,7 +122,7 @@ class Manager {
     _pinSongBeingFetched = songToFetch;
     _prefetch(songToFetch).then((value) {
       _pinSongBeingFetched = null;
-      _wake();
+      _timer.wake();
     });
 
     return false;

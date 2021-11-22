@@ -130,6 +130,7 @@ class MediaCache implements MediaCacheInterface {
     });
 
     // TODO use LRU policy to preserve some amount of cached content
+    // TODO this can yeet just_audio .part files while they are useful
 
     try {
       int numDeleted = 0;

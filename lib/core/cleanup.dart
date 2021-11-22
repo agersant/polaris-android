@@ -1,10 +1,10 @@
-import 'package:async/async.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
+import 'package:polaris/core/unique_timer.dart';
 
 class Manager {
   final connection.Manager connectionManager;
@@ -12,8 +12,7 @@ class Manager {
   final pin.ManagerInterface pinManager;
   final AudioPlayer audioPlayer;
 
-  late RestartableTimer _timer;
-  bool _working = false;
+  late UniqueTimer _timer;
 
   Manager({
     required this.connectionManager,
@@ -21,33 +20,19 @@ class Manager {
     required this.pinManager,
     required this.audioPlayer,
   }) {
-    pinManager.addListener(_wake);
-    audioPlayer.sequenceStateStream.listen((e) => _wake());
-    _timer = RestartableTimer(const Duration(seconds: 30), _doWork);
+    _timer = UniqueTimer(
+      duration: const Duration(seconds: 30),
+      callback: _doWork,
+    );
+    pinManager.addListener(_timer.reset);
+    audioPlayer.sequenceStateStream.listen((e) => _timer.reset());
   }
 
   void dispose() {
     _timer.cancel();
   }
 
-  void _wake() {
-    _timer.reset();
-  }
-
-  void _doWork() async {
-    if (_working) {
-      _timer.reset();
-      return;
-    }
-
-    _working = true;
-
-    cleanup();
-
-    _working = false;
-  }
-
-  Future<void> cleanup() async {
+  Future<void> _doWork() async {
     final String? host = connectionManager.url;
     if (host == null) {
       return;
