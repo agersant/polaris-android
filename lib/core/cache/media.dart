@@ -6,11 +6,13 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/unique_timer.dart';
 
 const _firstVersion = 1;
 const _currentVersion = 4;
 
 abstract class MediaCacheInterface {
+  void dispose();
   Future<bool> hasImage(String host, String path);
   Future<io.File?> getImage(String host, String path);
   io.File getImageLocation(String host, String path);
@@ -25,9 +27,17 @@ abstract class MediaCacheInterface {
 
 class MediaCache implements MediaCacheInterface {
   final io.Directory _root;
-  final LRU _lru = LRU(); // TODO save and load from disk!
+  final LRU _lru;
+  late UniqueTimer _lruWriteTimer;
 
-  MediaCache(this._root);
+  MediaCache(this._root, this._lru) {
+    _lruWriteTimer = UniqueTimer(duration: const Duration(seconds: 5), callback: _saveLRUToDisk);
+    _lruWriteTimer.cancel();
+  }
+
+  static io.File _getLRUFile(io.Directory root) {
+    return io.File(p.join(root.path, 'cache.lru'));
+  }
 
   static Future<MediaCache> create() async {
     final temporaryDirectory = await getTemporaryDirectory();
@@ -45,7 +55,36 @@ class MediaCache implements MediaCacheInterface {
     final root = makeRoot(_currentVersion);
     await root.create(recursive: true);
 
-    return MediaCache(root);
+    LRU lru = LRU();
+    final lruFile = _getLRUFile(root);
+    try {
+      if (await lruFile.exists()) {
+        final lruData = await lruFile.readAsBytes();
+        lru = LRU.fromBytes(lruData);
+        developer.log('Read media cache LRU data from: $lruFile');
+      }
+    } catch (e) {
+      developer.log('Error while reading media cache LRU from disk: ', error: e);
+    }
+
+    return MediaCache(root, lru);
+  }
+
+  @override
+  void dispose() {
+    _lruWriteTimer.cancel();
+  }
+
+  Future<void> _saveLRUToDisk() async {
+    try {
+      final lruFile = _getLRUFile(_root);
+      await lruFile.create(recursive: true);
+      final serializedData = _lru.toBytes();
+      await lruFile.writeAsBytes(serializedData, flush: true);
+      developer.log('Wrote media cache LRU data to: $lruFile');
+    } catch (e) {
+      developer.log('Error while writing media cache LRU data to disk: ', error: e);
+    }
   }
 
   @override
@@ -62,6 +101,7 @@ class MediaCache implements MediaCacheInterface {
       if (await file.exists()) {
         developer.log('Found image in disk cache: $path');
         _lru.upsert(fullPath);
+        _lruWriteTimer.reset();
         return file;
       }
     } catch (e) {
@@ -94,8 +134,12 @@ class MediaCache implements MediaCacheInterface {
     final targetFile = getAudioLocation(host, path);
     try {
       _lru.upsert(targetFile.path);
-      assert(source.path == targetFile.path); // We already download audio file where they should end up
-      // await source.copy(targetFile.path);
+      _lruWriteTimer.reset();
+      {
+        // We already download audio file where they should end up
+        assert(source.path == targetFile.path);
+        // await source.copy(targetFile.path);
+      }
     } catch (e) {
       developer.log('Error while adding audio to disk cache: $path', error: e);
     }
@@ -114,6 +158,7 @@ class MediaCache implements MediaCacheInterface {
       if (await file.exists()) {
         developer.log('Found audio in disk cache: $path');
         _lru.upsert(file.path);
+        _lruWriteTimer.reset();
         return file;
       }
     } catch (e) {
@@ -129,6 +174,7 @@ class MediaCache implements MediaCacheInterface {
     final file = io.File(fullPath);
     try {
       _lru.upsert(fullPath);
+      _lruWriteTimer.reset();
       await file.writeAsBytes(bytes, mode: io.FileMode.writeOnly, flush: true);
     } catch (e) {
       developer.log('Error while adding image to disk cache: $path', error: e);
@@ -150,16 +196,18 @@ class MediaCache implements MediaCacheInterface {
         return stat.size;
       }));
       int cacheSize = sizes.fold(0, (a, b) => a + b);
-      const maxCacheSize = 50 * 1024 * 1024; // 50MB, TODO make adjustable in settings
+      const maxCacheSize = 800 * 1024 * 1024; // 800MB, TODO make adjustable in settings
 
       int numFilesRemoved = 0;
+      io.File lruFile = _getLRUFile(_root);
       while (cacheSize > maxCacheSize && deletionCandidates.isNotEmpty) {
         final String path = deletionCandidates.removeAt(0);
         final io.File file = io.File(path);
         final stat = await file.stat();
         final isPartFile = p.extension(file.path) == 'part';
+        final isLRUFile = file.path == lruFile.path;
         final isStale = stat.modified.difference(DateTime.now()) > const Duration(hours: 1);
-        if (isPartFile && !isStale) {
+        if (isLRUFile || (isPartFile && !isStale)) {
           continue;
         }
         await file.delete();
@@ -218,7 +266,33 @@ class MediaCache implements MediaCacheInterface {
 
 class LRU {
   final Map<String, DateTime> data = {};
+
+  LRU();
+
   void upsert(String path) {
     data[path] = DateTime.now();
   }
+
+  factory LRU.fromBytes(List<int> bytes) {
+    return LRU.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
+  }
+
+  List<int> toBytes() {
+    return io.gzip.encode(utf8.encode(jsonEncode(this)));
+  }
+
+  LRU.fromJson(Map<String, dynamic> json) {
+    json['data'].forEach((String path, dynamic dateTime) {
+      final lastUsed = DateTime.tryParse(dateTime);
+      if (lastUsed != null) {
+        data[path] = lastUsed;
+      }
+    });
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'data': data.map(
+          (path, lastUsed) => MapEntry(path, lastUsed.toIso8601String()),
+        ),
+      };
 }

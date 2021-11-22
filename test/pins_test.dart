@@ -1,4 +1,4 @@
-import 'mock/client.dart' as http_client;
+import 'mock/client.dart' as mock;
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
@@ -9,7 +9,7 @@ import 'package:polaris/core/dto.dart' as dto;
 
 void main() {
   polaris.HttpClient _makeHttpClient() {
-    final mockHttpClient = http_client.Mock();
+    final mockHttpClient = mock.HttpClient();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
       httpClient: mockHttpClient,

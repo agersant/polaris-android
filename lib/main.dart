@@ -94,6 +94,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<CollectionCache>(collectionCache);
+  getIt.registerSingleton<MediaCacheInterface>(mediaCache);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<polaris.Client>(polarisClient);
@@ -217,6 +218,8 @@ class _PolarisAppState extends State<PolarisApp> {
   void dispose() {
     getIt<AudioPlayer>().dispose();
     getIt<prefetch.Manager>().dispose();
+    getIt<cleanup.Manager>().dispose();
+    getIt<MediaCacheInterface>().dispose();
     super.dispose();
   }
 }

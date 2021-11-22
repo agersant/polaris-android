@@ -1,9 +1,10 @@
-import 'mock/client.dart' as http_client;
-import 'mock/media_cache.dart';
+import 'mock/client.dart' as mock;
+import 'mock/media_cache.dart' as mock;
 import 'mock/pin.dart' as pin;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/cleanup.dart' as cleanup;
@@ -19,13 +20,13 @@ import 'package:uuid/uuid.dart';
 final getIt = GetIt.instance;
 
 class Harness {
-  final http_client.Mock mockHTTPClient;
+  final mock.HttpClient mockHTTPClient;
   final CollectionCache collectionCache;
 
   Harness(this.mockHTTPClient, this.collectionCache);
 
   static final Map<String, Object> reconnectPreferences = {
-    connection.hostPreferenceKey: http_client.goodHostURI,
+    connection.hostPreferenceKey: mock.goodHostURI,
     authentication.tokenPreferenceKey: 'auth-token',
     authentication.usernamePreferenceKey: 'good-username'
   };
@@ -40,7 +41,7 @@ class Harness {
     getIt.allowReassignment = true;
 
     const uuid = Uuid();
-    final mockHttpClient = http_client.Mock();
+    final mockHttpClient = mock.HttpClient();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
       httpClient: mockHttpClient,
@@ -51,7 +52,7 @@ class Harness {
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
     );
-    final mediaCache = await MediaCache.create();
+    final MediaCacheInterface mediaCache = await mock.MediaCache.create();
     final collectionCache = CollectionCache(Collection());
     final downloadManager = download.Manager(
       mediaCache: mediaCache,
@@ -95,6 +96,7 @@ class Harness {
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
     getIt.registerSingleton<Playlist>(playlist);
     getIt.registerSingleton<CollectionCache>(collectionCache);
+    getIt.registerSingleton<MediaCacheInterface>(mediaCache);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);

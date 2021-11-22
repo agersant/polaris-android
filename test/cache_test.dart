@@ -6,7 +6,7 @@ import 'package:polaris/core/cache/media.dart';
 void main() {
   test('Missing image returns null', () async {
     final manager = await MediaCache.create();
-    assert(await manager.getImage('polaris.org', 'some image') == null);
+    expect(await manager.getImage('polaris.org', 'some image'), isNull);
   });
 
   test('Save and read image', () async {
@@ -30,5 +30,15 @@ void main() {
     }
     final Uint8List cacheFileContent = await cacheFile.readAsBytes();
     expect(cacheFileContent.buffer.asUint8List(), equals(imageData));
+  });
+
+  test('Serialize LRU', () async {
+    final lru = LRU();
+    lru.upsert('some-path');
+    expect(lru.data['some-path'], isNotNull);
+    final lastUsed = lru.data['some-path']!;
+    final lruFromDisk = LRU.fromBytes(lru.toBytes());
+    expect(lruFromDisk.data['some-path'], isNotNull);
+    expect(lruFromDisk.data['some-path'], equals(lastUsed));
   });
 }

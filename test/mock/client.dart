@@ -30,14 +30,14 @@ const fallInwardsSongName = 'Falling Inwards';
 const labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
 const fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
 
-class Mock extends mocktail.Mock implements http.Client {
+class HttpClient extends mocktail.Mock implements http.Client {
   bool _failLogin = false;
 
   void mockBadLogin() {
     _failLogin = true;
   }
 
-  Mock() {
+  HttpClient() {
     mocktail.registerFallbackValue(http.Request("", Uri()));
 
     mocktail.when(() => send(mocktail.any())).thenAnswer((Invocation invocation) async {

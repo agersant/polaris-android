@@ -8,6 +8,9 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
+  void dispose() {}
+
+  @override
   Future<bool> hasImage(String host, String path) async => false;
 
   @override
