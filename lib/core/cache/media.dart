@@ -94,7 +94,8 @@ class MediaCache implements MediaCacheInterface {
     final targetFile = getAudioLocation(host, path);
     try {
       _lru.upsert(targetFile.path);
-      await source.copy(targetFile.path);
+      assert(source.path == targetFile.path); // We already download audio file where they should end up
+      // await source.copy(targetFile.path);
     } catch (e) {
       developer.log('Error while adding audio to disk cache: $path', error: e);
     }
@@ -142,8 +143,6 @@ class MediaCache implements MediaCacheInterface {
     try {
       developer.log('Purging unused files from disk cache');
 
-      // TODO this can yeet just_audio .part files while they are useful
-
       final List<String> deletionCandidates = await _listDeletionCandidates(songsToPreserve, imagesToPreserve);
       final List<int> sizes = await Future.wait(deletionCandidates.map((path) async {
         final file = io.File(path);
@@ -158,6 +157,11 @@ class MediaCache implements MediaCacheInterface {
         final String path = deletionCandidates.removeAt(0);
         final io.File file = io.File(path);
         final stat = await file.stat();
+        final isPartFile = p.extension(file.path) == 'part';
+        final isStale = stat.modified.difference(DateTime.now()) > const Duration(hours: 1);
+        if (isPartFile && !isStale) {
+          continue;
+        }
         await file.delete();
         _lru.data.remove(path);
         cacheSize -= stat.size;
