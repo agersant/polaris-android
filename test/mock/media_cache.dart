@@ -23,6 +23,9 @@ class MediaCache implements MediaCacheInterface {
   Future<bool> hasAudio(String host, String path) async => false;
 
   @override
+  Future<void> putAudio(String host, String path, File source) async {}
+
+  @override
   bool hasAudioSync(String host, String path) => false;
 
   @override

@@ -14,8 +14,9 @@ abstract class MediaCacheInterface {
   Future<bool> hasImage(String host, String path);
   Future<io.File?> getImage(String host, String path);
   io.File getImageLocation(String host, String path);
-  Future putImage(String host, String path, Uint8List bytes);
+  Future<void> putImage(String host, String path, Uint8List bytes);
   Future<bool> hasAudio(String host, String path);
+  Future<void> putAudio(String host, String path, io.File source);
   bool hasAudioSync(String host, String path);
   Future<io.File?> getAudio(String host, String path);
   io.File getAudioLocation(String host, String path);
@@ -24,6 +25,7 @@ abstract class MediaCacheInterface {
 
 class MediaCache implements MediaCacheInterface {
   final io.Directory _root;
+  final LRU _lru = LRU(); // TODO save and load from disk!
 
   MediaCache(this._root);
 
@@ -58,11 +60,12 @@ class MediaCache implements MediaCacheInterface {
     final file = io.File(fullPath);
     try {
       if (await file.exists()) {
-        developer.log('Found image in cache: $path');
+        developer.log('Found image in disk cache: $path');
+        _lru.upsert(fullPath);
         return file;
       }
     } catch (e) {
-      developer.log('Error while accessing image from cache: $path', error: e);
+      developer.log('Error while accessing image from disk cache: $path', error: e);
     }
     return null;
   }
@@ -86,6 +89,18 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
+  Future<void> putAudio(String host, String path, io.File source) async {
+    developer.log('Adding audio to disk cache: $path');
+    final targetFile = getAudioLocation(host, path);
+    try {
+      _lru.upsert(targetFile.path);
+      await source.copy(targetFile.path);
+    } catch (e) {
+      developer.log('Error while adding audio to disk cache: $path', error: e);
+    }
+  }
+
+  @override
   bool hasAudioSync(String host, String path) {
     final file = getAudioLocation(host, path);
     return file.existsSync();
@@ -96,11 +111,12 @@ class MediaCache implements MediaCacheInterface {
     final file = getAudioLocation(host, path);
     try {
       if (await file.exists()) {
-        developer.log('Found audio in cache: $path');
+        developer.log('Found audio in disk cache: $path');
+        _lru.upsert(file.path);
         return file;
       }
     } catch (e) {
-      developer.log('Error while accessing audio from cache: $path', error: e);
+      developer.log('Error while accessing audio from disk cache: $path', error: e);
     }
     return null;
   }
@@ -111,16 +127,53 @@ class MediaCache implements MediaCacheInterface {
     final fullPath = _buildImagePath(host, path);
     final file = io.File(fullPath);
     try {
+      _lru.upsert(fullPath);
       await file.writeAsBytes(bytes, mode: io.FileMode.writeOnly, flush: true);
     } catch (e) {
-      developer.log('Error while saving image: $path', error: e);
+      developer.log('Error while adding image to disk cache: $path', error: e);
     }
   }
 
   @override
-  Future<void> purge(Map<String, Set<String>> songsToPreserve, Map<String, Set<String>> imagesToPreserve) async {
-    developer.log('Purging unused files from disk cache');
+  Future<void> purge(
+    Map<String, Set<String>> songsToPreserve,
+    Map<String, Set<String>> imagesToPreserve,
+  ) async {
+    try {
+      developer.log('Purging unused files from disk cache');
 
+      // TODO this can yeet just_audio .part files while they are useful
+
+      final List<String> deletionCandidates = await _listDeletionCandidates(songsToPreserve, imagesToPreserve);
+      final List<int> sizes = await Future.wait(deletionCandidates.map((path) async {
+        final file = io.File(path);
+        final stat = await file.stat();
+        return stat.size;
+      }));
+      int cacheSize = sizes.fold(0, (a, b) => a + b);
+      const maxCacheSize = 50 * 1024 * 1024; // 50MB, TODO make adjustable in settings
+
+      int numFilesRemoved = 0;
+      while (cacheSize > maxCacheSize && deletionCandidates.isNotEmpty) {
+        final String path = deletionCandidates.removeAt(0);
+        final io.File file = io.File(path);
+        final stat = await file.stat();
+        await file.delete();
+        _lru.data.remove(path);
+        cacheSize -= stat.size;
+        numFilesRemoved += 1;
+      }
+      developer.log(
+          'Deleted $numFilesRemoved files from media cache. ${deletionCandidates.length} eligible files left intact, totalling ${cacheSize / (1024 * 1024)} MB.');
+    } catch (e) {
+      developer.log('Error purging files from media cache', error: e);
+    }
+  }
+
+  Future<List<String>> _listDeletionCandidates(
+    Map<String, Set<String>> songsToPreserve,
+    Map<String, Set<String>> imagesToPreserve,
+  ) async {
     final Set<String> filesToPreserve = {};
     songsToPreserve.forEach((host, songs) {
       filesToPreserve.addAll(songs.map((path) => _buildAudioPath(host, path)));
@@ -129,24 +182,21 @@ class MediaCache implements MediaCacheInterface {
       filesToPreserve.addAll(images.map((path) => _buildImagePath(host, path)));
     });
 
-    // TODO use LRU policy to preserve some amount of cached content
-    // TODO this can yeet just_audio .part files while they are useful
+    final List<String> deletionCandidates = [];
 
-    try {
-      int numDeleted = 0;
-      final cacheContent = _root.list();
-      await for (final file in cacheContent) {
-        if (!filesToPreserve.contains(file.path)) {
-          final fileToDelete = io.File(file.path);
-          developer.log('Deleting $file from disk cache');
-          await fileToDelete.delete();
-          numDeleted += 1;
-        }
+    await for (final fileEntity in _root.list()) {
+      if (!filesToPreserve.contains(fileEntity.path)) {
+        deletionCandidates.add(fileEntity.path);
       }
-      developer.log('Purged $numDeleted files from disk cache');
-    } catch (e) {
-      developer.log('Error while purging unused files from disk cache', error: e);
     }
+
+    deletionCandidates.sort((a, b) {
+      final aUsed = _lru.data[a] ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bUsed = _lru.data[b] ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return aUsed.compareTo(bUsed);
+    });
+
+    return deletionCandidates;
   }
 
   String _sanitize(String input) {
@@ -159,5 +209,12 @@ class MediaCache implements MediaCacheInterface {
 
   String _buildAudioPath(String host, String path) {
     return p.join(_root.path, 'audio_' + _sanitize(host + '::' + path));
+  }
+}
+
+class LRU {
+  final Map<String, DateTime> data = {};
+  void upsert(String path) {
+    data[path] = DateTime.now();
   }
 }

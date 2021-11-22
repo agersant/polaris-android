@@ -92,9 +92,10 @@ class Manager {
     final job = _AudioJob(path, audioSource, progressStream);
 
     late StreamSubscription progressSubscription;
-    progressSubscription = progressStream.listen((progress) {
+    progressSubscription = progressStream.listen((progress) async {
       if (progress >= 1.0) {
         developer.log('Downloaded audio: $cacheFile');
+        mediaCache.putAudio(host, path, await audioSource.cacheFile);
         progressSubscription.cancel();
         _audioJobs.remove(path);
       }
