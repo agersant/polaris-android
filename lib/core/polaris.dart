@@ -79,12 +79,12 @@ abstract class _BaseHttpClient {
       return Future.error(APIError.networkError);
     }
 
-    return response.catchError((dynamic e) => throw APIError.networkError).then((r) {
+    return response.then((r) {
       if (r.statusCode == 401) {
-        throw APIError.unauthorized;
+        return Future.error(APIError.unauthorized);
       }
       if (r.statusCode >= 300) {
-        throw APIError.requestFailed;
+        return Future.error(APIError.requestFailed);
       }
       return r;
     });
@@ -214,7 +214,7 @@ class OfflineClient {
   Future<List<dto.CollectionFile>> browse(String host, String path) async {
     final cachedContent = collectionCache.getDirectory(host, path);
     if (cachedContent == null) {
-      throw throw APIError.unexpectedCacheMiss;
+      throw APIError.unexpectedCacheMiss;
     }
 
     return cachedContent.where((file) {
