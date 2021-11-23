@@ -47,14 +47,8 @@ class Manager {
 
     developer.log('Downloading image: $path');
     final imageData = httpClient.getImage(path).then((r) => http.Response.fromStream(r)).then((r) {
-      if (r.statusCode >= 300) {
-        throw r.statusCode;
-      }
       mediaCache.putImage(host, path, r.bodyBytes);
       return r.bodyBytes;
-    }).catchError((dynamic e) {
-      developer.log('Error while downloading image: $path', error: e);
-      throw e;
     });
 
     final job = _ImageJob(path, imageData);
