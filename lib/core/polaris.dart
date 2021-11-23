@@ -305,14 +305,17 @@ class Client {
   }
 
   Future<Uri?> _getImageURI(String path) async {
-    final String host = _getHost();
-    if (await mediaCache.hasImage(host, path)) {
-      return mediaCache.getImageLocation(host, path).uri;
+    try {
+      final String host = _getHost();
+      if (await mediaCache.hasImage(host, path)) {
+        return mediaCache.getImageLocation(host, path).uri;
+      }
+      if (connectionManager.state == connection.State.connected) {
+        return _httpClient.getImageURI(path);
+      }
+    } catch (e) {
+      return null;
     }
-    if (connectionManager.state == connection.State.connected) {
-      return _httpClient.getImageURI(path);
-    }
-    return null;
   }
 
   Future<AudioSource?> getAudio(dto.Song song, String id) async {
@@ -323,11 +326,15 @@ class Client {
     }
     final mediaItem = song.toMediaItem(id, artworkUri);
 
-    final String host = _getHost();
-    if (connectionManager.state == connection.State.connected) {
-      return await downloadManager.getAudio(host, song.path, mediaItem);
-    } else {
-      return await offlineClient.getAudio(host, song.path, mediaItem);
+    try {
+      final String host = _getHost();
+      if (connectionManager.state == connection.State.connected) {
+        return await downloadManager.getAudio(host, song.path, mediaItem).catchError((Object e) => null);
+      } else {
+        return await offlineClient.getAudio(host, song.path, mediaItem).catchError((Object e) => null);
+      }
+    } catch (e) {
+      return null;
     }
   }
 
@@ -335,9 +342,9 @@ class Client {
     try {
       final String host = _getHost();
       if (connectionManager.state == connection.State.connected) {
-        return await downloadManager.getImage(host, path);
+        return await downloadManager.getImage(host, path).catchError((Object e) => null);
       } else {
-        return await offlineClient.getImage(host, path);
+        return await offlineClient.getImage(host, path).catchError((Object e) => null);
       }
     } catch (e) {
       return null;
