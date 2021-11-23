@@ -92,7 +92,7 @@ abstract class _BaseHttpClient {
 
   Future<Uint8List> completeRequest(_Method method, String url, {dynamic body, String? authenticationToken}) async {
     final streamedResponse = makeRequest(method, url, body: body, authenticationToken: authenticationToken);
-    return streamedResponse.then((r) => r.stream.toBytes().catchError((dynamic e) => throw APIError.networkError));
+    return streamedResponse.then((r) => r.stream.toBytes());
   }
 }
 
@@ -329,9 +329,9 @@ class Client {
     try {
       final String host = _getHost();
       if (connectionManager.state == connection.State.connected) {
-        return await downloadManager.getAudio(host, song.path, mediaItem).catchError((Object e) => null);
+        return await downloadManager.getAudio(host, song.path, mediaItem);
       } else {
-        return await offlineClient.getAudio(host, song.path, mediaItem).catchError((Object e) => null);
+        return await offlineClient.getAudio(host, song.path, mediaItem);
       }
     } catch (e) {
       return null;
@@ -342,9 +342,9 @@ class Client {
     try {
       final String host = _getHost();
       if (connectionManager.state == connection.State.connected) {
-        return await downloadManager.getImage(host, path).catchError((Object e) => null);
+        return await downloadManager.getImage(host, path);
       } else {
-        return await offlineClient.getImage(host, path).catchError((Object e) => null);
+        return await offlineClient.getImage(host, path);
       }
     } catch (e) {
       return null;
