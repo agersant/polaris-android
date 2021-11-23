@@ -172,6 +172,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       }
                       if (pagesModel.isQueueOpen) {
                         pagesModel.closeQueue();
+                      } else if (pagesModel.isOfflineMusicOpen) {
+                        pagesModel.closeOfflineMusic();
                       }
                       return true;
                     },
