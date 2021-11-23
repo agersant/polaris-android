@@ -21,16 +21,10 @@ class OfflineMusicPage extends StatelessWidget {
             leading: const Icon(Icons.offline_pin, size: 40),
             title: const Text("1.24 GB"),
             subtitle: Row(
-              children: [
-                Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Text("21 Directories", style: Theme.of(context).textTheme.caption)),
-                Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Text("124 songs", style: Theme.of(context).textTheme.caption)),
-                Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Text("5d 20h 31m", style: Theme.of(context).textTheme.caption)),
+              children: const [
+                Caption('21 Directories'),
+                Caption('124 songs'),
+                Caption('5d 20h 31m'),
               ],
             ),
           ),
@@ -70,8 +64,8 @@ class OfflineMusicPage extends StatelessWidget {
                     children: [
                       Row(
                         children: const [
-                          Padding(padding: EdgeInsets.only(right: 8), child: Text('14 songs')),
-                          Padding(padding: EdgeInsets.only(right: 8), child: Text('2.58 MB')),
+                          Caption('14 songs'),
+                          Caption('2.58 MB'),
                         ],
                       ),
                     ],
@@ -85,4 +79,11 @@ class OfflineMusicPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class Caption extends StatelessWidget {
+  final String text;
+  const Caption(this.text, {Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(right: 8), child: Text(text));
 }
