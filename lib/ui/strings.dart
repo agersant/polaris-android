@@ -49,10 +49,13 @@ const unknownUser = 'Offline User';
 const unknownHost = 'Unknown Host';
 
 // Playback
-const queueTitle = "Queue";
-const queueEmpty = "There are no songs in the queue.";
-const removeFromQueue = "Remove";
+const queueTitle = 'Queue';
+const queueEmpty = 'There are no songs in the queue.';
+const removeFromQueue = 'Remove';
 
 // Offline music
-const offlineMusicTitle = "Offline Music";
-const offlineMusicEmpty = "You have not saved any  music.";
+const offlineMusicTitle = 'Offline Music';
+const offlineMusicEmpty = 'You have not saved any music.';
+String xySongs(int? x, int? y) => '${x ?? "?"}/${y ?? "?"} ${(y ?? 2) > 1 ? "songs" : "song"}';
+String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
+String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';

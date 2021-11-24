@@ -121,8 +121,8 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
             title: Text(formatBytes(_sizeOnDisk, 2)),
             subtitle: Row(
               children: [
-                Caption('$_numDirectories ${_numDirectories == 1 ? 'Directory' : 'Directories'}'),
-                Caption('$_numSongs songs'),
+                Caption(nDirectories(_numDirectories)),
+                Caption(nSongs(_numSongs)),
               ],
             ),
           ),
@@ -212,16 +212,23 @@ class PinListTile extends StatefulWidget {
 }
 
 class _PinListTileState extends State<PinListTile> {
+  final _connectionManager = getIt<connection.Manager>();
   final _prefetchManager = getIt<prefetch.Manager>();
   final _pinManager = getIt<pin.Manager>();
+  final _mediaCache = getIt<MediaCacheInterface>();
+
   late StreamSubscription _fetchSubscription;
+  int? _numSongsOnDisk;
+  int? _totalSongs;
   int _sizeOnDisk = 0;
   bool _fullyComputedSizeOnDisk = false;
 
   @override
   void initState() {
     super.initState();
+    _updateTotalSongs();
     _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((event) {
+      _updateNumSongsOnDisk();
       _updateSizeOnDisk();
     });
   }
@@ -232,13 +239,37 @@ class _PinListTileState extends State<PinListTile> {
     _fetchSubscription.cancel();
   }
 
-  Future<void> _updateSizeOnDisk() async {
-    final Set<dto.Song> songs = {};
+  Future<Set<dto.Song>> _listSongs() async {
     if (widget.file.isSong()) {
-      songs.add(widget.file.asSong());
+      return {widget.file.asSong()};
     } else {
-      songs.addAll(await _pinManager.getSongsInDirectory(widget.host, widget.file.path));
+      return await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
     }
+  }
+
+  Future<void> _updateNumSongsOnDisk() async {
+    final Set<dto.Song> songs = await _listSongs();
+    int numSongsOnDisk = 0;
+    for (dto.Song song in songs) {
+      if (await _mediaCache.hasAudio(widget.host, song.path)) {
+        numSongsOnDisk += 1;
+      }
+    }
+    setState(() => _numSongsOnDisk = numSongsOnDisk);
+  }
+
+  Future<void> _updateTotalSongs() async {
+    final isOnline = _connectionManager.state == connection.State.connected;
+    if (!isOnline) {
+      setState(() => _totalSongs = null);
+      return;
+    }
+    final Set<dto.Song> songs = await _listSongs();
+    setState(() => _totalSongs = songs.length);
+  }
+
+  Future<void> _updateSizeOnDisk() async {
+    final Set<dto.Song> songs = await _listSongs();
     final size = await computeSizeOnDisk(songs, widget.host, onProgress: (s) {
       if (!_fullyComputedSizeOnDisk) {
         setState(() => _sizeOnDisk = s);
@@ -258,8 +289,7 @@ class _PinListTileState extends State<PinListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final connectionManager = getIt<connection.Manager>();
-    final isOnline = connectionManager.state == connection.State.connected;
+    final isOnline = _connectionManager.state == connection.State.connected;
     return ListTile(
       dense: true,
       // TODO this will try to fetch art from current server, even for offline music from other servers
@@ -275,8 +305,8 @@ class _PinListTileState extends State<PinListTile> {
         children: [
           Row(
             children: [
-              // TODO directory stats
-              const Caption('14/14 songs'),
+              if (_numSongsOnDisk != _totalSongs) Caption(xySongs(_numSongsOnDisk, _totalSongs)),
+              if (_numSongsOnDisk == _totalSongs) Caption(nSongs(_numSongsOnDisk)),
               if (_sizeOnDisk > 0) Caption(formatBytes(_sizeOnDisk, 2)),
             ],
           ),
