@@ -8,6 +8,7 @@ import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -67,6 +68,18 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
     });
   }
 
+  Widget _buildHelp() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 64),
+      child: ErrorMessage(
+        offlineMusicEmpty,
+        icon: Icons.cloud_off,
+        actionLabel: goBackButtonLabel,
+        action: Navigator.of(context).pop,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,10 +105,11 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
                 stream: _hosts,
                 initialData: const <pin.Host>[],
                 builder: (BuildContext context, AsyncSnapshot<List<pin.Host>> snapshot) {
-                  // TODO add help message if nothing pinned
-                  return Column(
-                    children: snapshot.requireData.map((pin.Host host) => PinsByServer(host)).toList(),
-                  );
+                  final hosts = snapshot.requireData;
+                  if (hosts.isEmpty) {
+                    return _buildHelp();
+                  }
+                  return Column(children: hosts.map((pin.Host host) => PinsByServer(host)).toList());
                 },
               ),
             ),

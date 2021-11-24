@@ -55,3 +55,4 @@ const removeFromQueue = "Remove";
 
 // Offline music
 const offlineMusicTitle = "Offline Music";
+const offlineMusicEmpty = "You have not saved any  music.";
