@@ -204,7 +204,7 @@ class MediaCache implements MediaCacheInterface {
         final String path = deletionCandidates.removeAt(0);
         final io.File file = io.File(path);
         final stat = await file.stat();
-        final isPartFile = p.extension(file.path) == 'part';
+        final isPartFile = p.extension(file.path) == '.part';
         final isLRUFile = file.path == lruFile.path;
         final isStale = stat.modified.difference(DateTime.now()) > const Duration(hours: 1);
         if (isLRUFile || (isPartFile && !isStale)) {
