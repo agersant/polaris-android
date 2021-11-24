@@ -119,12 +119,11 @@ class Collection {
     final parent = _findOrCreateDirectory(host, path);
     final Set<String> childrenToKeep = {};
     for (dto.CollectionFile file in content) {
+      final name = _basename(file.path);
       if (file.isSong()) {
-        final name = _basename(file.asSong().path);
         parent._children[name] = File(Left(Song(file.asSong())));
         childrenToKeep.add(name);
       } else {
-        final name = _basename(file.asDirectory().path);
         if (parent._children[name]?.isDirectory() != true) {
           parent._children[name] = File(Right(Directory()));
         }
@@ -226,6 +225,7 @@ class Collection {
   }
 }
 
+// TODO this looks 100% redundant with dto.CollectionFile
 class File {
   final Either<Song, Directory> content;
   File(this.content);

@@ -108,6 +108,22 @@ class CollectionFile {
 
   CollectionFile(this.content);
 
+  String get path {
+    if (isSong()) {
+      return asSong().path;
+    } else {
+      return asDirectory().path;
+    }
+  }
+
+  String? get artwork {
+    if (isSong()) {
+      return asSong().artwork;
+    } else {
+      return asDirectory().artwork;
+    }
+  }
+
   bool isSong() {
     return content.isLeft();
   }
