@@ -25,16 +25,21 @@ class OfflineMusicPage extends StatefulWidget {
 
 class _OfflineMusicPageState extends State<OfflineMusicPage> {
   late Stream<List<pin.Host>> _hosts;
-  late StreamSubscription _statsSubscription;
-  int numDirectories = 0;
-  int numSongs = 0;
+  late StreamSubscription _pinsSubscription;
+  late StreamSubscription _fetchSubscription;
+  final _pinManager = getIt<pin.Manager>();
+  final _mediaCache = getIt<MediaCacheInterface>();
+  final _prefetchManager = getIt<prefetch.Manager>();
+  int _numDirectories = 0;
+  int _numSongs = 0;
+  int _sizeOnDisk = 0;
+  bool _fullyComputedSizeOnDisk = false;
 
   @override
   initState() {
     super.initState();
-    final pinManager = getIt<pin.Manager>();
     final String? host = getIt<connection.Manager>().url;
-    _hosts = pinManager.hostsStream.map((Set<pin.Host> hosts) {
+    _hosts = _pinManager.hostsStream.map((Set<pin.Host> hosts) {
       return hosts.toList()
         ..sort((a, b) {
           if (a.url == host) return -1;
@@ -43,13 +48,21 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
         });
     });
 
-    _statsSubscription = pinManager.hostsStream.listen(_updateStats);
+    _pinsSubscription = _pinManager.hostsStream.listen((hosts) {
+      _updateStats(hosts);
+      _updateSizeOnDisk();
+    });
+
+    _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) {
+      _updateSizeOnDisk();
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    _statsSubscription.cancel();
+    _pinsSubscription.cancel();
+    _fetchSubscription.cancel();
   }
 
   void _updateStats(Set<pin.Host> hosts) {
@@ -65,9 +78,34 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
       }
     }
     setState(() {
-      numDirectories = newNumDirectories;
-      numSongs = newNumSongs;
+      _numDirectories = newNumDirectories;
+      _numSongs = newNumSongs;
     });
+  }
+
+  Future<void> _updateSizeOnDisk() async {
+    int size = 0;
+    for (pin.Host host in _pinManager.hosts) {
+      final songs = await _pinManager.getAllSongs(host.url);
+      await Future.wait(songs.map((song) async {
+        final hasAudio = await _mediaCache.hasAudio(host.url, song.path);
+        if (!hasAudio) {
+          return;
+        }
+        final cacheFile = _mediaCache.getAudioLocation(host.url, song.path);
+        try {
+          final stat = await cacheFile.stat();
+          size += stat.size;
+          if (!_fullyComputedSizeOnDisk) {
+            setState(() => _sizeOnDisk = size);
+          }
+        } catch (e) {
+          return;
+        }
+      }));
+    }
+    setState(() => _sizeOnDisk = size);
+    _fullyComputedSizeOnDisk = true;
   }
 
   Widget _buildHelp() {
@@ -92,11 +130,11 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
         children: [
           ListTile(
             leading: const Icon(Icons.offline_pin, size: 40),
-            title: const Text("1.24 GB"), // TODO compute size on disc
+            title: Text(formatBytes(_sizeOnDisk, 2)),
             subtitle: Row(
               children: [
-                Caption('$numDirectories ${numDirectories == 1 ? 'Directory' : 'Directories'}'),
-                Caption('$numSongs songs'),
+                Caption('$_numDirectories ${_numDirectories == 1 ? 'Directory' : 'Directories'}'),
+                Caption('$_numSongs songs'),
               ],
             ),
           ),
