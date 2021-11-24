@@ -69,7 +69,8 @@ class CollectionCache {
           }
         })
         .values
-        .toList(); // TODO sort
+        .toList()
+      ?..sort();
   }
 
   bool hasPopulatedDirectory(String host, String path) {
@@ -88,7 +89,8 @@ class CollectionCache {
   }
 
   List<dto.Song>? flattenDirectory(String host, String path) {
-    return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList(); // TODO sort
+    return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList()
+      ?..sort((a, b) => a.path.compareTo(b.path));
   }
 }
 

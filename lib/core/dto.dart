@@ -103,7 +103,7 @@ class Song {
       };
 }
 
-class CollectionFile {
+class CollectionFile extends Comparable<CollectionFile> {
   Either<Song, Directory> content;
 
   CollectionFile(this.content);
@@ -122,6 +122,14 @@ class CollectionFile {
     } else {
       return asDirectory().artwork;
     }
+  }
+
+  @override
+  int compareTo(CollectionFile other) {
+    if (isDirectory() != other.isDirectory()) {
+      return isDirectory() ? -1 : 1;
+    }
+    return path.compareTo(other.path);
   }
 
   bool isSong() {
