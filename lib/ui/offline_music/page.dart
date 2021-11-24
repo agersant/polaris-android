@@ -1,15 +1,42 @@
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/pin.dart' as pin;
+import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
 
-class OfflineMusicPage extends StatelessWidget {
+class OfflineMusicPage extends StatefulWidget {
   const OfflineMusicPage({Key? key}) : super(key: key);
+
+  @override
+  State<OfflineMusicPage> createState() => _OfflineMusicPageState();
+}
+
+class _OfflineMusicPageState extends State<OfflineMusicPage> {
+  late Stream<List<pin.Host>> _hosts;
+
+  @override
+  initState() {
+    super.initState();
+    final pinManager = getIt<pin.Manager>();
+    final String? host = getIt<connection.Manager>().url;
+    _hosts = pinManager.hostsStream.map((Set<pin.Host> hosts) {
+      return hosts.toList()
+        ..sort((a, b) {
+          if (a.url == host) return -1;
+          if (b.url == host) return 1;
+          return a.url.compareTo(b.url);
+        });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +60,15 @@ class OfflineMusicPage extends StatelessWidget {
           const Divider(),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  PinsByServer(),
-                  PinsByServer(),
-                ],
+              child: StreamBuilder(
+                stream: _hosts,
+                initialData: const <pin.Host>[],
+                builder: (BuildContext context, AsyncSnapshot<List<pin.Host>> snapshot) {
+                  // TODO add help message if nothing pinned
+                  return Column(
+                    children: snapshot.requireData.map((pin.Host host) => PinsByServer(host)).toList(),
+                  );
+                },
               ),
             ),
           )
@@ -48,18 +79,23 @@ class OfflineMusicPage extends StatelessWidget {
 }
 
 class PinsByServer extends StatelessWidget {
+  final pin.Host host;
+
+  const PinsByServer(this.host, {Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    final pinnedFiles = host.content.toList()..sort((a, b) => a.path.compareTo(b.path));
+
     return Column(
       children: [
-        ServerHeader(),
+        ServerHeader(host.url),
         ListView.builder(
-          itemCount: 20,
+          itemCount: pinnedFiles.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            return PinListTile();
-          },
+          itemBuilder: (context, index) =>
+              PinListTile(pinnedFiles[index], key: Key(host.url + pinnedFiles[index].path)),
         ),
       ],
     );
@@ -67,7 +103,9 @@ class PinsByServer extends StatelessWidget {
 }
 
 class ServerHeader extends StatelessWidget {
-  const ServerHeader({Key? key}) : super(key: key);
+  final String host;
+
+  const ServerHeader(this.host, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +117,7 @@ class ServerHeader extends StatelessWidget {
           Row(
             children: [
               const Padding(padding: EdgeInsets.only(right: 8), child: Icon(Icons.desktop_windows, size: 16)),
-              Text('From polaris.agersant.com', style: Theme.of(context).textTheme.bodyText2),
+              Text('From $host', style: Theme.of(context).textTheme.bodyText2),
             ],
           ),
           const Divider(),
@@ -91,20 +129,28 @@ class ServerHeader extends StatelessWidget {
 
 class PinListTile extends StatelessWidget {
   // final String host;
-  // final dto.CollectionFile file;
+  final dto.CollectionFile file;
 
-  const PinListTile({Key? key}) : super(key: key);
+  const PinListTile(this.file, {Key? key}) : super(key: key);
+
+  String formatTitle() {
+    if (file.isDirectory()) {
+      return file.asDirectory().formatName();
+    } else {
+      return file.asSong().formatTitle();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       dense: true,
-      leading: const ListThumbnail(
-          'Leviathan/OST - Anime/Howl\'s Moving Castle/2004 - Howl\'s Moving Castle Soundtrack/Folder.jpg'),
+      // TODO this will try to fetch art from current server, even for offline music from other servers
+      leading: ListThumbnail(file.artwork),
       title: Row(
         children: [
           Padding(padding: const EdgeInsets.only(right: 8), child: PinState()),
-          const Text('Automatic for the People'),
+          Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
       subtitle: Column(
@@ -117,7 +163,14 @@ class PinListTile extends StatelessWidget {
           ),
         ],
       ),
-      trailing: const Icon(Icons.more_vert),
+      trailing: CollectionFileContextMenuButton(
+        file: file,
+        actions: const [
+          CollectionFileAction.queueLast,
+          CollectionFileAction.queueNext,
+          CollectionFileAction.togglePin,
+        ],
+      ),
     );
   }
 }

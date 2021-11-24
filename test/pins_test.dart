@@ -23,7 +23,7 @@ void main() {
   }
 
   test('Can add/remove song', () async {
-    final pin.Manager pinManager = pin.Manager(pin.Pins(), polarisHttpClient: _makeHttpClient());
+    final pin.Manager pinManager = pin.Manager(pin.Storage(), polarisHttpClient: _makeHttpClient());
 
     final dto.Song song = dto.Song(path: 'root/Heron/Aegeus/Labyrinth.mp3');
     pinManager.pin('host', dto.CollectionFile(Left(song)));
@@ -35,7 +35,7 @@ void main() {
   });
 
   test('Can add/remove directory', () async {
-    final pin.Manager pinManager = pin.Manager(pin.Pins(), polarisHttpClient: _makeHttpClient());
+    final pin.Manager pinManager = pin.Manager(pin.Storage(), polarisHttpClient: _makeHttpClient());
 
     final dto.Directory directory = dto.Directory(path: 'root/Heron/Aegeus');
     pinManager.pin('host', dto.CollectionFile(Right(directory)));
@@ -47,29 +47,29 @@ void main() {
   });
 
   test('Can serialize pins list to json', () async {
-    final pins = pin.Pins();
+    final storage = pin.Storage();
 
     final dto.Song song = dto.Song(path: 'root/Heron/Aegeus/Labyrinth.mp3');
-    pins.add('host', dto.CollectionFile(Left(song)));
+    storage.add('host', dto.CollectionFile(Left(song)));
 
     final dto.Directory directory = dto.Directory(path: 'root/Heron/Eons');
-    pins.add('host', dto.CollectionFile(Right(directory)));
+    storage.add('host', dto.CollectionFile(Right(directory)));
 
-    final pin.Pins deserialized = pin.Pins.fromJson(pins.toJson());
+    final pin.Storage deserialized = pin.Storage.fromJson(storage.toJson());
     assert(deserialized.contains('host', dto.CollectionFile(Left(song))));
     assert(deserialized.contains('host', dto.CollectionFile(Right(directory))));
   });
 
   test('Can serialize pins list to bytes', () async {
-    final pins = pin.Pins();
+    final storage = pin.Storage();
 
     final dto.Song song = dto.Song(path: 'root/Heron/Aegeus/Labyrinth.mp3');
-    pins.add('host', dto.CollectionFile(Left(song)));
+    storage.add('host', dto.CollectionFile(Left(song)));
 
     final dto.Directory directory = dto.Directory(path: 'root/Heron/Eons');
-    pins.add('host', dto.CollectionFile(Right(directory)));
+    storage.add('host', dto.CollectionFile(Right(directory)));
 
-    final pin.Pins deserialized = pin.Pins.fromBytes(pins.toBytes());
+    final pin.Storage deserialized = pin.Storage.fromBytes(storage.toBytes());
     assert(deserialized.contains('host', dto.CollectionFile(Left(song))));
     assert(deserialized.contains('host', dto.CollectionFile(Right(directory))));
   });

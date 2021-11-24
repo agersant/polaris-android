@@ -52,7 +52,7 @@ class Manager {
       }
     });
 
-    for (String host in pinManager.hosts) {
+    for (String host in pinManager.hosts.map((host) => host.url)) {
       final hostPins = await pinManager.getAllSongs(host);
       final hostSongs = songsToPreserve.putIfAbsent(host, () => {});
       final hostImages = imagesToPreserve.putIfAbsent(host, () => {});

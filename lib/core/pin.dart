@@ -6,12 +6,14 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/polaris.dart' as polaris;
+import 'package:rxdart/rxdart.dart';
 
 const _firstVersion = 1;
 const _currentVersion = 1;
 
 abstract class ManagerInterface extends ChangeNotifier {
-  Set<String> get hosts;
+  Set<Host> get hosts;
+  Stream<Set<Host>> get hostsStream;
   Set<dto.Song>? getSongs(String host);
   Set<dto.Directory>? getDirectories(String host);
   Future<Set<dto.Song>> getAllSongs(String host);
@@ -19,16 +21,23 @@ abstract class ManagerInterface extends ChangeNotifier {
 
 class Manager extends ChangeNotifier implements ManagerInterface {
   final polaris.HttpClient polarisHttpClient;
-  final Pins _pins;
   final Map<String, Map<String, Set<dto.Song>>> _flattenCache = {};
+  final Storage _storage;
 
-  Manager(
-    this._pins, {
-    required this.polarisHttpClient,
-  });
+  final _hostsSubject = BehaviorSubject<Set<Host>>.seeded({});
 
   @override
-  Set<String> get hosts => _pins._servers.keys.toSet();
+  Stream<Set<Host>> get hostsStream => _hostsSubject.stream;
+
+  @override
+  Set<Host> get hosts => _hostsSubject.value!;
+
+  Manager(
+    this._storage, {
+    required this.polarisHttpClient,
+  }) {
+    _updateHosts();
+  }
 
   static Future<io.File> _getPinsFile(int version) async {
     final temporaryDirectory = await getTemporaryDirectory();
@@ -45,12 +54,12 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       });
     }
 
-    Pins pins = Pins();
+    Storage pins = Storage();
     final cachedFile = await _getPinsFile(_currentVersion);
     try {
       if (await cachedFile.exists()) {
         final cacheData = await cachedFile.readAsBytes();
-        pins = Pins.fromBytes(cacheData);
+        pins = Storage.fromBytes(cacheData);
         developer.log('Read pins list from: $cachedFile');
       }
     } catch (e) {
@@ -62,7 +71,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   @override
   Set<dto.Directory> getDirectories(String host) {
-    final server = _pins._servers[host];
+    final server = _storage._servers[host];
     if (server == null) {
       return {};
     }
@@ -71,7 +80,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   @override
   Set<dto.Song> getSongs(String host) {
-    final server = _pins._servers[host];
+    final server = _storage._servers[host];
     if (server == null) {
       return {};
     }
@@ -94,48 +103,66 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   void pin(String host, dto.CollectionFile file) async {
-    _pins.add(host, file);
+    _storage.add(host, file);
+    _updateHosts();
     notifyListeners();
     await saveToDisk();
   }
 
   void unpin(String host, dto.CollectionFile file) async {
-    _pins.remove(host, file);
+    _storage.remove(host, file);
+    _updateHosts();
     notifyListeners();
     await saveToDisk();
   }
 
   bool isPinned(String host, dto.CollectionFile file) {
-    return _pins.contains(host, file);
+    return _storage.contains(host, file);
   }
 
   Future saveToDisk() async {
     try {
       final cacheFile = await _getPinsFile(_currentVersion);
       await cacheFile.create(recursive: true);
-      final serializedData = _pins.toBytes();
+      final serializedData = _storage.toBytes();
       await cacheFile.writeAsBytes(serializedData, flush: true);
       developer.log('Wrote pins list to: $cacheFile');
     } catch (e) {
       developer.log('Error while writing pins list to disk: ', error: e);
     }
   }
+
+  void _updateHosts() {
+    _hostsSubject.add(_storage._servers.keys
+        .where((host) => _storage._servers[host]?.isNotEmpty ?? false)
+        .map((host) => Host(_storage, url: host))
+        .toSet());
+  }
 }
 
-class Pins {
+class Host {
+  final String url;
+  late Set<dto.CollectionFile> content;
+
+  Host(Storage storage, {required this.url}) {
+    content = storage._servers[url]?.values.toSet() ?? {};
+  }
+}
+
+class Storage {
   final Map<String, Map<String, dto.CollectionFile>> _servers = {};
 
-  Pins();
+  Storage();
 
-  factory Pins.fromBytes(List<int> bytes) {
-    return Pins.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
+  factory Storage.fromBytes(List<int> bytes) {
+    return Storage.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
   }
 
   List<int> toBytes() {
     return io.gzip.encode(utf8.encode(jsonEncode(this)));
   }
 
-  Pins.fromJson(Map<String, dynamic> json) {
+  Storage.fromJson(Map<String, dynamic> json) {
     json['servers'].forEach((String host, dynamic files) {
       _servers[host] = <String, dto.CollectionFile>{};
       files.forEach((String path, dynamic file) {
@@ -155,11 +182,7 @@ class Pins {
 
   void add(String host, dto.CollectionFile file) {
     final hostContent = _servers.putIfAbsent(host, () => <String, dto.CollectionFile>{});
-    if (file.isSong()) {
-      hostContent[file.asSong().path] = file;
-    } else {
-      hostContent[file.asDirectory().path] = file;
-    }
+    hostContent[file.path] = file;
   }
 
   bool contains(String host, dto.CollectionFile file) {
@@ -167,18 +190,10 @@ class Pins {
     if (hostContent == null) {
       return false;
     }
-    if (file.isSong()) {
-      return hostContent[file.asSong().path] != null;
-    } else {
-      return hostContent[file.asDirectory().path] != null;
-    }
+    return hostContent[file.path] != null;
   }
 
   void remove(String host, dto.CollectionFile file) {
-    if (file.isSong()) {
-      _servers[host]?.remove(file.asSong().path);
-    } else {
-      _servers[host]?.remove(file.asDirectory().path);
-    }
+    _servers[host]?.remove(file.path);
   }
 }

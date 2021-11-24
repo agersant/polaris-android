@@ -8,7 +8,10 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   @override
-  Set<String> get hosts => {};
+  Set<Host> get hosts => {};
+
+  @override
+  Stream<Set<Host>> get hostsStream => Stream.value({});
 
   @override
   Set<dto.Song>? getSongs(String host) => {};
