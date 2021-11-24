@@ -1,8 +1,8 @@
-import 'package:dartz/dartz.dart' as dartz;
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/pin.dart' as pin;
@@ -22,6 +22,9 @@ class OfflineMusicPage extends StatefulWidget {
 
 class _OfflineMusicPageState extends State<OfflineMusicPage> {
   late Stream<List<pin.Host>> _hosts;
+  late StreamSubscription _statsSubscription;
+  int numDirectories = 0;
+  int numSongs = 0;
 
   @override
   initState() {
@@ -36,6 +39,32 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
           return a.url.compareTo(b.url);
         });
     });
+
+    _statsSubscription = pinManager.hostsStream.listen(_updateStats);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _statsSubscription.cancel();
+  }
+
+  void _updateStats(Set<pin.Host> hosts) {
+    int newNumDirectories = 0;
+    int newNumSongs = 0;
+    for (pin.Host host in hosts) {
+      for (dto.CollectionFile file in host.content) {
+        if (file.isDirectory()) {
+          newNumDirectories += 1;
+        } else {
+          newNumSongs += 1;
+        }
+      }
+    }
+    setState(() {
+      numDirectories = newNumDirectories;
+      numSongs = newNumSongs;
+    });
   }
 
   @override
@@ -48,12 +77,11 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
         children: [
           ListTile(
             leading: const Icon(Icons.offline_pin, size: 40),
-            title: const Text("1.24 GB"),
+            title: const Text("1.24 GB"), // TODO compute size on disc
             subtitle: Row(
-              children: const [
-                Caption('21 Directories'),
-                Caption('124 songs'),
-                Caption('5d 20h 31m'),
+              children: [
+                Caption('$numDirectories ${numDirectories == 1 ? 'Directory' : 'Directories'}'),
+                Caption('$numSongs songs'),
               ],
             ),
           ),
@@ -149,7 +177,8 @@ class PinListTile extends StatelessWidget {
       leading: ListThumbnail(file.artwork),
       title: Row(
         children: [
-          Padding(padding: const EdgeInsets.only(right: 8), child: PinState()),
+          // TODO file loading state
+          const Padding(padding: EdgeInsets.only(right: 8), child: PinState()),
           Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
@@ -157,6 +186,7 @@ class PinListTile extends StatelessWidget {
         children: [
           Row(
             children: const [
+              // TODO directory stats
               Caption('14 songs'),
               Caption('2.58 MB'),
             ],
@@ -176,9 +206,11 @@ class PinListTile extends StatelessWidget {
 }
 
 class PinState extends StatelessWidget {
+  const PinState({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final index = 5;
+    const index = 5;
     if (index < 4) {
       return Icon(Icons.check, size: 16, color: Theme.of(context).textTheme.caption?.color);
     } else if (index == 4) {
