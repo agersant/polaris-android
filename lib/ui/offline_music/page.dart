@@ -28,7 +28,6 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
   late StreamSubscription _pinsSubscription;
   late StreamSubscription _fetchSubscription;
   final _pinManager = getIt<pin.Manager>();
-  final _mediaCache = getIt<MediaCacheInterface>();
   final _prefetchManager = getIt<prefetch.Manager>();
   int _numDirectories = 0;
   int _numSongs = 0;
@@ -87,22 +86,11 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
     int size = 0;
     for (pin.Host host in _pinManager.hosts) {
       final songs = await _pinManager.getAllSongs(host.url);
-      await Future.wait(songs.map((song) async {
-        final hasAudio = await _mediaCache.hasAudio(host.url, song.path);
-        if (!hasAudio) {
-          return;
+      size += await computeSizeOnDisk(songs, host.url, onProgress: (s) {
+        if (!_fullyComputedSizeOnDisk) {
+          setState(() => _sizeOnDisk = size + s);
         }
-        final cacheFile = _mediaCache.getAudioLocation(host.url, song.path);
-        try {
-          final stat = await cacheFile.stat();
-          size += stat.size;
-          if (!_fullyComputedSizeOnDisk) {
-            setState(() => _sizeOnDisk = size);
-          }
-        } catch (e) {
-          return;
-        }
-      }));
+      });
     }
     setState(() => _sizeOnDisk = size);
     _fullyComputedSizeOnDisk = true;
@@ -176,6 +164,7 @@ class PinsByServer extends StatelessWidget {
           itemCount: pinnedFiles.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          // TODO all these widgets get re-created when a pin is deleted
           itemBuilder: (context, index) => PinListTile(
             host.url,
             pinnedFiles[index],
@@ -212,17 +201,58 @@ class ServerHeader extends StatelessWidget {
   }
 }
 
-class PinListTile extends StatelessWidget {
+class PinListTile extends StatefulWidget {
   final String host;
   final dto.CollectionFile file;
 
   const PinListTile(this.host, this.file, {Key? key}) : super(key: key);
 
-  String formatTitle() {
-    if (file.isDirectory()) {
-      return file.asDirectory().formatName();
+  @override
+  State<PinListTile> createState() => _PinListTileState();
+}
+
+class _PinListTileState extends State<PinListTile> {
+  final _prefetchManager = getIt<prefetch.Manager>();
+  final _pinManager = getIt<pin.Manager>();
+  late StreamSubscription _fetchSubscription;
+  int _sizeOnDisk = 0;
+  bool _fullyComputedSizeOnDisk = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((event) {
+      _updateSizeOnDisk();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _fetchSubscription.cancel();
+  }
+
+  Future<void> _updateSizeOnDisk() async {
+    final Set<dto.Song> songs = {};
+    if (widget.file.isSong()) {
+      songs.add(widget.file.asSong());
     } else {
-      return file.asSong().formatTitle();
+      songs.addAll(await _pinManager.getSongsInDirectory(widget.host, widget.file.path));
+    }
+    final size = await computeSizeOnDisk(songs, widget.host, onProgress: (s) {
+      if (!_fullyComputedSizeOnDisk) {
+        setState(() => _sizeOnDisk = s);
+      }
+    });
+    setState(() => _sizeOnDisk = size);
+    _fullyComputedSizeOnDisk = true;
+  }
+
+  String formatTitle() {
+    if (widget.file.isDirectory()) {
+      return widget.file.asDirectory().formatName();
+    } else {
+      return widget.file.asSong().formatTitle();
     }
   }
 
@@ -233,26 +263,27 @@ class PinListTile extends StatelessWidget {
     return ListTile(
       dense: true,
       // TODO this will try to fetch art from current server, even for offline music from other servers
-      leading: ListThumbnail(file.artwork),
+      leading: ListThumbnail(widget.file.artwork),
       title: Row(
         children: [
-          if (isOnline) Padding(padding: const EdgeInsets.only(right: 8), child: PinStateIcon(host, file)),
+          if (isOnline)
+            Padding(padding: const EdgeInsets.only(right: 8), child: PinStateIcon(widget.host, widget.file)),
           Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
       subtitle: Column(
         children: [
           Row(
-            children: const [
+            children: [
               // TODO directory stats
-              Caption('14 songs'),
-              Caption('2.58 MB'),
+              const Caption('14/14 songs'),
+              if (_sizeOnDisk > 0) Caption(formatBytes(_sizeOnDisk, 2)),
             ],
           ),
         ],
       ),
       trailing: CollectionFileContextMenuButton(
-        file: file,
+        file: widget.file,
         actions: const [
           CollectionFileAction.queueLast,
           CollectionFileAction.queueNext,
@@ -374,4 +405,28 @@ class Caption extends StatelessWidget {
   const Caption(this.text, {Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(right: 8), child: Text(text));
+}
+
+Future<int> computeSizeOnDisk(Set<dto.Song> songs, String host, {Function(int)? onProgress}) async {
+  final _mediaCache = getIt<MediaCacheInterface>();
+
+  int size = 0;
+  await Future.wait(songs.map((song) async {
+    final hasAudio = await _mediaCache.hasAudio(host, song.path);
+    if (!hasAudio) {
+      return;
+    }
+    final cacheFile = _mediaCache.getAudioLocation(host, song.path);
+    try {
+      final stat = await cacheFile.stat();
+      size += stat.size;
+      if (onProgress != null) {
+        onProgress(size);
+      }
+    } catch (e) {
+      return;
+    }
+  }));
+
+  return size;
 }

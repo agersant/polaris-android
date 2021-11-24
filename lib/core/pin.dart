@@ -107,6 +107,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   Future<Set<dto.Song>> _flatten(String host, String path) async {
     Set<dto.Song>? songs = _flattenCache[host]?[path];
     if (songs == null) {
+      // TODO needs error handling
       songs = (await polarisHttpClient.flatten(path)).toSet();
       _flattenCache.putIfAbsent(host, () => {})[path] = songs;
     }
