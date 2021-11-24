@@ -41,7 +41,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   static Future<io.File> _getPinsFile(int version) async {
     final temporaryDirectory = await getTemporaryDirectory();
-    return io.File(p.join(temporaryDirectory.path, 'pins', 'v$version.cache'));
+    return io.File(p.join(temporaryDirectory.path, 'pins-v$version.pins'));
   }
 
   static Future<Manager> create(polaris.HttpClient polarisHttpClient) async {

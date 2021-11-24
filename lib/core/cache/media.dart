@@ -36,7 +36,7 @@ class MediaCache implements MediaCacheInterface {
   }
 
   static io.File _getLRUFile(io.Directory root) {
-    return io.File(p.join(root.path, 'cache.lru'));
+    return io.File(p.join(root.path, 'usage.lru'));
   }
 
   static Future<MediaCache> create() async {

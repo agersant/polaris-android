@@ -16,7 +16,7 @@ class CollectionCache {
 
   static Future<io.File> _getCollectionFile(int version) async {
     final temporaryDirectory = await getTemporaryDirectory();
-    return io.File(p.join(temporaryDirectory.path, 'collection', 'v$version.cache'));
+    return io.File(p.join(temporaryDirectory.path, 'collection-v$version.cache'));
   }
 
   static Future<CollectionCache> create() async {
@@ -227,7 +227,6 @@ class Collection {
   }
 }
 
-// TODO this looks 100% redundant with dto.CollectionFile
 class File {
   final Either<Song, Directory> content;
   File(this.content);
