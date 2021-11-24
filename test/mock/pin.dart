@@ -21,4 +21,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   @override
   Future<Set<dto.Song>> getAllSongs(String host) async => {};
+
+  @override
+  Future<Set<dto.Song>> getSongsInDirectory(String host, String path) async => {};
 }

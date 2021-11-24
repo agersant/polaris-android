@@ -9,6 +9,7 @@ import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/unique_timer.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
 class Manager {
@@ -22,6 +23,10 @@ class Manager {
   StreamAudioSource? _playlistSongBeingFetched;
   StreamAudioSource? _pinSongBeingFetched;
   late UniqueTimer _timer;
+
+  final _songsBeingFetchedSubject = BehaviorSubject<Set<dto.Song>>.seeded({});
+  Set<dto.Song> get songsBeingFetched => _songsBeingFetchedSubject.requireValue;
+  Stream<Set<dto.Song>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
 
   Manager({
     required this.uuid,
@@ -44,6 +49,7 @@ class Manager {
     bool allDone = false;
     allDone |= await _prefetchPlaylist();
     allDone |= await _prefetchPins();
+    _updateSongsBeingFetched();
     if (!allDone) {
       _timer.reset();
     }
@@ -65,6 +71,7 @@ class Manager {
     }
 
     _playlistSongBeingFetched = songToFetch;
+    _updateSongsBeingFetched();
 
     _prefetch(songToFetch).then((value) {
       _playlistSongBeingFetched = null;
@@ -120,6 +127,8 @@ class Manager {
     }
 
     _pinSongBeingFetched = songToFetch;
+    _updateSongsBeingFetched();
+
     _prefetch(songToFetch).then((value) {
       _pinSongBeingFetched = null;
       _timer.wake();
@@ -157,5 +166,16 @@ class Manager {
     } catch (e) {
       developer.log("Error ($e) while prefetching song: $path");
     }
+  }
+
+  void _updateSongsBeingFetched() {
+    final songs = <dto.Song>{};
+    if (_playlistSongBeingFetched != null) {
+      songs.add((_playlistSongBeingFetched!.tag as MediaItem).toSong());
+    }
+    if (_pinSongBeingFetched != null) {
+      songs.add((_pinSongBeingFetched!.tag as MediaItem).toSong());
+    }
+    _songsBeingFetchedSubject.add(songs);
   }
 }

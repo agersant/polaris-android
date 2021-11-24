@@ -17,6 +17,7 @@ abstract class ManagerInterface extends ChangeNotifier {
   Set<dto.Song>? getSongs(String host);
   Set<dto.Directory>? getDirectories(String host);
   Future<Set<dto.Song>> getAllSongs(String host);
+  Future<Set<dto.Song>> getSongsInDirectory(String host, String path);
 }
 
 class Manager extends ChangeNotifier implements ManagerInterface {
@@ -92,14 +93,24 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     final allSongs = getSongs(host);
     final directories = getDirectories(host);
     for (dto.Directory directory in directories) {
-      Set<dto.Song>? songs = _flattenCache[host]?[directory.path];
-      if (songs == null) {
-        songs = (await polarisHttpClient.flatten(directory.path)).toSet();
-        _flattenCache.putIfAbsent(host, () => {})[directory.path] = songs;
-      }
+      Set<dto.Song> songs = await _flatten(host, directory.path);
       allSongs.addAll(songs);
     }
     return allSongs;
+  }
+
+  @override
+  Future<Set<dto.Song>> getSongsInDirectory(String host, String path) async {
+    return await _flatten(host, path);
+  }
+
+  Future<Set<dto.Song>> _flatten(String host, String path) async {
+    Set<dto.Song>? songs = _flattenCache[host]?[path];
+    if (songs == null) {
+      songs = (await polarisHttpClient.flatten(path)).toSet();
+      _flattenCache.putIfAbsent(host, () => {})[path] = songs;
+    }
+    return songs;
   }
 
   void pin(String host, dto.CollectionFile file) async {

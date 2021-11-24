@@ -1,11 +1,13 @@
 import 'dart:async';
-
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/pin.dart' as pin;
+import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -136,8 +138,11 @@ class PinsByServer extends StatelessWidget {
           itemCount: pinnedFiles.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) =>
-              PinListTile(pinnedFiles[index], key: Key(host.url + pinnedFiles[index].path)),
+          itemBuilder: (context, index) => PinListTile(
+            host.url,
+            pinnedFiles[index],
+            key: Key(host.url + pinnedFiles[index].path),
+          ),
         ),
       ],
     );
@@ -170,10 +175,10 @@ class ServerHeader extends StatelessWidget {
 }
 
 class PinListTile extends StatelessWidget {
-  // final String host;
+  final String host;
   final dto.CollectionFile file;
 
-  const PinListTile(this.file, {Key? key}) : super(key: key);
+  const PinListTile(this.host, this.file, {Key? key}) : super(key: key);
 
   String formatTitle() {
     if (file.isDirectory()) {
@@ -185,14 +190,15 @@ class PinListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final connectionManager = getIt<connection.Manager>();
+    final isOnline = connectionManager.state == connection.State.connected;
     return ListTile(
       dense: true,
       // TODO this will try to fetch art from current server, even for offline music from other servers
       leading: ListThumbnail(file.artwork),
       title: Row(
         children: [
-          // TODO file loading state
-          const Padding(padding: EdgeInsets.only(right: 8), child: PinState()),
+          if (isOnline) Padding(padding: const EdgeInsets.only(right: 8), child: PinStateIcon(host, file)),
           Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
@@ -219,27 +225,108 @@ class PinListTile extends StatelessWidget {
   }
 }
 
-class PinState extends StatelessWidget {
-  const PinState({Key? key}) : super(key: key);
+enum PinState {
+  pending,
+  fetching,
+  fetched,
+}
+
+class PinStateIcon extends StatefulWidget {
+  final String host;
+  final dto.CollectionFile file;
+
+  const PinStateIcon(this.host, this.file, {Key? key}) : super(key: key);
+
+  @override
+  State<PinStateIcon> createState() => _PinStateIconState();
+}
+
+class _PinStateIconState extends State<PinStateIcon> {
+  PinState _pinState = PinState.pending;
+  late StreamSubscription _songsBeingFetchedSubscription;
+  final _prefetchManager = getIt<prefetch.Manager>();
+  final _pinManager = getIt<pin.Manager>();
+
+  @override
+  initState() {
+    super.initState();
+    _songsBeingFetchedSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) async {
+      try {
+        final newState = await _computeState();
+        setState(() => _pinState = newState);
+      } catch (e) {
+        developer.log('Error while computing pin state: $e');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _songsBeingFetchedSubscription.cancel();
+  }
+
+  Future<PinState> _computeState() async {
+    if (await _isFetchingThis()) {
+      return PinState.fetching;
+    }
+    if (await _finishedFetchingThis()) {
+      return PinState.fetched;
+    }
+    return PinState.pending;
+  }
+
+  Future<bool> _isFetchingThis() async {
+    final songsBeingFetched = _prefetchManager.songsBeingFetched;
+    if (widget.file.isSong()) {
+      return songsBeingFetched.any((song) => widget.file.path == song.path);
+    }
+    final songsInDirectory = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
+    for (dto.Song songBeingFetched in songsBeingFetched) {
+      if (songsInDirectory.any((song) => song.path == songBeingFetched.path)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> _finishedFetchingThis() async {
+    final mediaCache = getIt<MediaCacheInterface>();
+    if (widget.file.isSong()) {
+      return await mediaCache.hasAudio(widget.host, widget.file.path);
+    }
+    final songsToFetch = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
+    for (dto.Song song in songsToFetch) {
+      final hasAudio = await mediaCache.hasAudio(widget.host, song.path);
+      if (!hasAudio) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Widget _buildLoadingWidget() {
+    return const SizedBox(
+      width: 10,
+      height: 10,
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    const index = 5;
-    if (index < 4) {
-      return Icon(Icons.check, size: 16, color: Theme.of(context).textTheme.caption?.color);
-    } else if (index == 4) {
-      return const SizedBox(
-        width: 10,
-        height: 10,
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: 1.0,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-      );
-    } else {
-      return Icon(Icons.cloud_outlined, size: 16, color: Theme.of(context).textTheme.caption?.color);
+    switch (_pinState) {
+      case PinState.pending:
+        return Icon(Icons.cloud_outlined, size: 16, color: Theme.of(context).textTheme.caption?.color);
+      case PinState.fetching:
+        return _buildLoadingWidget();
+      case PinState.fetched:
+        return Icon(Icons.check, size: 16, color: Theme.of(context).textTheme.caption?.color);
     }
   }
 }
