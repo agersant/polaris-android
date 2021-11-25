@@ -88,10 +88,13 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       child: ListView(
         children: [
           _buildDrawerHeader(context),
-          // TODO implement settings
-          const ListTile(
-            leading: Icon(Icons.settings),
-            title: Text(drawerSettings),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text(drawerSettings),
+            onTap: () {
+              Navigator.pop(context);
+              getIt<PagesModel>().openSettings();
+            },
           ),
           ListTile(
             leading: const Icon(Icons.offline_pin),

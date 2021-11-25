@@ -5,12 +5,14 @@ import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/unique_timer.dart';
+import 'package:polaris/core/settings.dart' as settings;
 
 class Manager {
   final connection.Manager connectionManager;
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
   final AudioPlayer audioPlayer;
+  final settings.Manager settingsManager;
 
   late UniqueTimer _timer;
 
@@ -19,6 +21,7 @@ class Manager {
     required this.mediaCache,
     required this.pinManager,
     required this.audioPlayer,
+    required this.settingsManager,
   }) {
     _timer = UniqueTimer(
       duration: const Duration(seconds: 30),
@@ -26,6 +29,7 @@ class Manager {
     );
     pinManager.addListener(_timer.reset);
     audioPlayer.sequenceStateStream.listen((e) => _timer.reset());
+    settingsManager.addListener(_timer.reset);
   }
 
   void dispose() {

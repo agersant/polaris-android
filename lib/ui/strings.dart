@@ -59,3 +59,8 @@ const offlineMusicEmpty = 'You have not saved any music.';
 String xySongs(int? x, int? y) => '${x ?? "?"}/${y ?? "?"} ${(y ?? 2) > 1 ? "songs" : "song"}';
 String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
 String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';
+
+// Settings
+const settingsTitle = 'Settings';
+const numberOfSongsToPreload = 'Number of queued songs to preload';
+const cacheSize = 'Cache size';

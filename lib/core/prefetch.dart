@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
@@ -9,6 +10,7 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
+import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/core/unique_timer.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -21,6 +23,7 @@ class Manager {
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
   final AudioPlayer audioPlayer;
+  final settings.Manager settingsManager;
 
   StreamAudioSource? _playlistSongBeingFetched;
   StreamAudioSource? _pinSongBeingFetched;
@@ -38,12 +41,14 @@ class Manager {
     required this.mediaCache,
     required this.pinManager,
     required this.audioPlayer,
+    required this.settingsManager,
   }) {
     _timer = UniqueTimer(duration: const Duration(seconds: 5), callback: _doWork);
     pinManager.addListener(_timer.wake);
     connectionManager.addListener(_timer.wake);
     authenticationManager.addListener(_timer.wake);
     audioPlayer.sequenceStateStream.listen((e) => _timer.wake());
+    settingsManager.addListener(_timer.wake);
   }
 
   void dispose() {
@@ -92,7 +97,8 @@ class Manager {
     final SequenceState? sequenceState = audioPlayer.sequenceState;
     final List<IndexedAudioSource> audioSources = sequenceState?.sequence ?? [];
     final int currentIndex = sequenceState?.currentIndex ?? -1;
-    const int maxSongsToPreload = 5; // TODO Make this configurable in settings screen
+    final int maxSongsToPreload =
+        Settings.getValue<int>(settings.keyNumSongsToPreload, settings.defaultNumSongsToPreload);
     for (int index = 0; index < audioSources.length; index++) {
       if (index <= currentIndex) {
         continue;

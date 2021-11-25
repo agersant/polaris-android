@@ -12,6 +12,7 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
+import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,7 @@ class Harness {
     getIt.allowReassignment = true;
 
     const uuid = Uuid();
+    final settingsManager = settings.Manager();
     final mockHttpClient = mock.HttpClient();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
@@ -86,12 +88,14 @@ class Harness {
       mediaCache: mediaCache,
       pinManager: pinManager,
       audioPlayer: audioPlayer,
+      settingsManager: settingsManager,
     );
     final cleanupManager = cleanup.Manager(
       connectionManager: connectionManager,
       mediaCache: mediaCache,
       pinManager: pinManager,
       audioPlayer: audioPlayer,
+      settingsManager: settingsManager,
     );
     final browserModel = BrowserModel(connectionManager: connectionManager);
 
@@ -107,6 +111,7 @@ class Harness {
     getIt.registerSingleton<cleanup.Manager>(cleanupManager);
     getIt.registerSingleton<BrowserModel>(browserModel);
     getIt.registerSingleton<PagesModel>(PagesModel());
+    getIt.registerSingleton<settings.Manager>(settingsManager);
     getIt.registerSingleton<Uuid>(uuid);
 
     return Harness(mockHttpClient, collectionCache);

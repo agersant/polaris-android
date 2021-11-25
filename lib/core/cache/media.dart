@@ -4,8 +4,10 @@ import 'dart:developer' as developer;
 import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/settings.dart';
 import 'package:polaris/core/unique_timer.dart';
 
 const _firstVersion = 1;
@@ -196,7 +198,8 @@ class MediaCache implements MediaCacheInterface {
         return stat.size;
       }));
       int cacheSize = sizes.fold(0, (a, b) => a + b);
-      const maxCacheSize = 800 * 1024 * 1024; // 800MB, TODO make adjustable in settings
+      const oneMB = 1024 * 1024;
+      final maxCacheSize = oneMB * Settings.getValue<int>(keyCacheCapacityMB, defaultCacheSizeMB);
 
       int numFilesRemoved = 0;
       io.File lruFile = _getLRUFile(_root);

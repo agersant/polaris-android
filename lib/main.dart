@@ -1,5 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
@@ -14,12 +15,14 @@ import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
+import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/playback/queue.dart';
+import 'package:polaris/ui/settings/page.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/utils/back_button_handler.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +44,7 @@ final darkTheme = ThemeData(
 
 Future _registerSingletons() async {
   const uuid = Uuid();
+  final settingsManager = settings.Manager();
   final httpClient = http.Client();
   final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
@@ -89,12 +93,14 @@ Future _registerSingletons() async {
     mediaCache: mediaCache,
     pinManager: pinManager,
     audioPlayer: audioPlayer,
+    settingsManager: settingsManager,
   );
   final cleanupManager = cleanup.Manager(
     connectionManager: connectionManager,
     mediaCache: mediaCache,
     pinManager: pinManager,
     audioPlayer: audioPlayer,
+    settingsManager: settingsManager,
   );
   final browserModel = BrowserModel(connectionManager: connectionManager);
 
@@ -110,13 +116,14 @@ Future _registerSingletons() async {
   getIt.registerSingleton<cleanup.Manager>(cleanupManager);
   getIt.registerSingleton<BrowserModel>(browserModel);
   getIt.registerSingleton<PagesModel>(PagesModel());
+  getIt.registerSingleton<settings.Manager>(settingsManager);
   getIt.registerSingleton<Uuid>(uuid);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _registerSingletons();
-
+  await Settings.init();
   await JustAudioBackground.init(
     androidNotificationChannelName: 'Polaris Audio Playback',
     androidNotificationOngoing: true,
@@ -157,6 +164,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
+          final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
 
           return BackButtonHandler(
@@ -168,6 +176,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     pages: [
                       if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
                       if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
+                      if (showSettings) const MaterialPage<dynamic>(child: SettingsPage()),
                       if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
                       // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
                       if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
@@ -180,6 +189,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                         pagesModel.closeQueue();
                       } else if (pagesModel.isOfflineMusicOpen) {
                         pagesModel.closeOfflineMusic();
+                      } else if (pagesModel.isSettingsOpen) {
+                        pagesModel.closeSettings();
                       }
                       return true;
                     },
