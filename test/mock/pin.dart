@@ -14,10 +14,10 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   Stream<Set<Host>> get hostsStream => Stream.value({});
 
   @override
-  Set<dto.Song>? getSongs(String host) => {};
+  Set<dto.Song> getSongs(String host) => {};
 
   @override
-  Set<dto.Directory>? getDirectories(String host) => {};
+  Set<dto.Directory> getDirectories(String host) => {};
 
   @override
   Future<Set<dto.Song>> getAllSongs(String host) async => {};

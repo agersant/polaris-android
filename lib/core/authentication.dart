@@ -124,6 +124,10 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticated);
   }
 
+  bool isAuthenticated() {
+    return state == State.authenticated;
+  }
+
   void _setState(State newState) {
     if (_state == newState) {
       return;

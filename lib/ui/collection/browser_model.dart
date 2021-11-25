@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:polaris/core/dto.dart';
 
 class BrowserModel extends ChangeNotifier {
+// TODO this needs to reset when changing server
   List<String> _browserStack = const [''];
   List<String> get browserStack => _browserStack;
   bool isBrowserActive = false;

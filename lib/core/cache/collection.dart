@@ -5,6 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/utils.dart';
 
 const _firstVersion = 1;
 const _currentVersion = 1;
@@ -121,7 +122,7 @@ class Collection {
     final parent = _findOrCreateDirectory(host, path);
     final Set<String> childrenToKeep = {};
     for (dto.CollectionFile file in content) {
-      final name = _basename(file.path);
+      final name = basename(file.path);
       if (file.isSong()) {
         parent._children[name] = File(Left(Song(file.asSong())));
         childrenToKeep.add(name);
@@ -139,8 +140,8 @@ class Collection {
 
   void addSongs(String host, List<dto.Song> songs) {
     for (dto.Song song in songs) {
-      final directoryPath = _dirname(song.path);
-      final name = _basename(song.path);
+      final directoryPath = dirname(song.path);
+      final name = basename(song.path);
       final parent = _findOrCreateDirectory(host, directoryPath);
       parent._children[name] = File(Left(Song(song)));
     }
@@ -177,7 +178,7 @@ class Collection {
     if (topLevelDirectory == null) {
       return false;
     }
-    final components = _splitPath(path);
+    final components = splitPath(path);
     File? file = File(Right(topLevelDirectory));
     while (components.isNotEmpty) {
       final component = components.removeAt(0);
@@ -198,7 +199,7 @@ class Collection {
       topLevelDirectory = newDirectory;
     }
 
-    final components = _splitPath(path);
+    final components = splitPath(path);
     File? file = File(Right(topLevelDirectory));
     while (components.isNotEmpty) {
       final component = components.removeAt(0);
@@ -209,21 +210,6 @@ class Collection {
       }
     }
     return file!.asDirectory();
-  }
-
-  static List<String> _splitPath(String path) {
-    // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
-    return p.split(path);
-  }
-
-  static String _dirname(String path) {
-    // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
-    return p.dirname(path);
-  }
-
-  static String _basename(String path) {
-    // TODO this probably won't split path correctly when they use \ as separator (ie. server running on Windows)
-    return p.basename(path);
   }
 }
 

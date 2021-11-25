@@ -58,11 +58,12 @@ Future _registerSingletons() async {
     mediaCache: mediaCache,
     httpClient: polarisHttpClient,
   );
+  final polarisOfflineClient = polaris.OfflineClient(
+    mediaCache: mediaCache,
+    collectionCache: collectionCache,
+  );
   final polarisClient = polaris.Client(
-    offlineClient: polaris.OfflineClient(
-      mediaCache: mediaCache,
-      collectionCache: collectionCache,
-    ),
+    offlineClient: polarisOfflineClient,
     httpClient: polarisHttpClient,
     downloadManager: downloadManager,
     connectionManager: connectionManager,
@@ -76,10 +77,14 @@ Future _registerSingletons() async {
     polarisClient: polarisClient,
     audioPlayer: audioPlayer,
   );
-  final pinManager = await pin.Manager.create(polarisHttpClient);
+  final pinManager = await pin.Manager.create(
+    connectionManager: connectionManager,
+    polarisClient: polarisClient,
+  );
   final prefetchManager = prefetch.Manager(
     uuid: uuid,
     connectionManager: connectionManager,
+    authenticationManager: authenticationManager,
     downloadManager: downloadManager,
     mediaCache: mediaCache,
     pinManager: pinManager,
@@ -148,7 +153,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
         builder: (context, connectionManager, authenticationManager, pagesModel, child) {
           final isOfflineMode = connectionManager.state == connection.State.offlineMode;
           final connectionComplete = connectionManager.isConnected();
-          final authenticationComplete = authenticationManager.state == authentication.State.authenticated;
+          final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;

@@ -1,29 +1,55 @@
 import 'mock/client.dart' as mock;
+import 'mock/media_cache.dart' as mock;
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
+import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 
 void main() {
-  polaris.HttpClient _makeHttpClient() {
+  pin.Manager _makePinManager() {
     final mockHttpClient = mock.HttpClient();
+    final collectionCache = CollectionCache(Collection());
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
+    final mediaCache = mock.MediaCache();
     final authenticationManager = authentication.Manager(
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
     );
-    return polaris.HttpClient(
+    final polarisHttpClient = polaris.HttpClient(
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
     );
+    final polarisOfflineClient = polaris.OfflineClient(
+      collectionCache: collectionCache,
+      mediaCache: mediaCache,
+    );
+    final downloadManager = download.Manager(
+      mediaCache: mediaCache,
+      httpClient: polarisHttpClient,
+    );
+    final polarisClient = polaris.Client(
+      collectionCache: collectionCache,
+      connectionManager: connectionManager,
+      mediaCache: mediaCache,
+      httpClient: polarisHttpClient,
+      offlineClient: polarisOfflineClient,
+      downloadManager: downloadManager,
+    );
+    return pin.Manager(
+      pin.Storage(),
+      connectionManager: connectionManager,
+      polarisClient: polarisClient,
+    );
   }
 
   test('Can add/remove song', () async {
-    final pin.Manager pinManager = pin.Manager(pin.Storage(), polarisHttpClient: _makeHttpClient());
+    final pin.Manager pinManager = _makePinManager();
 
     final dto.Song song = dto.Song(path: 'root/Heron/Aegeus/Labyrinth.mp3');
     pinManager.pin('host', dto.CollectionFile(Left(song)));
@@ -35,7 +61,7 @@ void main() {
   });
 
   test('Can add/remove directory', () async {
-    final pin.Manager pinManager = pin.Manager(pin.Storage(), polarisHttpClient: _makeHttpClient());
+    final pin.Manager pinManager = _makePinManager();
 
     final dto.Directory directory = dto.Directory(path: 'root/Heron/Aegeus');
     pinManager.pin('host', dto.CollectionFile(Right(directory)));

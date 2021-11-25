@@ -81,6 +81,7 @@ class Harness {
     final prefetchManager = prefetch.Manager(
       uuid: uuid,
       connectionManager: connectionManager,
+      authenticationManager: authenticationManager,
       downloadManager: downloadManager,
       mediaCache: mediaCache,
       pinManager: pinManager,

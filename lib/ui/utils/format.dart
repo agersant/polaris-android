@@ -1,8 +1,7 @@
 import 'dart:math';
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/ui/strings.dart';
-
-final _pathSeparatorRegExp = RegExp(r'[/\\]');
+import 'package:polaris/utils.dart';
 
 String formatDuration(Duration d) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -25,14 +24,11 @@ String formatBytes(int bytes, int decimals) {
   return ((bytes / pow(1024, suffixIndex)).toStringAsFixed(decimals)) + ' ' + suffixes[suffixIndex];
 }
 
-List<String> splitPath(String path) {
-  return path.split(_pathSeparatorRegExp).toList();
-}
-
 extension SongFormatting on Song {
   String formatTitle() {
     if (title?.isEmpty ?? true) {
-      return path.split(_pathSeparatorRegExp).last;
+      final components = splitPath(path);
+      return components.last;
     }
     return title!;
   }
@@ -67,7 +63,7 @@ extension SongFormatting on Song {
 
 extension DirectoryFormatting on Directory {
   String formatName() {
-    return album ?? path.split(_pathSeparatorRegExp).last;
+    return album ?? splitPath(path).last;
   }
 
   String formatArtist() {

@@ -14,6 +14,7 @@ import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:polaris/utils.dart';
 import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;

@@ -4,6 +4,7 @@ import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:rxdart/rxdart.dart';
@@ -14,14 +15,15 @@ const _currentVersion = 1;
 abstract class ManagerInterface extends ChangeNotifier {
   Set<Host> get hosts;
   Stream<Set<Host>> get hostsStream;
-  Set<dto.Song>? getSongs(String host);
-  Set<dto.Directory>? getDirectories(String host);
-  Future<Set<dto.Song>> getAllSongs(String host);
-  Future<Set<dto.Song>> getSongsInDirectory(String host, String path);
+  Set<dto.Song> getSongs(String host);
+  Set<dto.Directory> getDirectories(String host);
+  Future<Set<dto.Song>?> getAllSongs(String host);
+  Future<Set<dto.Song>?> getSongsInDirectory(String host, String path);
 }
 
 class Manager extends ChangeNotifier implements ManagerInterface {
-  final polaris.HttpClient polarisHttpClient;
+  final connection.Manager connectionManager;
+  final polaris.Client polarisClient;
   final Map<String, Map<String, Set<dto.Song>>> _flattenCache = {};
   final Storage _storage;
 
@@ -35,7 +37,8 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   Manager(
     this._storage, {
-    required this.polarisHttpClient,
+    required this.connectionManager,
+    required this.polarisClient,
   }) {
     _updateHosts();
   }
@@ -45,7 +48,10 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     return io.File(p.join(temporaryDirectory.path, 'pins-v$version.pins'));
   }
 
-  static Future<Manager> create(polaris.HttpClient polarisHttpClient) async {
+  static Future<Manager> create({
+    required connection.Manager connectionManager,
+    required polaris.Client polarisClient,
+  }) async {
     for (int version = _firstVersion; version < _currentVersion; version++) {
       final oldCacheFile = await _getPinsFile(version);
       oldCacheFile.exists().then((exists) {
@@ -67,7 +73,11 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       developer.log('Error while reading pins list from disk: ', error: e);
     }
 
-    return Manager(pins, polarisHttpClient: polarisHttpClient);
+    return Manager(
+      pins,
+      connectionManager: connectionManager,
+      polarisClient: polarisClient,
+    );
   }
 
   @override
@@ -89,29 +99,45 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   @override
-  Future<Set<dto.Song>> getAllSongs(String host) async {
+  Future<Set<dto.Song>?> getAllSongs(String host) async {
     final allSongs = getSongs(host);
     final directories = getDirectories(host);
     for (dto.Directory directory in directories) {
-      Set<dto.Song> songs = await _flatten(host, directory.path);
+      Set<dto.Song>? songs = await _flatten(host, directory.path);
+      if (songs == null) {
+        return null;
+      }
       allSongs.addAll(songs);
     }
     return allSongs;
   }
 
   @override
-  Future<Set<dto.Song>> getSongsInDirectory(String host, String path) async {
+  Future<Set<dto.Song>?> getSongsInDirectory(String host, String path) async {
     return await _flatten(host, path);
   }
 
-  Future<Set<dto.Song>> _flatten(String host, String path) async {
-    Set<dto.Song>? songs = _flattenCache[host]?[path];
-    if (songs == null) {
-      // TODO needs error handling
-      songs = (await polarisHttpClient.flatten(path)).toSet();
-      _flattenCache.putIfAbsent(host, () => {})[path] = songs;
+  Future<Set<dto.Song>?> _flatten(String host, String path) async {
+    Set<dto.Song>? cachedSongs = _flattenCache[host]?[path];
+    if (cachedSongs != null) {
+      return cachedSongs;
     }
-    return songs;
+
+    if (host != connectionManager.url || !connectionManager.isConnected()) {
+      try {
+        return (await polarisClient.offlineClient.flatten(host, path)).toSet();
+      } catch (e) {
+        return {};
+      }
+    }
+
+    try {
+      final songs = (await polarisClient.flatten(path)).toSet();
+      _flattenCache.putIfAbsent(host, () => {})[path] = songs;
+      return songs;
+    } catch (e) {
+      return null;
+    }
   }
 
   void pin(String host, dto.CollectionFile file) async {

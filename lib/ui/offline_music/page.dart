@@ -86,6 +86,9 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
     int size = 0;
     for (pin.Host host in _pinManager.hosts) {
       final songs = await _pinManager.getAllSongs(host.url);
+      if (songs == null) {
+        continue;
+      }
       size += await computeSizeOnDisk(songs, host.url, onProgress: (s) {
         if (!_fullyComputedSizeOnDisk) {
           setState(() => _sizeOnDisk = size + s);
@@ -239,7 +242,7 @@ class _PinListTileState extends State<PinListTile> {
     _fetchSubscription.cancel();
   }
 
-  Future<Set<dto.Song>> _listSongs() async {
+  Future<Set<dto.Song>?> _listSongs() async {
     if (widget.file.isSong()) {
       return {widget.file.asSong()};
     } else {
@@ -248,7 +251,10 @@ class _PinListTileState extends State<PinListTile> {
   }
 
   Future<void> _updateNumSongsOnDisk() async {
-    final Set<dto.Song> songs = await _listSongs();
+    final Set<dto.Song>? songs = await _listSongs();
+    if (songs == null) {
+      return;
+    }
     int numSongsOnDisk = 0;
     for (dto.Song song in songs) {
       if (await _mediaCache.hasAudio(widget.host, song.path)) {
@@ -259,16 +265,21 @@ class _PinListTileState extends State<PinListTile> {
   }
 
   Future<void> _updateTotalSongs() async {
-    if (!_connectionManager.isConnected()) {
+    if (!_connectionManager.isConnected() || _connectionManager.url != widget.host) {
       setState(() => _totalSongs = null);
       return;
     }
-    final Set<dto.Song> songs = await _listSongs();
-    setState(() => _totalSongs = songs.length);
+    final Set<dto.Song>? songs = await _listSongs();
+    if (songs != null) {
+      setState(() => _totalSongs = songs.length);
+    }
   }
 
   Future<void> _updateSizeOnDisk() async {
-    final Set<dto.Song> songs = await _listSongs();
+    final Set<dto.Song>? songs = await _listSongs();
+    if (songs == null) {
+      return;
+    }
     final size = await computeSizeOnDisk(songs, widget.host, onProgress: (s) {
       if (!_fullyComputedSizeOnDisk) {
         setState(() => _sizeOnDisk = s);
@@ -295,7 +306,14 @@ class _PinListTileState extends State<PinListTile> {
       title: Row(
         children: [
           if (_connectionManager.isConnected())
-            Padding(padding: const EdgeInsets.only(right: 8), child: PinStateIcon(widget.host, widget.file)),
+            Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: PinStateIcon(
+                  widget.host,
+                  widget.file,
+                  numSongsOnDisk: _numSongsOnDisk,
+                  totalSongs: _totalSongs,
+                )),
           Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
@@ -312,6 +330,7 @@ class _PinListTileState extends State<PinListTile> {
       ),
       trailing: CollectionFileContextMenuButton(
         file: widget.file,
+        // TODO add children
         actions: const [
           CollectionFileAction.queueLast,
           CollectionFileAction.queueNext,
@@ -331,8 +350,16 @@ enum PinState {
 class PinStateIcon extends StatefulWidget {
   final String host;
   final dto.CollectionFile file;
+  final int? numSongsOnDisk;
+  final int? totalSongs;
 
-  const PinStateIcon(this.host, this.file, {Key? key}) : super(key: key);
+  const PinStateIcon(
+    this.host,
+    this.file, {
+    required this.numSongsOnDisk,
+    required this.totalSongs,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<PinStateIcon> createState() => _PinStateIconState();
@@ -367,10 +394,10 @@ class _PinStateIconState extends State<PinStateIcon> {
     if (await _isFetchingThis()) {
       return PinState.fetching;
     }
-    if (await _finishedFetchingThis()) {
-      return PinState.fetched;
+    if (widget.totalSongs == null || widget.numSongsOnDisk == null || widget.numSongsOnDisk != widget.totalSongs) {
+      return PinState.pending;
     }
-    return PinState.pending;
+    return PinState.fetched;
   }
 
   Future<bool> _isFetchingThis() async {
@@ -379,27 +406,15 @@ class _PinStateIconState extends State<PinStateIcon> {
       return songsBeingFetched.any((song) => widget.file.path == song.path);
     }
     final songsInDirectory = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
+    if (songsInDirectory == null) {
+      return false;
+    }
     for (dto.Song songBeingFetched in songsBeingFetched) {
       if (songsInDirectory.any((song) => song.path == songBeingFetched.path)) {
         return true;
       }
     }
     return false;
-  }
-
-  Future<bool> _finishedFetchingThis() async {
-    final mediaCache = getIt<MediaCacheInterface>();
-    if (widget.file.isSong()) {
-      return await mediaCache.hasAudio(widget.host, widget.file.path);
-    }
-    final songsToFetch = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
-    for (dto.Song song in songsToFetch) {
-      final hasAudio = await mediaCache.hasAudio(widget.host, song.path);
-      if (!hasAudio) {
-        return false;
-      }
-    }
-    return true;
   }
 
   Widget _buildLoadingWidget() {

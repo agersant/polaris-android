@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/dto.dart' as dto;
@@ -15,6 +16,7 @@ import 'package:uuid/uuid.dart';
 class Manager {
   final Uuid uuid;
   final connection.Manager connectionManager;
+  final authentication.Manager authenticationManager;
   final download.Manager downloadManager;
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
@@ -31,6 +33,7 @@ class Manager {
   Manager({
     required this.uuid,
     required this.connectionManager,
+    required this.authenticationManager,
     required this.downloadManager,
     required this.mediaCache,
     required this.pinManager,
@@ -38,6 +41,8 @@ class Manager {
   }) {
     _timer = UniqueTimer(duration: const Duration(seconds: 5), callback: _doWork);
     pinManager.addListener(_timer.wake);
+    connectionManager.addListener(_timer.wake);
+    authenticationManager.addListener(_timer.wake);
     audioPlayer.sequenceStateStream.listen((e) => _timer.wake());
   }
 
@@ -46,9 +51,11 @@ class Manager {
   }
 
   Future<void> _doWork() async {
-    bool allDone = false;
-    allDone |= await _prefetchPlaylist();
-    allDone |= await _prefetchPins();
+    bool allDone = true;
+    if (connectionManager.isConnected() && authenticationManager.isAuthenticated()) {
+      allDone &= await _prefetchPlaylist();
+      allDone &= await _prefetchPins();
+    }
     _updateSongsBeingFetched();
     if (!allDone) {
       _timer.reset();
@@ -139,6 +146,9 @@ class Manager {
 
   Future<StreamAudioSource?> _pickPinSongToFetch(String host) async {
     final songs = await pinManager.getAllSongs(host);
+    if (songs == null) {
+      throw "Could not list pinned songs";
+    }
     for (dto.Song song in songs) {
       if (await mediaCache.hasAudio(host, song.path)) {
         continue;
