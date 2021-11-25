@@ -1,14 +1,18 @@
+import 'package:path/path.dart' as p;
+
 final _pathSeparatorRegExp = RegExp(r'[/\\]');
 
 List<String> splitPath(String path) {
-  return path.split(_pathSeparatorRegExp).toList();
+  final standardPath = path.replaceAll(_pathSeparatorRegExp, '/');
+  return p.split(standardPath);
 }
 
 String dirname(String path) {
-  final components = splitPath(path)..removeLast();
-  return components.join('/');
+  final standardPath = path.replaceAll(_pathSeparatorRegExp, '/');
+  return p.dirname(standardPath);
 }
 
 String basename(String path) {
-  return splitPath(path).last;
+  final standardPath = path.replaceAll(_pathSeparatorRegExp, '/');
+  return p.basename(standardPath);
 }
