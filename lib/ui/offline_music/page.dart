@@ -369,20 +369,28 @@ class _PinStateIconState extends State<PinStateIcon> {
   @override
   initState() {
     super.initState();
-    _songsBeingFetchedSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) async {
-      try {
-        final newState = await _computeState();
-        setState(() => _pinState = newState);
-      } catch (e) {
-        developer.log('Error while computing pin state: $e');
-      }
-    });
+    _songsBeingFetchedSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) => _updateState());
   }
 
   @override
   void dispose() {
     super.dispose();
     _songsBeingFetchedSubscription.cancel();
+  }
+
+  @override
+  void didUpdateWidget(PinStateIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _updateState();
+  }
+
+  void _updateState() async {
+    try {
+      final newState = await _computeState();
+      setState(() => _pinState = newState);
+    } catch (e) {
+      developer.log('Error while computing pin state: $e');
+    }
   }
 
   Future<PinState> _computeState() async {
