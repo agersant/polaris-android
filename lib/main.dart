@@ -104,6 +104,9 @@ Future _registerSingletons() async {
   );
   final browserModel = BrowserModel(connectionManager: connectionManager);
 
+  // TODO Needs some logic to recover from app restart while audio service is still running
+  // TODO Add disk persistence to playlist and playback state
+
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<CollectionCache>(collectionCache);
