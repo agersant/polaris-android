@@ -20,7 +20,7 @@ import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
 import 'package:polaris/ui/pages_model.dart';
-import 'package:polaris/ui/playback/player.dart';
+import 'package:polaris/ui/playback/mini_player.dart';
 import 'package:polaris/ui/playback/queue.dart';
 import 'package:polaris/ui/settings/page.dart';
 import 'package:polaris/ui/startup/page.dart';
