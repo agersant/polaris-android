@@ -164,7 +164,7 @@ class PinsByServer extends StatelessWidget {
           itemCount: pinnedFiles.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          // TODO all these widgets get re-created when a pin is deleted
+          // TODO When removing a pin, all the pins lower in the list get recreated
           itemBuilder: (context, index) => PinListTile(
             host.url,
             pinnedFiles[index],
