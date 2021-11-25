@@ -1,13 +1,27 @@
 import 'package:flutter/foundation.dart';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/connection.dart' as connection;
 
 class BrowserModel extends ChangeNotifier {
-// TODO this needs to reset when changing server
+  final connection.Manager connectionManager;
   List<String> _browserStack = const [''];
   List<String> get browserStack => _browserStack;
   bool isBrowserActive = false;
 
-  void pushBrowserLocation(Directory directory) {
+  BrowserModel({required this.connectionManager}) {
+    connectionManager.addListener(() {
+      if (connectionManager.state == connection.State.disconnected) {
+        clearBrowserLocations();
+      }
+    });
+  }
+
+  void clearBrowserLocations() {
+    _browserStack = const [''];
+    notifyListeners();
+  }
+
+  void pushBrowserLocation(dto.Directory directory) {
     final newLocations = List<String>.from(_browserStack);
     newLocations.add(directory.path);
     _browserStack = newLocations;

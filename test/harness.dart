@@ -93,6 +93,7 @@ class Harness {
       pinManager: pinManager,
       audioPlayer: audioPlayer,
     );
+    final browserModel = BrowserModel(connectionManager: connectionManager);
 
     getIt.registerSingleton<AudioPlayer>(audioPlayer);
     getIt.registerSingleton<Playlist>(playlist);
@@ -104,7 +105,7 @@ class Harness {
     getIt.registerSingleton<prefetch.Manager>(prefetchManager);
     getIt.registerSingleton<pin.Manager>(pinManager);
     getIt.registerSingleton<cleanup.Manager>(cleanupManager);
-    getIt.registerSingleton<BrowserModel>(BrowserModel());
+    getIt.registerSingleton<BrowserModel>(browserModel);
     getIt.registerSingleton<PagesModel>(PagesModel());
     getIt.registerSingleton<Uuid>(uuid);
 
