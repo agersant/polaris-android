@@ -17,8 +17,8 @@ class MediaState {
   MediaState(this.sequenceState, this.position);
 }
 
-class Player extends StatelessWidget {
-  const Player({Key? key}) : super(key: key);
+class MiniPlayer extends StatelessWidget {
+  const MiniPlayer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

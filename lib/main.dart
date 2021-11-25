@@ -199,7 +199,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     },
                   ),
                 ),
-                if (isStartupComplete) const Player(),
+                if (isStartupComplete) const MiniPlayer(),
               ],
             ),
           );
