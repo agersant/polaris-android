@@ -97,8 +97,6 @@ class Manager {
 
     _audioJobs[path] = job;
 
-    // TODO remove outdated jobs from _audioJobs (some combination of no longer in playlist, not being pending pin)
-
     return job.audioSource;
   }
 }

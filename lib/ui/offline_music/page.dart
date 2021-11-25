@@ -301,7 +301,6 @@ class _PinListTileState extends State<PinListTile> {
   Widget build(BuildContext context) {
     return ListTile(
       dense: true,
-      // TODO this will try to fetch art from current server, even for offline music from other servers
       leading: ListThumbnail(widget.file.artwork),
       title: Row(
         children: [

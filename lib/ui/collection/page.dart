@@ -93,7 +93,6 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
             leading: Icon(Icons.settings),
             title: Text(drawerSettings),
           ),
-          // TODO implement offline music
           ListTile(
             leading: const Icon(Icons.offline_pin),
             title: const Text(drawerOfflineMusic),
