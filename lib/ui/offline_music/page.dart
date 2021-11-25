@@ -330,12 +330,8 @@ class _PinListTileState extends State<PinListTile> {
       ),
       trailing: CollectionFileContextMenuButton(
         file: widget.file,
-        // TODO add children
-        actions: const [
-          CollectionFileAction.queueLast,
-          CollectionFileAction.queueNext,
-          CollectionFileAction.togglePin,
-        ],
+        host: widget.host,
+        actions: const [CollectionFileAction.togglePin],
       ),
     );
   }

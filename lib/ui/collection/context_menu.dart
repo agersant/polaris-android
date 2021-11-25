@@ -21,6 +21,7 @@ enum CollectionFileAction {
 
 class CollectionFileContextMenuButton extends StatelessWidget {
   final dto.CollectionFile file;
+  final String? host;
   final List<dto.Song>? children;
   final IconData icon;
   final bool compact;
@@ -36,8 +37,13 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       this.icon = Icons.more_vert,
       this.onRefresh = noop,
       this.onRemoveFromQueue = noop,
+      this.host,
       Key? key})
       : super(key: key);
+
+  String? _getHost() {
+    return host ?? getIt<connection.Manager>().url;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,13 +81,12 @@ class CollectionFileContextMenuButton extends StatelessWidget {
               break;
             case CollectionFileAction.togglePin:
               final pinManager = getIt<pin.Manager>();
-              final connectionManager = getIt<connection.Manager>();
-              final host = connectionManager.url;
-              if (host != null) {
+              final String? useHost = _getHost();
+              if (useHost != null) {
                 if (_isPinned()) {
-                  pinManager.unpin(host, file);
+                  pinManager.unpin(useHost, file);
                 } else {
-                  pinManager.pin(host, file);
+                  pinManager.pin(useHost, file);
                 }
               }
               break;
@@ -107,12 +112,11 @@ class CollectionFileContextMenuButton extends StatelessWidget {
 
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    final connectionManager = getIt<connection.Manager>();
-    final host = connectionManager.url;
-    if (host == null) {
+    final String? useHost = _getHost();
+    if (useHost == null) {
       return false;
     } else {
-      return pinManager.isPinned(host, file);
+      return pinManager.isPinned(useHost, file);
     }
   }
 
@@ -122,7 +126,11 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       if (knownSongs == null) {
         // TODO show some kind of UI while this is in progress (+ confirm)
         final polaris.Client client = getIt<polaris.Client>();
-        return await client.flatten(file.asDirectory().path);
+        final hostOverride = host;
+        if (hostOverride != null && hostOverride != client.connectionManager.url) {
+          return await client.offlineClient.flatten(hostOverride, file.path);
+        }
+        return await client.flatten(file.path);
       } else {
         return knownSongs;
       }
