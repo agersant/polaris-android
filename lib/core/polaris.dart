@@ -267,7 +267,7 @@ class Client {
   }) : _httpClient = httpClient;
 
   HttpClient? get httpClient {
-    if (connectionManager.state == connection.State.connected) {
+    if (connectionManager.isConnected()) {
       return _httpClient;
     }
     return null;
@@ -276,7 +276,7 @@ class Client {
   Future<List<dto.CollectionFile>> browse(String path, {bool useCache = true}) async {
     final String host = _getHost();
 
-    if (connectionManager.state != connection.State.connected) {
+    if (!connectionManager.isConnected()) {
       return offlineClient.browse(host, path);
     }
 
@@ -295,7 +295,7 @@ class Client {
 
   Future<List<dto.Song>> flatten(String path) async {
     final String host = _getHost();
-    if (connectionManager.state == connection.State.connected) {
+    if (connectionManager.isConnected()) {
       return _httpClient.flatten(path).then((songs) {
         collectionCache.putSongs(host, songs);
         return songs;
@@ -310,7 +310,7 @@ class Client {
       if (await mediaCache.hasImage(host, path)) {
         return mediaCache.getImageLocation(host, path).uri;
       }
-      if (connectionManager.state == connection.State.connected) {
+      if (connectionManager.isConnected()) {
         return _httpClient.getImageURI(path);
       }
     } catch (e) {
@@ -328,7 +328,7 @@ class Client {
 
     try {
       final String host = _getHost();
-      if (connectionManager.state == connection.State.connected) {
+      if (connectionManager.isConnected()) {
         return await downloadManager.getAudio(host, song.path, mediaItem);
       } else {
         return await offlineClient.getAudio(host, song.path, mediaItem);
@@ -341,7 +341,7 @@ class Client {
   Future<Uint8List?> getImage(String path) async {
     try {
       final String host = _getHost();
-      if (connectionManager.state == connection.State.connected) {
+      if (connectionManager.isConnected()) {
         return await downloadManager.getImage(host, path);
       } else {
         return await offlineClient.getImage(host, path);

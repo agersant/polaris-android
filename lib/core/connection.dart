@@ -85,6 +85,10 @@ class Manager extends ChangeNotifier {
     _setState(State.disconnected);
   }
 
+  bool isConnected() {
+    return state == State.connected;
+  }
+
   void startOffline() {
     if (state == State.disconnected) {
       _setState(State.offlineMode);

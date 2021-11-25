@@ -36,7 +36,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
 
   void _handleConnectionStateChanged() {
     setState(() {
-      isOnline = _connectionManager.state == connection.State.connected;
+      isOnline = _connectionManager.isConnected();
 
       _tabController.dispose();
       // TODO slightly buggy due to https://github.com/flutter/flutter/issues/93237

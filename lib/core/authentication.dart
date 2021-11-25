@@ -60,8 +60,7 @@ class Manager extends ChangeNotifier {
 
   Future _onConnectionStateChanged() async {
     final previousConnectionState = connectionManager.previousState;
-    final connectionState = connectionManager.state;
-    if (connectionState == connection.State.connected) {
+    if (connectionManager.isConnected()) {
       if (previousConnectionState == connection.State.reconnecting) {
         try {
           await _reauthenticate();

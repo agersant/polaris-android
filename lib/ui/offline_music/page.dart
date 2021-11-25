@@ -259,8 +259,7 @@ class _PinListTileState extends State<PinListTile> {
   }
 
   Future<void> _updateTotalSongs() async {
-    final isOnline = _connectionManager.state == connection.State.connected;
-    if (!isOnline) {
+    if (!_connectionManager.isConnected()) {
       setState(() => _totalSongs = null);
       return;
     }
@@ -289,14 +288,13 @@ class _PinListTileState extends State<PinListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final isOnline = _connectionManager.state == connection.State.connected;
     return ListTile(
       dense: true,
       // TODO this will try to fetch art from current server, even for offline music from other servers
       leading: ListThumbnail(widget.file.artwork),
       title: Row(
         children: [
-          if (isOnline)
+          if (_connectionManager.isConnected())
             Padding(padding: const EdgeInsets.only(right: 8), child: PinStateIcon(widget.host, widget.file)),
           Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
         ],
