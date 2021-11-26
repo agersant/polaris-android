@@ -11,22 +11,23 @@ class PlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(nowPlaying),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          foregroundColor: Theme.of(context).colorScheme.onSurface,
-          elevation: 0,
-          actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline))], // TODO implement info button
-        ),
-        body: OrientationBuilder(
-          builder: (context, orientation) {
-            if (orientation == Orientation.portrait) {
-              return _buildPortraitLayout(context);
-            } else {
-              return _buildLandscapeLayout(context);
-            }
-          },
-        ));
+      appBar: AppBar(
+        title: const Text(nowPlaying),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        elevation: 0,
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline))], // TODO implement info button
+      ),
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return _buildPortraitLayout(context);
+          } else {
+            return _buildLandscapeLayout(context);
+          }
+        },
+      ),
+    );
   }
 
   Widget _buildPortraitLayout(BuildContext context) {
