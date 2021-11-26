@@ -5,6 +5,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/ui/playback/media_state.dart';
+import 'package:polaris/ui/playback/playback_controls.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -117,30 +118,7 @@ class PlayerPage extends StatelessWidget {
         _buildTrackDetails(),
         // TODO slider interactions
         _buildProgressBar(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // TODO button interactions
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.skip_previous),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              visualDensity: VisualDensity.compact,
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.pause),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              visualDensity: VisualDensity.compact,
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.skip_next),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              visualDensity: VisualDensity.compact,
-            ),
-          ],
-        ),
+        const PlaybackControls(),
       ],
     );
   }
@@ -152,23 +130,34 @@ class PlayerPage extends StatelessWidget {
       builder: (context, snapshot) {
         final mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
         final dto.Song? song = mediaItem?.toSong();
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const StreamingIndicator(),
-                  Text(song?.formatTitle() ?? unknownSong, style: Theme.of(context).textTheme.subtitle1),
-                ],
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const StreamingIndicator(),
+                    Flexible(
+                      child: Text(
+                        song?.formatTitle() ?? unknownSong,
+                        style: Theme.of(context).textTheme.subtitle1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Text(
-              song?.formatArtist() ?? unknownArtist,
-              style: Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
-            ),
-          ],
+              Text(
+                song?.formatArtist() ?? unknownArtist,
+                style:
+                    Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         );
       },
     );

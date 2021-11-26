@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/media_state.dart';
+import 'package:polaris/ui/playback/playback_controls.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -95,56 +96,10 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                 ],
               ),
             ),
-            _controls(foregroundColor),
+            const PlaybackControls(),
           ],
         );
       },
-    );
-
-Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
-      stream: getIt<AudioPlayer>().playerStateStream,
-      builder: (context, snapshot) {
-        bool playing = false;
-        if (snapshot.hasData) {
-          playing = snapshot.data!.playing && snapshot.data!.processingState != ProcessingState.completed;
-        }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _previousButton(foregroundColor),
-            if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
-            _nextButton(foregroundColor),
-          ],
-        );
-      },
-    );
-
-IconButton _previousButton(Color color) => IconButton(
-      icon: const Icon(Icons.skip_previous),
-      onPressed: getIt<AudioPlayer>().hasPrevious ? getIt<AudioPlayer>().seekToPrevious : null,
-      iconSize: 24.0,
-      color: color,
-    );
-
-IconButton _pauseButton(Color color) => IconButton(
-      icon: const Icon(Icons.pause),
-      onPressed: getIt<AudioPlayer>().pause,
-      iconSize: 24.0,
-      color: color,
-    );
-
-IconButton _playButton(Color color) => IconButton(
-      icon: const Icon(Icons.play_arrow),
-      onPressed: getIt<AudioPlayer>().play,
-      iconSize: 24.0,
-      color: color,
-    );
-
-IconButton _nextButton(Color color) => IconButton(
-      icon: const Icon(Icons.skip_next),
-      onPressed: getIt<AudioPlayer>().hasNext ? getIt<AudioPlayer>().seekToNext : null,
-      iconSize: 24.0,
-      color: color,
     );
 
 Widget _progressBar() => LayoutBuilder(
