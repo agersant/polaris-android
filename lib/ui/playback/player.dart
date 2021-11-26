@@ -57,21 +57,24 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildLandscapeLayout(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.fromLTRB(32, 16, 32, 32),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 32),
             child: _buildArtwork(),
           ),
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildMainPanel(context),
-                _buildUpNextWidget(context),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: Center(child: _buildMainPanel(context))),
+                  _buildUpNextWidget(context),
+                ],
+              ),
             ),
           ),
         ],
