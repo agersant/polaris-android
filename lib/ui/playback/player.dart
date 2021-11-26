@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/media_item.dart';
+import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -84,10 +89,18 @@ class PlayerPage extends StatelessWidget {
   }
 
   Widget _buildArtwork() {
-    return const Material(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
-      child: LargeThumbnail(exampleArt), // TODO dynamic art
-      elevation: 2,
+    final audioPlayer = getIt<AudioPlayer>();
+    return StreamBuilder<SequenceState?>(
+      stream: audioPlayer.sequenceStateStream,
+      builder: (context, snapshot) {
+        final mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
+        final dto.Song? song = mediaItem?.toSong();
+        return Material(
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          child: LargeThumbnail(song?.artwork),
+          elevation: 2,
+        );
+      },
     );
   }
 
@@ -95,15 +108,7 @@ class PlayerPage extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // TODO real track info
-        Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: Text('Another World', style: Theme.of(context).textTheme.subtitle1),
-        ),
-        Text(
-          'Atsushi Kitajoh',
-          style: Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
-        ),
+        _buildTrackDetails(context),
         // TODO real slider progress
         // TODO slider interactions
         Slider(value: .25, onChanged: (value) {}),
@@ -143,6 +148,29 @@ class PlayerPage extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildTrackDetails(BuildContext context) {
+    final audioPlayer = getIt<AudioPlayer>();
+    return StreamBuilder<SequenceState?>(
+      stream: audioPlayer.sequenceStateStream,
+      builder: (context, snapshot) {
+        final mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
+        final dto.Song? song = mediaItem?.toSong();
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(song?.formatTitle() ?? unknownSong, style: Theme.of(context).textTheme.subtitle1),
+            ),
+            Text(
+              song?.formatArtist() ?? unknownArtist,
+              style: Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
+            ),
+          ],
+        );
+      },
     );
   }
 

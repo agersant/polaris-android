@@ -24,6 +24,7 @@ const collectionTitle = 'Collection';
 const collectionTabBrowseTitle = 'BROWSE';
 const collectionTabRandomTitle = 'RANDOM';
 const collectionTabRecentTitle = 'RECENT';
+const unknownSong = 'Unknown Song';
 const unknownAlbum = 'Unknown Album';
 const unknownArtist = 'Unknown Artist';
 const emptyDirectory = 'There is nothing in this directory.';
