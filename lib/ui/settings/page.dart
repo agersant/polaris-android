@@ -18,14 +18,18 @@ class SettingsPage extends StatelessWidget {
       title: settingsTitle,
       children: [
         SettingsGroup(
+          title: appearanceHeader,
+          children: const [
+            ThemeModeSetting(),
+          ],
+        ),
+        SettingsGroup(
           title: performanceHeader,
           children: const [
             CacheSizeSetting(),
             NumSongsToPreloadSetting(),
           ],
         ),
-
-        // TODO dark/light/system theme toggle
       ],
     );
   }
@@ -106,6 +110,59 @@ class NumSongsToPreloadSetting extends StatelessWidget {
                   selected: numSongs,
                   onChange: (value) {
                     getIt<settings.Manager>().handleSettingChanged(settings.keyNumSongsToPreload);
+                    Navigator.of(context).pop();
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ThemeModeSetting extends StatelessWidget {
+  const ThemeModeSetting({Key? key}) : super(key: key);
+
+  String _themeModeToString(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return themeLight;
+      case ThemeMode.dark:
+        return themeDark;
+      case ThemeMode.system:
+      default:
+        return themeSystem;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueChangeObserver<int>(
+      cacheKey: settings.keyThemeMode,
+      defaultValue: settings.defaultThemeMode,
+      builder: (context, int themeMode, _) {
+        return SimpleSettingsTile(
+          title: theme,
+          leading: const SettingTileIcon(Icons.dark_mode, Colors.purple),
+          subtitle: _themeModeToString(ThemeMode.values[themeMode]),
+          child: SettingsScreen(
+            title: settingsTitle,
+            children: [
+              Builder(builder: (context) {
+                return RadioSettingsTile<int>(
+                  title: theme,
+                  subtitle: themeDescription,
+                  settingKey: settings.keyThemeMode,
+                  values: <int, String>{
+                    ThemeMode.light.index: themeLight,
+                    ThemeMode.dark.index: themeDark,
+                    ThemeMode.system.index: themeSystem,
+                  },
+                  selected: themeMode,
+                  onChange: (value) {
+                    getIt<settings.Manager>().handleSettingChanged(settings.keyThemeMode);
                     Navigator.of(context).pop();
                   },
                 );

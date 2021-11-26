@@ -62,8 +62,14 @@ String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
 String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';
 
 // Settings
-const performanceHeader = 'PERFORMANCE';
 const settingsTitle = 'Settings';
+const appearanceHeader = 'APPEARANCE';
+const theme = 'Theme';
+const themeDescription = 'Your preferred visual style for this app.';
+const themeLight = 'Light';
+const themeDark = 'Dark';
+const themeSystem = 'System';
+const performanceHeader = 'PERFORMANCE';
 const numberOfSongsToPreload = 'Playlist lookahead';
 const numberOfSongsToPreloadDescription =
     'This setting controls how many upcoming songs in the playlist Polaris will download in advance.';

@@ -228,12 +228,19 @@ class PolarisApp extends StatefulWidget {
 class _PolarisAppState extends State<PolarisApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Polaris',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      routeInformationParser: PolarisRouteInformationParser(),
-      routerDelegate: PolarisRouterDelegate(),
+    return ValueChangeObserver<int>(
+      cacheKey: settings.keyThemeMode,
+      defaultValue: settings.defaultThemeMode,
+      builder: (context, int themeMode, _) {
+        return MaterialApp.router(
+          title: 'Polaris',
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: ThemeMode.values[themeMode],
+          routeInformationParser: PolarisRouteInformationParser(),
+          routerDelegate: PolarisRouterDelegate(),
+        );
+      },
     );
   }
 
