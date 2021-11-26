@@ -1,3 +1,5 @@
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+
 import 'mock/client.dart' as mock;
 import 'mock/media_cache.dart' as mock;
 import 'mock/pin.dart' as pin;
@@ -38,6 +40,7 @@ class Harness {
 
   static Future<Harness> create({Map<String, Object>? preferences}) async {
     SharedPreferences.setMockInitialValues(preferences ?? {});
+    await Settings.init();
 
     getIt.allowReassignment = true;
 
