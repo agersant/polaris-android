@@ -8,6 +8,8 @@ const exampleArt = 'Leviathan/OST - Anime/Howl\'s Moving Castle/2004 - Howl\'s M
 class PlayerPage extends StatelessWidget {
   const PlayerPage({Key? key}) : super(key: key);
 
+  // TODO landscape layout
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +43,15 @@ class PlayerPage extends StatelessWidget {
                         // TODO real track info
                         Padding(
                           padding: const EdgeInsets.only(bottom: 4),
-                          child: Text('Another World', style: Theme.of(context).textTheme.bodyText1),
+                          child: Text('Another World', style: Theme.of(context).textTheme.subtitle1),
                         ),
-                        Text('Atsushi Kitajoh', style: Theme.of(context).textTheme.caption),
+                        Text(
+                          'Atsushi Kitajoh',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText2!
+                              .copyWith(color: Theme.of(context).textTheme.caption!.color),
+                        ),
                         // TODO real slider progress
                         // TODO slider interactions
                         Slider(value: .25, onChanged: (value) {}),
