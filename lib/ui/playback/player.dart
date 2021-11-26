@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
+import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
+
+final getIt = GetIt.instance;
 
 const exampleArt = 'Leviathan/OST - Anime/Howl\'s Moving Castle/2004 - Howl\'s Moving Castle Soundtrack/Folder.jpg';
 
@@ -108,7 +112,7 @@ class PlayerPage extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildTrackDetails(context),
+        _buildTrackDetails(),
         // TODO real slider progress
         // TODO slider interactions
         Slider(value: .25, onChanged: (value) {}),
@@ -151,7 +155,7 @@ class PlayerPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTrackDetails(BuildContext context) {
+  Widget _buildTrackDetails() {
     final audioPlayer = getIt<AudioPlayer>();
     return StreamBuilder<SequenceState?>(
       stream: audioPlayer.sequenceStateStream,
@@ -162,7 +166,13 @@ class PlayerPage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text(song?.formatTitle() ?? unknownSong, style: Theme.of(context).textTheme.subtitle1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const StreamingIndicator(),
+                  Text(song?.formatTitle() ?? unknownSong, style: Theme.of(context).textTheme.subtitle1),
+                ],
+              ),
             ),
             Text(
               song?.formatArtist() ?? unknownArtist,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/ui/pages_model.dart';
+import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/core/dto.dart';
@@ -79,7 +80,7 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                 children: [
                   Row(
                     children: [
-                      _streamingIndicator(),
+                      const StreamingIndicator(),
                       Expanded(
                         child: Text(
                           song.formatTitle(),
@@ -119,30 +120,6 @@ Widget _controls(Color foregroundColor) => StreamBuilder<PlayerState>(
             if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
             _nextButton(foregroundColor),
           ],
-        );
-      },
-    );
-
-Widget _streamingIndicator() => StreamBuilder<PlayerState>(
-      stream: getIt<AudioPlayer>().playerStateStream,
-      builder: (context, snapshot) {
-        final bool isBuffering = snapshot.data?.processingState != ProcessingState.ready &&
-            snapshot.data?.processingState != ProcessingState.completed;
-        if (!isBuffering) {
-          return Container();
-        }
-        return const Padding(
-          padding: EdgeInsets.only(right: 8, bottom: 2),
-          child: SizedBox(
-            width: 10,
-            height: 10,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
         );
       },
     );
