@@ -14,6 +14,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SettingsScreen(
       title: settingsTitle,
+      // TODO better visuals
       children: [
         RadioModalSettingsTile<int>(
           title: numberOfSongsToPreload,
@@ -46,6 +47,7 @@ class SettingsPage extends StatelessWidget {
             getIt<settings.Manager>().handleSettingChanged(settings.keyCacheCapacityMB);
           },
         ),
+        // TODO dark/light/system theme toggle
       ],
     );
   }
