@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 class PagesModel extends ChangeNotifier {
+  bool _isPlayerOpen = false;
+  bool get isPlayerOpen => _isPlayerOpen;
+
   bool _isQueueOpen = false;
   bool get isQueueOpen => _isQueueOpen;
 
@@ -9,6 +12,16 @@ class PagesModel extends ChangeNotifier {
 
   bool _isSettingsOpen = false;
   bool get isSettingsOpen => _isSettingsOpen;
+
+  void openPlayer() {
+    _isPlayerOpen = true;
+    notifyListeners();
+  }
+
+  void closePlayer() {
+    _isPlayerOpen = false;
+    notifyListeners();
+  }
 
   void openQueue() {
     _isQueueOpen = true;

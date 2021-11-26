@@ -21,6 +21,7 @@ import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/mini_player.dart';
+import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/playback/queue.dart';
 import 'package:polaris/ui/settings/page.dart';
 import 'package:polaris/ui/startup/page.dart';
@@ -166,6 +167,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final connectionComplete = connectionManager.isConnected();
           final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
+          final showPlayer = isStartupComplete && pagesModel.isPlayerOpen;
+          final showMiniPlayer = isStartupComplete && (!pagesModel.isPlayerOpen || pagesModel.isQueueOpen);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
@@ -182,6 +185,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       if (showSettings) const MaterialPage<dynamic>(child: SettingsPage()),
                       if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
                       // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
+                      if (showPlayer) const MaterialPage<dynamic>(child: PlayerPage()),
                       if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
                     ],
                     onPopPage: (route, dynamic result) {
@@ -190,6 +194,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       }
                       if (pagesModel.isQueueOpen) {
                         pagesModel.closeQueue();
+                      } else if (pagesModel.isPlayerOpen) {
+                        pagesModel.closePlayer();
                       } else if (pagesModel.isOfflineMusicOpen) {
                         pagesModel.closeOfflineMusic();
                       } else if (pagesModel.isSettingsOpen) {
@@ -199,7 +205,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     },
                   ),
                 ),
-                if (isStartupComplete) const MiniPlayer(),
+                if (showMiniPlayer) const MiniPlayer(), // TODO animate in/out
               ],
             ),
           );

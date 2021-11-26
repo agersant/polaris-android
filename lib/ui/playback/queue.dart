@@ -59,6 +59,9 @@ class QueuePage extends StatelessWidget {
           appBar: AppBar(
             title: const Text(queueTitle),
             actions: [IconButton(onPressed: clearAction, icon: const Icon(Icons.delete))],
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            elevation: 0,
           ),
           body: body,
         );
