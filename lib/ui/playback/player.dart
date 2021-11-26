@@ -210,25 +210,55 @@ class PlayerPage extends StatelessWidget {
   }
 
   Widget _buildUpNextWidget(BuildContext context) {
-    return OutlinedButton(
-      onPressed: getIt<PagesModel>().openQueue,
-      style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16),
-            child: Text('Up Next', style: Theme.of(context).textTheme.overline),
+    final player = getIt<AudioPlayer>();
+
+    return StreamBuilder<SequenceState?>(
+      stream: player.sequenceStateStream,
+      builder: (context, snapshot) {
+        final int? nextIndex = player.nextIndex;
+        dto.Song? nextSong;
+        if (nextIndex != null) {
+          final audioSource = snapshot.data?.effectiveSequence[nextIndex];
+          final mediaItem = audioSource?.tag as MediaItem?;
+          nextSong = mediaItem?.toSong();
+        }
+
+        return OutlinedButton(
+          onPressed: getIt<PagesModel>().openQueue,
+          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 16, left: 16),
+                child: Text(upNext, style: Theme.of(context).textTheme.overline),
+              ),
+              if (nextSong == null)
+                const ListTile(
+                  leading: Icon(Icons.music_off, size: 40),
+                  title: Text(upNextNothing),
+                  subtitle: Text(upNextNothingSubtitle),
+                  trailing: Icon(Icons.queue_music),
+                ),
+              if (nextSong != null)
+                ListTile(
+                  leading: ListThumbnail(nextSong.artwork),
+                  title: Text(
+                    nextSong.formatTitle(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  subtitle: Text(
+                    nextSong.formatArtist(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  trailing: const Icon(Icons.queue_music),
+                ),
+            ],
           ),
-          const ListTile(
-            // TODO real-queue information
-            leading: ListThumbnail(exampleArt),
-            title: Text('After the Rain'),
-            subtitle: Text('Joe Hisaishi'),
-            trailing: Icon(Icons.queue_music),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

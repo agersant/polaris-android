@@ -54,6 +54,9 @@ const queueTitle = 'Queue';
 const queueEmpty = 'There are no songs in the queue.';
 const removeFromQueue = 'Remove';
 const nowPlaying = 'Now Playing';
+const upNext = 'Up Next';
+const upNextNothing = 'End of the queue';
+const upNextNothingSubtitle = 'No upcoming song';
 
 // Offline music
 const offlineMusicTitle = 'Offline Music';
