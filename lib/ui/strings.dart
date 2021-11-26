@@ -52,6 +52,7 @@ const unknownHost = 'Unknown Host';
 const queueTitle = 'Queue';
 const queueEmpty = 'There are no songs in the queue.';
 const removeFromQueue = 'Remove';
+const nowPlaying = 'Now Playing';
 
 // Offline music
 const offlineMusicTitle = 'Offline Music';
