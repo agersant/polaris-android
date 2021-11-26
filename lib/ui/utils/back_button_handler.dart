@@ -25,6 +25,16 @@ class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindi
     super.dispose();
   }
 
+  // Unclear how this works out, but the code below fixes a bug where after a hot-reload,
+  // the back buttons prioritizes closing collection browser routes instead of
+  // album details.
+  @override
+  void didUpdateWidget(BackButtonHandler oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     return widget.child;
