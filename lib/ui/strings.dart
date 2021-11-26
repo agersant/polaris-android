@@ -62,6 +62,11 @@ String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
 String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';
 
 // Settings
+const performanceHeader = 'PERFORMANCE';
 const settingsTitle = 'Settings';
-const numberOfSongsToPreload = 'Number of queued songs to preload';
+const numberOfSongsToPreload = 'Playlist lookahead';
+const numberOfSongsToPreloadDescription =
+    'This setting controls how many upcoming songs in the playlist Polaris will download in advance.';
 const cacheSize = 'Cache size';
+const cacheSizeDescription =
+    'This setting controls how much space Polaris is allowed to use to store recently used audio and image files.\nMusic in the queue, and music added to Offline Music do not count towards this limit.';
