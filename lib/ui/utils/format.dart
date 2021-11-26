@@ -3,15 +3,19 @@ import 'package:polaris/core/dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/utils.dart';
 
-String formatDuration(Duration d) {
+String formatDuration(Duration? d) {
+  if (d == null) {
+    return '-:--';
+  }
   String twoDigits(int n) => n.toString().padLeft(2, '0');
+  String oneDigitMinutes = d.inMinutes.remainder(60).toString();
   String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
   String twoDigitSeconds = twoDigits(d.inSeconds.remainder(60));
   if (d.inHours > 0) {
     String hours = '${d.inHours}';
     return '$hours:$twoDigitMinutes:$twoDigitSeconds';
   } else {
-    return '$twoDigitMinutes:$twoDigitSeconds';
+    return '$oneDigitMinutes:$twoDigitSeconds';
   }
 }
 

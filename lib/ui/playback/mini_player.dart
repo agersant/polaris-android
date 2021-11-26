@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/ui/pages_model.dart';
+import 'package:polaris/ui/playback/media_state.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -11,12 +12,6 @@ import 'package:polaris/core/media_item.dart';
 import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
-
-class MediaState {
-  final SequenceState? sequenceState;
-  final Duration position;
-  MediaState(this.sequenceState, this.position);
-}
 
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({Key? key}) : super(key: key);

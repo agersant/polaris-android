@@ -4,11 +4,13 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
+import 'package:polaris/ui/playback/media_state.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -113,20 +115,8 @@ class PlayerPage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildTrackDetails(),
-        // TODO real slider progress
         // TODO slider interactions
-        Slider(value: .25, onChanged: (value) {}),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // TODO real timing information
-              Text('0:39', style: Theme.of(context).textTheme.caption),
-              Text('1:44', style: Theme.of(context).textTheme.caption),
-            ],
-          ),
-        ),
+        _buildProgressBar(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -177,6 +167,52 @@ class PlayerPage extends StatelessWidget {
             Text(
               song?.formatArtist() ?? unknownArtist,
               style: Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildProgressBar() {
+    final player = getIt<AudioPlayer>();
+    final Stream<MediaState> mediaStateStream = Rx.combineLatest2<SequenceState?, Duration, MediaState>(
+        player.sequenceStateStream,
+        player.positionStream,
+        (sequenceState, position) => MediaState(sequenceState, position));
+
+    return StreamBuilder<MediaState>(
+      stream: mediaStateStream,
+      builder: (context, snapshot) {
+        double? progress;
+        Duration? position;
+        Duration? duration;
+
+        final int? positionMs = snapshot.data?.position.inMilliseconds;
+        final MediaItem? mediaItem = snapshot.data?.sequenceState?.currentSource?.tag as MediaItem?;
+        final int? durationMs = mediaItem?.duration?.inMilliseconds;
+        if (positionMs != null && durationMs != null && durationMs > 0) {
+          progress = (positionMs / durationMs).clamp(0.0, 1.0);
+        }
+        if (positionMs != null) {
+          position = Duration(milliseconds: positionMs);
+        }
+        if (durationMs != null) {
+          duration = Duration(milliseconds: durationMs);
+        }
+
+        return Column(
+          children: [
+            Slider(value: progress ?? 0, onChanged: (value) {}),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(formatDuration(position), style: Theme.of(context).textTheme.caption),
+                  Text(formatDuration(duration), style: Theme.of(context).textTheme.caption),
+                ],
+              ),
             ),
           ],
         );
