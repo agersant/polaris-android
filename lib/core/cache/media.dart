@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/settings.dart';
 import 'package:polaris/core/unique_timer.dart';
+import 'package:polaris/utils.dart';
 
 const _firstVersion = 1;
 const _currentVersion = 4;
@@ -198,7 +199,6 @@ class MediaCache implements MediaCacheInterface {
         return stat.size;
       }));
       int cacheSize = sizes.fold(0, (a, b) => a + b);
-      const oneMB = 1024 * 1024;
       final maxCacheSize = oneMB * Settings.getValue<int>(keyCacheCapacityMB, defaultCacheSizeMB);
 
       int numFilesRemoved = 0;
