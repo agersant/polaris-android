@@ -11,6 +11,7 @@ class PlaybackControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foregroundColor = Theme.of(context).colorScheme.onSurface;
+    // TODO needs to update based on sequence stream too so skip arrows properly change color when songs are queued
     return StreamBuilder<PlayerState>(
       stream: getIt<AudioPlayer>().playerStateStream,
       builder: (context, snapshot) {

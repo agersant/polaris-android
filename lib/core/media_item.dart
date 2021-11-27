@@ -26,6 +26,7 @@ extension MediaItemConversions on Song {
         extraKeyDiscNumber: discNumber,
         extraKeyArtist: artist,
         extraKeyAlbumArtist: albumArtist,
+        extraKeyYear: year,
         extraKeyArtwork: artwork,
       },
     );

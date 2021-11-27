@@ -58,6 +58,18 @@ const upNext = 'Up Next';
 const upNextNothing = 'End of the queue';
 const upNextNothingSubtitle = 'No upcoming song';
 
+// Song info
+const songInfoPopupTitle = 'Song Details';
+const songInfoTitle = 'Title';
+const songInfoArtist = 'Artist';
+const songInfoAlbumArtist = 'Album Artist';
+const songInfoAlbum = 'Album';
+const songInfoDiscNumber = 'Disc Number';
+const songInfoTrackNumber = 'Track Number';
+const songInfoDuration = 'Duration';
+const songInfoYear = 'Year';
+const songInfoCloseButton = 'Close';
+
 // Offline music
 const offlineMusicTitle = 'Offline Music';
 const offlineMusicEmpty = 'You have not saved any music.';

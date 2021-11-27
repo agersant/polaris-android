@@ -11,6 +11,7 @@ import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/song_info.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
@@ -28,7 +29,7 @@ class PlayerPage extends StatelessWidget {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline))], // TODO implement info button
+        actions: [_buildInfoButton(context)],
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {
@@ -95,6 +96,20 @@ class PlayerPage extends StatelessWidget {
     );
   }
 
+  Widget _buildInfoButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.info_outline),
+      onPressed: () {
+        final audioPlayer = getIt<AudioPlayer>();
+        final MediaItem? mediaItem = audioPlayer.sequenceState?.currentSource?.tag as MediaItem?;
+        final dto.Song? song = mediaItem?.toSong();
+        if (song != null) {
+          SongInfoDialog.openInfoDialog(context, song);
+        }
+      },
+    );
+  }
+
   Widget _buildArtwork() {
     final audioPlayer = getIt<AudioPlayer>();
     return StreamBuilder<SequenceState?>(
@@ -139,6 +154,7 @@ class PlayerPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Expanded(child: Align(child: StreamingIndicator(), alignment: Alignment.centerRight)),
+                    // TODO can overflow
                     Text(
                       song?.formatTitle() ?? unknownSong,
                       style: Theme.of(context).textTheme.subtitle1,
