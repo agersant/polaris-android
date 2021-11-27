@@ -9,6 +9,10 @@ const String extraKeyArtist = 'artist';
 const String extraKeyAlbumArtist = 'albumArtist';
 const String extraKeyYear = 'year';
 const String extraKeyArtwork = 'artwork';
+const String extraKeyLyricist = 'lyricist';
+const String extraKeyComposer = 'composer';
+const String extraKeyGenre = 'genre';
+const String extraKeyLabel = 'label';
 
 extension MediaItemConversions on Song {
   MediaItem toMediaItem(String id, Uri? artworkUri) {
@@ -28,6 +32,10 @@ extension MediaItemConversions on Song {
         extraKeyAlbumArtist: albumArtist,
         extraKeyYear: year,
         extraKeyArtwork: artwork,
+        extraKeyLyricist: lyricist,
+        extraKeyComposer: composer,
+        extraKeyGenre: genre,
+        extraKeyLabel: label,
       },
     );
   }
@@ -44,6 +52,10 @@ extension DTOConversions on MediaItem {
       ..year = extras?[extraKeyYear]
       ..album = album
       ..artwork = extras?[extraKeyArtwork]
-      ..duration = duration?.inSeconds;
+      ..duration = duration?.inSeconds
+      ..lyricist = extras?[extraKeyLyricist]
+      ..composer = extras?[extraKeyComposer]
+      ..genre = extras?[extraKeyGenre]
+      ..label = extras?[extraKeyLabel];
   }
 }

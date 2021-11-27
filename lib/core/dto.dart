@@ -74,6 +74,10 @@ class Song {
   String? album;
   String? artwork;
   int? duration;
+  String? lyricist;
+  String? composer;
+  String? genre;
+  String? label;
 
   Song({required this.path});
 
@@ -87,7 +91,11 @@ class Song {
       ..year = json['year']
       ..album = json['album']
       ..artwork = json['artwork']
-      ..duration = json['duration'];
+      ..duration = json['duration']
+      ..lyricist = json['lyricist']
+      ..composer = json['composer']
+      ..genre = json['genre']
+      ..label = json['label'];
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -101,6 +109,10 @@ class Song {
         'album': album,
         'artwork': artwork,
         'duration': duration,
+        'lyricist': lyricist,
+        'composer': composer,
+        'genre': genre,
+        'label': label,
       };
 }
 

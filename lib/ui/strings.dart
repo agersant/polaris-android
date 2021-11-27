@@ -63,13 +63,17 @@ const upNextNothingSubtitle = 'No upcoming song';
 
 // Song info
 const songInfoPopupTitle = 'Song Details';
-const songInfoTitle = 'Title';
-const songInfoArtist = 'Artist';
-const songInfoAlbumArtist = 'Album Artist';
 const songInfoAlbum = 'Album';
+const songInfoAlbumArtist = 'Album Artist';
+const songInfoArtist = 'Artist';
+const songInfoComposer = 'Composer';
 const songInfoDiscNumber = 'Disc Number';
-const songInfoTrackNumber = 'Track Number';
 const songInfoDuration = 'Duration';
+const songInfoGenre = 'Genre';
+const songInfoLabel = 'Label';
+const songInfoLyricist = 'Lyricist';
+const songInfoTitle = 'Title';
+const songInfoTrackNumber = 'Track Number';
 const songInfoYear = 'Year';
 const songInfoCloseButton = 'Close';
 
