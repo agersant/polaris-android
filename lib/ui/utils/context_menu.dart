@@ -6,6 +6,7 @@ import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/song_info.dart';
 
 final getIt = GetIt.instance;
 
@@ -17,6 +18,7 @@ enum CollectionFileAction {
   refresh,
   removeFromQueue,
   togglePin,
+  songInfo,
 }
 
 class CollectionFileContextMenuButton extends StatelessWidget {
@@ -90,6 +92,11 @@ class CollectionFileContextMenuButton extends StatelessWidget {
                 }
               }
               break;
+            case CollectionFileAction.songInfo:
+              if (file.isSong()) {
+                SongInfoDialog.openInfoDialog(context, file.asSong());
+              }
+              break;
             default:
               break;
           }
@@ -97,15 +104,18 @@ class CollectionFileContextMenuButton extends StatelessWidget {
         itemBuilder: (BuildContext context) {
           return <PopupMenuEntry<CollectionFileAction>>[
             if (actions.contains(CollectionFileAction.queueLast))
-              _buildButton(CollectionFileAction.queueLast, Icons.playlist_add, queueLast),
+              _buildButton(CollectionFileAction.queueLast, Icons.playlist_add, contextMenuQueueLast),
             if (actions.contains(CollectionFileAction.queueNext))
-              _buildButton(CollectionFileAction.queueNext, Icons.playlist_play, queueNext),
+              _buildButton(CollectionFileAction.queueNext, Icons.playlist_play, contextMenuQueueNext),
             if (actions.contains(CollectionFileAction.refresh))
-              _buildButton(CollectionFileAction.refresh, Icons.refresh, refresh),
+              _buildButton(CollectionFileAction.refresh, Icons.refresh, contextMenuRefresh),
             if (actions.contains(CollectionFileAction.removeFromQueue))
-              _buildButton(CollectionFileAction.removeFromQueue, Icons.clear, removeFromQueue),
+              _buildButton(CollectionFileAction.removeFromQueue, Icons.clear, contextMenuRemoveFromQueue),
             if (actions.contains(CollectionFileAction.togglePin))
-              _buildButton(CollectionFileAction.togglePin, Icons.offline_pin, _isPinned() ? unpinFile : pinFile),
+              _buildButton(CollectionFileAction.togglePin, Icons.offline_pin,
+                  _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+            if (actions.contains(CollectionFileAction.songInfo))
+              _buildButton(CollectionFileAction.songInfo, Icons.info_outline, contextMenuSongInfo),
           ];
         });
   }

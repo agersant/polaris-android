@@ -279,6 +279,7 @@ class Song extends StatelessWidget {
           CollectionFileAction.queueLast,
           CollectionFileAction.queueNext,
           CollectionFileAction.togglePin,
+          CollectionFileAction.songInfo,
         ],
       ),
       dense: true,

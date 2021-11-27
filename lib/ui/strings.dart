@@ -35,11 +35,15 @@ const randomError = 'There was an error while listing albums.';
 const recentError = 'There was an error while listing albums.';
 const albumDetailsError = 'There was an error while reading this album.';
 const goBackButtonLabel = 'GO BACK';
-const queueLast = 'Play Last';
-const queueNext = 'Play Next';
-const refresh = 'Refresh';
-const pinFile = 'Add to Offline Music';
-const unpinFile = 'Remove from Offline Music';
+
+// Context menu
+const contextMenuQueueLast = 'Play Last';
+const contextMenuQueueNext = 'Play Next';
+const contextMenuRefresh = 'Refresh';
+const contextMenuRemoveFromQueue = 'Remove';
+const contextMenuPinFile = 'Add to Offline Music';
+const contextMenuUnpinFile = 'Remove from Offline Music';
+const contextMenuSongInfo = 'Song Details';
 
 // Collection drawer
 const drawerSettings = 'Settings';
@@ -52,7 +56,6 @@ const unknownHost = 'Unknown Host';
 // Playback
 const queueTitle = 'Queue';
 const queueEmpty = 'There are no songs in the queue.';
-const removeFromQueue = 'Remove';
 const nowPlaying = 'Now Playing';
 const upNext = 'Up Next';
 const upNextNothing = 'End of the queue';

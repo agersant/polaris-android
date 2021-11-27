@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/strings.dart';
 
 class SongInfoDialog extends StatelessWidget {
