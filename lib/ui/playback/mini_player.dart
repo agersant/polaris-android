@@ -32,7 +32,13 @@ class MiniPlayer extends StatelessWidget {
           child: Material(
             elevation: 8,
             child: InkWell(
-              onTap: getIt<PagesModel>().openPlayer,
+              onTap: () {
+                final pagesModel = getIt<PagesModel>();
+                pagesModel.openPlayer();
+                if (pagesModel.isQueueOpen) {
+                  pagesModel.closeQueue();
+                }
+              },
               child: playerContent(context, mediaItem.toSong()),
             ),
           ),
