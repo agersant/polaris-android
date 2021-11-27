@@ -239,6 +239,7 @@ class _PolarisAppState extends State<PolarisApp> {
           themeMode: ThemeMode.values[themeMode],
           routeInformationParser: PolarisRouteInformationParser(),
           routerDelegate: PolarisRouterDelegate(),
+          debugShowCheckedModeBanner: false,
         );
       },
     );

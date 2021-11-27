@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/ui/pages_model.dart';
-import 'package:polaris/ui/playback/media_state.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
+import 'package:polaris/ui/playback/progress_state.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
@@ -105,26 +105,23 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
 Widget _progressBar() => LayoutBuilder(
       builder: (context, size) {
         final player = getIt<AudioPlayer>();
-        final Stream<MediaState> mediaStateStream = Rx.combineLatest2<SequenceState?, Duration, MediaState>(
-            player.sequenceStateStream,
-            player.positionStream,
-            (sequenceState, position) => MediaState(sequenceState, position));
+        final Stream<ProgressState> progressStream = Rx.combineLatest2<Duration, Duration?, ProgressState>(
+            player.positionStream, player.durationStream, (position, duration) => ProgressState(position, duration));
 
         final Color backgroundColor = Theme.of(context).backgroundColor;
         final Color foregroundColor = Theme.of(context).colorScheme.primary;
         return Stack(
           children: [
             Container(color: backgroundColor),
-            StreamBuilder<MediaState>(
-              stream: mediaStateStream,
+            StreamBuilder<ProgressState>(
+              stream: progressStream,
               builder: (context, snapshot) {
                 double progress = 0.0;
                 if (snapshot.hasData) {
-                  final int? position = snapshot.data!.position.inMilliseconds;
-                  final MediaItem? mediaItem = snapshot.data!.sequenceState?.currentSource?.tag as MediaItem;
-                  final int? duration = mediaItem?.duration?.inMilliseconds;
-                  if (position != null && duration != null && duration > 0) {
-                    progress = (position / duration).clamp(0.0, 1.0);
+                  final Duration? position = snapshot.data?.position;
+                  final Duration? duration = snapshot.data?.duration;
+                  if (position != null && duration != null && duration.inMilliseconds > 0) {
+                    progress = (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
                   }
                 }
                 return SizedBox(

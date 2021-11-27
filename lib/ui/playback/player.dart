@@ -4,8 +4,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
-import 'package:polaris/ui/playback/media_state.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
+import 'package:polaris/ui/playback/progress_state.dart';
+import 'package:polaris/ui/playback/seekbar.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -116,7 +117,6 @@ class PlayerPage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildTrackDetails(),
-        // TODO slider interactions
         _buildProgressBar(),
         const PlaybackControls(),
       ],
@@ -165,34 +165,21 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildProgressBar() {
     final player = getIt<AudioPlayer>();
-    final Stream<MediaState> mediaStateStream = Rx.combineLatest2<SequenceState?, Duration, MediaState>(
-        player.sequenceStateStream,
-        player.positionStream,
-        (sequenceState, position) => MediaState(sequenceState, position));
+    final Stream<ProgressState> progressStream = Rx.combineLatest2<Duration, Duration?, ProgressState>(
+        player.positionStream, player.durationStream, (position, duration) => ProgressState(position, duration));
 
-    return StreamBuilder<MediaState>(
-      stream: mediaStateStream,
+    return StreamBuilder<ProgressState>(
+      stream: progressStream,
       builder: (context, snapshot) {
-        double? progress;
-        Duration? position;
-        Duration? duration;
-
-        final int? positionMs = snapshot.data?.position.inMilliseconds;
-        final MediaItem? mediaItem = snapshot.data?.sequenceState?.currentSource?.tag as MediaItem?;
-        final int? durationMs = mediaItem?.duration?.inMilliseconds;
-        if (positionMs != null && durationMs != null && durationMs > 0) {
-          progress = (positionMs / durationMs).clamp(0.0, 1.0);
-        }
-        if (positionMs != null) {
-          position = Duration(milliseconds: positionMs);
-        }
-        if (durationMs != null) {
-          duration = Duration(milliseconds: durationMs);
-        }
-
+        final Duration? position = snapshot.data?.position;
+        final Duration? duration = snapshot.data?.duration;
         return Column(
           children: [
-            Slider(value: progress ?? 0, onChanged: (value) {}),
+            SeekBar(
+              duration: duration ?? Duration.zero,
+              position: position ?? Duration.zero,
+              onChangeEnd: player.seek,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
