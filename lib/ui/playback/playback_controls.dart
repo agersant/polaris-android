@@ -11,54 +11,58 @@ class PlaybackControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foregroundColor = Theme.of(context).colorScheme.onSurface;
-    // TODO needs to update based on sequence stream too so skip arrows properly change color when songs are queued
-    return StreamBuilder<PlayerState>(
-      stream: getIt<AudioPlayer>().playerStateStream,
-      builder: (context, snapshot) {
-        bool playing = false;
-        if (snapshot.hasData) {
-          playing = snapshot.data!.playing && snapshot.data!.processingState != ProcessingState.completed;
-        }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _previousButton(foregroundColor),
-            if (playing) _pauseButton(foregroundColor) else _playButton(foregroundColor),
-            _nextButton(foregroundColor),
-          ],
-        );
-      },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _previousButton(foregroundColor),
+        _playPauseButton(foregroundColor),
+        _nextButton(foregroundColor),
+      ],
     );
   }
 }
 
-IconButton _previousButton(Color color) => IconButton(
-      icon: const Icon(Icons.skip_previous),
-      onPressed: getIt<AudioPlayer>().hasPrevious ? getIt<AudioPlayer>().seekToPrevious : null,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      visualDensity: VisualDensity.compact,
-      color: color,
+Widget _previousButton(Color color) => StreamBuilder<SequenceState?>(
+      stream: getIt<AudioPlayer>().sequenceStateStream,
+      builder: (context, snapshot) {
+        return _button(
+          Icons.skip_previous,
+          getIt<AudioPlayer>().hasPrevious ? getIt<AudioPlayer>().seekToPrevious : null,
+          color,
+        );
+      },
     );
 
-IconButton _pauseButton(Color color) => IconButton(
-      icon: const Icon(Icons.pause),
-      onPressed: getIt<AudioPlayer>().pause,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      visualDensity: VisualDensity.compact,
-      color: color,
+Widget _nextButton(Color color) => StreamBuilder<SequenceState?>(
+      stream: getIt<AudioPlayer>().sequenceStateStream,
+      builder: (context, snapshot) {
+        return _button(
+          Icons.skip_next,
+          getIt<AudioPlayer>().hasNext ? getIt<AudioPlayer>().seekToNext : null,
+          color,
+        );
+      },
     );
 
-IconButton _playButton(Color color) => IconButton(
-      icon: const Icon(Icons.play_arrow),
-      onPressed: getIt<AudioPlayer>().play,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      visualDensity: VisualDensity.compact,
-      color: color,
+Widget _playPauseButton(Color color) => StreamBuilder<PlayerState>(
+      stream: getIt<AudioPlayer>().playerStateStream,
+      builder: (context, snapshot) {
+        final isPlaying = snapshot.data?.playing == true && snapshot.data?.processingState != ProcessingState.completed;
+        if (isPlaying) {
+          return _pauseButton(color);
+        } else {
+          return _playButton(color);
+        }
+      },
     );
 
-IconButton _nextButton(Color color) => IconButton(
-      icon: const Icon(Icons.skip_next),
-      onPressed: getIt<AudioPlayer>().hasNext ? getIt<AudioPlayer>().seekToNext : null,
+Widget _pauseButton(Color color) => _button(Icons.pause, getIt<AudioPlayer>().pause, color);
+
+Widget _playButton(Color color) => _button(Icons.play_arrow, getIt<AudioPlayer>().play, color);
+
+IconButton _button(IconData icon, Future<void> Function()? onPressed, Color color) => IconButton(
+      icon: Icon(icon),
+      onPressed: onPressed,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       visualDensity: VisualDensity.compact,
       color: color,
