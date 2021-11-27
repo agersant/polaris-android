@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/collection/album_details.dart';
-import 'package:polaris/ui/collection/context_menu.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
