@@ -138,14 +138,13 @@ class PlayerPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const StreamingIndicator(),
-                    Flexible(
-                      child: Text(
-                        song?.formatTitle() ?? unknownSong,
-                        style: Theme.of(context).textTheme.subtitle1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    const Expanded(child: Align(child: StreamingIndicator(), alignment: Alignment.centerRight)),
+                    Text(
+                      song?.formatTitle() ?? unknownSong,
+                      style: Theme.of(context).textTheme.subtitle1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    Expanded(child: Container()),
                   ],
                 ),
               ),
