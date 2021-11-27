@@ -12,7 +12,6 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
-import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -165,8 +164,7 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildProgressBar() {
     final player = getIt<AudioPlayer>();
-    final Stream<ProgressState> progressStream = Rx.combineLatest2<Duration, Duration?, ProgressState>(
-        player.positionStream, player.durationStream, (position, duration) => ProgressState(position, duration));
+    final Stream<ProgressState> progressStream = ProgressState.createStream(player);
 
     return StreamBuilder<ProgressState>(
       stream: progressStream,
@@ -178,6 +176,8 @@ class PlayerPage extends StatelessWidget {
             SeekBar(
               duration: duration ?? Duration.zero,
               position: position ?? Duration.zero,
+              // TODO For songs that arent from the cache, this simply restarts playback (?)
+              // while still advancing the slider to the specified location.
               onChangeEnd: player.seek,
             ),
             Padding(

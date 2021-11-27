@@ -10,7 +10,6 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/media_item.dart';
-import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -105,8 +104,7 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
 Widget _progressBar() => LayoutBuilder(
       builder: (context, size) {
         final player = getIt<AudioPlayer>();
-        final Stream<ProgressState> progressStream = Rx.combineLatest2<Duration, Duration?, ProgressState>(
-            player.positionStream, player.durationStream, (position, duration) => ProgressState(position, duration));
+        final Stream<ProgressState> progressStream = ProgressState.createStream(player);
 
         final Color backgroundColor = Theme.of(context).backgroundColor;
         final Color foregroundColor = Theme.of(context).colorScheme.primary;
