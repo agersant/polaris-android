@@ -91,7 +91,7 @@ class CollectionCache {
 
   List<dto.Song>? flattenDirectory(String host, String path) {
     return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList()
-      ?..sort((a, b) => a.path.compareTo(b.path));
+      ?..sort((a, b) => compareStrings(a.path, b.path));
   }
 }
 

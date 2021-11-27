@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:polaris/utils.dart';
 
 class APIVersion {
   int major, minor;
@@ -129,7 +130,7 @@ class CollectionFile extends Comparable<CollectionFile> {
     if (isDirectory() != other.isDirectory()) {
       return isDirectory() ? -1 : 1;
     }
-    return path.compareTo(other.path);
+    return compareStrings(path, other.path);
   }
 
   bool isSong() {

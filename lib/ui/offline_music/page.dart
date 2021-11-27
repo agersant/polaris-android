@@ -13,6 +13,7 @@ import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
+import 'package:polaris/utils.dart';
 
 final getIt = GetIt.instance;
 
@@ -43,7 +44,7 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
         ..sort((a, b) {
           if (a.url == host) return -1;
           if (b.url == host) return 1;
-          return a.url.compareTo(b.url);
+          return compareStrings(a.url, b.url);
         });
     });
 
@@ -158,7 +159,7 @@ class PinsByServer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pinnedFiles = host.content.toList()..sort((a, b) => a.path.compareTo(b.path));
+    final pinnedFiles = host.content.toList()..sort((a, b) => compareStrings(a.path, b.path));
 
     return Column(
       children: [

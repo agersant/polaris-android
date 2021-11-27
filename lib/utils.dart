@@ -18,3 +18,7 @@ String basename(String path) {
   final standardPath = path.replaceAll(_pathSeparatorRegExp, '/');
   return p.basename(standardPath);
 }
+
+int compareStrings(String a, String b) {
+  return a.toLowerCase().compareTo(b.toLowerCase());
+}
