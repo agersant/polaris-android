@@ -13,8 +13,9 @@ class StreamingIndicator extends StatelessWidget {
     return StreamBuilder<PlayerState>(
       stream: getIt<AudioPlayer>().playerStateStream,
       builder: (context, snapshot) {
-        final bool isBuffering = snapshot.data?.processingState != ProcessingState.ready &&
-            snapshot.data?.processingState != ProcessingState.completed;
+        // TODO debounce this by a few frames to avoid quick flashes (eg. when skipping to next track)
+        final bool isBuffering = snapshot.data?.processingState == ProcessingState.loading ||
+            snapshot.data?.processingState == ProcessingState.buffering;
         if (!isBuffering) {
           return Container();
         }

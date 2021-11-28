@@ -116,7 +116,7 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
 
 Widget _currentSongIcon(BuildContext context, bool isPlaying, ProcessingState state) {
   final Color color = Theme.of(context).colorScheme.primary;
-  final bool isBuffering = state != ProcessingState.ready && state != ProcessingState.completed;
+  final bool isBuffering = state == ProcessingState.loading || state == ProcessingState.buffering;
 
   if (isBuffering) {
     return Padding(

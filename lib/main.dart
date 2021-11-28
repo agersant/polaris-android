@@ -168,7 +168,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showPlayer = isStartupComplete && pagesModel.isPlayerOpen;
-          final showMiniPlayer = isStartupComplete && (!pagesModel.isPlayerOpen || pagesModel.isQueueOpen);
+          final collapseMiniPlayer = !isStartupComplete || (pagesModel.isPlayerOpen && !pagesModel.isQueueOpen);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
@@ -205,7 +205,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     },
                   ),
                 ),
-                if (showMiniPlayer) const MiniPlayer(), // TODO animate in/out
+                MiniPlayer(collapse: collapseMiniPlayer),
               ],
             ),
           );
