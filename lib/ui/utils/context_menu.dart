@@ -134,7 +134,7 @@ class CollectionFileContextMenuButton extends StatelessWidget {
     final knownSongs = children;
     if (file.isDirectory()) {
       if (knownSongs == null) {
-        // TODO show some kind of UI while this is in progress (+ confirm)
+        // TODO Show some kind of UI while this is in progress and/or confirm result
         final polaris.Client client = getIt<polaris.Client>();
         final hostOverride = host;
         if (hostOverride != null && hostOverride != client.connectionManager.url) {

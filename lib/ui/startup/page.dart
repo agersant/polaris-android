@@ -80,8 +80,7 @@ class StartupPage extends StatelessWidget {
           orientation == Orientation.portrait ? const EdgeInsets.symmetric(horizontal: 48.0) : const EdgeInsets.all(0);
       Axis direction = orientation == Orientation.portrait ? Axis.vertical : Axis.horizontal;
 
-      // TODO would be nicer if logo lined up with splash screen
-      // for some kind of seemless transition
+      // TODO Logo should line up with splash screen for some seemless transition
 
       return Padding(
         padding: padding,

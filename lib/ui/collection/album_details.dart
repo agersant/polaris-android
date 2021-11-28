@@ -239,7 +239,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
-        // TODO ideally this would line up with the artwork on the right,
+        // Ideally this would line up with the artwork on the right,
         // but the top padding built-in the ListTile makes it difficult
         child: ListView(
           physics: const BouncingScrollPhysics(),

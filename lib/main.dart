@@ -184,7 +184,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                       if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
                       if (showSettings) const MaterialPage<dynamic>(child: SettingsPage()),
                       if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
-                      // TODO Ideally album details would be here but OpenContainer() can't be used with the pages API.
+                      // Ideally album details would be here but OpenContainer() can't be used with the pages API.
                       if (showPlayer) const MaterialPage<dynamic>(child: PlayerPage()),
                       if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
                     ],
