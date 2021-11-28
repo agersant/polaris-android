@@ -169,6 +169,7 @@ class PlayerPage extends StatelessWidget {
                 style:
                     Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ],
           ),
