@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
 import 'package:polaris/ui/playback/progress_state.dart';
@@ -13,37 +16,107 @@ import 'package:polaris/core/media_item.dart';
 
 final getIt = GetIt.instance;
 
-class MiniPlayer extends StatelessWidget {
-  const MiniPlayer({Key? key}) : super(key: key);
+class MiniPlayer extends StatefulWidget {
+  final bool collapse;
+
+  const MiniPlayer({required this.collapse, Key? key}) : super(key: key);
+
+  @override
+  State<MiniPlayer> createState() => _MiniPlayerState();
+}
+
+class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
+  static const int slideDurationMs = 120;
+  static const int slideInDelayMs = 400;
+
+  final audioPlayer = getIt<AudioPlayer>();
+  late StreamSubscription stateSubscription;
+  late final AnimationController _controller = AnimationController(vsync: this, value: 0);
+  bool isVisible = false;
+  dto.Song? _song;
+
+  @override
+  void initState() {
+    super.initState();
+    stateSubscription = audioPlayer.sequenceStateStream.listen((event) {
+      final MediaItem? mediaItem = event?.currentSource?.tag as MediaItem?;
+      if (mediaItem != null) {
+        setState(() => _song = mediaItem.toSong());
+      }
+      _updateVisibility();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stateSubscription.cancel();
+    _controller.dispose();
+  }
+
+  @override
+  void didUpdateWidget(MiniPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _updateVisibility();
+  }
+
+  void _updateVisibility() {
+    final bool newIsVisible = !widget.collapse && audioPlayer.sequenceState?.currentSource != null;
+    if (newIsVisible == isVisible) {
+      return;
+    }
+    final double height = newIsVisible ? 1 : 0;
+    final int durationMs = slideDurationMs + (newIsVisible ? slideInDelayMs : 0);
+    _controller.animateTo(height, duration: Duration(milliseconds: durationMs));
+    isVisible = newIsVisible;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = getIt<AudioPlayer>();
-
     return StreamBuilder<SequenceState?>(
       stream: audioPlayer.sequenceStateStream,
       builder: (context, snapshot) {
-        final MediaItem? mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
-        if (mediaItem == null) {
-          return Container(); // TODO animate the whole thing in/out
+        final song = _song;
+        if (song == null) {
+          return Container();
         }
-        return SizedBox(
-          height: 64,
-          child: Material(
-            elevation: 8,
-            child: InkWell(
-              onTap: () {
-                final pagesModel = getIt<PagesModel>();
-                pagesModel.openPlayer();
-                if (pagesModel.isQueueOpen) {
-                  pagesModel.closeQueue();
-                }
-              },
-              child: playerContent(context, mediaItem.toSong()),
+        return SizeTransition(
+          sizeFactor: CurvedAnimation(
+            parent: _controller,
+            curve: _getAnimationCurve(),
+          ),
+          axisAlignment: -1.0,
+          child: SizedBox(
+            height: 64,
+            child: Material(
+              elevation: 8,
+              child: InkWell(
+                onTap: _handleTap,
+                child: playerContent(context, song),
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  void _handleTap() {
+    final pagesModel = getIt<PagesModel>();
+    pagesModel.openPlayer();
+    if (pagesModel.isQueueOpen) {
+      pagesModel.closeQueue();
+    }
+  }
+
+  Curve _getAnimationCurve() {
+    if (!isVisible) {
+      return Curves.fastOutSlowIn;
+    }
+    return const Interval(
+      slideInDelayMs / (slideInDelayMs + slideDurationMs),
+      1.0,
+      curve: Curves.easeOutCubic,
     );
   }
 }
