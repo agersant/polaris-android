@@ -1,3 +1,4 @@
+import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
@@ -12,6 +13,7 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
+import 'package:polaris/ui/utils/text_one_line.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
@@ -150,18 +152,16 @@ class PlayerPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Expanded(child: Align(child: StreamingIndicator(), alignment: Alignment.centerRight)),
-                    // TODO can overflow
-                    Text(
-                      song?.formatTitle() ?? unknownSong,
-                      style: Theme.of(context).textTheme.subtitle1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Expanded(child: Container()),
-                  ],
+                child: AlignPositioned.relative(
+                  // Workaround for https://github.com/flutter/flutter/issues/18761
+                  container: TextOneLine(
+                    song?.formatTitle() ?? unknownSong,
+                    style: Theme.of(context).textTheme.subtitle1,
+                    textAlign: TextAlign.center,
+                  ),
+                  child: const StreamingIndicator(),
+                  touch: Touch.outside,
+                  alignment: const Alignment(-1.0, 0.0),
                 ),
               ),
               Text(

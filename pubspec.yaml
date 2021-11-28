@@ -24,9 +24,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  align_positioned: ^3.0.0
   animations: ^2.0.0
   audio_session: ^0.1.5
   async: ^2.8.1
+  characters: ^1.1.0
   crypto: ^3.0.1
   dartz: ^0.10.0-nullsafety.1
   flutter_settings_screens: ^0.3.2-null-safety
