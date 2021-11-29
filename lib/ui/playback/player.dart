@@ -192,8 +192,6 @@ class PlayerPage extends StatelessWidget {
             SeekBar(
               duration: duration ?? Duration.zero,
               position: position ?? Duration.zero,
-              // TODO For songs that arent from the cache, this simply restarts playback (?)
-              // while still advancing the slider to the specified location.
               onChangeEnd: player.seek,
             ),
             Padding(
