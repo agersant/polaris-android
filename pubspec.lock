@@ -8,13 +8,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "21.0.0"
-  align_positioned:
-    dependency: "direct main"
-    description:
-      name: align_positioned
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   analyzer:
     dependency: transitive
     description:
@@ -324,13 +317,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10"
-  matrix4_transform:
-    dependency: transitive
-    description:
-      name: matrix4_transform
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.1"
   meta:
     dependency: transitive
     description:

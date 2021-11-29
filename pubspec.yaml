@@ -24,7 +24,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  align_positioned: ^3.0.0
   animations: ^2.0.0
   audio_session: ^0.1.5
   async: ^2.8.1

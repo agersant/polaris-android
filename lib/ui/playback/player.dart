@@ -1,4 +1,3 @@
-import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
@@ -152,16 +151,19 @@ class PlayerPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
-                child: AlignPositioned.relative(
-                  // Workaround for https://github.com/flutter/flutter/issues/18761
-                  container: TextOneLine(
-                    song?.formatTitle() ?? unknownSong,
-                    style: Theme.of(context).textTheme.subtitle1,
-                    textAlign: TextAlign.center,
-                  ),
-                  child: const StreamingIndicator(),
-                  touch: Touch.outside,
-                  alignment: const Alignment(-1.0, 0.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const StreamingIndicator(),
+                    Flexible(
+                      // Workaround for https://github.com/flutter/flutter/issues/18761
+                      child: TextOneLine(
+                        song?.formatTitle() ?? unknownSong,
+                        style: Theme.of(context).textTheme.subtitle1,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Text(

@@ -30,7 +30,7 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   static const int slideInDelayMs = 400;
 
   final audioPlayer = getIt<AudioPlayer>();
-  late StreamSubscription stateSubscription;
+  late StreamSubscription _stateSubscription;
   late final AnimationController _controller = AnimationController(vsync: this, value: 0);
   bool isVisible = false;
   dto.Song? _song;
@@ -38,7 +38,7 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    stateSubscription = audioPlayer.sequenceStateStream.listen((event) {
+    _stateSubscription = audioPlayer.sequenceStateStream.listen((event) {
       final MediaItem? mediaItem = event?.currentSource?.tag as MediaItem?;
       if (mediaItem != null) {
         setState(() => _song = mediaItem.toSong());
@@ -50,7 +50,7 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
-    stateSubscription.cancel();
+    _stateSubscription.cancel();
     _controller.dispose();
   }
 
