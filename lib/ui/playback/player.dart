@@ -194,6 +194,12 @@ class PlayerPage extends StatelessWidget {
             SeekBar(
               duration: duration ?? Duration.zero,
               position: position ?? Duration.zero,
+              // TODO More often than not, this restarts playback from the beginning, while
+              // still moving the current position forward.
+              // Seems to happen more reliably on real device than emulator, and when song
+              // isn't streaming from disk.
+              // May or may not coincide with the audioplayer's durationStream not having
+              // a value to report (and the displayed duration being from the dto.Song).
               onChangeEnd: player.seek,
             ),
             Padding(
