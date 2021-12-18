@@ -52,7 +52,7 @@ class CollectionFileContextMenuButton extends StatelessWidget {
     // Mimic logic from ListTile._iconColor
     const iconSize = 20.0;
     final theme = Theme.of(context);
-    final ListTileTheme tileTheme = ListTileTheme.of(context);
+    final ListTileThemeData tileTheme = ListTileTheme.of(context);
     var iconColor = tileTheme.iconColor;
     iconColor ??= theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
 
