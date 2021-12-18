@@ -1,7 +1,5 @@
 import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class FallbackArtwork extends StatelessWidget {
   const FallbackArtwork({Key? key}) : super(key: key);
