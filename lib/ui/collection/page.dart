@@ -17,7 +17,7 @@ class CollectionPage extends StatefulWidget {
   const CollectionPage({Key? key}) : super(key: key);
 
   @override
-  _CollectionPageState createState() => _CollectionPageState();
+  State<CollectionPage> createState() => _CollectionPageState();
 }
 
 class _CollectionPageState extends State<CollectionPage> with TickerProviderStateMixin {

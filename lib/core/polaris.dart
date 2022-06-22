@@ -26,7 +26,7 @@ enum _Method {
   post,
 }
 
-extension MethodToString on _Method {
+extension _MethodToString on _Method {
   String toHTTPMethod() {
     switch (this) {
       case _Method.get:
@@ -64,7 +64,7 @@ abstract class _BaseHttpClient {
     http.Request request = http.Request(method.toHTTPMethod(), Uri.parse(url));
 
     if (authenticationToken != null) {
-      request.headers[HttpHeaders.authorizationHeader] = 'Bearer ' + authenticationToken;
+      request.headers[HttpHeaders.authorizationHeader] = 'Bearer $authenticationToken';
     }
 
     if (method == _Method.post) {
@@ -187,10 +187,10 @@ class HttpClient extends _BaseHttpClient {
   }
 
   Uri getImageURI(String path) {
-    String url = makeURL(thumbnailEndpoint + Uri.encodeComponent(path) + '?pad=false');
+    String url = makeURL('$thumbnailEndpoint${Uri.encodeComponent(path)}?pad=false');
     String? token = authenticationManager.token;
     if (token != null && token.isNotEmpty) {
-      url += '&auth_token=' + token;
+      url += '&auth_token=$token';
     }
     return Uri.parse(url);
   }
@@ -199,7 +199,7 @@ class HttpClient extends _BaseHttpClient {
     String url = makeURL(audioEndpoint + Uri.encodeComponent(path));
     String? token = authenticationManager.token;
     if (token != null && token.isNotEmpty) {
-      url += '?auth_token=' + token;
+      url += '?auth_token=$token';
     }
     return Uri.parse(url);
   }

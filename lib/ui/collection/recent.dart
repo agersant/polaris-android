@@ -12,7 +12,7 @@ class RecentAlbums extends StatefulWidget {
   const RecentAlbums({Key? key}) : super(key: key);
 
   @override
-  _RecentAlbumsState createState() => _RecentAlbumsState();
+  State<RecentAlbums> createState() => _RecentAlbumsState();
 }
 
 class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClientMixin {

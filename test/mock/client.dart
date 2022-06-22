@@ -9,10 +9,10 @@ import 'package:polaris/core/polaris.dart';
 const goodHost = 'my-polaris-server';
 const badHost = 'not-a-polaris-server';
 const incompatibleHost = 'incompatible-polaris-server';
-const goodHostURI = 'http://' + goodHost;
-const badHostURI = 'http://' + badHost;
-const incompatibleHostURI = 'http://' + incompatibleHost;
-const trailingSlashHostURI = goodHostURI + '/';
+const goodHostURI = 'http://$goodHost';
+const badHostURI = 'http://$badHost';
+const incompatibleHostURI = 'http://$incompatibleHost';
+const trailingSlashHostURI = '$goodHostURI/';
 
 const compatibleAPIVersion = '{"major": 6, "minor": 0}';
 const incompatibleAPIVersion = '{"major": 5, "minor": 0}';
@@ -22,13 +22,13 @@ const rootDirectoryName = 'root';
 const heronDirectoryName = 'Heron';
 const aegeusDirectoryName = 'Aegeus';
 const rootDirectoryPath = rootDirectoryName;
-const heronDirectoryPath = rootDirectoryName + '/' + heronDirectoryName;
-const aegeusDirectoryPath = heronDirectoryPath + '/' + aegeusDirectoryName;
+const heronDirectoryPath = '$rootDirectoryName/$heronDirectoryName';
+const aegeusDirectoryPath = '$heronDirectoryPath/$aegeusDirectoryName';
 
 const labyrinthSongName = 'Labyrinth';
 const fallInwardsSongName = 'Falling Inwards';
-const labyrinthFilePath = aegeusDirectoryPath + '/' + labyrinthSongName + '.mp3';
-const fallInwardsFilePath = aegeusDirectoryPath + '/' + fallInwardsSongName + '.mp3';
+const labyrinthFilePath = '$aegeusDirectoryPath/$labyrinthSongName.mp3';
+const fallInwardsFilePath = '$aegeusDirectoryPath/$fallInwardsSongName.mp3';
 
 class HttpClient extends mocktail.Mock implements http.Client {
   bool _failLogin = false;

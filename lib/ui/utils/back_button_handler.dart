@@ -9,7 +9,7 @@ class BackButtonHandler extends StatefulWidget {
   const BackButtonHandler(this.child, {Key? key}) : super(key: key);
 
   @override
-  _BackButtonHandlerState createState() => _BackButtonHandlerState();
+  State<BackButtonHandler> createState() => _BackButtonHandlerState();
 }
 
 class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindingObserver {

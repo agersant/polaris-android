@@ -18,7 +18,7 @@ class AlbumDetails extends StatefulWidget {
   const AlbumDetails(this.album, {Key? key}) : super(key: key);
 
   @override
-  _AlbumDetailsState createState() => _AlbumDetailsState();
+  State<AlbumDetails> createState() => _AlbumDetailsState();
 }
 
 class _AlbumDetailsState extends State<AlbumDetails> {

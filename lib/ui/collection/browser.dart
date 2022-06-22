@@ -23,7 +23,7 @@ class Browser extends StatefulWidget {
   const Browser({Key? key}) : super(key: key);
 
   @override
-  _BrowserState createState() => _BrowserState();
+  State<Browser> createState() => _BrowserState();
 }
 
 class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
@@ -98,7 +98,7 @@ class BrowserLocation extends StatefulWidget {
       : super(key: key);
 
   @override
-  _BrowserLocationState createState() => _BrowserLocationState();
+  State<BrowserLocation> createState() => _BrowserLocationState();
 }
 
 class _BrowserLocationState extends State<BrowserLocation> {
@@ -256,7 +256,7 @@ class Directory extends StatelessWidget {
         closedColor: Theme.of(context).scaffoldBackgroundColor,
         openColor: Theme.of(context).scaffoldBackgroundColor,
         openBuilder: (context, action) => AlbumDetails(directory),
-        closedBuilder: (context, action) => Material(child: InkWell(child: tile, enableFeedback: true, onTap: action)),
+        closedBuilder: (context, action) => Material(child: InkWell(enableFeedback: true, onTap: action, child: tile)),
       );
     }
   }
@@ -300,7 +300,7 @@ class Breadcrumbs extends StatefulWidget {
   const Breadcrumbs(this.path, this.popLocations, {Key? key}) : super(key: key);
 
   @override
-  _BreadcrumbsState createState() => _BreadcrumbsState();
+  State<Breadcrumbs> createState() => _BreadcrumbsState();
 }
 
 class _BreadcrumbsState extends State<Breadcrumbs> {

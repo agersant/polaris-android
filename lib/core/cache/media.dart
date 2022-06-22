@@ -259,11 +259,13 @@ class MediaCache implements MediaCacheInterface {
   }
 
   String _buildImagePath(String host, String path) {
-    return p.join(_root.path, 'image_' + _sanitize(host + '::' + path));
+    final fullPath = '$host::$path';
+    return p.join(_root.path, 'image_${_sanitize(fullPath)}');
   }
 
   String _buildAudioPath(String host, String path) {
-    return p.join(_root.path, 'audio_' + _sanitize(host + '::' + path));
+    final fullPath = '$host::$path';
+    return p.join(_root.path, 'audio_${_sanitize(fullPath)}');
   }
 }
 

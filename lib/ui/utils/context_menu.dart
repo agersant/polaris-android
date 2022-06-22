@@ -63,61 +63,62 @@ class CollectionFileContextMenuButton extends StatelessWidget {
     );
 
     return PopupMenuButton<CollectionFileAction>(
-        // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
-        child: compact ? icon : null,
-        icon: compact ? null : icon,
-        iconSize: iconSize,
-        onSelected: (CollectionFileAction result) async {
-          switch (result) {
-            case CollectionFileAction.queueLast:
-              getIt<Playlist>().queueLast(await _listSongs());
-              break;
-            case CollectionFileAction.queueNext:
-              getIt<Playlist>().queueNext(await _listSongs());
-              break;
-            case CollectionFileAction.refresh:
-              onRefresh();
-              break;
-            case CollectionFileAction.removeFromQueue:
-              onRemoveFromQueue();
-              break;
-            case CollectionFileAction.togglePin:
-              final pinManager = getIt<pin.Manager>();
-              final String? useHost = _getHost();
-              if (useHost != null) {
-                if (_isPinned()) {
-                  pinManager.unpin(useHost, file);
-                } else {
-                  pinManager.pin(useHost, file);
-                }
+      icon: compact ? null : icon,
+      iconSize: iconSize,
+      onSelected: (CollectionFileAction result) async {
+        switch (result) {
+          case CollectionFileAction.queueLast:
+            getIt<Playlist>().queueLast(await _listSongs());
+            break;
+          case CollectionFileAction.queueNext:
+            getIt<Playlist>().queueNext(await _listSongs());
+            break;
+          case CollectionFileAction.refresh:
+            onRefresh();
+            break;
+          case CollectionFileAction.removeFromQueue:
+            onRemoveFromQueue();
+            break;
+          case CollectionFileAction.togglePin:
+            final pinManager = getIt<pin.Manager>();
+            final String? useHost = _getHost();
+            if (useHost != null) {
+              if (_isPinned()) {
+                pinManager.unpin(useHost, file);
+              } else {
+                pinManager.pin(useHost, file);
               }
-              break;
-            case CollectionFileAction.songInfo:
-              if (file.isSong()) {
-                SongInfoDialog.openInfoDialog(context, file.asSong());
-              }
-              break;
-            default:
-              break;
-          }
-        },
-        itemBuilder: (BuildContext context) {
-          return <PopupMenuEntry<CollectionFileAction>>[
-            if (actions.contains(CollectionFileAction.queueLast))
-              _buildButton(CollectionFileAction.queueLast, Icons.playlist_add, contextMenuQueueLast),
-            if (actions.contains(CollectionFileAction.queueNext))
-              _buildButton(CollectionFileAction.queueNext, Icons.playlist_play, contextMenuQueueNext),
-            if (actions.contains(CollectionFileAction.refresh))
-              _buildButton(CollectionFileAction.refresh, Icons.refresh, contextMenuRefresh),
-            if (actions.contains(CollectionFileAction.removeFromQueue))
-              _buildButton(CollectionFileAction.removeFromQueue, Icons.clear, contextMenuRemoveFromQueue),
-            if (actions.contains(CollectionFileAction.togglePin))
-              _buildButton(CollectionFileAction.togglePin, Icons.offline_pin,
-                  _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
-            if (actions.contains(CollectionFileAction.songInfo))
-              _buildButton(CollectionFileAction.songInfo, Icons.info_outline, contextMenuSongInfo),
-          ];
-        });
+            }
+            break;
+          case CollectionFileAction.songInfo:
+            if (file.isSong()) {
+              SongInfoDialog.openInfoDialog(context, file.asSong());
+            }
+            break;
+          default:
+            break;
+        }
+      },
+      itemBuilder: (BuildContext context) {
+        return <PopupMenuEntry<CollectionFileAction>>[
+          if (actions.contains(CollectionFileAction.queueLast))
+            _buildButton(CollectionFileAction.queueLast, Icons.playlist_add, contextMenuQueueLast),
+          if (actions.contains(CollectionFileAction.queueNext))
+            _buildButton(CollectionFileAction.queueNext, Icons.playlist_play, contextMenuQueueNext),
+          if (actions.contains(CollectionFileAction.refresh))
+            _buildButton(CollectionFileAction.refresh, Icons.refresh, contextMenuRefresh),
+          if (actions.contains(CollectionFileAction.removeFromQueue))
+            _buildButton(CollectionFileAction.removeFromQueue, Icons.clear, contextMenuRemoveFromQueue),
+          if (actions.contains(CollectionFileAction.togglePin))
+            _buildButton(CollectionFileAction.togglePin, Icons.offline_pin,
+                _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+          if (actions.contains(CollectionFileAction.songInfo))
+            _buildButton(CollectionFileAction.songInfo, Icons.info_outline, contextMenuSongInfo),
+        ];
+      },
+      // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
+      child: compact ? icon : null,
+    );
   }
 
   bool _isPinned() {

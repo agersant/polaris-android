@@ -13,7 +13,7 @@ class Thumbnail extends StatefulWidget {
   const Thumbnail(this.path, {Key? key}) : super(key: key);
 
   @override
-  _ThumbnailState createState() => _ThumbnailState();
+  State<Thumbnail> createState() => _ThumbnailState();
 }
 
 class _ThumbnailState extends State<Thumbnail> {

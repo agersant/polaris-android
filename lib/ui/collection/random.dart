@@ -12,7 +12,7 @@ class RandomAlbums extends StatefulWidget {
   const RandomAlbums({Key? key}) : super(key: key);
 
   @override
-  _RandomAlbumsState createState() => _RandomAlbumsState();
+  State<RandomAlbums> createState() => _RandomAlbumsState();
 }
 
 class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClientMixin {

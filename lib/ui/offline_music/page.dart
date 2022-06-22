@@ -454,15 +454,15 @@ class Caption extends StatelessWidget {
 }
 
 Future<int> computeSizeOnDisk(Set<dto.Song> songs, String host, {Function(int)? onProgress}) async {
-  final _mediaCache = getIt<MediaCacheInterface>();
+  final mediaCache = getIt<MediaCacheInterface>();
 
   int size = 0;
   await Future.wait(songs.map((song) async {
-    final hasAudio = await _mediaCache.hasAudio(host, song.path);
+    final hasAudio = await mediaCache.hasAudio(host, song.path);
     if (!hasAudio) {
       return;
     }
-    final cacheFile = _mediaCache.getAudioLocation(host, song.path);
+    final cacheFile = mediaCache.getAudioLocation(host, song.path);
     try {
       final stat = await cacheFile.stat();
       size += stat.size;

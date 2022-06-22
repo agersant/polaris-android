@@ -158,7 +158,7 @@ class Manager extends ChangeNotifier {
   String _cleanURL(String url) {
     url = url.trim();
     if (!url.startsWith('http')) {
-      url = 'http://' + url;
+      url = 'http://$url';
     }
     while (url.endsWith('/')) {
       url = url.substring(0, url.length - 1);

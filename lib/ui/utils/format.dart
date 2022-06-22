@@ -25,7 +25,9 @@ String formatBytes(int bytes, int decimals) {
   }
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   final int suffixIndex = (log(bytes) / log(1024)).floor();
-  return ((bytes / pow(1024, suffixIndex)).toStringAsFixed(decimals)) + ' ' + suffixes[suffixIndex];
+  final value = ((bytes / pow(1024, suffixIndex)).toStringAsFixed(decimals));
+  final suffix = suffixes[suffixIndex];
+  return '$value $suffix';
 }
 
 extension SongFormatting on Song {

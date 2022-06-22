@@ -120,8 +120,8 @@ class PlayerPage extends StatelessWidget {
         final dto.Song? song = mediaItem?.toSong();
         return Material(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          child: LargeThumbnail(song?.artwork),
           elevation: 2,
+          child: LargeThumbnail(song?.artwork),
         );
       },
     );

@@ -10,7 +10,7 @@ class AnimatedEqualizer extends StatefulWidget {
   const AnimatedEqualizer(this.color, this.size, this.isPlaying, {Key? key}) : super(key: key);
 
   @override
-  _AnimatedEqualizerState createState() => _AnimatedEqualizerState();
+  State<AnimatedEqualizer> createState() => _AnimatedEqualizerState();
 }
 
 class _AnimatedEqualizerState extends State<AnimatedEqualizer> with SingleTickerProviderStateMixin {

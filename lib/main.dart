@@ -223,7 +223,7 @@ class PolarisApp extends StatefulWidget {
   const PolarisApp({Key? key}) : super(key: key);
 
   @override
-  _PolarisAppState createState() => _PolarisAppState();
+  State<PolarisApp> createState() => _PolarisAppState();
 }
 
 class _PolarisAppState extends State<PolarisApp> {

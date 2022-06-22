@@ -11,7 +11,7 @@ class ConnectForm extends StatefulWidget {
   const ConnectForm({Key? key}) : super(key: key);
 
   @override
-  _ConnectFormState createState() => _ConnectFormState();
+  State<ConnectForm> createState() => _ConnectFormState();
 }
 
 class _ConnectFormState extends State<ConnectForm> {
@@ -40,7 +40,7 @@ class _ConnectFormState extends State<ConnectForm> {
                 if (connectionManager.state != connection.State.disconnected) {
                   return const CircularProgressIndicator();
                 }
-                return ElevatedButton(child: const Text(connectButtonLabel), onPressed: _onConnectPressed);
+                return ElevatedButton(onPressed: _onConnectPressed, child: const Text(connectButtonLabel));
               })),
         ],
       ),
