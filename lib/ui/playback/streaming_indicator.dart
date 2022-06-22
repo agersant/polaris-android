@@ -18,13 +18,15 @@ class StreamingIndicator extends StatefulWidget {
 class _StreamingIndicatorState extends State<StreamingIndicator> with TickerProviderStateMixin {
   final audioPlayer = getIt<AudioPlayer>();
   late StreamSubscription _stateSubscription;
-  late final AnimationController _controller = AnimationController(vsync: this, value: 0);
+  late final AnimationController _controller;
   late Stream<bool> bufferingStream;
   bool visible = false;
 
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(vsync: this, value: 0);
 
     final bufferingStream = getIt<AudioPlayer>()
         .playerStateStream

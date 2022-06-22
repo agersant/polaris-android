@@ -31,13 +31,16 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
 
   final audioPlayer = getIt<AudioPlayer>();
   late StreamSubscription _stateSubscription;
-  late final AnimationController _controller = AnimationController(vsync: this, value: 0);
+  late final AnimationController _controller;
   bool isVisible = false;
   dto.Song? _song;
 
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(vsync: this, value: 0);
+
     _stateSubscription = audioPlayer.sequenceStateStream.listen((event) {
       final MediaItem? mediaItem = event?.currentSource?.tag as MediaItem?;
       if (mediaItem != null) {

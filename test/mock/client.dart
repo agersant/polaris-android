@@ -38,7 +38,7 @@ class HttpClient extends mocktail.Mock implements http.Client {
   }
 
   HttpClient() {
-    mocktail.registerFallbackValue(http.Request("", Uri()));
+    mocktail.registerFallbackValue(http.Request("GET", Uri()));
 
     mocktail.when(() => send(mocktail.any())).thenAnswer((Invocation invocation) async {
       final Request request = invocation.positionalArguments[0];
