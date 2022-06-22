@@ -33,7 +33,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   Stream<Set<Host>> get hostsStream => _hostsSubject.stream;
 
   @override
-  Set<Host> get hosts => _hostsSubject.value!;
+  Set<Host> get hosts => _hostsSubject.value;
 
   Manager(
     this._storage, {

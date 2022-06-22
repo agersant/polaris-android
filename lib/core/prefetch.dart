@@ -30,7 +30,7 @@ class Manager {
   late UniqueTimer _timer;
 
   final _songsBeingFetchedSubject = BehaviorSubject<Set<dto.Song>>.seeded({});
-  Set<dto.Song> get songsBeingFetched => _songsBeingFetchedSubject.requireValue;
+  Set<dto.Song> get songsBeingFetched => _songsBeingFetchedSubject.value;
   Stream<Set<dto.Song>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
 
   Manager({

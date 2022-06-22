@@ -26,19 +26,19 @@ dependencies:
 
   animations: ^2.0.0
   audio_session: ^0.1.5
-  async: ^2.8.1
-  characters: ^1.1.0
+  async: ^2.8.2
+  characters: ^1.2.0
   crypto: ^3.0.1
   dartz: ^0.10.0-nullsafety.1
   flutter_settings_screens: ^0.3.2-null-safety
-  flutter_svg: ^0.22.0
-  get_it: ^6.1.1
+  flutter_svg: ^1.1.0
+  get_it: ^7.2.0
   just_audio: ^0.9.17
   just_audio_background: ^0.0.1-beta.1
   http: ^0.13.1
   path_provider: ^2.0.1
   provider: ^6.0.0
-  rxdart: ^0.26.0
+  rxdart: ^0.27.4
   shared_preferences: ^2.0.5
   uuid: ^3.0.4
 
