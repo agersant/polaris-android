@@ -98,7 +98,7 @@ class Manager {
     final List<IndexedAudioSource> audioSources = sequenceState?.sequence ?? [];
     final int currentIndex = sequenceState?.currentIndex ?? -1;
     final int maxSongsToPreload =
-        Settings.getValue<int>(settings.keyNumSongsToPreload, settings.defaultNumSongsToPreload);
+        Settings.getValue<int>(settings.keyNumSongsToPreload) ?? settings.defaultNumSongsToPreload;
     for (int index = 0; index < audioSources.length; index++) {
       if (index <= currentIndex) {
         continue;

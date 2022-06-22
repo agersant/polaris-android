@@ -316,6 +316,7 @@ class Client {
     } catch (e) {
       return null;
     }
+    return null;
   }
 
   Future<AudioSource?> getAudio(dto.Song song, String id) async {

@@ -319,7 +319,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
   }
 
   void _scrollToEnd() {
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(
         _scrollController.position.maxScrollExtent,
       );

@@ -42,7 +42,7 @@ class FallbackArtworkPainter extends CustomPainter {
 
     // Draw error icon
     if (drawIcon) {
-      final IconData icon = Icons.error;
+      const IconData icon = Icons.error;
       final TextSpan span = TextSpan(
           text: String.fromCharCode(icon.codePoint),
           style: TextStyle(fontFamily: icon.fontFamily, fontSize: 2 * iconRadius, color: iconColor));

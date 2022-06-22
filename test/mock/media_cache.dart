@@ -32,7 +32,9 @@ class MediaCache implements MediaCacheInterface {
   bool hasAudioSync(String host, String path) => false;
 
   @override
-  Future<File?> getAudio(String host, String path) async {}
+  Future<File?> getAudio(String host, String path) async {
+    return null;
+  }
 
   @override
   File getAudioLocation(String host, String path) => File("");

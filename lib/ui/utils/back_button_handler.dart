@@ -16,12 +16,12 @@ class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindi
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -31,8 +31,8 @@ class _BackButtonHandlerState extends State<BackButtonHandler> with WidgetsBindi
   @override
   void didUpdateWidget(BackButtonHandler oldWidget) {
     super.didUpdateWidget(oldWidget);
-    WidgetsBinding.instance?.removeObserver(this);
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
