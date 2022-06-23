@@ -60,8 +60,6 @@ class Playlist {
   }
 
   Future clear() async {
-    // TODO after using this, calling queueLast or queueNext somehow always skips a song
-    // See https://github.com/ryanheise/just_audio/issues/591
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
   }
