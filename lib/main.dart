@@ -126,8 +126,8 @@ Future _registerSingletons() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await _registerSingletons();
   await Settings.init();
+  await _registerSingletons();
   await JustAudioBackground.init(
     androidNotificationChannelName: 'Polaris Audio Playback',
     androidNotificationOngoing: true,

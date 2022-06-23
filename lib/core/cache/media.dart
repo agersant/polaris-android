@@ -199,7 +199,7 @@ class MediaCache implements MediaCacheInterface {
         return stat.size;
       }));
       int cacheSize = sizes.fold(0, (a, b) => a + b);
-      final maxCacheSize = oneMB * (Settings.getValue<int>(keyCacheCapacityMB) ?? defaultCacheSizeMB);
+      final maxCacheSize = oneMB * Settings.getValue<int>(keyCacheCapacityMB, defaultCacheSizeMB);
 
       int numFilesRemoved = 0;
       io.File lruFile = _getLRUFile(_root);
