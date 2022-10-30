@@ -14,6 +14,7 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
+import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -81,7 +82,8 @@ class Harness {
       polarisClient: polarisClient,
       audioPlayer: audioPlayer,
     );
-    audioPlayer.setAudioSource(playlist.audioSource);
+    final savestateManager =
+        savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
     final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(
       uuid: uuid,
@@ -109,13 +111,17 @@ class Harness {
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
     getIt.registerSingleton<polaris.Client>(polarisClient);
-    getIt.registerSingleton<prefetch.Manager>(prefetchManager);
+    getIt.registerSingleton<savestate.Manager>(savestateManager);
     getIt.registerSingleton<pin.Manager>(pinManager);
+    getIt.registerSingleton<prefetch.Manager>(prefetchManager);
     getIt.registerSingleton<cleanup.Manager>(cleanupManager);
     getIt.registerSingleton<BrowserModel>(browserModel);
     getIt.registerSingleton<PagesModel>(PagesModel());
     getIt.registerSingleton<settings.Manager>(settingsManager);
     getIt.registerSingleton<Uuid>(uuid);
+
+    audioPlayer.setAudioSource(playlist.audioSource);
+    savestateManager.init();
 
     return Harness(mockHttpClient, collectionCache);
   }
