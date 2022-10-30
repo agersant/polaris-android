@@ -1,6 +1,8 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
@@ -26,10 +28,10 @@ class Playlist {
     });
   }
 
-  Future queueLast(List<dto.Song> songs) async {
+  Future queueLast(List<dto.Song> songs, {bool autoPlay = true}) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     await _audioSource.addAll(await _makeAudioSources(songs));
-    if (wasEmpty) {
+    if (wasEmpty && autoPlay) {
       audioPlayer.play();
     }
   }
@@ -62,6 +64,10 @@ class Playlist {
   Future clear() async {
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
+  }
+
+  List<dto.Song> getSongs() {
+    return _audioSource.sequence.map((e) => (e.tag as MediaItem?)?.toSong()).whereType<dto.Song>().toList();
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<dto.Song> songs) async {

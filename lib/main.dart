@@ -15,6 +15,7 @@ import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
+import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
@@ -82,6 +83,8 @@ Future _registerSingletons() async {
     polarisClient: polarisClient,
     audioPlayer: audioPlayer,
   );
+  final savestateManager =
+      savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,
     polarisClient: polarisClient,
@@ -105,8 +108,7 @@ Future _registerSingletons() async {
   );
   final browserModel = BrowserModel(connectionManager: connectionManager);
 
-  // TODO Needs some logic to recover from app restart while audio service is still running
-  // TODO Add disk persistence to playlist and playback state
+  // TODO Needs some logic to recover from app restart while audio service is still running (?)
 
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
@@ -115,8 +117,9 @@ Future _registerSingletons() async {
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
   getIt.registerSingleton<polaris.Client>(polarisClient);
-  getIt.registerSingleton<prefetch.Manager>(prefetchManager);
+  getIt.registerSingleton<savestate.Manager>(savestateManager);
   getIt.registerSingleton<pin.Manager>(pinManager);
+  getIt.registerSingleton<prefetch.Manager>(prefetchManager);
   getIt.registerSingleton<cleanup.Manager>(cleanupManager);
   getIt.registerSingleton<BrowserModel>(browserModel);
   getIt.registerSingleton<PagesModel>(PagesModel());
@@ -135,6 +138,7 @@ void main() async {
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
+  getIt<savestate.Manager>().init();
 
   runApp(const PolarisApp());
 }
