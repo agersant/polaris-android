@@ -129,11 +129,14 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildMainPanel(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: MainAxisSize.max,
       children: [
         _buildTrackDetails(),
         _buildProgressBar(),
-        const PlaybackControls(),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          child: PlaybackControls(),
+        ),
       ],
     );
   }
@@ -227,7 +230,7 @@ class PlayerPage extends StatelessWidget {
         final int? nextIndex = player.nextIndex;
         dto.Song? nextSong;
         if (nextIndex != null) {
-          final audioSource = snapshot.data?.effectiveSequence[nextIndex];
+          final audioSource = snapshot.data?.sequence[nextIndex];
           final mediaItem = audioSource?.tag as MediaItem?;
           nextSong = mediaItem?.toSong();
         }

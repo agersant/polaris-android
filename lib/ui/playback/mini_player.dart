@@ -52,9 +52,9 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    super.dispose();
     _stateSubscription.cancel();
     _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -177,7 +177,7 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                 ],
               ),
             ),
-            const PlaybackControls(),
+            const PlaybackControls(mini: true),
           ],
         );
       },

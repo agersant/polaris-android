@@ -94,19 +94,29 @@ class Manager {
   }
 
   Future<StreamAudioSource?> _pickPlaylistSongToFetch(String host) async {
-    final SequenceState? sequenceState = audioPlayer.sequenceState;
-    final List<IndexedAudioSource> audioSources = sequenceState?.sequence ?? [];
-    final int currentIndex = sequenceState?.currentIndex ?? -1;
     final int maxSongsToPreload =
         Settings.getValue<int>(settings.keyNumSongsToPreload, settings.defaultNumSongsToPreload);
-    for (int index = 0; index < audioSources.length; index++) {
-      if (index <= currentIndex) {
-        continue;
-      }
-      if ((index - currentIndex) > maxSongsToPreload) {
-        return null;
-      }
-      final audioSource = audioSources[index];
+    final SequenceState? sequenceState = audioPlayer.sequenceState;
+    final List<IndexedAudioSource> effectiveSequence = sequenceState?.effectiveSequence ?? [];
+    final int currentIndex = sequenceState?.currentIndex ?? -1;
+
+    int currentEffectiveIndex;
+    if (audioPlayer.shuffleModeEnabled) {
+      currentEffectiveIndex = sequenceState?.shuffleIndices.indexOf(currentIndex) ?? -1;
+    } else {
+      currentEffectiveIndex = currentIndex;
+    }
+
+    if (effectiveSequence.isEmpty) {
+      return null;
+    }
+
+    int numSongsConsidered = 0;
+    while (numSongsConsidered < maxSongsToPreload) {
+      numSongsConsidered++;
+      int index = (currentEffectiveIndex + numSongsConsidered) % effectiveSequence.length;
+
+      final audioSource = effectiveSequence[index];
       final MediaItem mediaItem = audioSource.tag;
       final dto.Song song = mediaItem.toSong();
       final bool hasAudio = await mediaCache.hasAudio(host, song.path);
@@ -114,6 +124,7 @@ class Manager {
         return audioSource;
       }
     }
+
     return null;
   }
 
