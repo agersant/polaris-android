@@ -1,5 +1,5 @@
 name: polaris
-description: A new Flutter project.
+description: Music player for usage with a Polaris streaming server.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
