@@ -1,0 +1,78 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def secretProperties = new Properties()
+secretProperties.setProperty("SIGNING_KEYSTORE_PATH", "${System.getenv("SIGNING_KEYSTORE_PATH")}")
+secretProperties.setProperty("SIGNING_KEYSTORE_PASSWORD", "${System.getenv("SIGNING_KEYSTORE_PASSWORD")}")
+secretProperties.setProperty("SIGNING_KEY_ALIAS", "${System.getenv("SIGNING_KEY_ALIAS")}")
+secretProperties.setProperty("SIGNING_KEY_PASSWORD", "${System.getenv("SIGNING_KEY_PASSWORD")}")
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 31
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        applicationId "agersant.polaris"
+        minSdkVersion 21
+        targetSdkVersion 31
+        versionCode 1
+        versionName "0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("${secretProperties["SIGNING_KEYSTORE_PATH"]}")
+            storePassword "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
+            keyAlias "${secretProperties["SIGNING_KEY_ALIAS"]}"
+            keyPassword "${secretProperties["SIGNING_KEY_PASSWORD"]}"
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            shrinkResources false
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+task printVersionCode {
+    doLast {
+        println android.defaultConfig.versionCode
+    }
+}
+
+task printVersionName {
+    doLast {
+        println android.defaultConfig.versionName
+    }
+}

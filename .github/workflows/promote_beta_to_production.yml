@@ -3,7 +3,6 @@ name: Promote Beta To Production
 on: workflow_dispatch
 
 jobs:
-
   publish:
     name: Promote
     runs-on: ubuntu-20.04
@@ -24,8 +23,9 @@ jobs:
       - name: Promote release
         uses: maierj/fastlane-action@v1.4.0
         with:
-          lane: 'promote_beta_to_production'
-          skip-tracking: 'true'
+          lane: "promote_beta_to_production"
+          skip-tracking: "true"
+          subdirectory: "android"
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
       - name: Tag production branch
@@ -35,4 +35,3 @@ jobs:
           git tag -f -a google-play-production -m "Deployed to Google play"
           git tag -f -a ${{ env.VERSION_NAME }} -m "Version number"
           git push -f --tags
-
