@@ -24,7 +24,7 @@ jobs:
           ref: beta
       - name: Retrieve encryption keys
         id: decode_keystore
-        uses: timheuer/base64-to-file@v1.0.3
+        uses: timheuer/base64-to-file@v1.2
         with:
           fileName: "android-signing-keystore.jks"
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
