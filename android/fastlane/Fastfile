@@ -2,7 +2,7 @@ opt_out_usage
 default_platform(:android)
 
 lane :publish_to_beta do |options|
-  upload_to_play_store(track: 'beta', apk: options[:apk_path], json_key_data: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON'])
+  upload_to_play_store(track: 'beta', aab: options[:aab_path], json_key_data: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON'])
 end
 
 lane :promote_beta_to_production do |options|
