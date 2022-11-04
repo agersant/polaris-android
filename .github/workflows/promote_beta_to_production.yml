@@ -19,7 +19,8 @@ jobs:
         with:
           ref: production
       - name: Read version name
-        run: echo "VERSION_NAME=v$(gradle -q printVersionName)" >> $GITHUB_ENV
+        run: gawk -F'[ \+]' '/^[[:space:]]*version/ { print "VERSION_NAME="$2 }' pubspec.yaml >> $GITHUB_ENV
+      - run: echo "${{ env.VERSION_NAME }}"
       - name: Promote release
         uses: maierj/fastlane-action@v1.4.0
         with:

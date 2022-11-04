@@ -31,16 +31,14 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "3.0.2"
-      - name: Update version name in gradle build file
-        run: gawk -i inplace '/^[[:space:]]*versionName/ { $1 = "\t\t"$1; $2 = "\"${{ github.event.inputs.versionName }}\""; } 1' android/app/build.gradle
-      - name: Increment version code in gradle build file
-        run: gawk -i inplace '/^[[:space:]]*versionCode/ { $1 = "\t\t"$1; $2 = $2 + 1; } 1' android/app/build.gradle
-      - name: Read version code from gradle build file
-        run: echo "VERSION_CODE=v$(gradle -q printVersionCode)" >> $GITHUB_ENV
+      - name: Update version name and increment version code in pubspec.yaml
+        run: gawk -i inplace -F'[ \+]' '/^[[:space:]]*version/ { $1 = $1; $2 = "${{ github.event.inputs.versionName }}+"1+$3; $3 = ""} 1' pubspec.yaml
+      - name: Read version code from pubspec.yaml
+        run: gawk -F'[ \+]' '/^[[:space:]]*version/ { print "VERSION_CODE="$3 }' pubspec.yaml >> $GITHUB_ENV
+      - run: echo "${{ env.VERSION_CODE }}"
       - name: Build Flutter app
         run: flutter build appbundle
         env:
-          VERSION_CODE: ${{ env.VERSION_CODE }}
           SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
           SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
