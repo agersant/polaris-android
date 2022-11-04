@@ -11,6 +11,9 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+
 def secretProperties = new Properties()
 secretProperties.setProperty("SIGNING_KEYSTORE_PATH", "${System.getenv("SIGNING_KEYSTORE_PATH")}")
 secretProperties.setProperty("SIGNING_KEYSTORE_PASSWORD", "${System.getenv("SIGNING_KEYSTORE_PASSWORD")}")
@@ -36,8 +39,8 @@ android {
         applicationId "agersant.polaris"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1
-        versionName "0.0"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     signingConfigs {
