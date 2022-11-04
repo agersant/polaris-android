@@ -59,7 +59,7 @@ jobs:
         with:
           branch: beta
           message: "Updated release notes, versionCode and versionName"
-          add: "*.txt *.gradle"
+          add: "*.txt *.yaml"
           tag: "google-play-beta --force"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
