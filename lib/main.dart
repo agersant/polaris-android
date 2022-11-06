@@ -132,6 +132,7 @@ void main() async {
   await Settings.init();
   await _registerSingletons();
   await JustAudioBackground.init(
+    androidNotificationIcon: "drawable/notification_icon",
     androidNotificationChannelName: 'Polaris Audio Playback',
     androidNotificationOngoing: true,
   );
