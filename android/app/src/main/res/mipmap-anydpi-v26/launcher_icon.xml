@@ -1,0 +1,5 @@
+<adaptive-icon
+    xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/polaris_light_grey"/>
+  <foreground android:drawable="@drawable/launcher_icon_polaris_logo"/>
+</adaptive-icon>
