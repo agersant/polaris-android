@@ -2,6 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@android:color/white" />
     <item
-        android:drawable="@drawable/ic_logo"
+        android:drawable="@drawable/splash_screen_polaris_logo"
         android:gravity="center"/>
 </layer-list>
