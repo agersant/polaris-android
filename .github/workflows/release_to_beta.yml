@@ -30,7 +30,7 @@ jobs:
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "3.0.2"
+          flutter-version: "3.3.8"
       - name: Update version name and increment version code in pubspec.yaml
         run: gawk -i inplace -F'[ +]' '/^[[:space:]]*version/ { $1 = $1; $2 = "${{ github.event.inputs.versionName }}+"1+$3; $3 = ""} 1' pubspec.yaml
       - name: Read version code from pubspec.yaml
