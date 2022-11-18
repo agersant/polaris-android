@@ -125,7 +125,7 @@ class Manager extends ChangeNotifier {
       throw Error.unknownError;
     }
 
-    if (apiVersion.major != 6) {
+    if (apiVersion.major < 6 || apiVersion.major > 7) {
       _setState(State.disconnected);
       throw Error.unsupportedAPIVersion;
     }
