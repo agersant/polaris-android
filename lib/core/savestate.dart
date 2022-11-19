@@ -41,8 +41,14 @@ class PlaylistState {
 class PlaybackState {
   final int currentSongIndex;
   final int currentSongProgressMilliseconds;
+  final bool repeat;
+  final bool shuffle;
 
-  PlaybackState({required this.currentSongIndex, required this.currentSongProgressMilliseconds});
+  PlaybackState(
+      {required this.currentSongIndex,
+      required this.currentSongProgressMilliseconds,
+      required this.repeat,
+      required this.shuffle});
 
   factory PlaybackState.fromBytes(List<int> bytes) {
     return PlaybackState.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
@@ -54,13 +60,18 @@ class PlaybackState {
 
   factory PlaybackState.fromJson(Map<String, dynamic> json) {
     return PlaybackState(
-        currentSongIndex: json['currentSongIndex'],
-        currentSongProgressMilliseconds: json['currentSongProgressMilliseconds']);
+      currentSongIndex: json['currentSongIndex'],
+      currentSongProgressMilliseconds: json['currentSongProgressMilliseconds'],
+      repeat: json['repeat'],
+      shuffle: json['shuffle'],
+    );
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'currentSongIndex': currentSongIndex,
         'currentSongProgressMilliseconds': currentSongProgressMilliseconds,
+        'repeat': repeat,
+        'shuffle': shuffle,
       };
 }
 
@@ -98,6 +109,8 @@ class Manager {
 
       audioPlayer.sequenceStream.listen((e) => savePlaylistState());
       audioPlayer.currentIndexStream.listen((e) => savePlaybackState());
+      audioPlayer.shuffleModeEnabledStream.listen((e) => savePlaybackState());
+      audioPlayer.loopModeStream.listen((e) => savePlaybackState());
       audioPlayer.positionStream
           .throttleTime(const Duration(seconds: 5), trailing: true)
           .listen((position) => savePlaybackState());
@@ -124,7 +137,9 @@ class Manager {
   Future<void> savePlaybackState() async {
     PlaybackState playbackState = PlaybackState(
         currentSongIndex: audioPlayer.currentIndex ?? 0,
-        currentSongProgressMilliseconds: audioPlayer.position.inMilliseconds);
+        currentSongProgressMilliseconds: audioPlayer.position.inMilliseconds,
+        repeat: audioPlayer.loopMode == LoopMode.all,
+        shuffle: audioPlayer.shuffleModeEnabled);
     try {
       final playbackStateFile = await _getPlaybackStateFile(_currentVersion);
       await playbackStateFile.create(recursive: true);
@@ -165,6 +180,8 @@ class Manager {
           await audioPlayer.seek(Duration(milliseconds: playbackState.currentSongProgressMilliseconds),
               index: playbackState.currentSongIndex);
         }
+        audioPlayer.setLoopMode(playbackState.repeat ? LoopMode.all : LoopMode.off);
+        audioPlayer.setShuffleModeEnabled(playbackState.shuffle);
         developer.log('Read playback state from: $playbackStateFile');
       }
     } catch (e) {
