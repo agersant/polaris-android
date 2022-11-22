@@ -94,7 +94,7 @@ class _ConnectFormState extends State<ConnectForm> {
         break;
       case connection.Error.unknownError:
         errorText = errorUnknown;
-        action = null;
+        action = offlineModeAction;
         break;
     }
 
