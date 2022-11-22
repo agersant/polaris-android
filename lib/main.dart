@@ -1,5 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -131,6 +132,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
   await _registerSingletons();
+  await FlutterDisplayMode.setHighRefreshRate();
   await JustAudioBackground.init(
     androidNotificationIcon: "drawable/notification_icon",
     androidNotificationChannelName: 'Polaris Audio Playback',
