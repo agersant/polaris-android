@@ -42,22 +42,26 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
           Padding(
-              padding: const EdgeInsets.only(top: 32),
-              child: Consumer<authentication.Manager>(builder: (context, authenticationManager, child) {
-                if (authenticationManager.state != authentication.State.unauthenticated) {
-                  return const CircularProgressIndicator();
-                }
-                return Row(
-                  children: [
-                    TextButton(onPressed: _onDisconnectPressed, child: const Text(disconnectButtonLabel)),
-                    const Spacer(),
-                    ElevatedButton(onPressed: _onLoginPressed, child: const Text(loginButtonLabel)),
-                  ],
-                );
-              })),
+            padding: const EdgeInsets.only(top: 32),
+            child: Row(children: [
+              TextButton(onPressed: _onDisconnectPressed, child: const Text(disconnectButtonLabel)),
+              const Spacer(),
+              _buildLoginWidget(context),
+            ])
+          )
         ],
       ),
     );
+  }
+
+  Widget _buildLoginWidget(BuildContext context) {
+    return Consumer<authentication.Manager>(builder: (context, authenticationManager, child) {
+      if (authenticationManager.state != authentication.State.unauthenticated) {
+        return const CircularProgressIndicator();
+      } else {
+        return ElevatedButton(onPressed: _onLoginPressed, child: const Text(loginButtonLabel));
+      }
+    });
   }
 
   Future _onDisconnectPressed() async {

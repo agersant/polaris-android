@@ -35,16 +35,31 @@ class _ConnectFormState extends State<ConnectForm> {
                 icon: Icon(Icons.desktop_windows), labelText: serverURLFieldLabel, hintText: "Polaris server address"),
           ),
           Padding(
-              padding: const EdgeInsets.only(top: 32),
-              child: Consumer<connection.Manager>(builder: (context, connectionManager, child) {
-                if (connectionManager.state != connection.State.disconnected) {
-                  return const CircularProgressIndicator();
-                }
-                return ElevatedButton(onPressed: _onConnectPressed, child: const Text(connectButtonLabel));
-              })),
+            padding: const EdgeInsets.only(top: 32),
+            child: Row(children: [
+              TextButton(onPressed: _onGoOfflinePressed, child: const Text(goOfflineButtonLabel)),
+              const Spacer(),
+              _buildConnectWidget(context),
+            ])
+          )
         ],
       ),
     );
+  }
+
+  Widget _buildConnectWidget(BuildContext context) {
+    return Consumer<connection.Manager>(builder: (context, connectionManager, child) {
+      if (connectionManager.state != connection.State.disconnected) {
+        return const CircularProgressIndicator();
+      } else {
+        return ElevatedButton(onPressed: _onConnectPressed, child: const Text(connectButtonLabel));
+      }
+    });
+  }
+
+  void _onGoOfflinePressed() {
+    _connectionManager.disconnect();
+    _connectionManager.startOffline();
   }
 
   Future _onConnectPressed() async {

@@ -1,11 +1,15 @@
 import 'package:animations/animations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/startup/connect.dart';
 import 'package:polaris/ui/startup/login.dart';
+import 'package:polaris/ui/strings.dart';
 import 'package:provider/provider.dart';
+
+final getIt = GetIt.instance;
 
 enum StartupState {
   reconnecting,
@@ -41,12 +45,25 @@ class StartupPage extends StatelessWidget {
   Widget _buildWidgetForState(StartupState state) {
     switch (state) {
       case StartupState.reconnecting:
-        return const CircularProgressIndicator();
+        return Padding(
+          padding: const EdgeInsets.only(top: 32),
+          child: Row(children: [
+            TextButton(onPressed: _onGoOfflinePressed, child: const Text(goOfflineButtonLabel)),
+            const Spacer(),
+            const CircularProgressIndicator(),
+          ])
+        );
       case StartupState.connect:
         return const ConnectForm();
       case StartupState.login:
         return const LoginForm();
     }
+  }
+
+  void _onGoOfflinePressed() {
+    final connectionManager = getIt<connection.Manager>();
+    connectionManager.disconnect();
+    connectionManager.startOffline();
   }
 
   Widget _buildContent() {

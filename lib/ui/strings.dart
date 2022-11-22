@@ -16,6 +16,7 @@ const usernameFieldLabel = 'Username';
 const passwordFieldLabel = 'Password';
 const connectButtonLabel = 'CONNECT';
 const disconnectButtonLabel = 'DISCONNECT';
+const goOfflineButtonLabel = 'GO OFFLINE';
 const loginButtonLabel = 'LOGIN';
 const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
