@@ -86,6 +86,9 @@ class _LoginFormState extends State<LoginForm> {
       case authentication.Error.requestFailed:
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorRequestFailed)));
         break;
+      case authentication.Error.requestTimeout:
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorTimeout)));
+        break;
       case authentication.Error.unknownError:
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorUnknown)));
         break;

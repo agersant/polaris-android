@@ -81,6 +81,24 @@ void main() {
     expect(connectButton, findsNothing);
   });
 
+  testWidgets('Connect screen can timeout', (WidgetTester tester) async {
+    final harness = await Harness.create();
+    const networkDelay = Duration(seconds: 10);
+    harness.mockHTTPClient.addDelay(networkDelay);
+
+    await tester.pumpWidget(const PolarisApp());
+
+    await tester.enterText(urlInputField, client.goodHostURI);
+    await tester.tap(connectButton);
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(SnackBar, errorTimeout), findsOneWidget);
+    expect(urlInputField, findsOneWidget);
+    expect(connectButton, findsOneWidget);
+
+    await tester.pumpAndSettle(networkDelay);
+  });
+
   testWidgets('Reconnects on startup', (WidgetTester tester) async {
     await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
 

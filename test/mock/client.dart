@@ -32,15 +32,25 @@ const fallInwardsFilePath = '$aegeusDirectoryPath/$fallInwardsSongName.mp3';
 
 class HttpClient extends mocktail.Mock implements http.Client {
   bool _failLogin = false;
+  Duration? _delay;
 
   void mockBadLogin() {
     _failLogin = true;
+  }
+
+  void addDelay(Duration delay) {
+    _delay = delay;
   }
 
   HttpClient() {
     mocktail.registerFallbackValue(http.Request("GET", Uri()));
 
     mocktail.when(() => send(mocktail.any())).thenAnswer((Invocation invocation) async {
+      final delay = _delay;
+      if (delay != null) {
+        await Future<void>.delayed(delay);
+      }
+
       final Request request = invocation.positionalArguments[0];
       final String endpoint = request.url.path;
 

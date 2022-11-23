@@ -14,6 +14,7 @@ enum Error {
   authenticationAlreadyInProgress,
   incorrectCredentials,
   requestFailed,
+  requestTimeout,
   unknownError,
 }
 
@@ -28,6 +29,8 @@ extension _ToAuthenticationError on polaris.APIError {
       case polaris.APIError.responseParseError:
       case polaris.APIError.unexpectedCacheMiss:
         return Error.requestFailed;
+      case polaris.APIError.timeout:
+        return Error.requestTimeout;
     }
   }
 }

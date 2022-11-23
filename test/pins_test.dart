@@ -11,7 +11,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 
 void main() {
-  pin.Manager _makePinManager() {
+  pin.Manager makePinManager() {
     final mockHttpClient = mock.HttpClient();
     final collectionCache = CollectionCache(Collection());
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
@@ -49,7 +49,7 @@ void main() {
   }
 
   test('Can add/remove song', () async {
-    final pin.Manager pinManager = _makePinManager();
+    final pin.Manager pinManager = makePinManager();
 
     final dto.Song song = dto.Song(path: 'root/Heron/Aegeus/Labyrinth.mp3');
     pinManager.pin('host', dto.CollectionFile(Left(song)));
@@ -61,7 +61,7 @@ void main() {
   });
 
   test('Can add/remove directory', () async {
-    final pin.Manager pinManager = _makePinManager();
+    final pin.Manager pinManager = makePinManager();
 
     final dto.Directory directory = dto.Directory(path: 'root/Heron/Aegeus');
     pinManager.pin('host', dto.CollectionFile(Right(directory)));
