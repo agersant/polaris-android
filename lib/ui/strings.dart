@@ -4,6 +4,7 @@ const appName = 'Polaris';
 const errorAPIVersion = 'The Polaris server responded but uses an incompatible API version.';
 const errorNetwork = 'The Polaris server could not be reached.';
 const errorRequestFailed = 'The Polaris server sent an unexpected response.';
+const errorTimeout = 'The Polaris server is taking too long to respond.';
 const errorUnknown = 'An unknown error occured.';
 const errorAlreadyConnecting = 'Please wait while the connection is being established.';
 const errorAlreadyAuthenticating = 'Please wait while the authentication is in progress.';

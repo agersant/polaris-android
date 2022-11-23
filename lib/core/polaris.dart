@@ -43,6 +43,7 @@ enum APIError {
   unauthorized,
   responseParseError,
   requestFailed,
+  timeout,
   unexpectedCacheMiss,
 }
 
@@ -60,7 +61,7 @@ abstract class _BaseHttpClient {
   }
 
   Future<http.StreamedResponse> makeRequest(_Method method, String url,
-      {dynamic body, String? authenticationToken}) async {
+      {dynamic body, String? authenticationToken, Duration? timeout}) async {
     http.Request request = http.Request(method.toHTTPMethod(), Uri.parse(url));
 
     if (authenticationToken != null) {
@@ -79,6 +80,10 @@ abstract class _BaseHttpClient {
       return Future.error(APIError.networkError);
     }
 
+    if (timeout != null) {
+      response = response.timeout(timeout, onTimeout: () => throw APIError.timeout);
+    }
+
     return response.then((r) {
       if (r.statusCode == 401) {
         return Future.error(APIError.unauthorized);
@@ -90,8 +95,10 @@ abstract class _BaseHttpClient {
     });
   }
 
-  Future<Uint8List> completeRequest(_Method method, String url, {dynamic body, String? authenticationToken}) async {
-    final streamedResponse = makeRequest(method, url, body: body, authenticationToken: authenticationToken);
+  Future<Uint8List> completeRequest(_Method method, String url,
+      {dynamic body, String? authenticationToken, Duration? timeout}) async {
+    final streamedResponse =
+        makeRequest(method, url, body: body, authenticationToken: authenticationToken, timeout: timeout);
     return streamedResponse.then((r) => r.stream.toBytes());
   }
 }
@@ -104,7 +111,7 @@ class HttpGuestClient extends _BaseHttpClient {
 
   Future<dto.APIVersion> getAPIVersion() async {
     final url = makeURL(apiVersionEndpoint);
-    final responseBody = await completeRequest(_Method.get, url);
+    final responseBody = await completeRequest(_Method.get, url, timeout: const Duration(seconds: 5));
     try {
       String body = utf8.decode(responseBody);
       return dto.APIVersion.fromJson(jsonDecode(body));

@@ -13,6 +13,7 @@ enum Error {
   unsupportedAPIVersion,
   networkError,
   requestFailed,
+  requestTimeout,
   unknownError,
 }
 
@@ -27,6 +28,8 @@ extension _ToConnectionError on polaris.APIError {
       case polaris.APIError.networkError:
       case polaris.APIError.unspecifiedHost:
         return Error.networkError;
+      case polaris.APIError.timeout:
+        return Error.requestTimeout;
     }
   }
 }
