@@ -1,0 +1,3 @@
+- Complete redesign of the Polaris Android application
+- Added a new menu to manage music saved for offline use
+- New startup/login flow
