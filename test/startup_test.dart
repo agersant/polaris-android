@@ -84,7 +84,7 @@ void main() {
   testWidgets('Connect screen can timeout', (WidgetTester tester) async {
     final harness = await Harness.create();
     const networkDelay = Duration(seconds: 10);
-    harness.mockHTTPClient.addDelay(networkDelay);
+    harness.mockHTTPClient.setNetworkDelay(networkDelay);
 
     await tester.pumpWidget(const PolarisApp());
 
@@ -126,6 +126,37 @@ void main() {
     expect(inputField.controller?.text, equals(client.badHostURI));
   });
 
+  testWidgets('Failed reconnect does not wipe auth token', (WidgetTester tester) async {
+    await Harness.create(preferences: {
+      connection.hostPreferenceKey: client.badHostURI,
+      authentication.authHostPreferenceKey: client.goodHostURI,
+      authentication.tokenPreferenceKey: 'auth-token',
+      authentication.usernamePreferenceKey: 'good-username'
+    });
+
+    await tester.pumpWidget(const PolarisApp());
+    expect(connectButton, findsOneWidget);
+
+    await tester.enterText(urlInputField, client.goodHostURI);
+    await tester.tap(connectButton);
+    await tester.pumpAndSettle();
+    expect(startupPage, findsNothing);
+  });
+
+  testWidgets('Failed re-login lands on login screen', (WidgetTester tester) async {
+    final harness = await Harness.create(preferences: {
+      connection.hostPreferenceKey: client.goodHostURI,
+      authentication.authHostPreferenceKey: client.goodHostURI,
+      authentication.tokenPreferenceKey: 'auth-token',
+      authentication.usernamePreferenceKey: 'bad-username'
+    });
+
+    harness.mockHTTPClient.mockUnauthorized();
+    await tester.pumpWidget(const PolarisApp());
+
+    expect(loginButton, findsOneWidget);
+  });
+
   testWidgets('Disconnect returns to connect screen', (WidgetTester tester) async {
     await Harness.create();
 
@@ -143,7 +174,7 @@ void main() {
 
   testWidgets('Login screen rejects bad credentials', (WidgetTester tester) async {
     Harness harness = await Harness.create(preferences: {connection.hostPreferenceKey: client.goodHostURI});
-    harness.mockHTTPClient.mockBadLogin();
+    harness.mockHTTPClient.mockUnauthorized();
 
     await tester.pumpWidget(const PolarisApp());
 
@@ -170,6 +201,7 @@ void main() {
   testWidgets('Re-logins on startup', (WidgetTester tester) async {
     await Harness.create(preferences: {
       connection.hostPreferenceKey: client.goodHostURI,
+      authentication.authHostPreferenceKey: client.goodHostURI,
       authentication.tokenPreferenceKey: 'auth-token',
       authentication.usernamePreferenceKey: 'good-username'
     });
