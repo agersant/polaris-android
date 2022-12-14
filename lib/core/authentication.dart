@@ -7,6 +7,7 @@ import 'package:polaris/core/dto.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String authHostPreferenceKey = "polaris_auth_host";
 const String tokenPreferenceKey = "polaris_auth_token";
 const String usernamePreferenceKey = "polaris_auth_username";
 
@@ -62,18 +63,12 @@ class Manager extends ChangeNotifier {
   }
 
   Future _onConnectionStateChanged() async {
-    final previousConnectionState = connectionManager.previousState;
     if (connectionManager.isConnected()) {
-      if (previousConnectionState == connection.State.reconnecting) {
-        try {
-          await _reauthenticate();
-        } catch (e) {
-          developer.log("Error during reauthentication", error: e);
-        }
-      } else if (previousConnectionState == connection.State.connecting) {
-        _setToken(null);
-        _setUsername(null);
-        _setState(State.unauthenticated);
+      _setState(State.unauthenticated);
+      try {
+        await _reauthenticate();
+      } catch (e) {
+        developer.log("Error during reauthentication", error: e);
       }
     }
   }
@@ -81,11 +76,13 @@ class Manager extends ChangeNotifier {
   Future _reauthenticate() async {
     assert(_state == State.unauthenticated);
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    final url = preferences.getString(authHostPreferenceKey);
     _token = preferences.getString(tokenPreferenceKey);
     _username = preferences.getString(usernamePreferenceKey);
+    final isSameHost = url == connectionManager.url;
     final hasToken = _token?.isNotEmpty ?? false;
     final hasUsername = _username?.isNotEmpty ?? false;
-    if (!hasToken || !hasUsername) {
+    if (!hasToken || !hasUsername || !isSameHost) {
       return;
     }
 
@@ -94,9 +91,11 @@ class Manager extends ChangeNotifier {
       final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
       await guestAPI.testConnection(_token);
     } on polaris.APIError catch (e) {
+      await _clear();
       _setState(State.unauthenticated);
       throw e.toAuthenticationError();
     } catch (e) {
+      await _clear();
       _setState(State.unauthenticated);
       throw Error.unknownError;
     }
@@ -122,6 +121,7 @@ class Manager extends ChangeNotifier {
       throw Error.unknownError;
     }
 
+    _setHost(connectionManager.url);
     _setUsername(newUsername);
     _setToken(authorization.token);
     _setState(State.authenticated);
@@ -137,6 +137,21 @@ class Manager extends ChangeNotifier {
     }
     _state = newState;
     notifyListeners();
+  }
+
+  Future _clear() async {
+    await _setHost(null);
+    await _setToken(null);
+    await _setUsername(null);
+  }
+
+  Future _setHost(String? host) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    if (host != null) {
+      preferences.setString(authHostPreferenceKey, host);
+    } else {
+      preferences.remove(authHostPreferenceKey);
+    }
   }
 
   Future _setToken(String? newToken) async {

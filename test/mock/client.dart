@@ -31,14 +31,14 @@ const labyrinthFilePath = '$aegeusDirectoryPath/$labyrinthSongName.mp3';
 const fallInwardsFilePath = '$aegeusDirectoryPath/$fallInwardsSongName.mp3';
 
 class HttpClient extends mocktail.Mock implements http.Client {
-  bool _failLogin = false;
+  bool _mockUnauthorized = false;
   Duration? _delay;
 
-  void mockBadLogin() {
-    _failLogin = true;
+  void mockUnauthorized() {
+    _mockUnauthorized = true;
   }
 
-  void addDelay(Duration delay) {
+  void setNetworkDelay(Duration delay) {
     _delay = delay;
   }
 
@@ -54,6 +54,10 @@ class HttpClient extends mocktail.Mock implements http.Client {
       final Request request = invocation.positionalArguments[0];
       final String endpoint = request.url.path;
 
+      if (_mockUnauthorized) {
+        return http.StreamedResponse(Stream<List<int>>.value([]), 401);
+      }
+
       if (endpoint.startsWith(apiVersionEndpoint)) {
         final String host = request.url.host;
         if (host == goodHost) {
@@ -66,11 +70,7 @@ class HttpClient extends mocktail.Mock implements http.Client {
           return http.StreamedResponse(Stream<List<int>>.value([]), 404);
         }
       } else if (endpoint.startsWith(loginEndpoint)) {
-        if (_failLogin) {
-          return http.StreamedResponse(Stream<List<int>>.value([]), 401);
-        } else {
-          return http.StreamedResponse(Stream<List<int>>.value(authorization.codeUnits), 200);
-        }
+        return http.StreamedResponse(Stream<List<int>>.value(authorization.codeUnits), 200);
       } else if (endpoint.startsWith(browseEndpoint)) {
         final String path = Uri.decodeComponent(endpoint.substring(browseEndpoint.length));
         final List<CollectionFile>? files = _browseData[path];
