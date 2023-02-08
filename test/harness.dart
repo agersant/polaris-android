@@ -31,6 +31,7 @@ class Harness {
 
   static final Map<String, Object> reconnectPreferences = {
     connection.hostPreferenceKey: mock.goodHostURI,
+    authentication.authHostPreferenceKey: mock.goodHostURI,
     authentication.tokenPreferenceKey: 'auth-token',
     authentication.usernamePreferenceKey: 'good-username'
   };
