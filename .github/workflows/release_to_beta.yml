@@ -44,14 +44,13 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
       - name: Copy release notes
-        run: cp ./android/fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./android/fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
+        run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
       - name: Upload release
         uses: maierj/fastlane-action@v1.4.0
         with:
           lane: "publish_to_beta"
           skip-tracking: "true"
-          subdirectory: "android"
-          options: '{ "aab_path": "../build/app/outputs/bundle/release/app-release.aab" }'
+          options: '{ "aab_path": "build/app/outputs/bundle/release/app-release.aab" }'
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
       - name: Commit and tag changes to beta branch
