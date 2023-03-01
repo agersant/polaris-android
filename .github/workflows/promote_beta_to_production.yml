@@ -26,7 +26,6 @@ jobs:
         with:
           lane: "promote_beta_to_production"
           skip-tracking: "true"
-          subdirectory: "android"
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
       - name: Tag production branch
