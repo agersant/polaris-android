@@ -69,7 +69,11 @@ extension SongFormatting on Song {
 
 extension DirectoryFormatting on Directory {
   String formatName() {
-    return album ?? splitPath(path).last;
+    return splitPath(path).last;
+  }
+
+  String formatAlbumName() {
+    return album ?? formatName();
   }
 
   String formatArtist() {

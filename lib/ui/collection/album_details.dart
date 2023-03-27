@@ -202,7 +202,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.album.formatName(),
+                    widget.album.formatAlbumName(),
                     style: Theme.of(context).textTheme.bodyText1,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -259,7 +259,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.album.formatName())),
+      appBar: AppBar(title: Text(widget.album.formatAlbumName())),
       body: body,
     );
   }
