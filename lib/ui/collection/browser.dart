@@ -211,24 +211,13 @@ class Directory extends StatelessWidget {
   const Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
 
   Widget _getLeading() {
-    if (directory.artwork != null || directory.album != null) {
-      return ListThumbnail(directory.artwork);
-    }
     return const Icon(Icons.folder);
-  }
-
-  Widget? _getSubtitle() {
-    if (directory.album != null) {
-      return Text(directory.formatArtist());
-    }
-    return null;
   }
 
   ListTile _buildTile({void Function()? onTap}) {
     return ListTile(
       leading: _getLeading(),
       title: Text(directory.formatName()),
-      subtitle: _getSubtitle(),
       trailing: CollectionFileContextMenuButton(
         file: dto.CollectionFile(dartz.Right(directory)),
         actions: const [
@@ -244,21 +233,8 @@ class Directory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAlbum = directory.album != null;
-    final tile = _buildTile(onTap: isAlbum ? null : onTap);
-    if (!isAlbum) {
-      return Material(child: tile);
-    } else {
-      return OpenContainer(
-        closedElevation: 0,
-        useRootNavigator: true,
-        transitionType: ContainerTransitionType.fade,
-        closedColor: Theme.of(context).scaffoldBackgroundColor,
-        openColor: Theme.of(context).scaffoldBackgroundColor,
-        openBuilder: (context, action) => AlbumDetails(directory),
-        closedBuilder: (context, action) => Material(child: InkWell(enableFeedback: true, onTap: action, child: tile)),
-      );
-    }
+    final tile = _buildTile(onTap: onTap);
+    return Material(child: tile);
   }
 }
 
