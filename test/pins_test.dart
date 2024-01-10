@@ -11,6 +11,8 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   pin.Manager makePinManager() {
     final mockHttpClient = mock.HttpClient();
     final collectionCache = CollectionCache(Collection());
