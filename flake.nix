@@ -1,7 +1,6 @@
 {
-description = "Flutter 3.13.x";
 inputs = {
-  nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   flake-utils.url = "github:numtide/flake-utils";
 };
 outputs = { self, nixpkgs, flake-utils }:
@@ -14,15 +13,21 @@ outputs = { self, nixpkgs, flake-utils }:
           allowUnfree = true;
         };
       };
-      androidSdk = pkgs.androidenv.androidPkgs_9_0.androidsdk;
+      android-comp = pkgs.androidenv.composeAndroidPackages {
+        buildToolsVersions = [ "34.0.0" ];
+        platformVersions = [ "33" "34" "35" ];
+      };
+      android-sdk = android-comp.androidsdk;
+      android-sdk-root = "${android-sdk}/libexec/android-sdk";
     in
     {
       devShell =
         with pkgs; mkShell rec {
-          ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+          ANDROID_SDK_ROOT = "${android-sdk-root}";
+          GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_SDK_ROOT}/build-tools/34.0.0/aapt2";
           buildInputs = [
             flutter
-            androidSdk
+            android-sdk
             jdk17
           ];
         };

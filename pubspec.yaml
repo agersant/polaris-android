@@ -19,31 +19,32 @@ version: 1.0.0+415293115
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
+  flutter: 3.27.1
 
 dependencies:
   flutter:
     sdk: flutter
 
   animations: ^2.0.0
-  audio_service: ^0.18.5
+  audio_service: ^0.18.16
   audio_session: ^0.1.7
   async: ^2.8.2
   characters: ^1.2.0
   crypto: ^3.0.1
   dartz: ^0.10.0-nullsafety.1
-  flutter_settings_screens: 0.3.2-null-safety
+  flutter_settings_screens: 0.3.2-null-safety # // https://github.com/GAM3RG33K/flutter_settings_screens/issues/90
   flutter_svg: ^1.1.0
   get_it: ^7.2.0
-  just_audio: ^0.9.25
-  just_audio_background: ^0.0.1-beta.6
+  just_audio: ^0.9.43
+  just_audio_background: ^0.0.1-beta.14
   http: ^0.13.1
   path: ^1.8.1
-  path_provider: ^2.0.1
+  path_provider: ^2.1.5
   provider: ^6.0.0
   rxdart: ^0.27.4
-  shared_preferences: ^2.0.5
+  shared_preferences: ^2.3.5
   uuid: ^3.0.4
-  flutter_displaymode: ^0.4.1
+  flutter_displaymode: ^0.6.0
 
 dev_dependencies:
   flutter_lints: ^2.0.1

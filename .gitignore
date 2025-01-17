@@ -1,3 +1,6 @@
+# Dev shell
+.direnv
+
 # Miscellaneous
 *.class
 *.log
@@ -30,6 +33,7 @@
 .pub-cache/
 .pub/
 /build/
+coverage
 
 # Web related
 lib/generated_plugin_registrant.dart
