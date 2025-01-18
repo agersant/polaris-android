@@ -1,5 +1,15 @@
 # Maintenance Guide
 
+## Updating Flutter versions
+- Update in `pubspec.yml`
+- For local development: `nix flake update`
+- For F-Droid builds: `cd .flutter`, `git checkout <hash>`
+- For CI: update in files within `.github`
+
+## Testing within Nix dev shell
+- Run `run-test-emulator` to launch the emulator
+- Use debug panel from VS code to launch app (Flutter VSCode extension possibly required)
+
 ## Deploying a branch to Beta
 - Write the user-facing changelog in `fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt`
 - Commit and push changes to the branch you want to deploy (usually **master**)
