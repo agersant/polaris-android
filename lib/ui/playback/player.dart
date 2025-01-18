@@ -12,7 +12,6 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
-import 'package:polaris/ui/utils/text_one_line.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
@@ -159,11 +158,12 @@ class PlayerPage extends StatelessWidget {
                   children: [
                     const StreamingIndicator(),
                     Flexible(
-                      // Workaround for https://github.com/flutter/flutter/issues/18761
-                      child: TextOneLine(
+                      child: Text(
                         song?.formatTitle() ?? unknownSong,
                         style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
+                        softWrap: false,
                       ),
                     ),
                   ],
