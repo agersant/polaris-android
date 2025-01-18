@@ -188,7 +188,7 @@ Widget _progressBar() => LayoutBuilder(
         final player = getIt<AudioPlayer>();
         final Stream<ProgressState> progressStream = ProgressState.createStream(player);
 
-        final Color backgroundColor = Theme.of(context).colorScheme.background;
+        final Color backgroundColor = Theme.of(context).colorScheme.surfaceBright;
         final Color foregroundColor = Theme.of(context).colorScheme.primary;
         return Stack(
           children: [

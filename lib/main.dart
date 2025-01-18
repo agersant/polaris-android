@@ -34,11 +34,13 @@ import 'package:uuid/uuid.dart';
 final getIt = GetIt.instance;
 
 final lightTheme = ThemeData(
+  useMaterial3: false,
   brightness: Brightness.light,
   primarySwatch: Colors.blue,
 );
 
 final darkTheme = ThemeData(
+  useMaterial3: false,
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
   indicatorColor: Colors.blue, // TabBar current tab highlight
