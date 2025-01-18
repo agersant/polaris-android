@@ -189,29 +189,48 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     key: navigatorKey,
                     pages: [
                       if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
+
                       if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-                      if (showSettings) const MaterialPage<dynamic>(child: SettingsPage()),
-                      if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
+
+                      if (showSettings)
+                        MaterialPage<dynamic>(
+                            child: const SettingsPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.closeSettings();
+                              }
+                            }),
+
+                      if (showOfflineMusic)
+                        MaterialPage<dynamic>(
+                            child: const OfflineMusicPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.closeOfflineMusic();
+                              }
+                            }),
+
                       // Ideally album details would be here but OpenContainer() can't be used with the pages API.
                       // TODO Consider transitions that aren't the default for player and queue pages
-                      if (showPlayer) const MaterialPage<dynamic>(child: PlayerPage()),
-                      if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
+
+                      if (showPlayer)
+                        MaterialPage<dynamic>(
+                            child: const PlayerPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.closePlayer();
+                              }
+                            }),
+
+                      if (showQueue)
+                        MaterialPage<dynamic>(
+                            child: const QueuePage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.closeQueue();
+                              }
+                            }),
                     ],
-                    onPopPage: (route, dynamic result) {
-                      if (!route.didPop(result)) {
-                        return false;
-                      }
-                      if (pagesModel.isQueueOpen) {
-                        pagesModel.closeQueue();
-                      } else if (pagesModel.isPlayerOpen) {
-                        pagesModel.closePlayer();
-                      } else if (pagesModel.isOfflineMusicOpen) {
-                        pagesModel.closeOfflineMusic();
-                      } else if (pagesModel.isSettingsOpen) {
-                        pagesModel.closeSettings();
-                      }
-                      return true;
-                    },
                   ),
                 ),
                 MiniPlayer(collapse: collapseMiniPlayer),
