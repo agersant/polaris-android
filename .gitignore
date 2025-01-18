@@ -35,6 +35,7 @@
 /build/
 coverage
 devtools_options.yaml
+temporaryPath
 
 # Web related
 lib/generated_plugin_registrant.dart
