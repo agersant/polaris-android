@@ -1,15 +1,23 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="agersant.polaris">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+
     <application
         android:name="${applicationName}"
         android:label="Polaris"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
 
-        <service android:name="com.ryanheise.audioservice.AudioService" android:exported="true">
+        <service
+          android:name="com.ryanheise.audioservice.AudioService"
+          android:foregroundServiceType="mediaPlayback"
+          android:exported="true">
           <intent-filter>
             <action android:name="android.media.browse.MediaBrowserService" />
           </intent-filter>
