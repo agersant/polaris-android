@@ -171,8 +171,10 @@ class PlayerPage extends StatelessWidget {
               ),
               Text(
                 song?.formatArtist() ?? unknownArtist,
-                style:
-                    Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).textTheme.bodySmall!.color),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).textTheme.bodySmall!.color),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
@@ -237,7 +239,9 @@ class PlayerPage extends StatelessWidget {
 
         return OutlinedButton(
           onPressed: getIt<PagesModel>().openQueue,
-          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+          style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4)))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
