@@ -67,6 +67,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                     child: ClipRect(
                       clipBehavior: Clip.hardEdge,
                       child: Navigator(
+                        onDidRemovePage: (page) {},
                         pages: browserModel.browserStack.map((location) {
                           return MaterialPage<dynamic>(
                             child: BrowserLocation(

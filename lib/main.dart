@@ -185,6 +185,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
               Expanded(
                 child: Navigator(
                   key: navigatorKey,
+                  onDidRemovePage: (page) {},
                   pages: [
                     if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
 
