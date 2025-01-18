@@ -131,7 +131,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   Expanded(
                     child: Text(
                       widget.album.album ?? unknownAlbum,
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                       softWrap: true,
                     ),
                   ),
@@ -157,11 +157,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 children: [
                   Text(
                     widget.album.artist ?? unknownArtist,
-                    style: Theme.of(context).textTheme.bodyText2,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   Text(
                     widget.album.year?.toString() ?? '',
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
               ),
@@ -203,11 +203,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 children: [
                   Text(
                     widget.album.formatAlbumName(),
-                    style: Theme.of(context).textTheme.bodyText1,
+                    style: Theme.of(context).textTheme.bodyLarge,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.caption),
+                  Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
             ),
@@ -306,7 +306,7 @@ class Disc extends StatelessWidget {
             children: [
               Text(
                 'Disc $discNumberLabel',
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               const Divider(),
             ],

@@ -162,7 +162,7 @@ class PlayerPage extends StatelessWidget {
                       // Workaround for https://github.com/flutter/flutter/issues/18761
                       child: TextOneLine(
                         song?.formatTitle() ?? unknownSong,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -172,7 +172,7 @@ class PlayerPage extends StatelessWidget {
               Text(
                 song?.formatArtist() ?? unknownArtist,
                 style:
-                    Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
+                    Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).textTheme.bodySmall!.color),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
@@ -210,8 +210,8 @@ class PlayerPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(formatDuration(position), style: Theme.of(context).textTheme.caption),
-                  Text(formatDuration(duration), style: Theme.of(context).textTheme.caption),
+                  Text(formatDuration(position), style: Theme.of(context).textTheme.bodySmall),
+                  Text(formatDuration(duration), style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
             ),
@@ -243,7 +243,7 @@ class PlayerPage extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 16, left: 16),
-                child: Text(upNext, style: Theme.of(context).textTheme.overline),
+                child: Text(upNext, style: Theme.of(context).textTheme.labelSmall),
               ),
               if (nextSong == null)
                 const ListTile(

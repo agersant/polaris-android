@@ -199,10 +199,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_settings_screens
-      sha256: b3924ef45f741af9debd59430f64248736ed50b36b97c77d6e02cb240aa5ccca
+      sha256: b9e5ff87537fceeb67012560db6ef4bb0ff7d7a031e8184e1689538756ca99a0
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.2-null-safety"
+    version: "0.3.4"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -501,14 +501,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.11.1"
   petitparser:
     dependency: transitive
     description:

@@ -339,7 +339,7 @@ class Chevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color? chevronColor = Theme.of(context).textTheme.caption?.color;
+    final Color? chevronColor = Theme.of(context).textTheme.bodySmall?.color;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
       child: Icon(

@@ -32,7 +32,7 @@ dependencies:
   characters: ^1.2.0
   crypto: ^3.0.1
   dartz: ^0.10.0-nullsafety.1
-  flutter_settings_screens: 0.3.2-null-safety # // https://github.com/GAM3RG33K/flutter_settings_screens/issues/90
+  flutter_settings_screens: ^0.3.4
   flutter_svg: ^1.1.0
   get_it: ^7.2.0
   just_audio: ^0.9.43

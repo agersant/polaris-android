@@ -95,7 +95,7 @@ class Manager {
 
   Future<StreamAudioSource?> _pickPlaylistSongToFetch(String host) async {
     final int maxSongsToPreload =
-        Settings.getValue<int>(settings.keyNumSongsToPreload, settings.defaultNumSongsToPreload);
+        Settings.getValue<int>(settings.keyNumSongsToPreload) ?? settings.defaultNumSongsToPreload;
     final SequenceState? sequenceState = audioPlayer.sequenceState;
     final List<IndexedAudioSource> effectiveSequence = sequenceState?.effectiveSequence ?? [];
     final int currentIndex = sequenceState?.currentIndex ?? -1;
