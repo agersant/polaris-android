@@ -44,34 +44,43 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
         builder: (BuildContext context, BrowserModel browserModel, Widget? child) {
           return Theme(
             data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                  child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
-                ),
-                SizedBox(height: 1, child: Container(color: dividerColor)),
-                Expanded(
-                  child: ClipRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: Navigator(
-                      pages: browserModel.browserStack.map((location) {
-                        return MaterialPage<dynamic>(
-                          child: BrowserLocation(
-                            location,
-                            onDirectoryTapped: browserModel.pushBrowserLocation,
-                            navigateBack: browserModel.popBrowserLocation,
-                          ),
-                        );
-                      }).toList(),
-                      onPopPage: (route, dynamic result) {
-                        return route.didPop(result);
-                      },
+            child: PopScope(
+              canPop: !browserModel.isBrowserActive || browserModel.browserStack.length <= 1,
+              onPopInvokedWithResult: (didPop, dynamic result) {
+                if (didPop) {
+                  return;
+                }
+                final bool shouldPop = !browserModel.isBrowserActive || !browserModel.popBrowserLocation();
+                if (shouldPop && context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                    child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
+                  ),
+                  SizedBox(height: 1, child: Container(color: dividerColor)),
+                  Expanded(
+                    child: ClipRect(
+                      clipBehavior: Clip.hardEdge,
+                      child: Navigator(
+                        pages: browserModel.browserStack.map((location) {
+                          return MaterialPage<dynamic>(
+                            child: BrowserLocation(
+                              location,
+                              onDirectoryTapped: browserModel.pushBrowserLocation,
+                              navigateBack: browserModel.popBrowserLocation,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
