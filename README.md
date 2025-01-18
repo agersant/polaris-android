@@ -1,6 +1,7 @@
 [![Actions Status](https://github.com/agersant/polaris-android/workflows/Build/badge.svg)](https://github.com/agersant/polaris-android/actions)
-[![codecov.io](http://codecov.io/github/agersant/polaris-android/branch/master/graphs/badge.svg)](http://codecov.io/github/agersant/polaris-android)
+[![codecov](https://codecov.io/gh/agersant/polaris-android/graph/badge.svg?token=mQT0pHTfha)](https://codecov.io/gh/agersant/polaris-android)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE-MIT)
+
 
 # Polaris Android
 
