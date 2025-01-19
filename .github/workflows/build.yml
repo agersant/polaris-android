@@ -19,9 +19,10 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
       - name: Upload test coverage results to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     name: Build Android App Bundle
