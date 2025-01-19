@@ -161,7 +161,7 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                       Expanded(
                         child: Text(
                           song.formatTitle(),
-                          style: Theme.of(context).textTheme.subtitle2?.copyWith(color: foregroundColor),
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: foregroundColor),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -170,7 +170,8 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                   ),
                   Text(
                     song.formatArtist(),
-                    style: Theme.of(context).textTheme.caption?.copyWith(color: foregroundColor.withOpacity(0.75)),
+                    style:
+                        Theme.of(context).textTheme.bodySmall?.copyWith(color: foregroundColor.withValues(alpha: 0.75)),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -188,7 +189,7 @@ Widget _progressBar() => LayoutBuilder(
         final player = getIt<AudioPlayer>();
         final Stream<ProgressState> progressStream = ProgressState.createStream(player);
 
-        final Color backgroundColor = Theme.of(context).backgroundColor;
+        final Color backgroundColor = Theme.of(context).colorScheme.surfaceBright;
         final Color foregroundColor = Theme.of(context).colorScheme.primary;
         return Stack(
           children: [

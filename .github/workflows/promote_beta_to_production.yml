@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   publish:
     name: Promote
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Merge beta branch to production branch
         uses: devmasx/merge-branch@v1.3.1

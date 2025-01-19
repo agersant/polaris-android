@@ -25,7 +25,7 @@ class ErrorMessage extends StatelessWidget {
             Icon(
               icon,
               size: 24,
-              color: Theme.of(context).textTheme.caption?.color,
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),

@@ -12,7 +12,6 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
-import 'package:polaris/ui/utils/text_one_line.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
@@ -159,11 +158,12 @@ class PlayerPage extends StatelessWidget {
                   children: [
                     const StreamingIndicator(),
                     Flexible(
-                      // Workaround for https://github.com/flutter/flutter/issues/18761
-                      child: TextOneLine(
+                      child: Text(
                         song?.formatTitle() ?? unknownSong,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
+                        softWrap: false,
                       ),
                     ),
                   ],
@@ -171,8 +171,10 @@ class PlayerPage extends StatelessWidget {
               ),
               Text(
                 song?.formatArtist() ?? unknownArtist,
-                style:
-                    Theme.of(context).textTheme.bodyText2!.copyWith(color: Theme.of(context).textTheme.caption!.color),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: Theme.of(context).textTheme.bodySmall!.color),
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
               ),
@@ -210,8 +212,8 @@ class PlayerPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(formatDuration(position), style: Theme.of(context).textTheme.caption),
-                  Text(formatDuration(duration), style: Theme.of(context).textTheme.caption),
+                  Text(formatDuration(position), style: Theme.of(context).textTheme.bodySmall),
+                  Text(formatDuration(duration), style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
             ),
@@ -237,13 +239,15 @@ class PlayerPage extends StatelessWidget {
 
         return OutlinedButton(
           onPressed: getIt<PagesModel>().openQueue,
-          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+          style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4)))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 16, left: 16),
-                child: Text(upNext, style: Theme.of(context).textTheme.overline),
+                child: Text(upNext, style: Theme.of(context).textTheme.labelSmall),
               ),
               if (nextSong == null)
                 const ListTile(

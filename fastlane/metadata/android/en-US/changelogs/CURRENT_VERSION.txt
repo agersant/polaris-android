@@ -1,1 +1,1 @@
-- Updated target Android SDK
+- Updated Flutter framework to version 3.27

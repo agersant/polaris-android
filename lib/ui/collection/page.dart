@@ -136,7 +136,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
                 builder: (context, authenticationManager, child) {
                   return Text(
                     authenticationManager.username ?? unknownUser,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   );
                 },
               ),
@@ -144,7 +144,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
                 builder: (context, connectionManager, child) {
                   return Text(
                     connectionManager.url ?? unknownHost,
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   );
                 },
               ),
