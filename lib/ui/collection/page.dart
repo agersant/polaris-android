@@ -49,7 +49,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
   }
 
   void _handleActiveTabChanged() {
-    _browserModel.isBrowserActive = _tabController.index == 0;
+    _browserModel.setBrowserActive(_tabController.index == 0);
   }
 
   @override
