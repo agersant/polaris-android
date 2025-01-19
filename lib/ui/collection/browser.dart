@@ -11,7 +11,6 @@ import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
-import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -184,13 +183,9 @@ class Directory extends StatelessWidget {
 
   const Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
 
-  Widget _getLeading() {
-    return const Icon(Icons.folder);
-  }
-
   ListTile _buildTile({void Function()? onTap}) {
     return ListTile(
-      leading: _getLeading(),
+      leading: const Icon(Icons.folder),
       title: Text(directory.formatName()),
       trailing: CollectionFileContextMenuButton(
         file: dto.CollectionFile(dartz.Right(directory)),
@@ -220,9 +215,8 @@ class Song extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: ListThumbnail(song.artwork),
+      leading: const Icon(Icons.audio_file),
       title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
-      subtitle: Text(song.formatArtist(), overflow: TextOverflow.ellipsis),
       trailing: CollectionFileContextMenuButton(
         file: dto.CollectionFile(dartz.Left(song)),
         actions: const [
