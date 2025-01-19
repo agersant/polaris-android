@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
@@ -35,7 +36,7 @@ class BrowserModel extends ChangeNotifier {
   }
 
   void popBrowserLocations(int numLocationsToPop) {
-    _browserStack = _browserStack.take(_browserStack.length - numLocationsToPop).toList();
+    _browserStack = _browserStack.take(max(1, _browserStack.length - numLocationsToPop)).toList();
     notifyListeners();
   }
 
