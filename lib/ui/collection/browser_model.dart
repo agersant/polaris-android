@@ -6,7 +6,8 @@ class BrowserModel extends ChangeNotifier {
   final connection.Manager connectionManager;
   List<String> _browserStack = const [''];
   List<String> get browserStack => _browserStack;
-  bool isBrowserActive = false;
+  bool _isBrowserActive = false;
+  bool get isBrowserActive => _isBrowserActive;
 
   BrowserModel({required this.connectionManager}) {
     connectionManager.addListener(() {
@@ -14,6 +15,11 @@ class BrowserModel extends ChangeNotifier {
         clearBrowserLocations();
       }
     });
+  }
+
+  void setBrowserActive(bool active) {
+    _isBrowserActive = active;
+    notifyListeners();
   }
 
   void clearBrowserLocations() {
