@@ -7,7 +7,6 @@ import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
-import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -93,11 +92,6 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
   bool get wantKeepAlive => true;
 }
 
-enum ViewMode {
-  explorer,
-  discography,
-}
-
 class BrowserLocation extends StatefulWidget {
   final String location;
   final void Function(dto.Directory) onDirectoryTapped;
@@ -137,31 +131,6 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
   }
 
-  ViewMode _getViewMode() {
-    List<dto.CollectionFile>? files = _files;
-    if (files == null || files.isEmpty) {
-      return ViewMode.explorer;
-    }
-
-    var onlyDirectories = true;
-    var hasAnyPicture = false;
-    var allHaveAlbums = true;
-    for (var file in files) {
-      onlyDirectories &= file.isDirectory();
-      if (file.isDirectory()) {
-        hasAnyPicture |= file.asDirectory().artwork != null;
-        allHaveAlbums &= file.asDirectory().album != null;
-      } else {
-        allHaveAlbums = false;
-      }
-    }
-
-    if (onlyDirectories && hasAnyPicture && allHaveAlbums) {
-      return ViewMode.discography;
-    }
-    return ViewMode.explorer;
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
@@ -186,25 +155,21 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
 
     late Widget content;
-    if (_getViewMode() == ViewMode.discography) {
-      final albums = files.map((f) => f.asDirectory()).toList();
-      content = AlbumGrid(albums);
-    } else {
-      content = ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        itemCount: files.length,
-        itemBuilder: (context, index) {
-          final file = files[index];
-          if (file.isDirectory()) {
-            final directory = file.asDirectory();
-            return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
-          } else {
-            assert(file.isSong());
-            return Song(file.asSong());
-          }
-        },
-      );
-    }
+
+    content = ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        final file = files[index];
+        if (file.isDirectory()) {
+          final directory = file.asDirectory();
+          return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
+        } else {
+          assert(file.isSong());
+          return Song(file.asSong());
+        }
+      },
+    );
 
     return RefreshIndicator(
       onRefresh: () => _fetchData(useCache: false),
