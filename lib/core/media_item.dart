@@ -21,21 +21,21 @@ extension MediaItemConversions on Song {
       playable: true,
       album: album ?? "",
       title: title ?? "",
-      artist: formatArtist(),
+      artist: formatArtists(),
       duration: duration != null ? Duration(seconds: duration!) : null,
       artUri: artworkUri,
       extras: <String, dynamic>{
         extraKeyPath: path,
         extraKeyTrackNumber: trackNumber,
         extraKeyDiscNumber: discNumber,
-        extraKeyArtist: artist,
-        extraKeyAlbumArtist: albumArtist,
+        extraKeyArtist: artists,
+        extraKeyAlbumArtist: albumArtists,
         extraKeyYear: year,
         extraKeyArtwork: artwork,
-        extraKeyLyricist: lyricist,
-        extraKeyComposer: composer,
-        extraKeyGenre: genre,
-        extraKeyLabel: label,
+        extraKeyLyricist: lyricists,
+        extraKeyComposer: composers,
+        extraKeyGenre: genres,
+        extraKeyLabel: labels,
       },
     );
   }
@@ -47,15 +47,15 @@ extension DTOConversions on MediaItem {
       ..trackNumber = extras?[extraKeyTrackNumber]
       ..discNumber = extras?[extraKeyDiscNumber]
       ..title = title
-      ..artist = extras?[extraKeyArtist]
-      ..albumArtist = extras?[extraKeyAlbumArtist]
+      ..artists = extras?[extraKeyArtist]
+      ..albumArtists = extras?[extraKeyAlbumArtist]
       ..year = extras?[extraKeyYear]
       ..album = album
       ..artwork = extras?[extraKeyArtwork]
       ..duration = duration?.inSeconds
-      ..lyricist = extras?[extraKeyLyricist]
-      ..composer = extras?[extraKeyComposer]
-      ..genre = extras?[extraKeyGenre]
-      ..label = extras?[extraKeyLabel];
+      ..lyricists = extras?[extraKeyLyricist]
+      ..composers = extras?[extraKeyComposer]
+      ..genres = extras?[extraKeyGenre]
+      ..labels = extras?[extraKeyLabel];
   }
 }

@@ -169,7 +169,7 @@ Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
                     ],
                   ),
                   Text(
-                    song.formatArtist(),
+                    song.formatArtists(),
                     style:
                         Theme.of(context).textTheme.bodySmall?.copyWith(color: foregroundColor.withValues(alpha: 0.75)),
                     overflow: TextOverflow.ellipsis,

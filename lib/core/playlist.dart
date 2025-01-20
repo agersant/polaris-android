@@ -1,7 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
@@ -66,8 +65,8 @@ class Playlist {
     await audioPlayer.setAudioSource(_audioSource);
   }
 
-  List<dto.Song> getSongs() {
-    return _audioSource.sequence.map((e) => (e.tag as MediaItem?)?.toSong()).whereType<dto.Song>().toList();
+  List<String> getSongs() {
+    return _audioSource.sequence.map((e) => (e.tag as MediaItem?)!.toSong().path).toList().cast<String>();
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<String> songs) async {

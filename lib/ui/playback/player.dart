@@ -170,7 +170,7 @@ class PlayerPage extends StatelessWidget {
                 ),
               ),
               Text(
-                song?.formatArtist() ?? unknownArtist,
+                song?.formatArtists() ?? unknownArtist,
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!
@@ -265,7 +265,7 @@ class PlayerPage extends StatelessWidget {
                     maxLines: 1,
                   ),
                   subtitle: Text(
-                    nextSong.formatArtist(),
+                    nextSong.formatArtists(),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),

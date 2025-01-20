@@ -18,6 +18,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
+import 'package:polaris/core/songs.dart' as songs;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
@@ -69,6 +70,11 @@ Future _registerSingletons() async {
     mediaCache: mediaCache,
     collectionCache: collectionCache,
   );
+  final songsManager = songs.Manager(
+    connectionManager: connectionManager,
+    collectionCache: collectionCache,
+    httpClient: polarisHttpClient,
+  );
   final polarisClient = polaris.Client(
     offlineClient: polarisOfflineClient,
     httpClient: polarisHttpClient,
@@ -76,6 +82,7 @@ Future _registerSingletons() async {
     connectionManager: connectionManager,
     collectionCache: collectionCache,
     mediaCache: mediaCache,
+    songsManager: songsManager,
   );
   final audioPlayer = AudioPlayer();
   final playlist = Playlist(
@@ -84,8 +91,8 @@ Future _registerSingletons() async {
     polarisClient: polarisClient,
     audioPlayer: audioPlayer,
   );
-  final savestateManager =
-      savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
+  final savestateManager = savestate.Manager(
+      connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist, songsManager: songsManager);
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,
     polarisClient: polarisClient,
@@ -125,6 +132,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<BrowserModel>(browserModel);
   getIt.registerSingleton<PagesModel>(PagesModel());
   getIt.registerSingleton<settings.Manager>(settingsManager);
+  getIt.registerSingleton<songs.Manager>(songsManager);
   getIt.registerSingleton<Uuid>(uuid);
 }
 

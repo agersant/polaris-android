@@ -408,14 +408,14 @@ class _PinStateIconState extends State<PinStateIcon> {
   Future<bool> _isFetchingThis() async {
     final songsBeingFetched = _prefetchManager.songsBeingFetched;
     if (widget.file.isSong()) {
-      return songsBeingFetched.any((song) => widget.file.path == song.path);
+      return songsBeingFetched.any((path) => widget.file.path == path);
     }
     final songsInDirectory = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
     if (songsInDirectory == null) {
       return false;
     }
-    for (dto.Song songBeingFetched in songsBeingFetched) {
-      if (songsInDirectory.any((song) => song.path == songBeingFetched.path)) {
+    for (String songBeingFetched in songsBeingFetched) {
+      if (songsInDirectory.any((song) => song.path == songBeingFetched)) {
         return true;
       }
     }

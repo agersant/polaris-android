@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
@@ -9,7 +10,7 @@ import 'package:polaris/utils.dart';
 const _firstVersion = 1;
 const _currentVersion = 2;
 
-class CollectionCache {
+class CollectionCache extends ChangeNotifier {
   final Collection _collection;
 
   CollectionCache(this._collection);
@@ -71,7 +72,6 @@ class CollectionCache {
     await saveToDisk();
   }
 
-  // TODO v8 testme
   Future putFiles(String host, List<String> files) async {
     final server = _collection.servers.putIfAbsent(host, () => Server());
     for (String path in files) {
@@ -87,7 +87,6 @@ class CollectionCache {
     await saveToDisk();
   }
 
-  // TODO v8 testme
   Future putSongs(String host, List<dto.Song> songs) async {
     final server = _collection.servers.putIfAbsent(host, () => Server());
     for (dto.Song song in songs) {
@@ -101,7 +100,24 @@ class CollectionCache {
         parent = child;
       }
     }
+    notifyListeners();
     await saveToDisk();
+  }
+
+  bool hasSong(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return false;
+    }
+    return server.songs.containsKey(path);
+  }
+
+  dto.Song? getSong(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return null;
+    }
+    return server.songs[path];
   }
 
   List<dto.BrowserEntry>? getDirectory(String host, String path) {

@@ -10,10 +10,13 @@ import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/download.dart' as download;
+import 'package:polaris/core/media_item.dart';
+import 'package:polaris/core/songs.dart' as songs;
 
 const apiVersionEndpoint = '/api/version/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
+const songsEndpoint = '/api/songs/';
 const randomEndpoint = '/api/albums/random/';
 const recentEndpoint = '/api/albums/recent/';
 const loginEndpoint = '/api/auth/';
@@ -167,6 +170,18 @@ class HttpClient extends _BaseHttpClient {
     }
   }
 
+  Future<dto.SongBatch> getSongs(List<String> paths) async {
+    final url = makeURL(songsEndpoint);
+    final payload = dto.SongBatchRequest(paths: paths).toJson();
+    final responseBody =
+        await completeRequest(_Method.post, url, authenticationToken: authenticationManager.token, body: payload);
+    try {
+      return dto.SongBatch.fromJson(json.decode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
   Future<List<dto.AlbumHeader>> random() async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -263,6 +278,7 @@ class Client {
   final connection.Manager connectionManager;
   final CollectionCache collectionCache;
   final MediaCacheInterface mediaCache;
+  final songs.Manager songsManager;
 
   Client({
     required HttpClient httpClient,
@@ -271,6 +287,7 @@ class Client {
     required this.downloadManager,
     required this.collectionCache,
     required this.mediaCache,
+    required this.songsManager,
   }) : _httpClient = httpClient;
 
   HttpClient? get httpClient {
@@ -296,6 +313,7 @@ class Client {
 
     return _httpClient.browse(path).then((content) {
       collectionCache.putDirectory(host, path, content);
+      songsManager.request(content.where((entry) => !entry.isDirectory).map((e) => e.path).toList());
       return content;
     });
   }
@@ -306,6 +324,7 @@ class Client {
       return _httpClient.flatten(path).then((songList) {
         collectionCache.putFiles(host, songList.paths);
         collectionCache.putSongs(host, songList.firstSongs);
+        songsManager.request(songList.paths);
         return songList;
       });
     }
@@ -328,23 +347,40 @@ class Client {
   }
 
   Future<AudioSource?> getAudio(String path, String id) async {
-    // TODO v8 fixme
-    // final String? artwork = song.artwork;
-    // Uri? artworkUri;
-    // if (artwork != null) {
-    //   artworkUri = await _getImageURI(artwork);
-    // }
-    // final mediaItem = song.toMediaItem(id, artworkUri);
-    final mediaItem = MediaItem(id: id, title: path, extras: <String, dynamic>{'path': path});
-
     try {
       final String host = _getHost();
+      final song = await _getSong(path);
+      if (song == null) {
+        return null;
+      }
+
+      final String? artwork = song.artwork;
+      Uri? artworkUri;
+      if (artwork != null) {
+        artworkUri = await _getImageURI(artwork);
+      }
+      final mediaItem = song.toMediaItem(id, artworkUri);
+
       if (connectionManager.isConnected()) {
         return await downloadManager.getAudio(host, path, mediaItem);
       } else {
         return await offlineClient.getAudio(host, path, mediaItem);
       }
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<dto.Song?> _getSong(String path) async {
+    final String host = _getHost();
+    final song = collectionCache.getSong(host, path);
+    if (song != null) {
+      return song;
+    }
+    if (connectionManager.isConnected()) {
+      final batch = await _httpClient.getSongs([path]);
+      return batch.songs.elementAtOrNull(0);
+    } else {
       return null;
     }
   }

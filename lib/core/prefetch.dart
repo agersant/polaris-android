@@ -29,9 +29,9 @@ class Manager {
   StreamAudioSource? _pinSongBeingFetched;
   late UniqueTimer _timer;
 
-  final _songsBeingFetchedSubject = BehaviorSubject<Set<dto.Song>>.seeded({});
-  Set<dto.Song> get songsBeingFetched => _songsBeingFetchedSubject.value;
-  Stream<Set<dto.Song>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
+  final _songsBeingFetchedSubject = BehaviorSubject<Set<String>>.seeded({});
+  Set<String> get songsBeingFetched => _songsBeingFetchedSubject.value;
+  Stream<Set<String>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
 
   Manager({
     required this.uuid,
@@ -118,8 +118,8 @@ class Manager {
 
       final audioSource = effectiveSequence[index];
       final MediaItem mediaItem = audioSource.tag;
-      final dto.Song song = mediaItem.toSong();
-      final bool hasAudio = await mediaCache.hasAudio(host, song.path);
+      final String path = mediaItem.toSong().path;
+      final bool hasAudio = await mediaCache.hasAudio(host, path);
       if (!hasAudio && audioSource is StreamAudioSource) {
         return audioSource;
       }
@@ -196,12 +196,12 @@ class Manager {
   }
 
   void _updateSongsBeingFetched() {
-    final songs = <dto.Song>{};
+    final songs = <String>{};
     if (_playlistSongBeingFetched != null) {
-      songs.add((_playlistSongBeingFetched!.tag as MediaItem).toSong());
+      songs.add((_playlistSongBeingFetched!.tag as MediaItem).toSong().path);
     }
     if (_pinSongBeingFetched != null) {
-      songs.add((_pinSongBeingFetched!.tag as MediaItem).toSong());
+      songs.add((_pinSongBeingFetched!.tag as MediaItem).toSong().path);
     }
     _songsBeingFetchedSubject.add(songs);
   }

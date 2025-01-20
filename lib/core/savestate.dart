@@ -5,15 +5,15 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
+import 'package:polaris/core/songs.dart' as songs;
 import 'package:rxdart/rxdart.dart';
 
 const _currentVersion = 1;
 
 class PlaylistState {
   final String host;
-  final List<dto.Song> songs;
+  final List<String> songs;
 
   PlaylistState({required this.host, required this.songs});
 
@@ -28,13 +28,13 @@ class PlaylistState {
   factory PlaylistState.fromJson(Map<String, dynamic> json) {
     return PlaylistState(
       host: json['host'],
-      songs: (json['songs'] as List<dynamic>).map((dynamic songJson) => dto.Song.fromJson(songJson)).toList(),
+      songs: (json['songs'] as List<dynamic>).cast<String>(),
     );
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'host': host,
-        'songs': songs.map((song) => song.toJson()).toList(),
+        'songs': songs,
       };
 }
 
@@ -79,11 +79,13 @@ class Manager {
   final connection.Manager connectionManager;
   final AudioPlayer audioPlayer;
   final Playlist playlist;
+  final songs.Manager songsManager;
 
   Manager({
     required this.connectionManager,
     required this.audioPlayer,
     required this.playlist,
+    required this.songsManager,
   });
 
   static Future<io.File> _getPlaylistStateFile(int version) async {
@@ -118,7 +120,7 @@ class Manager {
   }
 
   Future<void> savePlaylistState() async {
-    List<dto.Song> songs = playlist.getSongs();
+    List<String> songs = playlist.getSongs();
     PlaylistState playlistState = PlaylistState(
       host: connectionManager.url ?? "",
       songs: songs,
@@ -163,8 +165,8 @@ class Manager {
           return;
         }
         await playlist.clear();
-        // TODO v8 fixme
-        // await playlist.queueLast(playlistState.songs, autoPlay: false);
+        await playlist.queueLast(playlistState.songs, autoPlay: false);
+        songsManager.request(playlistState.songs);
         developer.log('Read playlist state from: $playlistStateFile');
       }
     } catch (e) {

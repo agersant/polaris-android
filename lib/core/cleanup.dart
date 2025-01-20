@@ -52,7 +52,7 @@ class Manager {
 
       final artwork = song.artwork;
       if (artwork != null) {
-        songsToPreserve[host]!.add(artwork);
+        imagesToPreserve[host]!.add(artwork);
       }
     });
 

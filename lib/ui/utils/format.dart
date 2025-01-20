@@ -59,13 +59,19 @@ extension SongFormatting on Song {
     return components.join('. ');
   }
 
-  String formatArtist() {
-    return artist ?? albumArtist ?? unknownArtist;
+  String formatArtists() {
+    if (artists.isNotEmpty) {
+      return artists.join(', ');
+    }
+    if (albumArtists.isNotEmpty) {
+      return albumArtists.join(', ');
+    }
+    return unknownArtist;
   }
 
   String formatArtistAndDuration() {
-    final artist = formatArtist();
-    List<String> components = [artist];
+    final artists = formatArtists();
+    List<String> components = [artists];
     int? songDuration = duration;
     if (songDuration != null) {
       components.add(formatDuration(Duration(seconds: songDuration)));

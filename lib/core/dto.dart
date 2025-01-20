@@ -52,8 +52,32 @@ class SongList {
   SongList({required this.paths, required this.firstSongs});
 
   factory SongList.fromJson(Map<String, dynamic> json) {
-    // TODO v8 probably not correct
-    return SongList(paths: json['paths'] as List<String>, firstSongs: json['first_songs'].map((s) => Song.fromJson(s)));
+    return SongList(
+      paths: (json['paths'] as List<dynamic>).cast<String>(),
+      firstSongs: (json['first_songs'] as List<dynamic>).map((s) => Song.fromJson(s)).toList(),
+    );
+  }
+}
+
+class SongBatchRequest {
+  List<String> paths;
+  SongBatchRequest({required this.paths});
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'paths': paths,
+      };
+}
+
+class SongBatch {
+  List<Song> songs;
+  List<String> notFound;
+
+  SongBatch({required this.songs, required this.notFound});
+
+  factory SongBatch.fromJson(Map<String, dynamic> json) {
+    return SongBatch(
+      songs: (json['songs'] as List<dynamic>).map((s) => Song.fromJson(s)).toList(),
+      notFound: (json['not_found'] as List<dynamic>).cast<String>(),
+    );
   }
 }
 
@@ -66,12 +90,13 @@ class AlbumHeader {
   AlbumHeader({required this.name, required this.mainArtists});
 
   factory AlbumHeader.fromJson(Map<String, dynamic> json) {
-    return AlbumHeader(name: json['name'], mainArtists: (json['main_artists'] as List<dynamic>).cast())
+    return AlbumHeader(name: json['name'], mainArtists: (json['main_artists'] as List<dynamic>).cast<String>())
       ..artwork = json['artwork']
       ..year = json['year'];
   }
 }
 
+// TODO v8 move me to legacy
 class Directory {
   String path;
   String? artist;
@@ -101,22 +126,21 @@ class Directory {
       };
 }
 
-// TODO v8 multi-value
 class Song {
   String path;
   int? trackNumber;
   int? discNumber;
   String? title;
-  String? artist;
-  String? albumArtist;
+  List<String> artists = [];
+  List<String> albumArtists = [];
+  List<String> lyricists = [];
+  List<String> composers = [];
+  List<String> genres = [];
+  List<String> labels = [];
   int? year;
   String? album;
   String? artwork;
   int? duration;
-  String? lyricist;
-  String? composer;
-  String? genre;
-  String? label;
 
   Song({required this.path});
 
@@ -125,16 +149,16 @@ class Song {
       ..trackNumber = json['track_number']
       ..discNumber = json['disc_number']
       ..title = json['title']
-      ..artist = json['artist']
-      ..albumArtist = json['album_artist']
+      ..artists = (json['artists'] as List<dynamic>? ?? []).cast<String>()
+      ..albumArtists = (json['album_artists'] as List<dynamic>? ?? []).cast<String>()
+      ..lyricists = (json['lyricists'] as List<dynamic>? ?? []).cast<String>()
+      ..composers = (json['composers'] as List<dynamic>? ?? []).cast<String>()
+      ..genres = (json['genres'] as List<dynamic>? ?? []).cast<String>()
+      ..labels = (json['labels'] as List<dynamic>? ?? []).cast<String>()
       ..year = json['year']
       ..album = json['album']
       ..artwork = json['artwork']
-      ..duration = json['duration']
-      ..lyricist = json['lyricist']
-      ..composer = json['composer']
-      ..genre = json['genre']
-      ..label = json['label'];
+      ..duration = json['duration'];
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -142,20 +166,20 @@ class Song {
         'track_number': trackNumber,
         'disc_number': discNumber,
         'title': title,
-        'artist': artist,
-        'album_artist': albumArtist,
+        'artists': artists,
+        'album_artists': albumArtists,
+        'lyricists': lyricists,
+        'composers': composers,
+        'genres': genres,
+        'labels': labels,
         'year': year,
         'album': album,
         'artwork': artwork,
         'duration': duration,
-        'lyricist': lyricist,
-        'composer': composer,
-        'genre': genre,
-        'label': label,
       };
 }
 
-// TODO v8 delete me
+// TODO v8 move me to legacy
 class CollectionFile {
   Either<Song, Directory> content;
 
