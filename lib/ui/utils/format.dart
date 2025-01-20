@@ -30,6 +30,13 @@ String formatBytes(int bytes, int decimals) {
   return '$value $suffix';
 }
 
+extension BrowserEntryFormatting on BrowserEntry {
+  String formatName() {
+    final components = splitPath(path);
+    return components.last;
+  }
+}
+
 extension SongFormatting on Song {
   String formatTitle() {
     if (title?.isEmpty ?? true) {

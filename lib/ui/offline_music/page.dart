@@ -67,15 +67,16 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
   void _updateStats(Set<pin.Host> hosts) {
     int newNumDirectories = 0;
     int newNumSongs = 0;
-    for (pin.Host host in hosts) {
-      for (dto.CollectionFile file in host.content) {
-        if (file.isDirectory()) {
-          newNumDirectories += 1;
-        } else {
-          newNumSongs += 1;
-        }
-      }
-    }
+    // TODO v8 fixme
+    // for (pin.Host host in hosts) {
+    //   for (dto.CollectionFile file in host.content) {
+    //     if (file.isDirectory()) {
+    //       newNumDirectories += 1;
+    //     } else {
+    //       newNumSongs += 1;
+    //     }
+    //   }
+    // }
     setState(() {
       _numDirectories = newNumDirectories;
       _numSongs = newNumSongs;
@@ -327,11 +328,12 @@ class _PinListTileState extends State<PinListTile> {
           ),
         ],
       ),
-      trailing: CollectionFileContextMenuButton(
-        file: widget.file,
-        host: widget.host,
-        actions: const [CollectionFileAction.togglePin],
-      ),
+      // TODO v8 fixme
+      // trailing: CollectionFileContextMenuButton(
+      //   file: widget.file,
+      //   host: widget.host,
+      //   actions: const [CollectionFileAction.togglePin],
+      // ),
     );
   }
 }

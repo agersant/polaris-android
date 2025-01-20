@@ -22,7 +22,7 @@ enum CollectionFileAction {
 }
 
 class CollectionFileContextMenuButton extends StatelessWidget {
-  final dto.CollectionFile file;
+  final String path;
   final String? host;
   final List<dto.Song>? children;
   final IconData icon;
@@ -32,7 +32,7 @@ class CollectionFileContextMenuButton extends StatelessWidget {
   final void Function() onRemoveFromQueue;
 
   const CollectionFileContextMenuButton(
-      {required this.file,
+      {required this.path,
       required this.actions,
       this.children,
       this.compact = false,
@@ -68,10 +68,12 @@ class CollectionFileContextMenuButton extends StatelessWidget {
       onSelected: (CollectionFileAction result) async {
         switch (result) {
           case CollectionFileAction.queueLast:
-            getIt<Playlist>().queueLast(await _listSongs());
+            // TODO v8 fixme
+            // getIt<Playlist>().queueLast(await _listSongs());
             break;
           case CollectionFileAction.queueNext:
-            getIt<Playlist>().queueNext(await _listSongs());
+            // TODO v8 fixme
+            // getIt<Playlist>().queueNext(await _listSongs());
             break;
           case CollectionFileAction.refresh:
             onRefresh();
@@ -84,16 +86,19 @@ class CollectionFileContextMenuButton extends StatelessWidget {
             final String? useHost = _getHost();
             if (useHost != null) {
               if (_isPinned()) {
-                pinManager.unpin(useHost, file);
+                // TODO v8 fixme
+                // pinManager.unpin(useHost, file);
               } else {
-                pinManager.pin(useHost, file);
+                // TODO v8 fixme
+                // pinManager.pin(useHost, file);
               }
             }
             break;
           case CollectionFileAction.songInfo:
-            if (file.isSong()) {
-              SongInfoDialog.openInfoDialog(context, file.asSong());
-            }
+            // TODO v8 fixme
+            // if (file.isSong()) {
+            //   SongInfoDialog.openInfoDialog(context, file.asSong());
+            // }
             break;
           default:
             break;
@@ -127,27 +132,32 @@ class CollectionFileContextMenuButton extends StatelessWidget {
     if (useHost == null) {
       return false;
     } else {
-      return pinManager.isPinned(useHost, file);
+      // TODO v8 fixme
+      // return pinManager.isPinned(useHost, file);
+      return false;
     }
   }
 
   Future<List<dto.Song>> _listSongs() async {
-    final knownSongs = children;
-    if (file.isDirectory()) {
-      if (knownSongs == null) {
-        // TODO Show some kind of UI while this is in progress and/or confirm result
-        final polaris.Client client = getIt<polaris.Client>();
-        final hostOverride = host;
-        if (hostOverride != null && hostOverride != client.connectionManager.url) {
-          return await client.offlineClient.flatten(hostOverride, file.path);
-        }
-        return await client.flatten(file.path);
-      } else {
-        return knownSongs;
-      }
-    } else {
-      return [file.asSong()];
-    }
+    // TODO v8 fixme
+    return [];
+
+    // final knownSongs = children;
+    // if (file.isDirectory()) {
+    //   if (knownSongs == null) {
+    //     // TODO Show some kind of UI while this is in progress and/or confirm result
+    //     final polaris.Client client = getIt<polaris.Client>();
+    //     final hostOverride = host;
+    //     if (hostOverride != null && hostOverride != client.connectionManager.url) {
+    //       return await client.offlineClient.flatten(hostOverride, file.path);
+    //     }
+    //     return await client.flatten(file.path);
+    //   } else {
+    //     return knownSongs;
+    //   }
+    // } else {
+    //   return [file.asSong()];
+    // }
   }
 
   PopupMenuItem<CollectionFileAction> _buildButton(CollectionFileAction action, IconData icon, String label) {

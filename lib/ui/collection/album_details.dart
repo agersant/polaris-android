@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
@@ -13,7 +12,7 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
-  final dto.Directory album;
+  final dto.AlbumHeader album;
 
   const AlbumDetails(this.album, {Key? key}) : super(key: key);
 
@@ -34,7 +33,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   void didUpdateWidget(AlbumDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.album.path != widget.album.path) {
+    // TODO v8 fixme implement == for AlbumHeader!
+    if (oldWidget.album != widget.album) {
       _fetchData();
     }
   }
@@ -45,10 +45,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      final files = await getIt<polaris.Client>().browse(widget.album.path, useCache: useCache);
-      final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
+      // TODO v8 fixme
+      // final files = await getIt<polaris.Client>().browse(widget.album.path, useCache: useCache);
+      // final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
       setState(() {
-        _songs = songs;
+        // TODO v8 fixme
+        // _songs = songs;
+        _songs = [];
       });
     } on polaris.APIError catch (e) {
       setState(() {
@@ -130,23 +133,24 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.album.album ?? unknownAlbum,
+                      widget.album.name,
                       style: Theme.of(context).textTheme.headlineSmall,
                       softWrap: true,
                     ),
                   ),
-                  CollectionFileContextMenuButton(
-                    file: dto.CollectionFile(dartz.Right(widget.album)),
-                    actions: const [
-                      CollectionFileAction.queueLast,
-                      CollectionFileAction.queueNext,
-                      CollectionFileAction.togglePin,
-                      CollectionFileAction.refresh,
-                    ],
-                    onRefresh: () => _fetchData(useCache: false),
-                    children: _songs,
-                    icon: Icons.menu,
-                  ),
+                  // TODO v8 fixme
+                  // CollectionFileContextMenuButton(
+                  //   file: dto.CollectionFile(dartz.Right(widget.album)),
+                  //   actions: const [
+                  //     CollectionFileAction.queueLast,
+                  //     CollectionFileAction.queueNext,
+                  //     CollectionFileAction.togglePin,
+                  //     CollectionFileAction.refresh,
+                  //   ],
+                  //   onRefresh: () => _fetchData(useCache: false),
+                  //   children: _songs,
+                  //   icon: Icons.menu,
+                  // ),
                 ],
               ),
             ),
@@ -156,7 +160,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.album.artist ?? unknownArtist,
+                    // TODO v8 fixme
+                    // widget.album.artist ?? unknownArtist,
+                    "artists",
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   Text(
@@ -202,31 +208,34 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.album.formatAlbumName(),
+                    widget.album.name,
                     style: Theme.of(context).textTheme.bodyLarge,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.bodySmall),
+                  // TODO v8 fixme
+                  // Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.bodySmall),
+                  Text("artists", style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: CollectionFileContextMenuButton(
-                file: dto.CollectionFile(dartz.Right(widget.album)),
-                actions: const [
-                  CollectionFileAction.queueLast,
-                  CollectionFileAction.queueNext,
-                  CollectionFileAction.togglePin,
-                  CollectionFileAction.refresh,
-                ],
-                onRefresh: () => _fetchData(useCache: false),
-                children: _songs,
-                icon: Icons.menu,
-                compact: true,
-              ),
-            ),
+            // TODO v8 fixme
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 8),
+            //   child: CollectionFileContextMenuButton(
+            //     file: dto.CollectionFile(dartz.Right(widget.album)),
+            //     actions: const [
+            //       CollectionFileAction.queueLast,
+            //       CollectionFileAction.queueNext,
+            //       CollectionFileAction.togglePin,
+            //       CollectionFileAction.refresh,
+            //     ],
+            //     onRefresh: () => _fetchData(useCache: false),
+            //     children: _songs,
+            //     icon: Icons.menu,
+            //     compact: true,
+            //   ),
+            // ),
           ],
         ),
       ],
@@ -259,7 +268,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.album.formatAlbumName())),
+      appBar: AppBar(title: Text(widget.album.name)),
       body: body,
     );
   }
@@ -334,13 +343,13 @@ class Song extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () => getIt<Playlist>().queueLast([song]),
+        onTap: () => getIt<Playlist>().queueLast([song.path]),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
           subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
           trailing: CollectionFileContextMenuButton(
-            file: dto.CollectionFile(dartz.Left(song)),
+            path: song.path,
             actions: const [
               CollectionFileAction.queueLast,
               CollectionFileAction.queueNext,

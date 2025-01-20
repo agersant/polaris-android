@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:animations/animations.dart';
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/dto.dart' as dto;
@@ -17,7 +16,7 @@ class GridMetrics {}
 const double _detailsSpacing = 8.0;
 
 class AlbumGrid extends StatelessWidget {
-  final List<dto.Directory> albums;
+  final List<dto.AlbumHeader> albums;
   final Future<void> Function()? onRefresh;
 
   const AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
@@ -101,7 +100,7 @@ class AlbumGrid extends StatelessWidget {
 }
 
 class Album extends StatelessWidget {
-  final dto.Directory album;
+  final dto.AlbumHeader album;
   final TextStyle titleStyle;
   final TextStyle artistStyle;
   final StrutStyle titleStrutStyle;
@@ -146,14 +145,15 @@ class Album extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              album.album ?? unknownAlbum,
+                              album.name,
                               strutStyle: titleStrutStyle,
                               style: titleStyle,
                               overflow: TextOverflow.ellipsis,
                               softWrap: false,
                             ),
                             Text(
-                              album.artist ?? unknownArtist,
+                              "TODO v8 fixme artists",
+                              // album.artist ?? unknownArtist,
                               strutStyle: artistStrutStyle,
                               style: artistStyle,
                               overflow: TextOverflow.ellipsis,
@@ -162,15 +162,16 @@ class Album extends StatelessWidget {
                           ],
                         ),
                       ),
-                      CollectionFileContextMenuButton(
-                        file: dto.CollectionFile(dartz.Right(album)),
-                        actions: const [
-                          CollectionFileAction.queueLast,
-                          CollectionFileAction.queueNext,
-                          CollectionFileAction.togglePin,
-                        ],
-                        compact: true,
-                      ),
+                      // TODO v8 fixme
+                      // CollectionFileContextMenuButton(
+                      //   file: dto.CollectionFile(dartz.Right(album)),
+                      //   actions: const [
+                      //     CollectionFileAction.queueLast,
+                      //     CollectionFileAction.queueNext,
+                      //     CollectionFileAction.togglePin,
+                      //   ],
+                      //   compact: true,
+                      // ),
                     ],
                   ),
                 ],

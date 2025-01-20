@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 
 class BrowserModel extends ChangeNotifier {
@@ -28,9 +27,9 @@ class BrowserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void pushBrowserLocation(dto.Directory directory) {
+  void pushBrowserLocation(String path) {
     final newLocations = List<String>.from(_browserStack);
-    newLocations.add(directory.path);
+    newLocations.add(path);
     _browserStack = newLocations;
     notifyListeners();
   }

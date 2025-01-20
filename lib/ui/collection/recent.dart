@@ -16,7 +16,7 @@ class RecentAlbums extends StatefulWidget {
 }
 
 class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClientMixin {
-  List<Directory>? _albums;
+  List<AlbumHeader>? _albums;
   polaris.APIError? _error;
 
   @override
@@ -35,7 +35,7 @@ class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClie
         actionLabel: retryButtonLabel,
       );
     }
-    List<Directory>? albums = _albums;
+    List<AlbumHeader>? albums = _albums;
     if (albums == null) {
       return const Center(child: CircularProgressIndicator());
     }

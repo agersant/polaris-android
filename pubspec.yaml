@@ -31,6 +31,7 @@ dependencies:
   async: ^2.8.2
   characters: ^1.2.0
   crypto: ^3.0.1
+  # TODO v8 delete me
   dartz: ^0.10.0-nullsafety.1
   flutter_settings_screens: ^0.3.4
   flutter_svg: ^1.1.0

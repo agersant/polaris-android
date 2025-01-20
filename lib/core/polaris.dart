@@ -10,13 +10,13 @@ import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/download.dart' as download;
-import 'package:polaris/core/media_item.dart';
 
+// TODO v8 move these where they are used
 const apiVersionEndpoint = '/api/version/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
-const randomEndpoint = '/api/random/';
-const recentEndpoint = '/api/recent/';
+const randomEndpoint = '/api/albums/random/';
+const recentEndpoint = '/api/albums/recent/';
 const loginEndpoint = '/api/auth/';
 const thumbnailEndpoint = '/api/thumbnail/';
 const audioEndpoint = '/api/audio/';
@@ -67,6 +67,8 @@ abstract class _BaseHttpClient {
     if (authenticationToken != null) {
       request.headers[HttpHeaders.authorizationHeader] = 'Bearer $authenticationToken';
     }
+
+    request.headers["Accept-Version"] = '8';
 
     if (method == _Method.post) {
       request.headers[HttpHeaders.contentTypeHeader] = 'application/json';
@@ -146,13 +148,11 @@ class HttpClient extends _BaseHttpClient {
     required this.authenticationManager,
   }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
-  Future<List<dto.CollectionFile>> browse(String path) async {
+  Future<List<dto.BrowserEntry>> browse(String path) async {
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List)
-          .map((dynamic c) => dto.CollectionFile.fromJson(c))
-          .toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto.BrowserEntry.fromJson(c)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -168,21 +168,21 @@ class HttpClient extends _BaseHttpClient {
     }
   }
 
-  Future<List<dto.Directory>> random() async {
+  Future<List<dto.AlbumHeader>> random() async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
   }
 
-  Future<List<dto.Directory>> recent() async {
+  Future<List<dto.AlbumHeader>> recent() async {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.Directory.fromJson(d)).toList();
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -218,20 +218,23 @@ class OfflineClient {
 
   OfflineClient({required this.mediaCache, required this.collectionCache});
 
-  Future<List<dto.CollectionFile>> browse(String host, String path) async {
+  Future<List<dto.BrowserEntry>> browse(String host, String path) async {
     final cachedContent = collectionCache.getDirectory(host, path);
     if (cachedContent == null) {
       throw APIError.unexpectedCacheMiss;
     }
 
-    return cachedContent.where((file) {
-      if (file.isSong()) {
-        return mediaCache.hasAudioSync(host, file.asSong().path);
-      } else {
-        final flattened = collectionCache.flattenDirectory(host, file.asDirectory().path);
-        return flattened?.any((song) => mediaCache.hasAudioSync(host, song.path)) ?? false;
-      }
-    }).toList();
+    return [];
+
+    // TODO v8 fixme
+    // return cachedContent.where((file) {
+    //   if (file.isSong()) {
+    //     return mediaCache.hasAudioSync(host, file.asSong().path);
+    //   } else {
+    //     final flattened = collectionCache.flattenDirectory(host, file.asDirectory().path);
+    //     return flattened?.any((song) => mediaCache.hasAudioSync(host, song.path)) ?? false;
+    //   }
+    // }).toList();
   }
 
   Future<List<dto.Song>> flatten(String host, String path) async {
@@ -280,22 +283,25 @@ class Client {
     return null;
   }
 
-  Future<List<dto.CollectionFile>> browse(String path, {bool useCache = true}) async {
+  Future<List<dto.BrowserEntry>> browse(String path, {bool useCache = true}) async {
     final String host = _getHost();
 
     if (!connectionManager.isConnected()) {
-      return offlineClient.browse(host, path);
+      // TODO v8 fixme
+      // return offlineClient.browse(host, path);
     }
 
     if (useCache && collectionCache.hasPopulatedDirectory(host, path)) {
       final cachedContent = collectionCache.getDirectory(host, path);
       if (cachedContent != null) {
-        return cachedContent;
+        // TODO v8 fixme
+        // return cachedContent;
       }
     }
 
     return _httpClient.browse(path).then((content) {
-      collectionCache.putDirectory(host, path, content);
+      // TODO v8 fixme
+      // collectionCache.putDirectory(host, path, content);
       return content;
     });
   }
@@ -326,20 +332,22 @@ class Client {
     return null;
   }
 
-  Future<AudioSource?> getAudio(dto.Song song, String id) async {
-    final String? artwork = song.artwork;
-    Uri? artworkUri;
-    if (artwork != null) {
-      artworkUri = await _getImageURI(artwork);
-    }
-    final mediaItem = song.toMediaItem(id, artworkUri);
+  Future<AudioSource?> getAudio(String path, String id) async {
+    // TODO v8 fixme
+    // final String? artwork = song.artwork;
+    // Uri? artworkUri;
+    // if (artwork != null) {
+    //   artworkUri = await _getImageURI(artwork);
+    // }
+    // final mediaItem = song.toMediaItem(id, artworkUri);
+    final mediaItem = MediaItem(id: id, title: path, extras: <String, dynamic>{path: path});
 
     try {
       final String host = _getHost();
       if (connectionManager.isConnected()) {
-        return await downloadManager.getAudio(host, song.path, mediaItem);
+        return await downloadManager.getAudio(host, path, mediaItem);
       } else {
-        return await offlineClient.getAudio(host, song.path, mediaItem);
+        return await offlineClient.getAudio(host, path, mediaItem);
       }
     } catch (e) {
       return null;

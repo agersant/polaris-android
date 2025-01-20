@@ -34,6 +34,32 @@ class Credentials {
       };
 }
 
+class BrowserEntry {
+  String path;
+  bool isDirectory;
+
+  BrowserEntry({required this.path, required this.isDirectory});
+
+  factory BrowserEntry.fromJson(Map<String, dynamic> json) {
+    return BrowserEntry(path: json['path'], isDirectory: json['is_directory']);
+  }
+}
+
+class AlbumHeader {
+  String name;
+  List<String> mainArtists;
+  String? artwork;
+  int? year;
+
+  AlbumHeader({required this.name, required this.mainArtists});
+
+  factory AlbumHeader.fromJson(Map<String, dynamic> json) {
+    return AlbumHeader(name: json['name'], mainArtists: (json['main_artists'] as List<dynamic>).cast())
+      ..artwork = json['artwork']
+      ..year = json['year'];
+  }
+}
+
 class Directory {
   String path;
   String? artist;
@@ -116,6 +142,7 @@ class Song {
       };
 }
 
+// TODO v8 delete me
 class CollectionFile extends Comparable<CollectionFile> {
   Either<Song, Directory> content;
 

@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
@@ -93,7 +92,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
 
 class BrowserLocation extends StatefulWidget {
   final String location;
-  final void Function(dto.Directory) onDirectoryTapped;
+  final void Function(String) onDirectoryTapped;
   final void Function() navigateBack;
 
   const BrowserLocation(this.location, {required this.onDirectoryTapped, required this.navigateBack, Key? key})
@@ -104,7 +103,7 @@ class BrowserLocation extends StatefulWidget {
 }
 
 class _BrowserLocationState extends State<BrowserLocation> {
-  List<dto.CollectionFile>? _files;
+  List<dto.BrowserEntry>? _entries;
   polaris.APIError? _error;
 
   @override
@@ -115,13 +114,13 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
   Future _fetchData({bool useCache = true}) async {
     setState(() {
-      _files = null;
+      _entries = null;
       _error = null;
     });
     try {
-      final files = await getIt<polaris.Client>().browse(widget.location, useCache: useCache);
+      final entries = await getIt<polaris.Client>().browse(widget.location, useCache: useCache);
       setState(() {
-        _files = files;
+        _entries = entries;
       });
     } on polaris.APIError catch (e) {
       setState(() {
@@ -140,12 +139,12 @@ class _BrowserLocationState extends State<BrowserLocation> {
       );
     }
 
-    List<dto.CollectionFile>? files = _files;
-    if (files == null) {
+    List<dto.BrowserEntry>? entries = _entries;
+    if (entries == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (files.isEmpty) {
+    if (entries.isEmpty) {
       return ErrorMessage(
         emptyDirectory,
         action: widget.navigateBack,
@@ -157,15 +156,13 @@ class _BrowserLocationState extends State<BrowserLocation> {
 
     content = ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      itemCount: files.length,
+      itemCount: entries.length,
       itemBuilder: (context, index) {
-        final file = files[index];
-        if (file.isDirectory()) {
-          final directory = file.asDirectory();
-          return Directory(directory, onTap: () => widget.onDirectoryTapped(directory));
+        final entry = entries[index];
+        if (entry.isDirectory) {
+          return Directory(entry, onTap: () => widget.onDirectoryTapped(entry.path));
         } else {
-          assert(file.isSong());
-          return Song(file.asSong());
+          return Song(entry);
         }
       },
     );
@@ -178,17 +175,17 @@ class _BrowserLocationState extends State<BrowserLocation> {
 }
 
 class Directory extends StatelessWidget {
-  final dto.Directory directory;
+  final dto.BrowserEntry entry;
   final GestureTapCallback? onTap;
 
-  const Directory(this.directory, {this.onTap, Key? key}) : super(key: key);
+  const Directory(this.entry, {this.onTap, Key? key}) : super(key: key);
 
   ListTile _buildTile({void Function()? onTap}) {
     return ListTile(
       leading: const Icon(Icons.folder),
-      title: Text(directory.formatName()),
+      title: Text(entry.formatName()),
       trailing: CollectionFileContextMenuButton(
-        file: dto.CollectionFile(dartz.Right(directory)),
+        path: entry.path,
         actions: const [
           CollectionFileAction.queueLast,
           CollectionFileAction.queueNext,
@@ -208,17 +205,17 @@ class Directory extends StatelessWidget {
 }
 
 class Song extends StatelessWidget {
-  final dto.Song song;
+  final dto.BrowserEntry entry;
 
-  const Song(this.song, {Key? key}) : super(key: key);
+  const Song(this.entry, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.audio_file),
-      title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
+      title: Text(entry.formatName(), overflow: TextOverflow.ellipsis),
       trailing: CollectionFileContextMenuButton(
-        file: dto.CollectionFile(dartz.Left(song)),
+        path: entry.path,
         actions: const [
           CollectionFileAction.queueLast,
           CollectionFileAction.queueNext,
@@ -233,7 +230,7 @@ class Song extends StatelessWidget {
 
   void _onTap() {
     final Playlist playlist = getIt<Playlist>();
-    playlist.queueLast([song]);
+    playlist.queueLast([entry.path]);
   }
 }
 

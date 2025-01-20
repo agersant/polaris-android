@@ -163,7 +163,8 @@ class Manager {
           return;
         }
         await playlist.clear();
-        await playlist.queueLast(playlistState.songs, autoPlay: false);
+        // TODO v8 fixme
+        // await playlist.queueLast(playlistState.songs, autoPlay: false);
         developer.log('Read playlist state from: $playlistStateFile');
       }
     } catch (e) {

@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -79,26 +78,29 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
         key: Key(mediaItem.id),
         stream: getIt<AudioPlayer>().playerStateStream,
         builder: (context, snapshot) {
-          final dto.Song song = mediaItem.toSong();
+          final String path = mediaItem.extras?["path"] ?? ""; // TODO v8 fixme
           final isPlaying = snapshot.data?.playing ?? false;
           final ProcessingState state = snapshot.data?.processingState ?? ProcessingState.idle;
           return Material(
             child: InkWell(
               onTap: onTap,
               child: ListTile(
-                leading: ListThumbnail(song.artwork),
+                // TODO v8 fixme
+                // leading: ListThumbnail(song.artwork),
                 title: Row(
                   children: [
                     if (isCurrent && state != ProcessingState.completed)
                       Padding(
                           padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
                           child: _currentSongIcon(context, isPlaying, state)),
-                    Expanded(child: Text(song.formatTitle(), overflow: TextOverflow.ellipsis)),
+                    // TODO v8 fixme
+                    Expanded(child: Text(path, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
-                subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
+                // TODO v8 fixme
+                // subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
                 trailing: CollectionFileContextMenuButton(
-                  file: dto.CollectionFile(dartz.Left(song)),
+                  path: path,
                   actions: const [
                     CollectionFileAction.removeFromQueue,
                     CollectionFileAction.togglePin,

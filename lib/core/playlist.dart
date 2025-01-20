@@ -28,7 +28,7 @@ class Playlist {
     });
   }
 
-  Future queueLast(List<dto.Song> songs, {bool autoPlay = true}) async {
+  Future queueLast(List<String> songs, {bool autoPlay = true}) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     await _audioSource.addAll(await _makeAudioSources(songs));
     if (wasEmpty && autoPlay) {
@@ -36,7 +36,7 @@ class Playlist {
     }
   }
 
-  Future queueNext(List<dto.Song> songs) async {
+  Future queueNext(List<String> songs) async {
     final bool wasEmpty = _audioSource.sequence.isEmpty;
     final int insertIndex = wasEmpty ? 0 : 1 + (audioPlayer.currentIndex ?? -1);
     await _audioSource.insertAll(insertIndex, await _makeAudioSources(songs));
@@ -70,7 +70,7 @@ class Playlist {
     return _audioSource.sequence.map((e) => (e.tag as MediaItem?)?.toSong()).whereType<dto.Song>().toList();
   }
 
-  Future<List<AudioSource>> _makeAudioSources(List<dto.Song> songs) async {
+  Future<List<AudioSource>> _makeAudioSources(List<String> songs) async {
     final futureAudioSources = songs.map((s) async => await polarisClient.getAudio(s, uuid.v4()));
     return (await Future.wait(futureAudioSources)).whereType<AudioSource>().toList();
   }
