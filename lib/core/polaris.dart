@@ -11,7 +11,6 @@ import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/download.dart' as download;
 
-// TODO v8 move these where they are used
 const apiVersionEndpoint = '/api/version/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
