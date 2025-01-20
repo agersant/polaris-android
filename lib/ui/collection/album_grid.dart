@@ -152,7 +152,8 @@ class Album extends StatelessWidget {
                               softWrap: false,
                             ),
                             Text(
-                              "TODO v8 fixme artists",
+                              // TODO v8 fixme
+                              "artists",
                               // album.artist ?? unknownArtist,
                               strutStyle: artistStrutStyle,
                               style: artistStyle,

@@ -184,12 +184,12 @@ class Directory extends StatelessWidget {
     return ListTile(
       leading: const Icon(Icons.folder),
       title: Text(entry.formatName()),
-      trailing: CollectionFileContextMenuButton(
+      trailing: DirectoryContextMenuButton(
         path: entry.path,
         actions: const [
-          CollectionFileAction.queueLast,
-          CollectionFileAction.queueNext,
-          CollectionFileAction.togglePin,
+          DirectoryAction.queueLast,
+          DirectoryAction.queueNext,
+          DirectoryAction.togglePin,
         ],
       ),
       dense: true,
@@ -214,13 +214,13 @@ class Song extends StatelessWidget {
     return ListTile(
       leading: const Icon(Icons.audio_file),
       title: Text(entry.formatName(), overflow: TextOverflow.ellipsis),
-      trailing: CollectionFileContextMenuButton(
+      trailing: SongContextMenuButton(
         path: entry.path,
         actions: const [
-          CollectionFileAction.queueLast,
-          CollectionFileAction.queueNext,
-          CollectionFileAction.togglePin,
-          CollectionFileAction.songInfo,
+          SongAction.queueLast,
+          SongAction.queueNext,
+          SongAction.togglePin,
+          SongAction.songInfo,
         ],
       ),
       dense: true,

@@ -348,13 +348,13 @@ class Song extends StatelessWidget {
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
           subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
-          trailing: CollectionFileContextMenuButton(
+          trailing: SongContextMenuButton(
             path: song.path,
             actions: const [
-              CollectionFileAction.queueLast,
-              CollectionFileAction.queueNext,
-              CollectionFileAction.togglePin,
-              CollectionFileAction.songInfo,
+              SongAction.queueLast,
+              SongAction.queueNext,
+              SongAction.togglePin,
+              SongAction.songInfo,
             ],
           ),
           dense: true,

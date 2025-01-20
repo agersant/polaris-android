@@ -96,11 +96,11 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
                   ],
                 ),
                 subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
-                trailing: CollectionFileContextMenuButton(
+                trailing: SongContextMenuButton(
                   path: song.path,
                   actions: const [
-                    CollectionFileAction.removeFromQueue,
-                    CollectionFileAction.togglePin,
+                    SongAction.removeFromQueue,
+                    SongAction.togglePin,
                   ],
                   onRemoveFromQueue: () {
                     getIt<Playlist>().removeSong(index);
