@@ -378,6 +378,7 @@ class Client {
       return song;
     }
     if (connectionManager.isConnected()) {
+      // TODO v8 validate we dont rely on this when queuing via flatten()
       final batch = await _httpClient.getSongs([path]);
       return batch.songs.elementAtOrNull(0);
     } else {

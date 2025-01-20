@@ -347,7 +347,7 @@ class Song extends StatelessWidget {
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
-          subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
+          subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
           trailing: CollectionFileContextMenuButton(
             path: song.path,
             actions: const [

@@ -69,7 +69,7 @@ extension SongFormatting on Song {
     return unknownArtist;
   }
 
-  String formatArtistAndDuration() {
+  String formatArtistsAndDuration() {
     final artists = formatArtists();
     List<String> components = [artists];
     int? songDuration = duration;

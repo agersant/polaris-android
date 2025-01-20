@@ -78,29 +78,26 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
         key: Key(mediaItem.id),
         stream: getIt<AudioPlayer>().playerStateStream,
         builder: (context, snapshot) {
-          final String path = mediaItem.extras?["path"] ?? ""; // TODO v8 fixme
+          final dto.Song song = mediaItem.toSong();
           final isPlaying = snapshot.data?.playing ?? false;
           final ProcessingState state = snapshot.data?.processingState ?? ProcessingState.idle;
           return Material(
             child: InkWell(
               onTap: onTap,
               child: ListTile(
-                // TODO v8 fixme
-                // leading: ListThumbnail(song.artwork),
+                leading: ListThumbnail(song.artwork),
                 title: Row(
                   children: [
                     if (isCurrent && state != ProcessingState.completed)
                       Padding(
                           padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
                           child: _currentSongIcon(context, isPlaying, state)),
-                    // TODO v8 fixme
-                    Expanded(child: Text(path, overflow: TextOverflow.ellipsis)),
+                    Expanded(child: Text(song.title ?? unknownSong, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
-                // TODO v8 fixme
-                // subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
+                subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
                 trailing: CollectionFileContextMenuButton(
-                  path: path,
+                  path: song.path,
                   actions: const [
                     CollectionFileAction.removeFromQueue,
                     CollectionFileAction.togglePin,
