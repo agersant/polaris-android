@@ -379,6 +379,7 @@ class Client {
       return song;
     }
     if (connectionManager.isConnected()) {
+      // TODO v8 this is spamming when flattenning a large folder (very very bad for perf)
       developer.log('Last resort song metadata acquisition for $path');
       final batch = await _httpClient.getSongs([path]);
       return batch.songs.elementAtOrNull(0);
