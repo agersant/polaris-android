@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
@@ -378,7 +379,7 @@ class Client {
       return song;
     }
     if (connectionManager.isConnected()) {
-      // TODO v8 validate we dont rely on this when queuing via flatten()
+      developer.log('Last resort song metadata acquisition for $path');
       final batch = await _httpClient.getSongs([path]);
       return batch.songs.elementAtOrNull(0);
     } else {
