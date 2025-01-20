@@ -123,21 +123,24 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       return cachedSongs;
     }
 
-    if (host != connectionManager.url || !connectionManager.isConnected()) {
-      try {
-        return (await polarisClient.offlineClient.flatten(host, path)).toSet();
-      } catch (e) {
-        return {};
-      }
-    }
+    return {};
 
-    try {
-      final songs = (await polarisClient.flatten(path)).toSet();
-      _flattenCache.putIfAbsent(host, () => {})[path] = songs;
-      return songs;
-    } catch (e) {
-      return null;
-    }
+    // TODO v8 fixme
+    // if (host != connectionManager.url || !connectionManager.isConnected()) {
+    //   try {
+    //     return (await polarisClient.offlineClient.flatten(host, path)).toSet();
+    //   } catch (e) {
+    //     return {};
+    //   }
+    // }
+
+    // try {
+    //   final songs = (await polarisClient.flatten(path)).toSet();
+    //   _flattenCache.putIfAbsent(host, () => {})[path] = songs;
+    //   return songs;
+    // } catch (e) {
+    //   return null;
+    // }
   }
 
   void pin(String host, dto.CollectionFile file) async {

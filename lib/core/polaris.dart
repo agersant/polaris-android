@@ -157,11 +157,11 @@ class HttpClient extends _BaseHttpClient {
     }
   }
 
-  Future<List<dto.Song>> flatten(String path) async {
+  Future<dto.SongList> flatten(String path) async {
     final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto.Song.fromJson(c)).toList();
+      return dto.SongList.fromJson(json.decode(utf8.decode(responseBody)));
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -223,25 +223,23 @@ class OfflineClient {
       throw APIError.unexpectedCacheMiss;
     }
 
-    return [];
-
-    // TODO v8 fixme
-    // return cachedContent.where((file) {
-    //   if (file.isSong()) {
-    //     return mediaCache.hasAudioSync(host, file.asSong().path);
-    //   } else {
-    //     final flattened = collectionCache.flattenDirectory(host, file.asDirectory().path);
-    //     return flattened?.any((song) => mediaCache.hasAudioSync(host, song.path)) ?? false;
-    //   }
-    // }).toList();
+    return cachedContent.where((entry) {
+      if (!entry.isDirectory) {
+        return mediaCache.hasAudioSync(host, entry.path);
+      } else {
+        final flattened = collectionCache.flattenDirectory(host, entry.path);
+        return flattened?.any((path) => mediaCache.hasAudioSync(host, path)) ?? false;
+      }
+    }).toList();
   }
 
-  Future<List<dto.Song>> flatten(String host, String path) async {
+  Future<dto.SongList> flatten(String host, String path) async {
     final cachedContent = collectionCache.flattenDirectory(host, path);
     if (cachedContent == null) {
       throw APIError.unexpectedCacheMiss;
     }
-    return cachedContent.where((s) => mediaCache.hasAudioSync(host, s.path)).toList();
+    final paths = cachedContent.where((path) => mediaCache.hasAudioSync(host, path)).toList();
+    return dto.SongList(paths: paths, firstSongs: []);
   }
 
   Future<Uint8List?> getImage(String host, String path) async {
@@ -286,31 +284,29 @@ class Client {
     final String host = _getHost();
 
     if (!connectionManager.isConnected()) {
-      // TODO v8 fixme
-      // return offlineClient.browse(host, path);
+      return offlineClient.browse(host, path);
     }
 
     if (useCache && collectionCache.hasPopulatedDirectory(host, path)) {
       final cachedContent = collectionCache.getDirectory(host, path);
       if (cachedContent != null) {
-        // TODO v8 fixme
-        // return cachedContent;
+        return cachedContent;
       }
     }
 
     return _httpClient.browse(path).then((content) {
-      // TODO v8 fixme
-      // collectionCache.putDirectory(host, path, content);
+      collectionCache.putDirectory(host, path, content);
       return content;
     });
   }
 
-  Future<List<dto.Song>> flatten(String path) async {
+  Future<dto.SongList> flatten(String path) async {
     final String host = _getHost();
     if (connectionManager.isConnected()) {
-      return _httpClient.flatten(path).then((songs) {
-        collectionCache.putSongs(host, songs);
-        return songs;
+      return _httpClient.flatten(path).then((songList) {
+        collectionCache.putFiles(host, songList.paths);
+        collectionCache.putSongs(host, songList.firstSongs);
+        return songList;
       });
     }
     return offlineClient.flatten(host, path);

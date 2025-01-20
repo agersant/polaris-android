@@ -45,6 +45,18 @@ class BrowserEntry {
   }
 }
 
+class SongList {
+  List<String> paths;
+  List<Song> firstSongs;
+
+  SongList({required this.paths, required this.firstSongs});
+
+  factory SongList.fromJson(Map<String, dynamic> json) {
+    // TODO v8 probably not correct
+    return SongList(paths: json['paths'] as List<String>, firstSongs: json['first_songs'].map((s) => Song.fromJson(s)));
+  }
+}
+
 class AlbumHeader {
   String name;
   List<String> mainArtists;
@@ -89,6 +101,7 @@ class Directory {
       };
 }
 
+// TODO v8 multi-value
 class Song {
   String path;
   int? trackNumber;
@@ -143,7 +156,7 @@ class Song {
 }
 
 // TODO v8 delete me
-class CollectionFile extends Comparable<CollectionFile> {
+class CollectionFile {
   Either<Song, Directory> content;
 
   CollectionFile(this.content);
@@ -162,14 +175,6 @@ class CollectionFile extends Comparable<CollectionFile> {
     } else {
       return asDirectory().artwork;
     }
-  }
-
-  @override
-  int compareTo(CollectionFile other) {
-    if (isDirectory() != other.isDirectory()) {
-      return isDirectory() ? -1 : 1;
-    }
-    return compareStrings(path, other.path);
   }
 
   bool isSong() {
