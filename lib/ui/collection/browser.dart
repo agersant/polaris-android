@@ -129,6 +129,8 @@ class _BrowserLocationState extends State<BrowserLocation> {
     }
   }
 
+  // TODO v8 needs some kind of play all button
+
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
