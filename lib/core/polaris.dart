@@ -335,7 +335,7 @@ class Client {
     //   artworkUri = await _getImageURI(artwork);
     // }
     // final mediaItem = song.toMediaItem(id, artworkUri);
-    final mediaItem = MediaItem(id: id, title: path, extras: <String, dynamic>{path: path});
+    final mediaItem = MediaItem(id: id, title: path, extras: <String, dynamic>{'path': path});
 
     try {
       final String host = _getHost();
