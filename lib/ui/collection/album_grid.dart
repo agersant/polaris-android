@@ -152,9 +152,7 @@ class Album extends StatelessWidget {
                               softWrap: false,
                             ),
                             Text(
-                              // TODO v8 fixme
-                              "artists",
-                              // album.artist ?? unknownArtist,
+                              album.mainArtists.isEmpty ? unknownArtist : album.mainArtists.join(', '),
                               strutStyle: artistStrutStyle,
                               style: artistStyle,
                               overflow: TextOverflow.ellipsis,
