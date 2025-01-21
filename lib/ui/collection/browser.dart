@@ -130,6 +130,7 @@ class _BrowserLocationState extends State<BrowserLocation> {
   }
 
   // TODO v8 needs some kind of play all button
+  // TODO v8 root can sneak in top-level view, mixed with underlying folders
 
   @override
   Widget build(BuildContext context) {
