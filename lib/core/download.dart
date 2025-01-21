@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:developer' as developer;
+import 'package:audio_service/audio_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 

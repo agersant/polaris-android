@@ -1,5 +1,5 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';

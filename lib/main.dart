@@ -5,7 +5,7 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/core/audio_handler.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
@@ -84,7 +84,12 @@ Future _registerSingletons() async {
     mediaCache: mediaCache,
     songsManager: songsManager,
   );
-  final audioPlayer = AudioPlayer();
+  final audioHandler = await initAudioService(
+    connectionManager: connectionManager,
+    collectionCache: collectionCache,
+    polarisClient: polarisClient,
+  );
+  final audioPlayer = audioHandler.audioPlayer;
   final playlist = Playlist(
     uuid: uuid,
     connectionManager: connectionManager,
@@ -118,6 +123,7 @@ Future _registerSingletons() async {
 
   // TODO Needs some logic to recover from app restart while audio service is still running (?)
 
+  getIt.registerSingleton<PolarisAudioHandler>(audioHandler);
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<CollectionCache>(collectionCache);
@@ -141,11 +147,6 @@ void main() async {
   await Settings.init();
   await _registerSingletons();
   await FlutterDisplayMode.setHighRefreshRate();
-  await JustAudioBackground.init(
-    androidNotificationIcon: "drawable/notification_icon",
-    androidNotificationChannelName: 'Polaris Audio Playback',
-    androidNotificationOngoing: true,
-  );
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);

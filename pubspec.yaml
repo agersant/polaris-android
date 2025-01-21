@@ -37,7 +37,6 @@ dependencies:
   flutter_svg: ^1.1.0
   get_it: ^7.2.0
   just_audio: ^0.9.43
-  just_audio_background: ^0.0.1-beta.14
   http: ^0.13.1
   path: ^1.8.1
   path_provider: ^2.1.5

@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:audio_service/audio_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
@@ -332,7 +331,7 @@ class Client {
     return offlineClient.flatten(host, path);
   }
 
-  Future<Uri?> _getImageURI(String path) async {
+  Future<Uri?> getImageURI(String path) async {
     try {
       final String host = _getHost();
       if (await mediaCache.hasImage(host, path)) {
@@ -350,40 +349,13 @@ class Client {
   Future<AudioSource?> getAudio(String path, String id) async {
     try {
       final String host = _getHost();
-      final song = await _getSong(path);
-      if (song == null) {
-        return null;
-      }
-
-      final String? artwork = song.artwork;
-      Uri? artworkUri;
-      if (artwork != null) {
-        artworkUri = await _getImageURI(artwork);
-      }
-      final mediaItem = song.toMediaItem(id, artworkUri);
-
+      final mediaItem = makeMediaItem(id, path);
       if (connectionManager.isConnected()) {
         return await downloadManager.getAudio(host, path, mediaItem);
       } else {
         return await offlineClient.getAudio(host, path, mediaItem);
       }
     } catch (e) {
-      return null;
-    }
-  }
-
-  Future<dto.Song?> _getSong(String path) async {
-    final String host = _getHost();
-    final song = collectionCache.getSong(host, path);
-    if (song != null) {
-      return song;
-    }
-    if (connectionManager.isConnected()) {
-      // TODO v8 this is spamming when flattenning a large folder (very very bad for perf)
-      developer.log('Last resort song metadata acquisition for $path');
-      final batch = await _httpClient.getSongs([path]);
-      return batch.songs.elementAtOrNull(0);
-    } else {
       return null;
     }
   }

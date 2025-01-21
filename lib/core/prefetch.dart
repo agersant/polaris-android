@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
