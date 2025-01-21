@@ -1,18 +1,19 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/audio_handler.dart';
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/media_item.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
 import 'package:polaris/ui/playback/progress_state.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
-import 'package:polaris/core/dto.dart';
-import 'package:polaris/core/media_item.dart';
+import 'package:polaris/ui/utils/placeholder.dart';
 
 final getIt = GetIt.instance;
 
@@ -33,7 +34,7 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   late StreamSubscription _stateSubscription;
   late final AnimationController _controller;
   bool isVisible = false;
-  dto.Song? _song;
+  String? _songPath;
 
   @override
   void initState() {
@@ -43,11 +44,11 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
 
     _stateSubscription = audioPlayer.sequenceStateStream.listen((event) {
       final MediaItem? mediaItem = event?.currentSource?.tag as MediaItem?;
-      if (mediaItem != null) {
-        setState(() => _song = mediaItem.toSong());
-      }
+      setState(() => _songPath = mediaItem?.getSongPath());
       _updateVisibility();
     });
+
+    setState(() => _songPath = (audioPlayer.sequenceState?.currentSource?.tag as MediaItem?)?.getSongPath());
   }
 
   @override
@@ -76,31 +77,26 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<SequenceState?>(
-      stream: audioPlayer.sequenceStateStream,
-      builder: (context, snapshot) {
-        final song = _song;
-        if (song == null) {
-          return Container();
-        }
-        return SizeTransition(
-          sizeFactor: CurvedAnimation(
-            parent: _controller,
-            curve: _getAnimationCurve(),
+    final songPath = _songPath;
+    if (songPath == null) {
+      return Container();
+    }
+    return SizeTransition(
+      sizeFactor: CurvedAnimation(
+        parent: _controller,
+        curve: _getAnimationCurve(),
+      ),
+      axisAlignment: -1.0,
+      child: SizedBox(
+        height: 64,
+        child: Material(
+          elevation: 8,
+          child: InkWell(
+            onTap: _handleTap,
+            child: playerContent(context),
           ),
-          axisAlignment: -1.0,
-          child: SizedBox(
-            height: 64,
-            child: Material(
-              elevation: 8,
-              child: InkWell(
-                onTap: _handleTap,
-                child: playerContent(context, song),
-              ),
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -124,14 +120,14 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   }
 }
 
-Widget playerContent(BuildContext context, Song song) {
+Widget playerContent(BuildContext context) {
   final theme = Theme.of(context);
   final backgroundColor = theme.colorScheme.surface;
   final foregroundColor = theme.colorScheme.onSurface;
   return Container(
       color: backgroundColor,
       child: Stack(children: [
-        _trackDetails(song, foregroundColor),
+        _trackDetails(foregroundColor),
         Positioned(
           bottom: 0,
           left: 0,
@@ -142,45 +138,55 @@ Widget playerContent(BuildContext context, Song song) {
       ]));
 }
 
-Widget _trackDetails(Song song, Color foregroundColor) => LayoutBuilder(
+Widget _trackDetails(Color foregroundColor) => LayoutBuilder(
       builder: (context, size) {
-        return Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ListThumbnail(song.artwork),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+        final placeholderColor = foregroundColor.withValues(alpha: 0.2);
+        final artistsColor = foregroundColor.withValues(alpha: 0.75);
+        return StreamBuilder<dto.Song?>(
+            stream: getIt.get<PolarisAudioHandler>().currentSong,
+            builder: (context, snapshot) {
+              final song = snapshot.data;
+              return Row(
                 children: [
-                  Row(
-                    children: [
-                      const StreamingIndicator(),
-                      Expanded(
-                        child: Text(
-                          song.formatTitle(),
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(color: foregroundColor),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: ListThumbnail(song?.artwork),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            const StreamingIndicator(),
+                            if (song == null) Placeholder(width: 120, height: 8, color: placeholderColor),
+                            if (song != null)
+                              Expanded(
+                                child: Text(
+                                  song.formatTitle(),
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(color: foregroundColor),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                          ],
                         ),
-                      )
-                    ],
+                        if (song == null) Placeholder(width: 80, height: 8, color: placeholderColor),
+                        if (song != null)
+                          Text(
+                            song.formatArtists(),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: artistsColor),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    song.formatArtists(),
-                    style:
-                        Theme.of(context).textTheme.bodySmall?.copyWith(color: foregroundColor.withValues(alpha: 0.75)),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
+                  const PlaybackControls(mini: true),
                 ],
-              ),
-            ),
-            const PlaybackControls(mini: true),
-          ],
-        );
+              );
+            });
       },
     );
 

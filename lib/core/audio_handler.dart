@@ -2,8 +2,10 @@ import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/connection.dart' as connection;
+import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
+import 'package:rxdart/rxdart.dart';
 
 Future<PolarisAudioHandler> initAudioService({
   required connection.Manager connectionManager,
@@ -30,6 +32,8 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
   final polaris.Client polarisClient;
 
   final audioPlayer = AudioPlayer();
+  final BehaviorSubject<dto.Song?> _currentSong = BehaviorSubject.seeded(null);
+  Stream<dto.Song?> get currentSong => _currentSong.stream;
 
   PolarisAudioHandler({
     required this.collectionCache,
@@ -51,6 +55,7 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
 
       final path = currentMediaItem.getSongPath();
       final song = collectionCache.getSong(host, path);
+      _currentSong.value = song;
       if (song == null) {
         mediaItem.add(currentMediaItem);
         return;
