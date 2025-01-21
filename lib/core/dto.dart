@@ -96,6 +96,20 @@ class AlbumHeader {
   }
 }
 
+class Album extends AlbumHeader {
+  List<Song> songs = [];
+
+  Album({required name, required mainArtists}) : super(name: name, mainArtists: mainArtists);
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    final header = AlbumHeader.fromJson(json);
+    return Album(name: header.name, mainArtists: header.mainArtists)
+      ..artwork = header.artwork
+      ..year = header.year
+      ..songs = (json['songs'] as List<dynamic>).map((s) => Song.fromJson(s)).toList();
+  }
+}
+
 // TODO v8 move me to legacy
 class Directory {
   String path;

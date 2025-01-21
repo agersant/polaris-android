@@ -82,17 +82,16 @@ enum DirectoryAction {
 class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   final String path;
   final String? host;
-  final List<dto.Song>? children;
   final void Function() onRefresh;
 
   const DirectoryContextMenuButton({
     required this.path,
-    required actions,
-    this.children,
+    required super.actions,
+    super.compact,
     this.onRefresh = noop,
     this.host,
     Key? key,
-  }) : super(actions: actions, key: key);
+  }) : super(key: key);
 
   @override
   (IconData, String) getActionVisuals(DirectoryAction action) {
@@ -149,12 +148,6 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   }
 
   Future<List<String>> _listSongs() async {
-    final knownSongs = children;
-    if (knownSongs != null) {
-      return knownSongs.map((s) => s.path).toList();
-    }
-
-    // TODO Show some kind of UI while this is in progress and/or confirm result
     final polaris.Client client = getIt<polaris.Client>();
     final hostOverride = host;
     if (hostOverride != null && hostOverride != client.connectionManager.url) {
@@ -183,11 +176,12 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
 
   SongContextMenuButton({
     required this.path,
-    required actions,
+    required super.actions,
+    super.compact,
     this.onRemoveFromQueue = noop,
     this.host,
     Key? key,
-  }) : super(actions: actions, key: key) {
+  }) : super(key: key) {
     final String? useHost = _getHost();
     if (useHost != null) {
       song = getIt<CollectionCache>().getSong(useHost, path);
@@ -253,5 +247,56 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       // return pinManager.isPinned(useHost, file);
       return false;
     }
+  }
+}
+
+enum AlbumAction {
+  queueLast,
+  queueNext,
+  // TODO v8 pinnable albums
+}
+
+class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
+  final String name;
+  final List<String> mainArtists;
+  final List<dto.Song>? children;
+
+  const AlbumContextMenuButton({
+    required this.name,
+    required this.mainArtists,
+    required super.actions,
+    super.compact,
+    this.children,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  (IconData, String) getActionVisuals(AlbumAction action) {
+    return switch (action) {
+      AlbumAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
+      AlbumAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+    };
+  }
+
+  @override
+  void executeAction(BuildContext context, AlbumAction action) async {
+    switch (action) {
+      case AlbumAction.queueLast:
+        getIt<Playlist>().queueLast(await _listSongs());
+        break;
+      case AlbumAction.queueNext:
+        getIt<Playlist>().queueNext(await _listSongs());
+        break;
+    }
+  }
+
+  Future<List<String>> _listSongs() async {
+    final knownSongs = children;
+    if (knownSongs != null) {
+      return knownSongs.map((s) => s.path).toList();
+    }
+    final polaris.Client client = getIt<polaris.Client>();
+    final songs = (await client.httpClient?.getAlbum(name, mainArtists))?.songs ?? [];
+    return songs.map((s) => s.path).toList();
   }
 }

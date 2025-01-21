@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
@@ -79,6 +80,7 @@ abstract class _BaseHttpClient {
 
     Future<http.StreamedResponse> response;
     try {
+      developer.log('Making API Request: ${request.url}');
       response = httpClient.send(request);
     } catch (e) {
       return Future.error(APIError.networkError);
@@ -143,10 +145,12 @@ class HttpGuestClient extends _BaseHttpClient {
 
 class HttpClient extends _BaseHttpClient {
   final authentication.Manager authenticationManager;
+  final CollectionCache collectionCache;
 
   HttpClient({
     required http.Client httpClient,
     required connection.Manager connectionManager,
+    required this.collectionCache,
     required this.authenticationManager,
   }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
@@ -177,6 +181,20 @@ class HttpClient extends _BaseHttpClient {
         await completeRequest(_Method.post, url, authenticationToken: authenticationManager.token, body: payload);
     try {
       return dto.SongBatch.fromJson(json.decode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  Future<dto.Album> getAlbum(String name, List<String> mainArtists) async {
+    final host = _getHost();
+    final url =
+        makeURL('/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}');
+    final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      final album = dto.Album.fromJson(json.decode(utf8.decode(responseBody)));
+      collectionCache.putSongs(host, album.songs);
+      return album;
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -223,6 +241,14 @@ class HttpClient extends _BaseHttpClient {
       url += '?auth_token=$token';
     }
     return Uri.parse(url);
+  }
+
+  String _getHost() {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+    return host;
   }
 }
 

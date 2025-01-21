@@ -161,16 +161,15 @@ class Album extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // TODO v8 fixme
-                      // CollectionFileContextMenuButton(
-                      //   file: dto.CollectionFile(dartz.Right(album)),
-                      //   actions: const [
-                      //     CollectionFileAction.queueLast,
-                      //     CollectionFileAction.queueNext,
-                      //     CollectionFileAction.togglePin,
-                      //   ],
-                      //   compact: true,
-                      // ),
+                      AlbumContextMenuButton(
+                        name: album.name,
+                        mainArtists: album.mainArtists,
+                        actions: const [
+                          AlbumAction.queueLast,
+                          AlbumAction.queueNext,
+                        ],
+                        compact: true,
+                      ),
                     ],
                   ),
                 ],

@@ -49,6 +49,8 @@ final darkTheme = ThemeData(
 Future _registerSingletons() async {
   const uuid = Uuid();
   final settingsManager = settings.Manager();
+  final mediaCache = await MediaCache.create();
+  final collectionCache = await CollectionCache.create();
   final httpClient = http.Client();
   final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
@@ -59,9 +61,8 @@ Future _registerSingletons() async {
     httpClient: httpClient,
     connectionManager: connectionManager,
     authenticationManager: authenticationManager,
+    collectionCache: collectionCache,
   );
-  final mediaCache = await MediaCache.create();
-  final collectionCache = await CollectionCache.create();
   final downloadManager = download.Manager(
     mediaCache: mediaCache,
     httpClient: polarisHttpClient,
