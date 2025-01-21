@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,6 +24,15 @@ class Browser extends StatefulWidget {
 }
 
 class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
+  void playAll() async {
+    final browserModel = getIt<BrowserModel>();
+    final client = getIt<polaris.Client>();
+    final songList = await client.flatten(browserModel.browserStack.last);
+    final playlist = getIt<Playlist>();
+    await playlist.clear();
+    await playlist.queueLast(songList.paths);
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -39,6 +49,8 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
       value: getIt<BrowserModel>(),
       child: Consumer<BrowserModel>(
         builder: (BuildContext context, BrowserModel browserModel, Widget? child) {
+          final isTopLevel = browserModel.browserStack.length == 1;
+          final String title = isTopLevel ? 'All Files' : basename(browserModel.browserStack.last);
           return Theme(
             data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
             child: PopScope(
@@ -56,9 +68,29 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                    child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
-                  ),
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 100,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title, style: Theme.of(context).textTheme.titleLarge),
+                                if (!isTopLevel)
+                                  Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                              flex: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16),
+                                child: OutlinedButton(onPressed: playAll, child: const Icon(Icons.play_arrow)),
+                              ))
+                        ],
+                      )),
                   SizedBox(height: 1, child: Container(color: dividerColor)),
                   Expanded(
                     child: ClipRect(
@@ -128,8 +160,6 @@ class _BrowserLocationState extends State<BrowserLocation> {
       });
     }
   }
-
-  // TODO v8 needs some kind of play all button
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +280,8 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
   final _scrollController = ScrollController();
 
   List<String> _getSegments() {
-    return ["All"].followedBy(splitPath(widget.path).where((s) => s.isNotEmpty)).toList();
+    final components = splitPath(widget.path).where((s) => s.isNotEmpty);
+    return ["All"].followedBy(components.take(max(0, components.length - 1))).toList();
   }
 
   @override
@@ -276,11 +307,11 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
     final breadcrumbs = segments.asMap().entries.map((entry) {
       final int index = entry.key;
       final String value = entry.value;
-      final style = index == segments.length - 1 ? TextStyle(color: Theme.of(context).colorScheme.primary) : null;
+      final style = Theme.of(context).textTheme.bodySmall;
       return Breadcrumb(
         name: value,
         style: style,
-        onTap: () => widget.popLocations(segments.length - 1 - index),
+        onTap: () => widget.popLocations(segments.length - index),
       );
     });
     List<Widget> children = breadcrumbs.expand((breadcrumb) => [const Chevron(), breadcrumb]).skip(1).toList();
