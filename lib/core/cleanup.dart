@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
@@ -9,6 +10,7 @@ import 'package:polaris/core/settings.dart' as settings;
 
 class Manager {
   final connection.Manager connectionManager;
+  final CollectionCache collectionCache;
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
   final AudioPlayer audioPlayer;
@@ -18,6 +20,7 @@ class Manager {
 
   Manager({
     required this.connectionManager,
+    required this.collectionCache,
     required this.mediaCache,
     required this.pinManager,
     required this.audioPlayer,
@@ -47,8 +50,13 @@ class Manager {
 
     audioPlayer.sequence?.forEach((audioSource) {
       final mediaItem = audioSource.tag as MediaItem;
-      final song = mediaItem.toSong();
-      songsToPreserve[host]!.add(song.path);
+      final path = mediaItem.getSongPath();
+      songsToPreserve[host]!.add(path);
+
+      final song = collectionCache.getSong(host, path);
+      if (song == null) {
+        return;
+      }
 
       final artwork = song.artwork;
       if (artwork != null) {
