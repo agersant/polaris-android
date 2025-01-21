@@ -1,7 +1,10 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/audio_handler.dart';
+import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
@@ -11,6 +14,7 @@ import 'package:polaris/ui/playback/streaming_indicator.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/placeholder.dart';
 import 'package:polaris/ui/utils/song_info.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 
@@ -97,26 +101,24 @@ class PlayerPage extends StatelessWidget {
   }
 
   Widget _buildInfoButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.info_outline),
-      onPressed: () {
-        final audioPlayer = getIt<AudioPlayer>();
-        final MediaItem? mediaItem = audioPlayer.sequenceState?.currentSource?.tag as MediaItem?;
-        final dto.Song? song = mediaItem?.toSong();
-        if (song != null) {
-          SongInfoDialog.openInfoDialog(context, song);
-        }
-      },
-    );
+    final audioHandler = getIt<PolarisAudioHandler>();
+    return StreamBuilder<dto.Song?>(
+        stream: audioHandler.currentSong,
+        builder: (context, snapshot) {
+          final song = snapshot.data;
+          return IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: song == null ? null : () => SongInfoDialog.openInfoDialog(context, song),
+          );
+        });
   }
 
   Widget _buildArtwork() {
-    final audioPlayer = getIt<AudioPlayer>();
-    return StreamBuilder<SequenceState?>(
-      stream: audioPlayer.sequenceStateStream,
+    final audioHandler = getIt<PolarisAudioHandler>();
+    return StreamBuilder<dto.Song?>(
+      stream: audioHandler.currentSong,
       builder: (context, snapshot) {
-        final mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
-        final dto.Song? song = mediaItem?.toSong();
+        final dto.Song? song = snapshot.data;
         return Material(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           elevation: 2,
@@ -141,12 +143,11 @@ class PlayerPage extends StatelessWidget {
   }
 
   Widget _buildTrackDetails() {
-    final audioPlayer = getIt<AudioPlayer>();
-    return StreamBuilder<SequenceState?>(
-      stream: audioPlayer.sequenceStateStream,
+    final audioHandler = getIt<PolarisAudioHandler>();
+    return StreamBuilder<dto.Song?>(
+      stream: audioHandler.currentSong,
       builder: (context, snapshot) {
-        final mediaItem = snapshot.data?.currentSource?.tag as MediaItem?;
-        final dto.Song? song = mediaItem?.toSong();
+        final dto.Song? song = snapshot.data;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
@@ -225,55 +226,65 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildUpNextWidget(BuildContext context) {
     final player = getIt<AudioPlayer>();
+    final collectionCache = getIt<CollectionCache>();
 
     return StreamBuilder<SequenceState?>(
       stream: player.sequenceStateStream,
       builder: (context, snapshot) {
         final int? nextIndex = player.nextIndex;
-        dto.Song? nextSong;
+        String? songPath;
         if (nextIndex != null) {
-          final audioSource = snapshot.data?.sequence[nextIndex];
-          final mediaItem = audioSource?.tag as MediaItem?;
-          nextSong = mediaItem?.toSong();
+          songPath = (snapshot.data?.sequence[nextIndex].tag as MediaItem?)?.getSongPath();
         }
-
-        return OutlinedButton(
-          onPressed: getIt<PagesModel>().openQueue,
-          style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4)))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16, left: 16),
-                child: Text(upNext, style: Theme.of(context).textTheme.labelSmall),
-              ),
-              if (nextSong == null)
-                const ListTile(
-                  leading: Icon(Icons.music_off, size: 40),
-                  title: Text(upNextNothing),
-                  subtitle: Text(upNextNothingSubtitle),
-                  trailing: Icon(Icons.queue_music),
+        return StreamBuilder<()>(
+            stream: collectionCache.onSongsIngested,
+            builder: (context, _) {
+              dto.Song? nextSong;
+              final host = getIt.get<connection.Manager>().url;
+              if (host != null && songPath != null) {
+                nextSong = collectionCache.getSong(host, songPath);
+              }
+              return OutlinedButton(
+                onPressed: getIt<PagesModel>().openQueue,
+                style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4)))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, left: 16),
+                      child: Text(upNext, style: Theme.of(context).textTheme.labelSmall),
+                    ),
+                    songPath == null
+                        ? const ListTile(
+                            leading: Icon(Icons.music_off, size: 40),
+                            title: Text(upNextNothing),
+                            subtitle: Text(upNextNothingSubtitle),
+                            trailing: Icon(Icons.queue_music),
+                          )
+                        : ListTile(
+                            leading: ListThumbnail(nextSong?.artwork),
+                            title: nextSong == null
+                                ? const Placeholder(width: 80, height: 8)
+                                : Text(
+                                    nextSong.formatTitle(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                            subtitle: nextSong == null
+                                ? const Placeholder(width: 80, height: 8)
+                                : Text(
+                                    nextSong.formatArtists(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                            trailing: const Icon(Icons.queue_music),
+                          ),
+                  ],
                 ),
-              if (nextSong != null)
-                ListTile(
-                  leading: ListThumbnail(nextSong.artwork),
-                  title: Text(
-                    nextSong.formatTitle(),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  subtitle: Text(
-                    nextSong.formatArtists(),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  trailing: const Icon(Icons.queue_music),
-                ),
-            ],
-          ),
-        );
+              );
+            });
       },
     );
   }

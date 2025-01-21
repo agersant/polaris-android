@@ -37,8 +37,4 @@ extension PolarisMediaItem on MediaItem {
   String getSongPath() {
     return extras![extraKeyPath];
   }
-
-  Song toSong() {
-    return Song(path: extras?[extraKeyPath]);
-  }
 }
