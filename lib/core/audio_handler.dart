@@ -49,6 +49,7 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
       final host = connectionManager.url;
       final currentMediaItem = sequenceState?.currentSource?.tag as MediaItem?;
       if (currentMediaItem == null || host == null) {
+        _currentSong.value = null;
         mediaItem.add(null);
         return;
       }
