@@ -136,19 +136,18 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                       softWrap: true,
                     ),
                   ),
-                  // TODO v8 fixme
-                  // CollectionFileContextMenuButton(
-                  //   file: dto.CollectionFile(dartz.Right(widget.album)),
-                  //   actions: const [
-                  //     CollectionFileAction.queueLast,
-                  //     CollectionFileAction.queueNext,
-                  //     CollectionFileAction.togglePin,
-                  //     CollectionFileAction.refresh,
-                  //   ],
-                  //   onRefresh: () => _fetchData(useCache: false),
-                  //   children: _songs,
-                  //   icon: Icons.menu,
-                  // ),
+                  AlbumContextMenuButton(
+                    name: widget.album.name,
+                    mainArtists: widget.album.mainArtists,
+                    actions: const [
+                      AlbumAction.queueLast,
+                      AlbumAction.queueNext,
+                      AlbumAction.refresh,
+                    ],
+                    onRefresh: () => _fetchData(useCache: false),
+                    songs: _songs,
+                    icon: Icons.menu,
+                  ),
                 ],
               ),
             ),

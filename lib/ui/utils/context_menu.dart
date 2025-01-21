@@ -253,20 +253,24 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
 enum AlbumAction {
   queueLast,
   queueNext,
+  refresh,
   // TODO v8 pinnable albums
 }
 
 class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   final String name;
   final List<String> mainArtists;
-  final List<dto.Song>? children;
+  final List<dto.Song>? songs;
+  final void Function() onRefresh;
 
   const AlbumContextMenuButton({
     required this.name,
     required this.mainArtists,
     required super.actions,
     super.compact,
-    this.children,
+    super.icon,
+    this.onRefresh = noop,
+    this.songs,
     Key? key,
   }) : super(key: key);
 
@@ -275,6 +279,7 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     return switch (action) {
       AlbumAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
       AlbumAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      AlbumAction.refresh => (Icons.refresh, contextMenuRefresh),
     };
   }
 
@@ -287,16 +292,19 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
       case AlbumAction.queueNext:
         getIt<Playlist>().queueNext(await _listSongs());
         break;
+      case AlbumAction.refresh:
+        onRefresh();
+        break;
     }
   }
 
   Future<List<String>> _listSongs() async {
-    final knownSongs = children;
+    final knownSongs = songs;
     if (knownSongs != null) {
       return knownSongs.map((s) => s.path).toList();
     }
     final polaris.Client client = getIt<polaris.Client>();
-    final songs = (await client.httpClient?.getAlbum(name, mainArtists))?.songs ?? [];
-    return songs.map((s) => s.path).toList();
+    final listedSongs = (await client.httpClient?.getAlbum(name, mainArtists))?.songs ?? [];
+    return listedSongs.map((s) => s.path).toList();
   }
 }
