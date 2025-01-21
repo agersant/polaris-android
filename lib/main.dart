@@ -114,6 +114,7 @@ Future _registerSingletons() async {
   );
   final cleanupManager = cleanup.Manager(
     connectionManager: connectionManager,
+    collectionCache: collectionCache,
     mediaCache: mediaCache,
     pinManager: pinManager,
     audioPlayer: audioPlayer,
