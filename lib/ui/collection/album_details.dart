@@ -45,13 +45,11 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      // TODO v8 fixme
-      // final files = await getIt<polaris.Client>().browse(widget.album.path, useCache: useCache);
-      // final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
+      final client = getIt<polaris.Client>();
+      final album = await client.httpClient?.getAlbum(widget.album.name, widget.album.mainArtists);
+      final songs = album?.songs ?? [];
       setState(() {
-        // TODO v8 fixme
-        // _songs = songs;
-        _songs = [];
+        _songs = songs;
       });
     } on polaris.APIError catch (e) {
       setState(() {
