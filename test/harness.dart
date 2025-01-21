@@ -48,6 +48,8 @@ class Harness {
 
     const uuid = Uuid();
     final settingsManager = settings.Manager();
+    final MediaCacheInterface mediaCache = await mock.MediaCache.create();
+    final collectionCache = CollectionCache(Collection());
     final mockHttpClient = mock.HttpClient();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
@@ -58,9 +60,8 @@ class Harness {
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
+      collectionCache: collectionCache,
     );
-    final MediaCacheInterface mediaCache = await mock.MediaCache.create();
-    final collectionCache = CollectionCache(Collection());
     final downloadManager = download.Manager(
       mediaCache: mediaCache,
       httpClient: polarisHttpClient,
@@ -98,6 +99,7 @@ class Harness {
     );
     final cleanupManager = cleanup.Manager(
       connectionManager: connectionManager,
+      collectionCache: collectionCache,
       mediaCache: mediaCache,
       pinManager: pinManager,
       audioPlayer: audioPlayer,

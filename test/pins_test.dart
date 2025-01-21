@@ -28,6 +28,7 @@ void main() {
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
+      collectionCache: collectionCache,
     );
     final polarisOfflineClient = polaris.OfflineClient(
       collectionCache: collectionCache,
