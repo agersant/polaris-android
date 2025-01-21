@@ -13,37 +13,21 @@ final getIt = GetIt.instance;
 
 void noop() {}
 
-enum DirectoryAction {
-  queueLast,
-  queueNext,
-  refresh,
-  togglePin,
-}
-
-// TODO v8 make base class for context menus so avoid copy/paste
-class DirectoryContextMenuButton extends StatelessWidget {
-  final String path;
-  final String? host;
-  final List<dto.Song>? children;
+abstract class ContextMenuButton<T> extends StatelessWidget {
   final IconData icon;
   final bool compact;
-  final List<DirectoryAction> actions;
-  final void Function() onRefresh;
+  final List<T> actions;
 
-  const DirectoryContextMenuButton(
-      {required this.path,
-      required this.actions,
-      this.children,
-      this.compact = false,
-      this.icon = Icons.more_vert,
-      this.onRefresh = noop,
-      this.host,
-      Key? key})
-      : super(key: key);
+  const ContextMenuButton({
+    required this.actions,
+    this.icon = Icons.more_vert,
+    this.compact = false,
+    Key? key,
+  }) : super(key: key);
 
-  String? _getHost() {
-    return host ?? getIt<connection.Manager>().url;
-  }
+  (IconData, String) getActionVisuals(T action);
+
+  void executeAction(BuildContext context, T action);
 
   @override
   Widget build(BuildContext context) {
@@ -60,51 +44,96 @@ class DirectoryContextMenuButton extends StatelessWidget {
       size: iconSize,
     );
 
-    return PopupMenuButton<DirectoryAction>(
+    return PopupMenuButton<T>(
       icon: compact ? null : icon,
       iconSize: iconSize,
-      onSelected: (DirectoryAction result) async {
-        switch (result) {
-          case DirectoryAction.queueLast:
-            getIt<Playlist>().queueLast(await _listSongs());
-            break;
-          case DirectoryAction.queueNext:
-            getIt<Playlist>().queueNext(await _listSongs());
-            break;
-          case DirectoryAction.refresh:
-            onRefresh();
-            break;
-          case DirectoryAction.togglePin:
-            final pinManager = getIt<pin.Manager>();
-            final String? useHost = _getHost();
-            if (useHost != null) {
-              if (_isPinned()) {
-                // TODO v8 fixme
-                // pinManager.unpin(useHost, file);
-              } else {
-                // TODO v8 fixme
-                // pinManager.pin(useHost, file);
-              }
-            }
-            break;
-        }
-      },
+      onSelected: (action) => executeAction(context, action),
       itemBuilder: (BuildContext context) {
-        return <PopupMenuEntry<DirectoryAction>>[
-          if (actions.contains(DirectoryAction.queueLast))
-            _buildButton(DirectoryAction.queueLast, Icons.playlist_add, contextMenuQueueLast),
-          if (actions.contains(DirectoryAction.queueNext))
-            _buildButton(DirectoryAction.queueNext, Icons.playlist_play, contextMenuQueueNext),
-          if (actions.contains(DirectoryAction.refresh))
-            _buildButton(DirectoryAction.refresh, Icons.refresh, contextMenuRefresh),
-          if (actions.contains(DirectoryAction.togglePin))
-            _buildButton(
-                DirectoryAction.togglePin, Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
-        ];
+        return actions.map((action) {
+          final (icon, label) = getActionVisuals(action);
+          return _buildButton(action, icon, label);
+        }).toList();
       },
       // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
       child: compact ? icon : null,
     );
+  }
+
+  PopupMenuItem<T> _buildButton(T action, IconData icon, String label) {
+    return PopupMenuItem<T>(
+      value: action,
+      child: Row(
+        children: [
+          Padding(padding: const EdgeInsets.only(right: 16.0), child: Icon(icon)),
+          Text(label),
+        ],
+      ),
+    );
+  }
+}
+
+enum DirectoryAction {
+  queueLast,
+  queueNext,
+  refresh,
+  togglePin,
+}
+
+class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
+  final String path;
+  final String? host;
+  final List<dto.Song>? children;
+  final void Function() onRefresh;
+
+  const DirectoryContextMenuButton({
+    required this.path,
+    required actions,
+    this.children,
+    this.onRefresh = noop,
+    this.host,
+    Key? key,
+  }) : super(actions: actions, key: key);
+
+  @override
+  (IconData, String) getActionVisuals(DirectoryAction action) {
+    return switch (action) {
+      DirectoryAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
+      DirectoryAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      DirectoryAction.refresh => (Icons.refresh, contextMenuRefresh),
+      DirectoryAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+    };
+  }
+
+  @override
+  void executeAction(BuildContext context, DirectoryAction action) async {
+    switch (action) {
+      case DirectoryAction.queueLast:
+        getIt<Playlist>().queueLast(await _listSongs());
+        break;
+      case DirectoryAction.queueNext:
+        getIt<Playlist>().queueNext(await _listSongs());
+        break;
+      case DirectoryAction.refresh:
+        onRefresh();
+        break;
+      case DirectoryAction.togglePin:
+        final pinManager = getIt<pin.Manager>();
+        final String? useHost = _getHost();
+        if (useHost != null) {
+          if (_isPinned()) {
+            // TODO v8 fixme
+            // pinManager.unpin(useHost, file);
+          } else {
+            // TODO v8 fixme
+            // pinManager.pin(useHost, file);
+          }
+        }
+        break;
+    }
+  }
+
+  String? _getHost() {
+    return host ?? getIt<connection.Manager>().url;
   }
 
   bool _isPinned() {
@@ -136,18 +165,6 @@ class DirectoryContextMenuButton extends StatelessWidget {
       return songList.paths;
     }
   }
-
-  PopupMenuItem<DirectoryAction> _buildButton(DirectoryAction action, IconData icon, String label) {
-    return PopupMenuItem<DirectoryAction>(
-      value: action,
-      child: Row(
-        children: [
-          Padding(padding: const EdgeInsets.only(right: 16.0), child: Icon(icon)),
-          Text(label),
-        ],
-      ),
-    );
-  }
 }
 
 enum SongAction {
@@ -158,102 +175,72 @@ enum SongAction {
   songInfo,
 }
 
-class SongContextMenuButton extends StatelessWidget {
+class SongContextMenuButton extends ContextMenuButton<SongAction> {
   final String path;
   final String? host;
   late final dto.Song? song;
-  final IconData icon;
-  final bool compact;
-  final List<SongAction> actions;
   final void Function() onRemoveFromQueue;
 
-  SongContextMenuButton(
-      {required this.path,
-      required this.actions,
-      this.compact = false,
-      this.icon = Icons.more_vert,
-      this.onRemoveFromQueue = noop,
-      this.host,
-      Key? key})
-      : super(key: key) {
+  SongContextMenuButton({
+    required this.path,
+    required actions,
+    this.onRemoveFromQueue = noop,
+    this.host,
+    Key? key,
+  }) : super(actions: actions, key: key) {
     final String? useHost = _getHost();
     if (useHost != null) {
       song = getIt<CollectionCache>().getSong(useHost, path);
     }
   }
 
-  String? _getHost() {
-    return host ?? getIt<connection.Manager>().url;
+  @override
+  (IconData, String) getActionVisuals(SongAction action) {
+    return switch (action) {
+      SongAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
+      SongAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      SongAction.removeFromQueue => (Icons.clear, contextMenuRemoveFromQueue),
+      SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+      SongAction.songInfo => (Icons.info_outline, contextMenuSongInfo),
+    };
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Mimic logic from ListTile._iconColor
-    const iconSize = 20.0;
-    final theme = Theme.of(context);
-    final ListTileThemeData tileTheme = ListTileTheme.of(context);
-    var iconColor = tileTheme.iconColor;
-    iconColor ??= theme.brightness == Brightness.light ? Colors.black45 : theme.iconTheme.color;
-
-    final icon = Icon(
-      this.icon,
-      color: iconColor,
-      size: iconSize,
-    );
-
-    return PopupMenuButton<SongAction>(
-      icon: compact ? null : icon,
-      iconSize: iconSize,
-      onSelected: (SongAction result) async {
-        switch (result) {
-          case SongAction.queueLast:
-            getIt<Playlist>().queueLast([path]);
-            break;
-          case SongAction.queueNext:
-            getIt<Playlist>().queueNext([path]);
-            break;
-          case SongAction.removeFromQueue:
-            onRemoveFromQueue();
-            break;
-          case SongAction.songInfo:
-            final useSong = song;
-            if (useSong != null) {
-              SongInfoDialog.openInfoDialog(context, useSong);
-            }
-            break;
-          case SongAction.togglePin:
-            final pinManager = getIt<pin.Manager>();
-            final String? useHost = _getHost();
-            if (useHost != null) {
-              if (_isPinned()) {
-                // TODO v8 fixme
-                // pinManager.unpin(useHost, file);
-              } else {
-                // TODO v8 fixme
-                // pinManager.pin(useHost, file);
-              }
-            }
-            break;
+  void executeAction(BuildContext context, SongAction action) async {
+    switch (action) {
+      case SongAction.queueLast:
+        getIt<Playlist>().queueLast([path]);
+        break;
+      case SongAction.queueNext:
+        getIt<Playlist>().queueNext([path]);
+        break;
+      case SongAction.removeFromQueue:
+        onRemoveFromQueue();
+        break;
+      case SongAction.songInfo:
+        final useSong = song;
+        if (useSong != null) {
+          SongInfoDialog.openInfoDialog(context, useSong);
         }
-      },
-      itemBuilder: (BuildContext context) {
-        return <PopupMenuEntry<SongAction>>[
-          if (actions.contains(SongAction.queueLast))
-            _buildButton(SongAction.queueLast, Icons.playlist_add, contextMenuQueueLast),
-          if (actions.contains(SongAction.queueNext))
-            _buildButton(SongAction.queueNext, Icons.playlist_play, contextMenuQueueNext),
-          if (actions.contains(SongAction.removeFromQueue))
-            _buildButton(SongAction.removeFromQueue, Icons.clear, contextMenuRemoveFromQueue),
-          if (actions.contains(SongAction.togglePin))
-            _buildButton(
-                SongAction.togglePin, Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
-          if (song != null && actions.contains(SongAction.songInfo))
-            _buildButton(SongAction.songInfo, Icons.info_outline, contextMenuSongInfo),
-        ];
-      },
-      // Manually specify child because default IconButton comes with an excessive minimum size of 48x48
-      child: compact ? icon : null,
-    );
+        break;
+      case SongAction.togglePin:
+        final pinManager = getIt<pin.Manager>();
+        final String? useHost = _getHost();
+        if (useHost != null) {
+          if (_isPinned()) {
+            // TODO v8 fixme
+            // pinManager.unpin(useHost, file);
+          } else {
+            // TODO v8 fixme
+            // pinManager.pin(useHost, file);
+          }
+        }
+        break;
+    }
+  }
+
+  String? _getHost() {
+    return host ?? getIt<connection.Manager>().url;
   }
 
   bool _isPinned() {
@@ -266,17 +253,5 @@ class SongContextMenuButton extends StatelessWidget {
       // return pinManager.isPinned(useHost, file);
       return false;
     }
-  }
-
-  PopupMenuItem<SongAction> _buildButton(SongAction action, IconData icon, String label) {
-    return PopupMenuItem<SongAction>(
-      value: action,
-      child: Row(
-        children: [
-          Padding(padding: const EdgeInsets.only(right: 16.0), child: Icon(icon)),
-          Text(label),
-        ],
-      ),
-    );
   }
 }
