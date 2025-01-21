@@ -118,7 +118,7 @@ class Manager {
 
       final audioSource = effectiveSequence[index];
       final MediaItem mediaItem = audioSource.tag;
-      final String path = mediaItem.toSong().path;
+      final String path = mediaItem.getSongPath();
       final bool hasAudio = await mediaCache.hasAudio(host, path);
       if (!hasAudio && audioSource is StreamAudioSource) {
         return audioSource;
@@ -182,7 +182,7 @@ class Manager {
   // TODO This can deadlock. See https://github.com/ryanheise/just_audio/issues/594
   Future<void> _prefetch(StreamAudioSource audioSource) async {
     final MediaItem mediaItem = audioSource.tag;
-    final String path = mediaItem.toSong().path;
+    final String path = mediaItem.getSongPath();
     try {
       developer.log("Beginning prefetch for song: $path");
       final response = await audioSource.request();
@@ -198,10 +198,10 @@ class Manager {
   void _updateSongsBeingFetched() {
     final songs = <String>{};
     if (_playlistSongBeingFetched != null) {
-      songs.add((_playlistSongBeingFetched!.tag as MediaItem).toSong().path);
+      songs.add((_playlistSongBeingFetched!.tag as MediaItem).getSongPath());
     }
     if (_pinSongBeingFetched != null) {
-      songs.add((_pinSongBeingFetched!.tag as MediaItem).toSong().path);
+      songs.add((_pinSongBeingFetched!.tag as MediaItem).getSongPath());
     }
     _songsBeingFetchedSubject.add(songs);
   }

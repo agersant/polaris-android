@@ -66,7 +66,7 @@ class Playlist {
   }
 
   List<String> getSongs() {
-    return _audioSource.sequence.map((e) => (e.tag as MediaItem?)!.toSong().path).toList().cast<String>();
+    return _audioSource.sequence.map((e) => (e.tag as MediaItem).getSongPath()).toList().cast<String>();
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<String> songs) async {
