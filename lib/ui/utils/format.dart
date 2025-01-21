@@ -93,3 +93,9 @@ extension DirectoryFormatting on Directory {
     return artist ?? unknownArtist;
   }
 }
+
+extension AlbumHeaderFormatting on AlbumHeader {
+  String formatArtists() {
+    return mainArtists.isNotEmpty ? mainArtists.join(', ') : unknownArtist;
+  }
+}

@@ -157,9 +157,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    // TODO v8 fixme
-                    // widget.album.artist ?? unknownArtist,
-                    "artists",
+                    widget.album.formatArtists(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   Text(
@@ -210,29 +208,28 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  // TODO v8 fixme
-                  // Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.bodySmall),
-                  Text("artists", style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    widget.album.formatArtists(),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ],
               ),
             ),
-            // TODO v8 fixme
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 8),
-            //   child: CollectionFileContextMenuButton(
-            //     file: dto.CollectionFile(dartz.Right(widget.album)),
-            //     actions: const [
-            //       CollectionFileAction.queueLast,
-            //       CollectionFileAction.queueNext,
-            //       CollectionFileAction.togglePin,
-            //       CollectionFileAction.refresh,
-            //     ],
-            //     onRefresh: () => _fetchData(useCache: false),
-            //     children: _songs,
-            //     icon: Icons.menu,
-            //     compact: true,
-            //   ),
-            // ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: AlbumContextMenuButton(
+                name: widget.album.name,
+                mainArtists: widget.album.mainArtists,
+                actions: const [
+                  AlbumAction.queueLast,
+                  AlbumAction.queueNext,
+                  AlbumAction.refresh,
+                ],
+                onRefresh: () => _fetchData(useCache: false),
+                songs: _songs,
+                icon: Icons.menu,
+              ),
+            ),
           ],
         ),
       ],
