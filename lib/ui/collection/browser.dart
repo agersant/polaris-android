@@ -77,7 +77,7 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(title, style: Theme.of(context).textTheme.titleLarge),
+                                Text(title, style: Theme.of(context).textTheme.titleMedium),
                                 if (!isTopLevel)
                                   Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
                               ],
