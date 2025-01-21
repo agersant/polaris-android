@@ -79,8 +79,8 @@ class CollectionCache {
     for (String path in files) {
       final components = splitPath(path);
       server.directorySongs.putIfAbsent(components.length > 1 ? dirname(path) : "", () => {}).add(components.last);
-      String parent = "";
-      for (int i = 0; i < components.length - 1; i++) {
+      String parent = components[0];
+      for (int i = 1; i < components.length - 1; i++) {
         final child = '$parent/${components[i]}';
         server.directoryChildren.putIfAbsent(parent, () => {}).add(child);
         parent = child;
@@ -95,8 +95,8 @@ class CollectionCache {
       server.songs[song.path] = song;
       final components = splitPath(song.path);
       server.directorySongs.putIfAbsent(components.length > 1 ? dirname(song.path) : "", () => {}).add(components.last);
-      String parent = "";
-      for (int i = 0; i < components.length - 1; i++) {
+      String parent = components[0];
+      for (int i = 1; i < components.length - 1; i++) {
         final child = '$parent/${components[i]}';
         server.directoryChildren.putIfAbsent(parent, () => {}).add(child);
         parent = child;
