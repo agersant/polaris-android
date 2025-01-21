@@ -160,26 +160,26 @@ Widget _trackDetails(Color foregroundColor) => LayoutBuilder(
                         Row(
                           children: [
                             const StreamingIndicator(),
-                            if (song == null) Placeholder(width: 120, height: 8, color: placeholderColor),
-                            if (song != null)
-                              Expanded(
-                                child: Text(
-                                  song.formatTitle(),
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(color: foregroundColor),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
+                            song == null
+                                ? const Placeholder(width: 120, height: 8)
+                                : Expanded(
+                                    child: Text(
+                                      song.formatTitle(),
+                                      style: Theme.of(context).textTheme.titleSmall?.copyWith(color: foregroundColor),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
                           ],
                         ),
-                        if (song == null) Placeholder(width: 80, height: 8, color: placeholderColor),
-                        if (song != null)
-                          Text(
-                            song.formatArtists(),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: artistsColor),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
+                        song == null
+                            ? const Placeholder(width: 80, height: 8)
+                            : Text(
+                                song.formatArtists(),
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: artistsColor),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
                       ],
                     ),
                   ),

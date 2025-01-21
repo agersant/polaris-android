@@ -1,16 +1,21 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/utils/animated_equalizer.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
+import 'package:polaris/ui/utils/placeholder.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
+import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -73,44 +78,67 @@ class QueuePage extends StatelessWidget {
   }
 }
 
-Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool isCurrent, Function() onTap) =>
-    StreamBuilder<PlayerState>(
-        key: Key(mediaItem.id),
-        stream: getIt<AudioPlayer>().playerStateStream,
-        builder: (context, snapshot) {
-          final dto.Song song = mediaItem.toSong();
-          final isPlaying = snapshot.data?.playing ?? false;
-          final ProcessingState state = snapshot.data?.processingState ?? ProcessingState.idle;
-          return Material(
-            child: InkWell(
-              onTap: onTap,
-              child: ListTile(
-                leading: ListThumbnail(song.artwork),
-                title: Row(
-                  children: [
-                    if (isCurrent && state != ProcessingState.completed)
-                      Padding(
-                          padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
-                          child: _currentSongIcon(context, isPlaying, state)),
-                    Expanded(child: Text(song.title ?? unknownSong, overflow: TextOverflow.ellipsis)),
-                  ],
+(Stream<dto.Song?>, dto.Song?) makeSongStream(String path) {
+  final collectionCache = getIt<CollectionCache>();
+  final host = getIt<connection.Manager>().url;
+  if (host == null) {
+    return (Stream.value(null), null);
+  }
+  final song = collectionCache.getSong(host, path);
+  final stream = collectionCache.onSongsIngested.map((_) => collectionCache.getSong(host, path)).whereNotNull().take(1);
+  return (stream, song);
+}
+
+Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool isCurrent, Function() onTap) {
+  final (songStream, initialSong) = makeSongStream(mediaItem.getSongPath());
+  return StreamProvider<dto.Song?>.value(
+      key: Key(mediaItem.id),
+      value: songStream,
+      initialData: initialSong,
+      builder: (context, snapshot) {
+        return StreamBuilder<PlayerState>(
+            stream: getIt<AudioPlayer>().playerStateStream,
+            builder: (context, snapshot) {
+              final song = context.watch<dto.Song?>();
+              final isPlaying = snapshot.data?.playing ?? false;
+              final ProcessingState state = snapshot.data?.processingState ?? ProcessingState.idle;
+              return Material(
+                child: InkWell(
+                  onTap: onTap,
+                  child: ListTile(
+                    leading: ListThumbnail(song?.artwork),
+                    title: Row(
+                      children: [
+                        if (isCurrent && state != ProcessingState.completed)
+                          Padding(
+                              padding: const EdgeInsets.only(right: 8.0, bottom: 4.0),
+                              child: _currentSongIcon(context, isPlaying, state)),
+                        Expanded(
+                            child: song == null
+                                ? const Placeholder(width: 100, height: 8)
+                                : Text(song.title ?? unknownSong, overflow: TextOverflow.ellipsis)),
+                      ],
+                    ),
+                    subtitle: song == null
+                        ? const Placeholder(width: 100, height: 8)
+                        : Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
+                    trailing: SongContextMenuButton(
+                      path: mediaItem.getSongPath(),
+                      actions: const [
+                        SongAction.removeFromQueue,
+                        SongAction.togglePin,
+                      ],
+                      onRemoveFromQueue: () {
+                        getIt<Playlist>().removeSong(index);
+                      },
+                    ),
+                    dense: true,
+                  ),
                 ),
-                subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
-                trailing: SongContextMenuButton(
-                  path: song.path,
-                  actions: const [
-                    SongAction.removeFromQueue,
-                    SongAction.togglePin,
-                  ],
-                  onRemoveFromQueue: () {
-                    getIt<Playlist>().removeSong(index);
-                  },
-                ),
-                dense: true,
-              ),
-            ),
-          );
-        });
+              );
+            });
+      });
+}
 
 Widget _currentSongIcon(BuildContext context, bool isPlaying, ProcessingState state) {
   final Color color = Theme.of(context).colorScheme.primary;

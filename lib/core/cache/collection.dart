@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io' as io;
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/utils.dart';
+import 'package:rxdart/rxdart.dart';
 
 const _firstVersion = 1;
 const _currentVersion = 2;
 
-class CollectionCache extends ChangeNotifier {
+class CollectionCache {
   final Collection _collection;
+  final BehaviorSubject<()> _ingestion = BehaviorSubject<()>();
+  Stream<()> get onSongsIngested => _ingestion.stream;
 
   CollectionCache(this._collection);
 
@@ -100,7 +102,7 @@ class CollectionCache extends ChangeNotifier {
         parent = child;
       }
     }
-    notifyListeners();
+    _ingestion.value = ();
     await saveToDisk();
   }
 
