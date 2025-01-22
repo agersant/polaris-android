@@ -10,22 +10,23 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@master
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "3.3.8"
+          flutter-version: "3.27.1"
       - name: Run tests
         run: flutter test --coverage
       - name: Upload test coverage results to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     name: Build Android App Bundle
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@master
       - name: Retrieve encryption keys
@@ -36,7 +37,7 @@ jobs:
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "3.3.8"
+          flutter-version: "3.27.1"
       - name: Build Flutter app
         run: flutter build appbundle
         env:

@@ -38,8 +38,8 @@ class AlbumGrid extends StatelessWidget {
             const crossAxisSpacing = 16.0;
             const padding = 24.0;
 
-            final titleStyle = Theme.of(context).textTheme.bodyText1 ?? const TextStyle();
-            final artistStyle = Theme.of(context).textTheme.caption ?? const TextStyle();
+            final titleStyle = Theme.of(context).textTheme.bodyLarge ?? const TextStyle();
+            final artistStyle = Theme.of(context).textTheme.bodySmall ?? const TextStyle();
             final titleStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: titleStyle.fontSize);
             final artistStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: artistStyle.fontSize);
 

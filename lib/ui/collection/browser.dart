@@ -7,7 +7,6 @@ import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
-import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
@@ -45,34 +44,44 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
         builder: (BuildContext context, BrowserModel browserModel, Widget? child) {
           return Theme(
             data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                  child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
-                ),
-                SizedBox(height: 1, child: Container(color: dividerColor)),
-                Expanded(
-                  child: ClipRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: Navigator(
-                      pages: browserModel.browserStack.map((location) {
-                        return MaterialPage<dynamic>(
-                          child: BrowserLocation(
-                            location,
-                            onDirectoryTapped: browserModel.pushBrowserLocation,
-                            navigateBack: browserModel.popBrowserLocation,
-                          ),
-                        );
-                      }).toList(),
-                      onPopPage: (route, dynamic result) {
-                        return route.didPop(result);
-                      },
+            child: PopScope(
+              canPop: !browserModel.isBrowserActive || browserModel.browserStack.length <= 1,
+              onPopInvokedWithResult: (didPop, dynamic result) {
+                if (didPop) {
+                  return;
+                }
+                final bool shouldPop = !browserModel.isBrowserActive || !browserModel.popBrowserLocation();
+                if (shouldPop && context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                    child: Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
+                  ),
+                  SizedBox(height: 1, child: Container(color: dividerColor)),
+                  Expanded(
+                    child: ClipRect(
+                      clipBehavior: Clip.hardEdge,
+                      child: Navigator(
+                        onDidRemovePage: (page) {},
+                        pages: browserModel.browserStack.map((location) {
+                          return MaterialPage<dynamic>(
+                            child: BrowserLocation(
+                              location,
+                              onDirectoryTapped: browserModel.pushBrowserLocation,
+                              navigateBack: browserModel.popBrowserLocation,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -339,7 +348,7 @@ class Chevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color? chevronColor = Theme.of(context).textTheme.caption?.color;
+    final Color? chevronColor = Theme.of(context).textTheme.bodySmall?.color;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 2, 4, 0),
       child: Icon(
@@ -370,7 +379,7 @@ class Breadcrumb extends StatelessWidget {
 // Disable ink
 class BreadcrumbsScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
     return child;
   }
 }

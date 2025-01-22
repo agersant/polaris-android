@@ -194,7 +194,7 @@ class ServerHeader extends StatelessWidget {
           Row(
             children: [
               const Padding(padding: EdgeInsets.only(right: 8), child: Icon(Icons.desktop_windows, size: 16)),
-              Text('From $host', style: Theme.of(context).textTheme.bodyText2),
+              Text('From $host', style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
           const Divider(),
@@ -437,11 +437,11 @@ class _PinStateIconState extends State<PinStateIcon> {
   Widget build(BuildContext context) {
     switch (_pinState) {
       case PinState.pending:
-        return Icon(Icons.cloud_outlined, size: 16, color: Theme.of(context).textTheme.caption?.color);
+        return Icon(Icons.cloud_outlined, size: 16, color: Theme.of(context).textTheme.bodySmall?.color);
       case PinState.fetching:
         return _buildLoadingWidget();
       case PinState.fetched:
-        return Icon(Icons.check, size: 16, color: Theme.of(context).textTheme.caption?.color);
+        return Icon(Icons.check, size: 16, color: Theme.of(context).textTheme.bodySmall?.color);
     }
   }
 }

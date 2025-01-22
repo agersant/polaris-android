@@ -9,9 +9,11 @@ import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
 
   pin.Manager makePinManager() {
     final mockHttpClient = mock.HttpClient();

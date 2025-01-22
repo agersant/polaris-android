@@ -13,18 +13,16 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(
+    return const SettingsScreen(
       title: settingsTitle,
       children: [
         SettingsGroup(
           title: appearanceHeader,
-          children: const [
-            ThemeModeSetting(),
-          ],
+          children: [ThemeModeSetting()],
         ),
         SettingsGroup(
           title: performanceHeader,
-          children: const [
+          children: [
             CacheSizeSetting(),
             NumSongsToPreloadSetting(),
           ],

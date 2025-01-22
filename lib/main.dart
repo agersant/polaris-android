@@ -27,22 +27,22 @@ import 'package:polaris/ui/playback/player.dart';
 import 'package:polaris/ui/playback/queue.dart';
 import 'package:polaris/ui/settings/page.dart';
 import 'package:polaris/ui/startup/page.dart';
-import 'package:polaris/ui/utils/back_button_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 final getIt = GetIt.instance;
 
 final lightTheme = ThemeData(
+  useMaterial3: false,
   brightness: Brightness.light,
   primarySwatch: Colors.blue,
 );
 
 final darkTheme = ThemeData(
+  useMaterial3: false,
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
   indicatorColor: Colors.blue, // TabBar current tab highlight
-  toggleableActiveColor: Colors.blue, // SwitchListTile color
 );
 
 Future _registerSingletons() async {
@@ -180,42 +180,60 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
 
-          return BackButtonHandler(
-            Column(
-              children: [
-                Expanded(
-                  child: Navigator(
-                    key: navigatorKey,
-                    pages: [
-                      if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
-                      if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-                      if (showSettings) const MaterialPage<dynamic>(child: SettingsPage()),
-                      if (showOfflineMusic) const MaterialPage<dynamic>(child: OfflineMusicPage()),
-                      // Ideally album details would be here but OpenContainer() can't be used with the pages API.
-                      // TODO Consider transitions that aren't the default for player and queue pages
-                      if (showPlayer) const MaterialPage<dynamic>(child: PlayerPage()),
-                      if (showQueue) const MaterialPage<dynamic>(child: QueuePage()),
-                    ],
-                    onPopPage: (route, dynamic result) {
-                      if (!route.didPop(result)) {
-                        return false;
-                      }
-                      if (pagesModel.isQueueOpen) {
-                        pagesModel.closeQueue();
-                      } else if (pagesModel.isPlayerOpen) {
-                        pagesModel.closePlayer();
-                      } else if (pagesModel.isOfflineMusicOpen) {
-                        pagesModel.closeOfflineMusic();
-                      } else if (pagesModel.isSettingsOpen) {
-                        pagesModel.closeSettings();
-                      }
-                      return true;
-                    },
-                  ),
+          return Column(
+            children: [
+              Expanded(
+                child: Navigator(
+                  key: navigatorKey,
+                  onDidRemovePage: (page) {},
+                  pages: [
+                    if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
+
+                    if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
+
+                    if (showSettings)
+                      MaterialPage<dynamic>(
+                          child: const SettingsPage(),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closeSettings();
+                            }
+                          }),
+
+                    if (showOfflineMusic)
+                      MaterialPage<dynamic>(
+                          child: const OfflineMusicPage(),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closeOfflineMusic();
+                            }
+                          }),
+
+                    // Ideally album details would be here but OpenContainer() can't be used with the pages API.
+                    // TODO Consider transitions that aren't the default for player and queue pages
+
+                    if (showPlayer)
+                      MaterialPage<dynamic>(
+                          child: const PlayerPage(),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closePlayer();
+                            }
+                          }),
+
+                    if (showQueue)
+                      MaterialPage<dynamic>(
+                          child: const QueuePage(),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closeQueue();
+                            }
+                          }),
+                  ],
                 ),
-                MiniPlayer(collapse: collapseMiniPlayer),
-              ],
-            ),
+              ),
+              MiniPlayer(collapse: collapseMiniPlayer),
+            ],
           );
         },
       ),
