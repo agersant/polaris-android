@@ -12,7 +12,6 @@ import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/utils.dart';
-import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -45,76 +44,75 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
 
     final dividerColor = DividerTheme.of(context).color ?? Theme.of(context).dividerColor;
 
-    return ChangeNotifierProvider.value(
-      value: getIt<BrowserModel>(),
-      child: Consumer<BrowserModel>(
-        builder: (BuildContext context, BrowserModel browserModel, Widget? child) {
-          final isTopLevel = browserModel.browserStack.length == 1;
-          final String title = isTopLevel ? 'All Files' : basename(browserModel.browserStack.last);
-          return Theme(
-            data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
-            child: PopScope(
-              canPop: !browserModel.isBrowserActive || browserModel.browserStack.length <= 1,
-              onPopInvokedWithResult: (didPop, dynamic result) {
-                if (didPop) {
-                  return;
-                }
-                final bool shouldPop = !browserModel.isBrowserActive || !browserModel.popBrowserLocation();
-                if (shouldPop && context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 100,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(title, style: Theme.of(context).textTheme.titleMedium),
-                                if (!isTopLevel)
-                                  Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
-                              ],
-                            ),
+    final browserModel = getIt<BrowserModel>();
+    return ListenableBuilder(
+      listenable: browserModel,
+      builder: (BuildContext context, Widget? child) {
+        final isTopLevel = browserModel.browserStack.length == 1;
+        final String title = isTopLevel ? 'All Files' : basename(browserModel.browserStack.last);
+        return Theme(
+          data: Theme.of(context).copyWith(pageTransitionsTheme: transitionTheme),
+          child: PopScope(
+            canPop: !browserModel.isBrowserActive || browserModel.browserStack.length <= 1,
+            onPopInvokedWithResult: (didPop, dynamic result) {
+              if (didPop) {
+                return;
+              }
+              final bool shouldPop = !browserModel.isBrowserActive || !browserModel.popBrowserLocation();
+              if (shouldPop && context.mounted) {
+                Navigator.pop(context);
+              }
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 100,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(title, style: Theme.of(context).textTheme.titleMedium),
+                              if (!isTopLevel)
+                                Breadcrumbs(browserModel.browserStack.last, browserModel.popBrowserLocations),
+                            ],
                           ),
-                          Expanded(
-                              flex: 0,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 16),
-                                child: OutlinedButton(onPressed: playAll, child: const Icon(Icons.play_arrow)),
-                              ))
-                        ],
-                      )),
-                  SizedBox(height: 1, child: Container(color: dividerColor)),
-                  Expanded(
-                    child: ClipRect(
-                      clipBehavior: Clip.hardEdge,
-                      child: Navigator(
-                        onDidRemovePage: (page) {},
-                        pages: browserModel.browserStack.map((location) {
-                          return MaterialPage<dynamic>(
-                            child: BrowserLocation(
-                              location,
-                              onDirectoryTapped: browserModel.pushBrowserLocation,
-                              navigateBack: browserModel.popBrowserLocation,
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                        ),
+                        Expanded(
+                            flex: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16),
+                              child: OutlinedButton(onPressed: playAll, child: const Icon(Icons.play_arrow)),
+                            ))
+                      ],
+                    )),
+                SizedBox(height: 1, child: Container(color: dividerColor)),
+                Expanded(
+                  child: ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: Navigator(
+                      onDidRemovePage: (page) {},
+                      pages: browserModel.browserStack.map((location) {
+                        return MaterialPage<dynamic>(
+                          child: BrowserLocation(
+                            location,
+                            onDirectoryTapped: browserModel.pushBrowserLocation,
+                            navigateBack: browserModel.popBrowserLocation,
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
