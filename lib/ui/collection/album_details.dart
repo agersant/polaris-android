@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/playlist.dart';
@@ -33,8 +34,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   void didUpdateWidget(AlbumDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // TODO v8 fixme implement == for AlbumHeader!
-    if (oldWidget.album != widget.album) {
+    if (oldWidget.album.name != widget.album.name ||
+        !listEquals(oldWidget.album.mainArtists, widget.album.mainArtists)) {
       _fetchData();
     }
   }
