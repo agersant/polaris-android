@@ -23,15 +23,6 @@ class Browser extends StatefulWidget {
 }
 
 class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
-  void playAll() async {
-    final browserModel = getIt<BrowserModel>();
-    final client = getIt<polaris.Client>();
-    final songList = await client.flatten(browserModel.browserStack.last);
-    final playlist = getIt<Playlist>();
-    await playlist.clear();
-    await playlist.queueLast(songList.paths);
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -86,7 +77,15 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                             flex: 0,
                             child: Padding(
                               padding: const EdgeInsets.only(left: 16),
-                              child: OutlinedButton(onPressed: playAll, child: const Icon(Icons.play_arrow)),
+                              child: DirectoryContextMenuButton(
+                                path: browserModel.browserStack.last,
+                                icon: Icons.menu,
+                                actions: const [
+                                  DirectoryAction.queueLast,
+                                  DirectoryAction.queueNext,
+                                  DirectoryAction.togglePin,
+                                ],
+                              ),
                             ))
                       ],
                     )),

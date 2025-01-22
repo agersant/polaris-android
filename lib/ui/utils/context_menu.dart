@@ -87,6 +87,7 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
     required this.path,
     required super.actions,
     super.compact,
+    super.icon,
     this.onRefresh = noop,
     Key? key,
   }) : super(key: key);
