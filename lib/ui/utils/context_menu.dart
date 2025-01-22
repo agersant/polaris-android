@@ -81,7 +81,6 @@ enum DirectoryAction {
 
 class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   final String path;
-  final String? host;
   final void Function() onRefresh;
 
   const DirectoryContextMenuButton({
@@ -89,7 +88,6 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
     required super.actions,
     super.compact,
     this.onRefresh = noop,
-    this.host,
     Key? key,
   }) : super(key: key);
 
@@ -99,7 +97,7 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
       DirectoryAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
       DirectoryAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
       DirectoryAction.refresh => (Icons.refresh, contextMenuRefresh),
-      DirectoryAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+      DirectoryAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
     };
   }
 
@@ -117,46 +115,24 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
         break;
       case DirectoryAction.togglePin:
         final pinManager = getIt<pin.Manager>();
-        final String? useHost = _getHost();
-        if (useHost != null) {
-          if (_isPinned()) {
-            // TODO v8 fixme
-            // pinManager.unpin(useHost, file);
-          } else {
-            // TODO v8 fixme
-            // pinManager.pin(useHost, file);
-          }
+        if (_isPinned()) {
+          pinManager.unpinDirectory(path);
+        } else {
+          pinManager.pinDirectory(path);
         }
         break;
     }
   }
 
-  String? _getHost() {
-    return host ?? getIt<connection.Manager>().url;
-  }
-
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    final String? useHost = _getHost();
-    if (useHost == null) {
-      return false;
-    } else {
-      // TODO v8 fixme
-      // return pinManager.isPinned(useHost, file);
-      return false;
-    }
+    return pinManager.isDirectoryPinned(path);
   }
 
   Future<List<String>> _listSongs() async {
     final polaris.Client client = getIt<polaris.Client>();
-    final hostOverride = host;
-    if (hostOverride != null && hostOverride != client.connectionManager.url) {
-      final songList = await client.offlineClient.flatten(hostOverride, path);
-      return songList.paths;
-    } else {
-      final songList = await client.flatten(path);
-      return songList.paths;
-    }
+    final songList = await client.flatten(path);
+    return songList.paths;
   }
 }
 
@@ -170,7 +146,6 @@ enum SongAction {
 
 class SongContextMenuButton extends ContextMenuButton<SongAction> {
   final String path;
-  final String? host;
   late final dto.Song? song;
   final void Function() onRemoveFromQueue;
 
@@ -179,12 +154,11 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
     required super.actions,
     super.compact,
     this.onRemoveFromQueue = noop,
-    this.host,
     Key? key,
   }) : super(key: key) {
-    final String? useHost = _getHost();
-    if (useHost != null) {
-      song = getIt<CollectionCache>().getSong(useHost, path);
+    final String? host = getIt<connection.Manager>().url;
+    if (host != null) {
+      song = getIt<CollectionCache>().getSong(host, path);
     }
   }
 
@@ -194,7 +168,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       SongAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
       SongAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
       SongAction.removeFromQueue => (Icons.clear, contextMenuRemoveFromQueue),
-      SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpinFile : contextMenuPinFile),
+      SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
       SongAction.songInfo => (Icons.info_outline, contextMenuSongInfo),
     };
   }
@@ -219,34 +193,18 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
         break;
       case SongAction.togglePin:
         final pinManager = getIt<pin.Manager>();
-        final String? useHost = _getHost();
-        if (useHost != null) {
-          if (_isPinned()) {
-            // TODO v8 fixme
-            // pinManager.unpin(useHost, file);
-          } else {
-            // TODO v8 fixme
-            // pinManager.pin(useHost, file);
-          }
+        if (_isPinned()) {
+          pinManager.unpinSong(path);
+        } else {
+          pinManager.pinSong(path);
         }
         break;
     }
   }
 
-  String? _getHost() {
-    return host ?? getIt<connection.Manager>().url;
-  }
-
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    final String? useHost = _getHost();
-    if (useHost == null) {
-      return false;
-    } else {
-      // TODO v8 fixme
-      // return pinManager.isPinned(useHost, file);
-      return false;
-    }
+    return pinManager.isSongPinned(path);
   }
 }
 
@@ -254,18 +212,20 @@ enum AlbumAction {
   queueLast,
   queueNext,
   refresh,
-  // TODO v8 pinnable albums
+  togglePin,
 }
 
 class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   final String name;
   final List<String> mainArtists;
+  final String? artwork;
   final List<dto.Song>? songs;
   final void Function() onRefresh;
 
   const AlbumContextMenuButton({
     required this.name,
     required this.mainArtists,
+    required this.artwork,
     required super.actions,
     super.compact,
     super.icon,
@@ -280,6 +240,7 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
       AlbumAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
       AlbumAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
       AlbumAction.refresh => (Icons.refresh, contextMenuRefresh),
+      AlbumAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
     };
   }
 
@@ -295,6 +256,14 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
       case AlbumAction.refresh:
         onRefresh();
         break;
+      case AlbumAction.togglePin:
+        final pinManager = getIt<pin.Manager>();
+        if (_isPinned()) {
+          pinManager.unpinAlbum(name, mainArtists);
+        } else {
+          pinManager.pinAlbum(name, mainArtists, artwork);
+        }
+        break;
     }
   }
 
@@ -306,5 +275,10 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     final polaris.Client client = getIt<polaris.Client>();
     final listedSongs = (await client.httpClient?.getAlbum(name, mainArtists))?.songs ?? [];
     return listedSongs.map((s) => s.path).toList();
+  }
+
+  bool _isPinned() {
+    final pinManager = getIt<pin.Manager>();
+    return pinManager.isAlbumPinned(name, mainArtists);
   }
 }

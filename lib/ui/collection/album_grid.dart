@@ -164,9 +164,11 @@ class Album extends StatelessWidget {
                       AlbumContextMenuButton(
                         name: album.name,
                         mainArtists: album.mainArtists,
+                        artwork: album.artwork,
                         actions: const [
                           AlbumAction.queueLast,
                           AlbumAction.queueNext,
+                          AlbumAction.togglePin,
                         ],
                         compact: true,
                       ),

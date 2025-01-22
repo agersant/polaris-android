@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
@@ -24,73 +25,34 @@ class OfflineMusicPage extends StatefulWidget {
 }
 
 class _OfflineMusicPageState extends State<OfflineMusicPage> {
-  late Stream<List<pin.Host>> _hosts;
-  late StreamSubscription _pinsSubscription;
-  late StreamSubscription _fetchSubscription;
   final _pinManager = getIt<pin.Manager>();
   final _prefetchManager = getIt<prefetch.Manager>();
-  int _numDirectories = 0;
-  int _numSongs = 0;
+  late StreamSubscription _fetchSubscription;
   int _sizeOnDisk = 0;
   bool _fullyComputedSizeOnDisk = false;
 
   @override
   initState() {
     super.initState();
-    final String? host = getIt<connection.Manager>().url;
-    _hosts = _pinManager.hostsStream.map((Set<pin.Host> hosts) {
-      return hosts.toList()
-        ..sort((a, b) {
-          if (a.url == host) return -1;
-          if (b.url == host) return 1;
-          return compareStrings(a.url, b.url);
-        });
-    });
-
-    _pinsSubscription = _pinManager.hostsStream.listen((hosts) {
-      _updateStats(hosts);
-      _updateSizeOnDisk();
-    });
-
-    _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) {
-      _updateSizeOnDisk();
-    });
+    _pinManager.addListener(_updateSizeOnDisk);
+    _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((songs) => _updateSizeOnDisk());
   }
 
   @override
   void dispose() {
     super.dispose();
-    _pinsSubscription.cancel();
+    _pinManager.removeListener(_updateSizeOnDisk);
     _fetchSubscription.cancel();
-  }
-
-  void _updateStats(Set<pin.Host> hosts) {
-    int newNumDirectories = 0;
-    int newNumSongs = 0;
-    // TODO v8 fixme
-    // for (pin.Host host in hosts) {
-    //   for (dto.CollectionFile file in host.content) {
-    //     if (file.isDirectory()) {
-    //       newNumDirectories += 1;
-    //     } else {
-    //       newNumSongs += 1;
-    //     }
-    //   }
-    // }
-    setState(() {
-      _numDirectories = newNumDirectories;
-      _numSongs = newNumSongs;
-    });
   }
 
   Future<void> _updateSizeOnDisk() async {
     int size = 0;
-    for (pin.Host host in _pinManager.hosts) {
-      final songs = await _pinManager.getAllSongs(host.url);
+    for (String host in _pinManager.hosts) {
+      final songs = _pinManager.getSongsInHost(host);
       if (songs == null) {
         continue;
       }
-      size += await computeSizeOnDisk(songs, host.url, onProgress: (s) {
+      size += await computeSizeOnDisk(songs, host, onProgress: (s) {
         if (!_fullyComputedSizeOnDisk) {
           setState(() => _sizeOnDisk = size + s);
         }
@@ -114,65 +76,59 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
 
   @override
   Widget build(BuildContext context) {
+    final pinManager = getIt<pin.Manager>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(offlineMusicTitle),
-      ),
-      body: Column(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.offline_pin, size: 40),
-            title: Text(formatBytes(_sizeOnDisk, 2)),
-            subtitle: Row(
+      appBar: AppBar(title: const Text(offlineMusicTitle)),
+      body: ListenableBuilder(
+          listenable: pinManager,
+          builder: (context, child) {
+            final hosts = pinManager.hosts;
+            return Column(
               children: [
-                Caption(nDirectories(_numDirectories)),
-                Caption(nSongs(_numSongs)),
+                ListTile(
+                  leading: const Icon(Icons.offline_pin, size: 40),
+                  title: Text(formatBytes(_sizeOnDisk, 2)),
+                  subtitle: Row(
+                    children: [
+                      Caption(nSongs(pinManager.countSongs())),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: hosts.isEmpty
+                        ? _buildHelp()
+                        : Column(children: hosts.map((host) => PinsByServer(host)).toList()),
+                  ),
+                )
               ],
-            ),
-          ),
-          const Divider(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: StreamBuilder(
-                stream: _hosts,
-                initialData: const <pin.Host>[],
-                builder: (BuildContext context, AsyncSnapshot<List<pin.Host>> snapshot) {
-                  final hosts = snapshot.requireData;
-                  if (hosts.isEmpty) {
-                    return _buildHelp();
-                  }
-                  return Column(children: hosts.map((pin.Host host) => PinsByServer(host)).toList());
-                },
-              ),
-            ),
-          )
-        ],
-      ),
+            );
+          }),
     );
   }
 }
 
 class PinsByServer extends StatelessWidget {
-  final pin.Host host;
+  final String host;
 
   const PinsByServer(this.host, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final pinnedFiles = host.content.toList()..sort((a, b) => compareStrings(a.path, b.path));
+    final pins = getIt<pin.Manager>().getPinsForHost(host) ?? [];
 
     return Column(
       children: [
-        ServerHeader(host.url),
+        ServerHeader(host),
         ListView.builder(
-          itemCount: pinnedFiles.length,
+          itemCount: pins.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          // TODO When removing a pin, all the pins lower in the list get recreated
           itemBuilder: (context, index) => PinListTile(
-            host.url,
-            pinnedFiles[index],
-            key: Key(host.url + pinnedFiles[index].path),
+            host,
+            pins[index],
+            key: Key(host + pins[index].key),
           ),
         ),
       ],
@@ -207,9 +163,9 @@ class ServerHeader extends StatelessWidget {
 
 class PinListTile extends StatefulWidget {
   final String host;
-  final dto.CollectionFile file;
+  final pin.Pin myPin;
 
-  const PinListTile(this.host, this.file, {Key? key}) : super(key: key);
+  const PinListTile(this.host, this.myPin, {Key? key}) : super(key: key);
 
   @override
   State<PinListTile> createState() => _PinListTileState();
@@ -218,19 +174,18 @@ class PinListTile extends StatefulWidget {
 class _PinListTileState extends State<PinListTile> {
   final _connectionManager = getIt<connection.Manager>();
   final _prefetchManager = getIt<prefetch.Manager>();
+  final _collectionCache = getIt<CollectionCache>();
   final _pinManager = getIt<pin.Manager>();
   final _mediaCache = getIt<MediaCacheInterface>();
 
   late StreamSubscription _fetchSubscription;
   int? _numSongsOnDisk;
-  int? _totalSongs;
   int _sizeOnDisk = 0;
   bool _fullyComputedSizeOnDisk = false;
 
   @override
   void initState() {
     super.initState();
-    _updateTotalSongs();
     _fetchSubscription = _prefetchManager.songsBeingFetchedStream.listen((event) {
       _updateNumSongsOnDisk();
       _updateSizeOnDisk();
@@ -243,44 +198,19 @@ class _PinListTileState extends State<PinListTile> {
     _fetchSubscription.cancel();
   }
 
-  Future<Set<dto.Song>?> _listSongs() async {
-    if (widget.file.isSong()) {
-      return {widget.file.asSong()};
-    } else {
-      return await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
-    }
-  }
-
   Future<void> _updateNumSongsOnDisk() async {
-    final Set<dto.Song>? songs = await _listSongs();
-    if (songs == null) {
-      return;
-    }
+    List<String> songs = widget.myPin.songs;
     int numSongsOnDisk = 0;
-    for (dto.Song song in songs) {
-      if (await _mediaCache.hasAudio(widget.host, song.path)) {
+    for (String song in songs) {
+      if (await _mediaCache.hasAudio(widget.host, song)) {
         numSongsOnDisk += 1;
       }
     }
     setState(() => _numSongsOnDisk = numSongsOnDisk);
   }
 
-  Future<void> _updateTotalSongs() async {
-    if (!_connectionManager.isConnected() || _connectionManager.url != widget.host) {
-      setState(() => _totalSongs = null);
-      return;
-    }
-    final Set<dto.Song>? songs = await _listSongs();
-    if (songs != null) {
-      setState(() => _totalSongs = songs.length);
-    }
-  }
-
   Future<void> _updateSizeOnDisk() async {
-    final Set<dto.Song>? songs = await _listSongs();
-    if (songs == null) {
-      return;
-    }
+    List<String> songs = widget.myPin.songs;
     final size = await computeSizeOnDisk(songs, widget.host, onProgress: (s) {
       if (!_fullyComputedSizeOnDisk) {
         setState(() => _sizeOnDisk = s);
@@ -290,19 +220,23 @@ class _PinListTileState extends State<PinListTile> {
     _fullyComputedSizeOnDisk = true;
   }
 
-  String formatTitle() {
-    if (widget.file.isDirectory()) {
-      return widget.file.asDirectory().formatName();
-    } else {
-      return widget.file.asSong().formatTitle();
-    }
-  }
+  String _formatTitle() => switch (widget.myPin) {
+        pin.SongPin p => _collectionCache.getSong(widget.host, p.path)?.formatTitle() ?? basename(p.path),
+        pin.DirectoryPin p => basename(p.path),
+        pin.AlbumPin p => '${p.name} by ${dto.AlbumHeader(name: p.name, mainArtists: p.mainArtists).formatArtists()}',
+      };
+
+  Widget _buildLeading() => switch (widget.myPin) {
+        pin.SongPin p => ListThumbnail(_collectionCache.getSong(widget.host, p.path)?.artwork),
+        pin.DirectoryPin _ => const SizedBox(width: 44, height: 44, child: Center(child: Icon(Icons.folder))),
+        pin.AlbumPin p => ListThumbnail(p.artwork),
+      };
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       dense: true,
-      leading: ListThumbnail(widget.file.artwork),
+      leading: _buildLeading(),
       title: Row(
         children: [
           if (_connectionManager.isConnected())
@@ -310,30 +244,41 @@ class _PinListTileState extends State<PinListTile> {
                 padding: const EdgeInsets.only(right: 8),
                 child: PinStateIcon(
                   widget.host,
-                  widget.file,
+                  widget.myPin,
                   numSongsOnDisk: _numSongsOnDisk,
-                  totalSongs: _totalSongs,
+                  totalSongs: widget.myPin.songs.length,
                 )),
-          Expanded(child: Text(formatTitle(), overflow: TextOverflow.ellipsis))
+          Expanded(child: Text(_formatTitle(), overflow: TextOverflow.ellipsis))
         ],
       ),
       subtitle: Column(
         children: [
           Row(
             children: [
-              if (_numSongsOnDisk != _totalSongs) Caption(xySongs(_numSongsOnDisk, _totalSongs)),
-              if (_numSongsOnDisk == _totalSongs) Caption(nSongs(_numSongsOnDisk)),
+              if (_numSongsOnDisk != widget.myPin.songs.length)
+                Caption(xySongs(_numSongsOnDisk, widget.myPin.songs.length)),
+              if (_numSongsOnDisk == widget.myPin.songs.length) Caption(nSongs(_numSongsOnDisk)),
               if (_sizeOnDisk > 0) Caption(formatBytes(_sizeOnDisk, 2)),
             ],
           ),
         ],
       ),
-      // TODO v8 fixme
-      // trailing: CollectionFileContextMenuButton(
-      //   file: widget.file,
-      //   host: widget.host,
-      //   actions: const [CollectionFileAction.togglePin],
-      // ),
+      trailing: switch (widget.myPin) {
+        pin.SongPin p => SongContextMenuButton(
+            path: p.path,
+            actions: const [SongAction.togglePin],
+          ),
+        pin.DirectoryPin p => DirectoryContextMenuButton(
+            path: p.path,
+            actions: const [DirectoryAction.togglePin],
+          ),
+        pin.AlbumPin p => AlbumContextMenuButton(
+            name: p.name,
+            mainArtists: p.mainArtists,
+            artwork: p.artwork,
+            actions: const [AlbumAction.togglePin],
+          ),
+      },
     );
   }
 }
@@ -346,13 +291,13 @@ enum PinState {
 
 class PinStateIcon extends StatefulWidget {
   final String host;
-  final dto.CollectionFile file;
+  final pin.Pin myPin;
   final int? numSongsOnDisk;
   final int? totalSongs;
 
   const PinStateIcon(
     this.host,
-    this.file, {
+    this.myPin, {
     required this.numSongsOnDisk,
     required this.totalSongs,
     Key? key,
@@ -366,7 +311,6 @@ class _PinStateIconState extends State<PinStateIcon> {
   PinState _pinState = PinState.pending;
   late StreamSubscription _songsBeingFetchedSubscription;
   final _prefetchManager = getIt<prefetch.Manager>();
-  final _pinManager = getIt<pin.Manager>();
 
   @override
   initState() {
@@ -407,19 +351,7 @@ class _PinStateIconState extends State<PinStateIcon> {
 
   Future<bool> _isFetchingThis() async {
     final songsBeingFetched = _prefetchManager.songsBeingFetched;
-    if (widget.file.isSong()) {
-      return songsBeingFetched.any((path) => widget.file.path == path);
-    }
-    final songsInDirectory = await _pinManager.getSongsInDirectory(widget.host, widget.file.path);
-    if (songsInDirectory == null) {
-      return false;
-    }
-    for (String songBeingFetched in songsBeingFetched) {
-      if (songsInDirectory.any((song) => song.path == songBeingFetched)) {
-        return true;
-      }
-    }
-    return false;
+    return songsBeingFetched.any((song) => widget.myPin.songs.contains(song));
   }
 
   Widget _buildLoadingWidget() {
@@ -455,16 +387,16 @@ class Caption extends StatelessWidget {
   Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(right: 8), child: Text(text));
 }
 
-Future<int> computeSizeOnDisk(Set<dto.Song> songs, String host, {Function(int)? onProgress}) async {
+Future<int> computeSizeOnDisk(Iterable<String> songs, String host, {Function(int)? onProgress}) async {
   final mediaCache = getIt<MediaCacheInterface>();
 
   int size = 0;
   await Future.wait(songs.map((song) async {
-    final hasAudio = await mediaCache.hasAudio(host, song.path);
+    final hasAudio = await mediaCache.hasAudio(host, song);
     if (!hasAudio) {
       return;
     }
-    final cacheFile = mediaCache.getAudioLocation(host, song.path);
+    final cacheFile = mediaCache.getAudioLocation(host, song);
     try {
       final stat = await cacheFile.stat();
       size += stat.size;

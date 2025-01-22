@@ -64,15 +64,16 @@ class Manager {
       }
     });
 
-    for (String host in pinManager.hosts.map((host) => host.url)) {
-      final pinnedSongs = await pinManager.getAllSongs(host);
-      if (pinnedSongs == null) {
-        return;
+    for (String host in pinManager.hosts) {
+      for (String path in pinManager.getSongsInHost(host) ?? []) {
+        final hostSongs = songsToPreserve.putIfAbsent(host, () => {});
+        final hostImages = imagesToPreserve.putIfAbsent(host, () => {});
+        hostSongs.add(path);
+        final artwork = collectionCache.getSong(host, path)?.artwork;
+        if (artwork != null) {
+          hostImages.add(artwork);
+        }
       }
-      final hostSongs = songsToPreserve.putIfAbsent(host, () => {});
-      final hostImages = imagesToPreserve.putIfAbsent(host, () => {});
-      hostSongs.addAll(pinnedSongs.map((s) => s.path));
-      hostImages.addAll(pinnedSongs.map((s) => s.artwork).whereType<String>());
     }
 
     await mediaCache.purge(songsToPreserve, imagesToPreserve);

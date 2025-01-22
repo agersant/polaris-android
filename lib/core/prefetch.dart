@@ -162,16 +162,16 @@ class Manager {
   }
 
   Future<StreamAudioSource?> _pickPinSongToFetch(String host) async {
-    final songs = await pinManager.getAllSongs(host);
+    final songs = pinManager.getSongsInHost(host);
     if (songs == null) {
-      throw "Could not list pinned songs";
+      return null;
     }
-    for (dto.Song song in songs) {
-      if (await mediaCache.hasAudio(host, song.path)) {
+    for (String path in songs) {
+      if (await mediaCache.hasAudio(host, path)) {
         continue;
       }
-      final mediaItem = song.toMediaItem(uuid.v4(), null);
-      final audioSource = await downloadManager.getAudio(host, song.path, mediaItem);
+      final mediaItem = makeMediaItem(uuid.v4(), path);
+      final audioSource = await downloadManager.getAudio(host, path, mediaItem);
       if (audioSource is StreamAudioSource) {
         return audioSource;
       }

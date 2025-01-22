@@ -42,8 +42,8 @@ const contextMenuQueueLast = 'Play Last';
 const contextMenuQueueNext = 'Play Next';
 const contextMenuRefresh = 'Refresh';
 const contextMenuRemoveFromQueue = 'Remove';
-const contextMenuPinFile = 'Add to Offline Music';
-const contextMenuUnpinFile = 'Remove from Offline Music';
+const contextMenuPin = 'Add to Offline Music';
+const contextMenuUnpin = 'Remove from Offline Music';
 const contextMenuSongInfo = 'Song Details';
 
 // Collection drawer
@@ -83,7 +83,6 @@ const offlineMusicTitle = 'Offline Music';
 const offlineMusicEmpty = 'You have not saved any music.';
 String xySongs(int? x, int? y) => '${x ?? "?"}/${y ?? "?"} ${(y ?? 2) > 1 ? "songs" : "song"}';
 String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
-String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';
 
 // Settings
 const settingsTitle = 'Settings';
