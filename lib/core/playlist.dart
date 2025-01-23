@@ -1,15 +1,15 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:uuid/uuid.dart';
 
 class Playlist {
   ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final connection.Manager connectionManager;
-  final polaris.Client polarisClient;
+  final AppClient appClient;
   final AudioPlayer audioPlayer;
 
   ConcatenatingAudioSource get audioSource => _audioSource;
@@ -17,7 +17,7 @@ class Playlist {
   Playlist({
     required this.uuid,
     required this.connectionManager,
-    required this.polarisClient,
+    required this.appClient,
     required this.audioPlayer,
   }) {
     connectionManager.addListener(() {
@@ -70,7 +70,7 @@ class Playlist {
   }
 
   Future<List<AudioSource>> _makeAudioSources(List<String> songs) async {
-    final futureAudioSources = songs.map((s) async => await polarisClient.getAudio(s, uuid.v4()));
+    final futureAudioSources = songs.map((s) async => await appClient.getAudio(s, uuid.v4()));
     return (await Future.wait(futureAudioSources)).whereType<AudioSource>().toList();
   }
 }

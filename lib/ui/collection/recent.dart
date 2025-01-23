@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
+import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
@@ -17,7 +19,7 @@ class RecentAlbums extends StatefulWidget {
 
 class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClientMixin {
   List<AlbumHeader>? _albums;
-  polaris.APIError? _error;
+  APIError? _error;
 
   @override
   void initState() {
@@ -47,14 +49,14 @@ class _RecentAlbumsState extends State<RecentAlbums> with AutomaticKeepAliveClie
       _error = null;
     });
     try {
-      final polaris.HttpClientInterface? client = getIt<polaris.Client>().httpClient;
+      final APIClientInterface? client = getIt<AppClient>().apiClient;
       if (client != null) {
         final albums = await client.recent();
         setState(() {
           _albums = albums;
         });
       }
-    } on polaris.APIError catch (e) {
+    } on APIError catch (e) {
       setState(() {
         _albums = null;
         _error = e;

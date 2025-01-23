@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
 
@@ -131,7 +131,7 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   }
 
   Future<List<String>> _listSongs() async {
-    final polaris.Client client = getIt<polaris.Client>();
+    final AppClient client = getIt<AppClient>();
     final songList = await client.flatten(path);
     return songList.paths;
   }
@@ -271,8 +271,8 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     if (knownSongs != null) {
       return knownSongs.map((s) => s.path).toList();
     }
-    final polaris.Client client = getIt<polaris.Client>();
-    final listedSongs = (await client.httpClient?.getAlbum(name, mainArtists))?.songs ?? [];
+    final AppClient client = getIt<AppClient>();
+    final listedSongs = (await client.apiClient?.getAlbum(name, mainArtists))?.songs ?? [];
     return listedSongs.map((s) => s.path).toList();
   }
 

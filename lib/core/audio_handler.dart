@@ -1,22 +1,22 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:rxdart/rxdart.dart';
 
 Future<PolarisAudioHandler> initAudioService({
   required connection.Manager connectionManager,
   required CollectionCache collectionCache,
-  required polaris.Client polarisClient,
+  required AppClient appClient,
 }) async {
   return await AudioService.init(
     builder: () => PolarisAudioHandler(
       connectionManager: connectionManager,
       collectionCache: collectionCache,
-      polarisClient: polarisClient,
+      appClient: appClient,
     ),
     config: const AudioServiceConfig(
       androidNotificationIcon: "drawable/notification_icon",
@@ -29,7 +29,7 @@ Future<PolarisAudioHandler> initAudioService({
 class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
   final connection.Manager connectionManager;
   final CollectionCache collectionCache;
-  final polaris.Client polarisClient;
+  final AppClient appClient;
 
   final audioPlayer = AudioPlayer();
   final BehaviorSubject<dto.Song?> _currentSong = BehaviorSubject.seeded(null);
@@ -38,7 +38,7 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
   PolarisAudioHandler({
     required this.collectionCache,
     required this.connectionManager,
-    required this.polarisClient,
+    required this.appClient,
   }) {
     _forwardPlaybackState();
     _forwardSongMetadata();
@@ -65,7 +65,7 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
       final String? artwork = song.artwork;
       Uri? artworkUri;
       if (artwork != null) {
-        artworkUri = await polarisClient.getImageURI(artwork);
+        artworkUri = await appClient.getImageURI(artwork);
       }
       mediaItem.add(song.toMediaItem(currentMediaItem.id, artworkUri));
     });

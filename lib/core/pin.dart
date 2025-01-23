@@ -4,8 +4,8 @@ import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/polaris.dart' as polaris;
 
 const _firstVersion = 1;
 const _currentVersion = 2;
@@ -141,12 +141,12 @@ class Pins {
 
 class Manager extends ChangeNotifier implements ManagerInterface {
   final connection.ManagerInterface connectionManager;
-  final polaris.ClientInterface polarisClient;
+  final AppClientInterface appClient;
   final Pins _pins;
 
   static Future<Manager> create({
     required connection.Manager connectionManager,
-    required polaris.Client polarisClient,
+    required AppClient appClient,
   }) async {
     for (int version = _firstVersion; version < _currentVersion; version++) {
       final oldCacheFile = await _getPinsFile(version);
@@ -172,14 +172,14 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     return Manager(
       pins,
       connectionManager: connectionManager,
-      polarisClient: polarisClient,
+      appClient: appClient,
     );
   }
 
   Manager(
     this._pins, {
     required this.connectionManager,
-    required this.polarisClient,
+    required this.appClient,
   });
 
   static Future<io.File> _getPinsFile(int version) async {
@@ -274,7 +274,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     if (host == null) {
       return;
     }
-    final songList = await polarisClient.httpClient?.flatten(path);
+    final songList = await appClient.apiClient?.flatten(path);
     if (songList == null) {
       return;
     }
@@ -313,7 +313,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     if (host == null) {
       return;
     }
-    final album = await polarisClient.httpClient?.getAlbum(name, mainArtists);
+    final album = await appClient.apiClient?.getAlbum(name, mainArtists);
     if (album == null) {
       return;
     }

@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
@@ -23,7 +24,7 @@ class AlbumDetails extends StatefulWidget {
 
 class _AlbumDetailsState extends State<AlbumDetails> {
   List<dto.Song>? _songs;
-  polaris.APIError? _error;
+  APIError? _error;
 
   @override
   initState() {
@@ -46,13 +47,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       _error = null;
     });
     try {
-      final client = getIt<polaris.Client>();
-      final album = await client.httpClient?.getAlbum(widget.album.name, widget.album.mainArtists);
+      final client = getIt<AppClient>();
+      final album = await client.apiClient?.getAlbum(widget.album.name, widget.album.mainArtists);
       final songs = album?.songs ?? [];
       setState(() {
         _songs = songs;
       });
-    } on polaris.APIError catch (e) {
+    } on APIError catch (e) {
       setState(() {
         _error = e;
       });

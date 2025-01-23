@@ -1,5 +1,5 @@
+import 'mock/client.dart' as mock;
 import 'mock/connection.dart' as mock;
-import 'mock/polaris.dart' as mock;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/core/pin.dart' as pin;
@@ -18,13 +18,13 @@ void main() {
 
   pin.Manager makePinManager() {
     final connectionManager = mock.ConnectionManager(host);
-    final httpClient = mock.HttpClient();
-    final polarisClient = mock.PolarisClient(httpClient);
+    final apiClient = mock.APIClient();
+    final appClient = mock.AppClient(apiClient);
 
     return pin.Manager(
       pin.Pins(),
       connectionManager: connectionManager,
-      polarisClient: polarisClient,
+      appClient: appClient,
     );
   }
 

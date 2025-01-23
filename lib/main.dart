@@ -10,11 +10,13 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/cleanup.dart' as cleanup;
+import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
@@ -57,7 +59,7 @@ Future _registerSingletons() async {
     httpClient: httpClient,
     connectionManager: connectionManager,
   );
-  final polarisHttpClient = polaris.HttpClient(
+  final apiClient = APIClient(
     httpClient: httpClient,
     connectionManager: connectionManager,
     authenticationManager: authenticationManager,
@@ -65,20 +67,20 @@ Future _registerSingletons() async {
   );
   final downloadManager = download.Manager(
     mediaCache: mediaCache,
-    httpClient: polarisHttpClient,
+    apiClient: apiClient,
   );
-  final polarisOfflineClient = polaris.OfflineClient(
+  final offlineClient = OfflineClient(
     mediaCache: mediaCache,
     collectionCache: collectionCache,
   );
   final songsManager = songs.Manager(
     connectionManager: connectionManager,
     collectionCache: collectionCache,
-    httpClient: polarisHttpClient,
+    apiClient: apiClient,
   );
-  final polarisClient = polaris.Client(
-    offlineClient: polarisOfflineClient,
-    httpClient: polarisHttpClient,
+  final appClient = AppClient(
+    offlineClient: offlineClient,
+    apiClient: apiClient,
     downloadManager: downloadManager,
     connectionManager: connectionManager,
     collectionCache: collectionCache,
@@ -88,13 +90,13 @@ Future _registerSingletons() async {
   final audioHandler = await initAudioService(
     connectionManager: connectionManager,
     collectionCache: collectionCache,
-    polarisClient: polarisClient,
+    appClient: appClient,
   );
   final audioPlayer = audioHandler.audioPlayer;
   final playlist = Playlist(
     uuid: uuid,
     connectionManager: connectionManager,
-    polarisClient: polarisClient,
+    appClient: appClient,
     audioPlayer: audioPlayer,
   );
   final savestateManager = savestate.Manager(
@@ -105,7 +107,7 @@ Future _registerSingletons() async {
   );
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,
-    polarisClient: polarisClient,
+    appClient: appClient,
   );
   final prefetchManager = prefetch.Manager(
     uuid: uuid,
@@ -136,7 +138,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<MediaCacheInterface>(mediaCache);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
-  getIt.registerSingleton<polaris.Client>(polarisClient);
+  getIt.registerSingleton<AppClient>(appClient);
   getIt.registerSingleton<savestate.Manager>(savestateManager);
   getIt.registerSingleton<pin.Manager>(pinManager);
   getIt.registerSingleton<prefetch.Manager>(prefetchManager);

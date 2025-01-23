@@ -1,13 +1,13 @@
 import 'package:async/async.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/api_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/core/polaris.dart' as polaris;
 
 class Manager {
   final connection.Manager connectionManager;
   final CollectionCache collectionCache;
-  final polaris.HttpClient httpClient;
+  final APIClient apiClient;
 
   final Set<String> _requested = {};
   final Set<String> _failed = {};
@@ -16,7 +16,7 @@ class Manager {
   Manager({
     required this.connectionManager,
     required this.collectionCache,
-    required this.httpClient,
+    required this.apiClient,
   }) {
     connectionManager.addListener(reset);
   }
@@ -85,7 +85,7 @@ class Manager {
       return;
     }
 
-    final operation = CancelableOperation.fromFuture(httpClient.getSongs(paths));
+    final operation = CancelableOperation.fromFuture(apiClient.getSongs(paths));
     _activeFetches.add(operation);
 
     final batch = await operation.valueOrCancellation();

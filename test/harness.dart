@@ -1,5 +1,4 @@
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-
 import 'mock/http_client.dart' as mock;
 import 'mock/media_cache.dart' as mock;
 import 'mock/pin.dart' as pin;
@@ -7,12 +6,14 @@ import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/cleanup.dart' as cleanup;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
@@ -57,7 +58,7 @@ class Harness {
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
     );
-    final polarisHttpClient = polaris.HttpClient(
+    final apiClient = APIClient(
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
@@ -65,19 +66,19 @@ class Harness {
     );
     final downloadManager = download.Manager(
       mediaCache: mediaCache,
-      httpClient: polarisHttpClient,
+      apiClient: apiClient,
     );
     final songsManager = songs.Manager(
       connectionManager: connectionManager,
       collectionCache: collectionCache,
-      httpClient: polarisHttpClient,
+      apiClient: apiClient,
     );
-    final polarisClient = polaris.Client(
-      offlineClient: polaris.OfflineClient(
+    final appClient = AppClient(
+      offlineClient: OfflineClient(
         mediaCache: mediaCache,
         collectionCache: collectionCache,
       ),
-      httpClient: polarisHttpClient,
+      apiClient: apiClient,
       downloadManager: downloadManager,
       connectionManager: connectionManager,
       collectionCache: collectionCache,
@@ -88,7 +89,7 @@ class Harness {
     final playlist = Playlist(
       uuid: uuid,
       connectionManager: connectionManager,
-      polarisClient: polarisClient,
+      appClient: appClient,
       audioPlayer: audioPlayer,
     );
     final savestateManager = savestate.Manager(
@@ -124,7 +125,7 @@ class Harness {
     getIt.registerSingleton<MediaCacheInterface>(mediaCache);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
-    getIt.registerSingleton<polaris.Client>(polarisClient);
+    getIt.registerSingleton<AppClient>(appClient);
     getIt.registerSingleton<savestate.Manager>(savestateManager);
     getIt.registerSingleton<pin.Manager>(pinManager);
     getIt.registerSingleton<prefetch.Manager>(prefetchManager);

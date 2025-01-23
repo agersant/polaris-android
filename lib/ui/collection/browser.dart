@@ -3,9 +3,10 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
@@ -133,7 +134,7 @@ class BrowserLocation extends StatefulWidget {
 
 class _BrowserLocationState extends State<BrowserLocation> {
   List<dto.BrowserEntry>? _entries;
-  polaris.APIError? _error;
+  APIError? _error;
 
   @override
   initState() {
@@ -147,11 +148,11 @@ class _BrowserLocationState extends State<BrowserLocation> {
       _error = null;
     });
     try {
-      final entries = await getIt<polaris.Client>().browse(widget.location, useCache: useCache);
+      final entries = await getIt<AppClient>().browse(widget.location, useCache: useCache);
       setState(() {
         _entries = entries;
       });
-    } on polaris.APIError catch (e) {
+    } on APIError catch (e) {
       setState(() {
         _error = e;
       });

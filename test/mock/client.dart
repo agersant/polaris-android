@@ -1,7 +1,8 @@
+import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/dto.dart';
-import 'package:polaris/core/polaris.dart';
 
-class HttpClient implements HttpClientInterface {
+class APIClient implements APIClientInterface {
   @override
   Future<SongList> flatten(String path) async {
     return SongList(paths: [], firstSongs: []);
@@ -23,11 +24,11 @@ class HttpClient implements HttpClientInterface {
   }
 }
 
-class PolarisClient implements ClientInterface {
-  final HttpClientInterface? _httpClient;
+class AppClient implements AppClientInterface {
+  final APIClientInterface? _apiClient;
 
-  PolarisClient(this._httpClient);
+  AppClient(this._apiClient);
 
   @override
-  HttpClientInterface? get httpClient => _httpClient;
+  APIClientInterface? get apiClient => _apiClient;
 }

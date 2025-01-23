@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/guest_client.dart';
 import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String hostPreferenceKey = "polaris_server_url";
@@ -21,18 +22,18 @@ enum Error {
   unknownError,
 }
 
-extension _ToConnectionError on polaris.APIError {
+extension _ToConnectionError on APIError {
   Error toConnectionError() {
     switch (this) {
-      case polaris.APIError.unauthorized:
-      case polaris.APIError.requestFailed:
-      case polaris.APIError.responseParseError:
-      case polaris.APIError.unexpectedCacheMiss:
+      case APIError.unauthorized:
+      case APIError.requestFailed:
+      case APIError.responseParseError:
+      case APIError.unexpectedCacheMiss:
         return Error.requestFailed;
-      case polaris.APIError.networkError:
-      case polaris.APIError.unspecifiedHost:
+      case APIError.networkError:
+      case APIError.unspecifiedHost:
         return Error.networkError;
-      case polaris.APIError.timeout:
+      case APIError.timeout:
         return Error.requestTimeout;
     }
   }
@@ -124,9 +125,9 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
     dto.APIVersion apiVersion;
     try {
-      polaris.HttpGuestClient guestClient = polaris.HttpGuestClient(httpClient: httpClient, connectionManager: this);
+      GuestClient guestClient = GuestClient(httpClient: httpClient, connectionManager: this);
       apiVersion = await guestClient.getAPIVersion();
-    } on polaris.APIError catch (e) {
+    } on APIError catch (e) {
       _setState(State.disconnected);
       throw e.toConnectionError();
     } catch (e) {
