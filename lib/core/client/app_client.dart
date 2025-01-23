@@ -16,7 +16,7 @@ abstract class AppClientInterface {
 }
 
 class AppClient implements AppClientInterface {
-  final APIClient _httpClient;
+  final APIClient _apiClient;
   final OfflineClient offlineClient;
   final download.Manager downloadManager;
   final connection.Manager connectionManager;
@@ -32,12 +32,12 @@ class AppClient implements AppClientInterface {
     required this.collectionCache,
     required this.mediaCache,
     required this.songsManager,
-  }) : _httpClient = apiClient;
+  }) : _apiClient = apiClient;
 
   @override
   APIClientInterface? get apiClient {
     if (connectionManager.isConnected()) {
-      return _httpClient;
+      return _apiClient;
     }
     return null;
   }
@@ -56,7 +56,7 @@ class AppClient implements AppClientInterface {
       }
     }
 
-    return _httpClient.browse(path).then((content) {
+    return _apiClient.browse(path).then((content) {
       collectionCache.putDirectory(host, path, content);
       songsManager.request(content.where((entry) => !entry.isDirectory).map((e) => e.path).toList());
       return content;
@@ -66,7 +66,7 @@ class AppClient implements AppClientInterface {
   Future<dto.SongList> flatten(String path) async {
     final String host = _getHost();
     if (connectionManager.isConnected()) {
-      return _httpClient.flatten(path).then((songList) {
+      return _apiClient.flatten(path).then((songList) {
         collectionCache.putFiles(host, songList.paths);
         collectionCache.putSongs(host, songList.firstSongs);
         songsManager.request(songList.paths);
@@ -83,7 +83,7 @@ class AppClient implements AppClientInterface {
         return mediaCache.getImageLocation(host, path).uri;
       }
       if (connectionManager.isConnected()) {
-        return _httpClient.getImageURI(path);
+        return _apiClient.getImageURI(path);
       }
     } catch (e) {
       return null;
