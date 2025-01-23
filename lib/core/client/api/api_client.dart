@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/api/v7_client.dart';
 import 'package:polaris/core/client/api/v8_client.dart';
-import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
+import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/connection.dart' as connection;
 
 abstract class APIClientInterface {
@@ -15,6 +16,7 @@ abstract class APIClientInterface {
 
 class APIClient implements APIClientInterface {
   connection.Manager connectionManager;
+  final V7Client v7;
   final V8Client v8;
 
   APIClient({
@@ -22,7 +24,13 @@ class APIClient implements APIClientInterface {
     required CollectionCache collectionCache,
     required this.connectionManager,
     required authentication.Manager authenticationManager,
-  }) : v8 = V8Client(
+  })  : v7 = V7Client(
+          httpClient: httpClient,
+          connectionManager: connectionManager,
+          authenticationManager: authenticationManager,
+          collectionCache: collectionCache,
+        ),
+        v8 = V8Client(
           httpClient: httpClient,
           connectionManager: connectionManager,
           authenticationManager: authenticationManager,
@@ -32,6 +40,7 @@ class APIClient implements APIClientInterface {
   Future<List<dto.BrowserEntry>> browse(String path) async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.browse(path),
+      7 => await v7.browse(path),
       _ => throw APIError.notImplemented,
     };
   }
@@ -40,6 +49,7 @@ class APIClient implements APIClientInterface {
   Future<dto.SongList> flatten(String path) async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.flatten(path),
+      7 => await v7.flatten(path),
       _ => throw APIError.notImplemented,
     };
   }
@@ -63,6 +73,7 @@ class APIClient implements APIClientInterface {
   Future<List<dto.AlbumHeader>> random() async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.random(),
+      7 => await v7.random(),
       _ => throw APIError.notImplemented,
     };
   }
@@ -71,6 +82,7 @@ class APIClient implements APIClientInterface {
   Future<List<dto.AlbumHeader>> recent() async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.recent(),
+      7 => await v7.recent(),
       _ => throw APIError.notImplemented,
     };
   }
@@ -78,6 +90,7 @@ class APIClient implements APIClientInterface {
   Future<http.StreamedResponse> getImage(String path) {
     return switch (connectionManager.apiVersion) {
       8 => v8.getImage(path),
+      7 => v7.getImage(path),
       _ => throw APIError.notImplemented,
     };
   }
@@ -85,6 +98,7 @@ class APIClient implements APIClientInterface {
   Uri getImageURI(String path) {
     return switch (connectionManager.apiVersion) {
       8 => v8.getImageURI(path),
+      7 => v7.getImageURI(path),
       _ => throw APIError.notImplemented,
     };
   }
@@ -92,6 +106,7 @@ class APIClient implements APIClientInterface {
   Uri getAudioURI(String path) {
     return switch (connectionManager.apiVersion) {
       8 => v8.getAudioURI(path),
+      7 => v7.getAudioURI(path),
       _ => throw APIError.notImplemented,
     };
   }

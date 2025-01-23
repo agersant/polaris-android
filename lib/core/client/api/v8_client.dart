@@ -55,8 +55,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
   @override
   Future<dto.Album> getAlbum(String name, List<String> mainArtists) async {
     final host = _getHost();
-    final url =
-        makeURL('/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}');
+    final url = makeURL(albumEndpoint(name, mainArtists));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       final album = dto.Album.fromJson(json.decode(utf8.decode(responseBody)));
@@ -69,7 +68,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto.AlbumHeader>> random() async {
-    final url = makeURL(randomEndpoint);
+    final url = makeURL(randomEndpoint(8));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
@@ -80,7 +79,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto.AlbumHeader>> recent() async {
-    final url = makeURL(recentEndpoint);
+    final url = makeURL(recentEndpoint(8));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();

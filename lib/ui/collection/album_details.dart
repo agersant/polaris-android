@@ -48,15 +48,12 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
     try {
       final client = getIt<AppClient>();
+      // TODO v8 needs a way to do this when talking to v7 server
       final album = await client.apiClient?.getAlbum(widget.album.name, widget.album.mainArtists);
       final songs = album?.songs ?? [];
-      setState(() {
-        _songs = songs;
-      });
+      setState(() => _songs = songs);
     } on APIError catch (e) {
-      setState(() {
-        _error = e;
-      });
+      setState(() => _error = e);
     }
   }
 

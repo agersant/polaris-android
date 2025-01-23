@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:async/async.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/api/api_client.dart';
@@ -88,8 +89,15 @@ class Manager {
     final operation = CancelableOperation.fromFuture(apiClient.getSongs(paths));
     _activeFetches.add(operation);
 
-    final batch = await operation.valueOrCancellation();
-    if (batch == null) {
+    dto.SongBatch? batch;
+    try {
+      batch = await operation.valueOrCancellation();
+      if (batch == null) {
+        return;
+      }
+    } catch (e) {
+      developer.log('Error while downloading song batch: $e');
+      _failed.addAll(paths);
       return;
     }
     collectionCache.putSongs(host, batch.songs);
