@@ -140,8 +140,8 @@ class Pins {
 }
 
 class Manager extends ChangeNotifier implements ManagerInterface {
-  final connection.Manager connectionManager;
-  final polaris.Client polarisClient;
+  final connection.ManagerInterface connectionManager;
+  final polaris.ClientInterface polarisClient;
   final Pins _pins;
 
   static Future<Manager> create({
@@ -227,10 +227,14 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   @override
   int countSongs() {
-    return _pins.byHost.values.fold(0, (a, b) => a + b.length);
+    int count = 0;
+    for (Set<Pin> pins in _pins.byHost.values) {
+      count += pins.fold(0, (a, b) => a + b.songs.length);
+    }
+    return count;
   }
 
-  void pinSong(String song) async {
+  Future<void> pinSong(String song) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -240,7 +244,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     await saveToDisk();
   }
 
-  void unpinSong(String song) async {
+  Future<void> unpinSong(String song) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -265,7 +269,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
         false;
   }
 
-  void pinDirectory(String path) async {
+  Future<void> pinDirectory(String path) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -279,7 +283,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     await saveToDisk();
   }
 
-  void unpinDirectory(String path) async {
+  Future<void> unpinDirectory(String path) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -304,7 +308,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
         false;
   }
 
-  void pinAlbum(String name, List<String> mainArtists) async {
+  Future<void> pinAlbum(String name, List<String> mainArtists) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -319,7 +323,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     await saveToDisk();
   }
 
-  void unpinAlbum(String name, List<String> mainArtists) async {
+  Future<void> unpinAlbum(String name, List<String> mainArtists) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
