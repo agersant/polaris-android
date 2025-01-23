@@ -1,7 +1,7 @@
 import 'package:async/async.dart';
 import 'package:polaris/core/cache/collection.dart';
-import 'package:polaris/core/client/api_client.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/api_client.dart';
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 
 class Manager {

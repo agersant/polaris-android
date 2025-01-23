@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'dart:io' as io;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/utils.dart';
 import 'package:rxdart/rxdart.dart';
 

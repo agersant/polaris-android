@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/context_menu.dart';

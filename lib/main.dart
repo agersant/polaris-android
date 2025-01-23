@@ -10,7 +10,7 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/cleanup.dart' as cleanup;
-import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/connection.dart' as connection;

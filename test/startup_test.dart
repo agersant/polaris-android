@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/authentication.dart' as authentication;
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/main.dart';
 import 'package:polaris/ui/startup/page.dart';
 import 'package:polaris/ui/strings.dart';

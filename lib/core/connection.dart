@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/client/guest_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +11,7 @@ const String hostPreferenceKey = "polaris_server_url";
 
 abstract class ManagerInterface {
   String? get url;
+  int? get apiVersion;
 }
 
 enum Error {
@@ -35,6 +36,8 @@ extension _ToConnectionError on APIError {
         return Error.networkError;
       case APIError.timeout:
         return Error.requestTimeout;
+      case APIError.notImplemented:
+        return Error.unsupportedAPIVersion;
     }
   }
 }
@@ -54,9 +57,12 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   State get state => _state;
 
   String? _url;
-
   @override
   String? get url => _url;
+
+  int? _apiVersion;
+  @override
+  int? get apiVersion => _apiVersion;
 
   State? _previousState;
   State? get previousState => _previousState;
@@ -123,10 +129,10 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   Future _tryConnect() async {
     assert(state == State.connecting || state == State.reconnecting);
 
-    dto.APIVersion apiVersion;
+    dto.APIVersion serverAPIVersion;
     try {
       GuestClient guestClient = GuestClient(httpClient: httpClient, connectionManager: this);
-      apiVersion = await guestClient.getAPIVersion();
+      serverAPIVersion = await guestClient.getAPIVersion();
     } on APIError catch (e) {
       _setState(State.disconnected);
       throw e.toConnectionError();
@@ -135,10 +141,11 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       throw Error.unknownError;
     }
 
-    if (apiVersion.major < 6 || apiVersion.major > 8) {
+    if (serverAPIVersion.major < 6 || serverAPIVersion.major > 8) {
       _setState(State.disconnected);
       throw Error.unsupportedAPIVersion;
     }
+    _apiVersion = serverAPIVersion.major;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? currentURL = url;

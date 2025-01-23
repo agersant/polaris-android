@@ -11,7 +11,7 @@ import 'package:polaris/ui/utils/placeholder.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/strings.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
 import 'package:provider/provider.dart';

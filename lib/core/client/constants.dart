@@ -5,6 +5,7 @@ enum APIError {
   responseParseError,
   requestFailed,
   timeout,
+  notImplemented,
   unexpectedCacheMiss,
 }
 

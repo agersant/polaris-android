@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
-import 'package:polaris/core/client/api_client.dart';
+import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/authentication.dart' as authentication;

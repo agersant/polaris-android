@@ -2,23 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/base_http.dart';
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 
-abstract class APIClientInterface {
-  Future<dto.SongList> flatten(String path);
-  Future<dto.Album> getAlbum(String name, List<String> mainArtists);
-  Future<List<dto.AlbumHeader>> random();
-  Future<List<dto.AlbumHeader>> recent();
-}
-
-class APIClient extends BaseHttpClient implements APIClientInterface {
+class V8Client extends BaseHttpClient implements APIClientInterface {
   final authentication.Manager authenticationManager;
   final CollectionCache collectionCache;
 
-  APIClient({
+  V8Client({
     required http.Client httpClient,
     required connection.Manager connectionManager,
     required this.collectionCache,

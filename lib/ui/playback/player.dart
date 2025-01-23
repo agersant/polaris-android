@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/audio_handler.dart';
 import 'package:polaris/core/cache/collection.dart';
-import 'package:polaris/core/client/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/ui/playback/playback_controls.dart';
