@@ -140,7 +140,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   AlbumContextMenuButton(
                     name: widget.album.name,
                     mainArtists: widget.album.mainArtists,
-                    artwork: widget.album.artwork,
                     actions: const [
                       AlbumAction.queueLast,
                       AlbumAction.queueNext,
@@ -223,7 +222,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               child: AlbumContextMenuButton(
                 name: widget.album.name,
                 mainArtists: widget.album.mainArtists,
-                artwork: widget.album.artwork,
                 actions: const [
                   AlbumAction.queueLast,
                   AlbumAction.queueNext,

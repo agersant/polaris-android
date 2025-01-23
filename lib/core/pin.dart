@@ -304,7 +304,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
         false;
   }
 
-  void pinAlbum(String name, List<String> mainArtists, String? artwork) async {
+  void pinAlbum(String name, List<String> mainArtists) async {
     final host = connectionManager.url;
     if (host == null) {
       return;
@@ -314,7 +314,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       return;
     }
     final songs = album.songs.map((s) => s.path).toList();
-    _pins.byHost.putIfAbsent(host, () => {}).add(AlbumPin(name, mainArtists, songs, artwork));
+    _pins.byHost.putIfAbsent(host, () => {}).add(AlbumPin(name, mainArtists, songs, album.artwork));
     notifyListeners();
     await saveToDisk();
   }

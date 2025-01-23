@@ -275,7 +275,6 @@ class _PinListTileState extends State<PinListTile> {
         pin.AlbumPin p => AlbumContextMenuButton(
             name: p.name,
             mainArtists: p.mainArtists,
-            artwork: p.artwork,
             actions: const [AlbumAction.togglePin],
           ),
       },

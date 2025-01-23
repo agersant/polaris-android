@@ -219,14 +219,12 @@ enum AlbumAction {
 class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   final String name;
   final List<String> mainArtists;
-  final String? artwork;
   final List<dto.Song>? songs;
   final void Function() onRefresh;
 
   const AlbumContextMenuButton({
     required this.name,
     required this.mainArtists,
-    required this.artwork,
     required super.actions,
     super.compact,
     super.icon,
@@ -262,7 +260,7 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
         if (_isPinned()) {
           pinManager.unpinAlbum(name, mainArtists);
         } else {
-          pinManager.pinAlbum(name, mainArtists, artwork);
+          pinManager.pinAlbum(name, mainArtists);
         }
         break;
     }
