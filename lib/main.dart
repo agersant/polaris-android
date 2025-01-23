@@ -98,7 +98,11 @@ Future _registerSingletons() async {
     audioPlayer: audioPlayer,
   );
   final savestateManager = savestate.Manager(
-      connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist, songsManager: songsManager);
+    connectionManager: connectionManager,
+    audioPlayer: audioPlayer,
+    playlist: playlist,
+    songsManager: songsManager,
+  );
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,
     polarisClient: polarisClient,
