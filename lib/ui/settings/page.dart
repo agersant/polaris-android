@@ -129,7 +129,6 @@ class ThemeModeSetting extends StatelessWidget {
       case ThemeMode.dark:
         return themeDark;
       case ThemeMode.system:
-      default:
         return themeSystem;
     }
   }

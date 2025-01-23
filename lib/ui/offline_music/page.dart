@@ -175,7 +175,6 @@ class _PinListTileState extends State<PinListTile> {
   final _connectionManager = getIt<connection.Manager>();
   final _prefetchManager = getIt<prefetch.Manager>();
   final _collectionCache = getIt<CollectionCache>();
-  final _pinManager = getIt<pin.Manager>();
   final _mediaCache = getIt<MediaCacheInterface>();
 
   late StreamSubscription _fetchSubscription;

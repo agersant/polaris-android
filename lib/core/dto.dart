@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:polaris/utils.dart';
 
 class APIVersion {
   int major, minor;

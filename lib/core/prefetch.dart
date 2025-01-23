@@ -7,7 +7,6 @@ import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/settings.dart' as settings;
