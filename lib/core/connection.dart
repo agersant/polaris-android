@@ -8,6 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String hostPreferenceKey = "polaris_server_url";
 
+abstract class ManagerInterface {
+  String? get url;
+}
+
 enum Error {
   connectionAlreadyInProgress,
   unsupportedAPIVersion,
@@ -42,13 +46,15 @@ enum State {
   offlineMode,
 }
 
-class Manager extends ChangeNotifier {
+class Manager extends ChangeNotifier implements ManagerInterface {
   http.Client httpClient;
 
   State _state = State.disconnected;
   State get state => _state;
 
   String? _url;
+
+  @override
   String? get url => _url;
 
   State? _previousState;
