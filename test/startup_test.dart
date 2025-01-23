@@ -1,6 +1,5 @@
 import 'harness.dart';
-import 'mock/client.dart' as client;
-import 'package:dartz/dartz.dart';
+import 'mock/http_client.dart' as client;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/core/connection.dart' as connection;
@@ -213,7 +212,7 @@ void main() {
   testWidgets('Failed connection offers offline mode', (WidgetTester tester) async {
     final harness = await Harness.create();
 
-    final song = dto.CollectionFile(Left(dto.Song(path: client.labyrinthFilePath)));
+    final song = dto.BrowserEntry(path: client.labyrinthFilePath, isDirectory: false);
     harness.collectionCache.putDirectory(client.badHostURI, client.aegeusDirectoryPath, [song]);
 
     await tester.pumpWidget(const PolarisApp());

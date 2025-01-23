@@ -1,5 +1,5 @@
 import 'harness.dart';
-import 'mock/client.dart';
+import 'mock/http_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:polaris/main.dart';
 import 'package:polaris/ui/collection/browser.dart';

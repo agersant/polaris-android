@@ -107,14 +107,14 @@ Map<String, List<CollectionFile>> _browseData = {
     CollectionFile(Left(
       Song(path: labyrinthFilePath)
         ..title = labyrinthSongName
-        ..artist = heronDirectoryName
+        ..artists = [heronDirectoryName]
         ..trackNumber = 1
         ..album = aegeusDirectoryName,
     )),
     CollectionFile(Left(
       Song(path: fallInwardsFilePath)
         ..title = fallInwardsSongName
-        ..artist = heronDirectoryName
+        ..artists = [heronDirectoryName]
         ..trackNumber = 2
         ..album = aegeusDirectoryName,
     )),

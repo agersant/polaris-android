@@ -1,6 +1,6 @@
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 
-import 'mock/client.dart' as mock;
+import 'mock/http_client.dart' as mock;
 import 'mock/media_cache.dart' as mock;
 import 'mock/pin.dart' as pin;
 import 'package:just_audio/just_audio.dart';
@@ -16,6 +16,7 @@ import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
+import 'package:polaris/core/songs.dart' as songs;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,6 +67,11 @@ class Harness {
       mediaCache: mediaCache,
       httpClient: polarisHttpClient,
     );
+    final songsManager = songs.Manager(
+      connectionManager: connectionManager,
+      collectionCache: collectionCache,
+      httpClient: polarisHttpClient,
+    );
     final polarisClient = polaris.Client(
       offlineClient: polaris.OfflineClient(
         mediaCache: mediaCache,
@@ -76,6 +82,7 @@ class Harness {
       connectionManager: connectionManager,
       collectionCache: collectionCache,
       mediaCache: mediaCache,
+      songsManager: songsManager,
     );
     final audioPlayer = AudioPlayer();
     final playlist = Playlist(
@@ -84,8 +91,12 @@ class Harness {
       polarisClient: polarisClient,
       audioPlayer: audioPlayer,
     );
-    final savestateManager =
-        savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
+    final savestateManager = savestate.Manager(
+      connectionManager: connectionManager,
+      audioPlayer: audioPlayer,
+      playlist: playlist,
+      songsManager: songsManager,
+    );
     final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(
       uuid: uuid,
@@ -121,6 +132,7 @@ class Harness {
     getIt.registerSingleton<BrowserModel>(browserModel);
     getIt.registerSingleton<PagesModel>(PagesModel());
     getIt.registerSingleton<settings.Manager>(settingsManager);
+    getIt.registerSingleton<songs.Manager>(songsManager);
     getIt.registerSingleton<Uuid>(uuid);
 
     audioPlayer.setAudioSource(playlist.audioSource);
