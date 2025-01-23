@@ -140,7 +140,6 @@ Widget playerContent(BuildContext context) {
 
 Widget _trackDetails(Color foregroundColor) => LayoutBuilder(
       builder: (context, size) {
-        final placeholderColor = foregroundColor.withValues(alpha: 0.2);
         final artistsColor = foregroundColor.withValues(alpha: 0.75);
         return StreamBuilder<dto.Song?>(
             stream: getIt.get<PolarisAudioHandler>().currentSong,
