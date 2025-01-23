@@ -80,20 +80,6 @@ extension SongFormatting on Song {
   }
 }
 
-extension DirectoryFormatting on Directory {
-  String formatName() {
-    return splitPath(path).last;
-  }
-
-  String formatAlbumName() {
-    return album ?? formatName();
-  }
-
-  String formatArtist() {
-    return artist ?? unknownArtist;
-  }
-}
-
 extension AlbumHeaderFormatting on AlbumHeader {
   String formatArtists() {
     return mainArtists.isNotEmpty ? mainArtists.join(', ') : unknownArtist;

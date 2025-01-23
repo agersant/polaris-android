@@ -1,5 +1,3 @@
-import 'package:dartz/dartz.dart';
-
 class APIVersion {
   int major, minor;
   APIVersion({required this.major, required this.minor});
@@ -119,36 +117,6 @@ class Album extends AlbumHeader {
   }
 }
 
-// TODO v8 move me to legacy
-class Directory {
-  String path;
-  String? artist;
-  int? year;
-  String? album;
-  String? artwork;
-  int? dateAdded;
-
-  Directory({required this.path});
-
-  factory Directory.fromJson(Map<String, dynamic> json) {
-    return Directory(path: json['path'])
-      ..artist = json['artist']
-      ..year = json['year']
-      ..album = json['album']
-      ..artwork = json['artwork']
-      ..dateAdded = json['date_added'];
-  }
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'path': path,
-        'artist': artist,
-        'year': year,
-        'album': album,
-        'artwork': artwork,
-        'dateAdded': dateAdded,
-      };
-}
-
 class Song {
   String path;
   int? trackNumber;
@@ -200,58 +168,4 @@ class Song {
         'artwork': artwork,
         'duration': duration,
       };
-}
-
-// TODO v8 move me to legacy
-class CollectionFile {
-  Either<Song, Directory> content;
-
-  CollectionFile(this.content);
-
-  String get path {
-    if (isSong()) {
-      return asSong().path;
-    } else {
-      return asDirectory().path;
-    }
-  }
-
-  String? get artwork {
-    if (isSong()) {
-      return asSong().artwork;
-    } else {
-      return asDirectory().artwork;
-    }
-  }
-
-  bool isSong() {
-    return content.isLeft();
-  }
-
-  bool isDirectory() {
-    return content.isRight();
-  }
-
-  Song asSong() {
-    return content.fold((song) => song, (directory) => throw "CollectionFile is not a song");
-  }
-
-  Directory asDirectory() {
-    return content.fold((song) => throw "CollectionFile is not a directory", (directory) => directory);
-  }
-
-  factory CollectionFile.fromJson(Map<String, dynamic> json) {
-    if (json['Song'] != null) {
-      return CollectionFile(Left(Song.fromJson(json['Song'])));
-    }
-    if (json['Directory'] != null) {
-      return CollectionFile(Right(Directory.fromJson(json['Directory'])));
-    }
-    throw ArgumentError("Malformed CollectionFile Json");
-  }
-
-  Map<String, dynamic> toJson() => content.fold(
-        (song) => <String, dynamic>{'Song': song.toJson()},
-        (directory) => <String, dynamic>{'Directory': directory.toJson()},
-      );
 }

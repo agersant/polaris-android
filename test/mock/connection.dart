@@ -7,4 +7,7 @@ class ConnectionManager implements ManagerInterface {
 
   @override
   String? get url => host;
+
+  @override
+  int? get apiVersion => 8;
 }
