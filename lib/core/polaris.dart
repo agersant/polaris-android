@@ -24,6 +24,17 @@ const loginEndpoint = '/api/auth/';
 const thumbnailEndpoint = '/api/thumbnail/';
 const audioEndpoint = '/api/audio/';
 
+abstract class ClientInterface {
+  HttpClientInterface? get httpClient;
+}
+
+abstract class HttpClientInterface {
+  Future<dto.SongList> flatten(String path);
+  Future<dto.Album> getAlbum(String name, List<String> mainArtists);
+  Future<List<dto.AlbumHeader>> random();
+  Future<List<dto.AlbumHeader>> recent();
+}
+
 enum _Method {
   get,
   post,
@@ -143,7 +154,7 @@ class HttpGuestClient extends _BaseHttpClient {
   }
 }
 
-class HttpClient extends _BaseHttpClient {
+class HttpClient extends _BaseHttpClient implements HttpClientInterface {
   final authentication.Manager authenticationManager;
   final CollectionCache collectionCache;
 
@@ -297,7 +308,7 @@ class OfflineClient {
   }
 }
 
-class Client {
+class Client implements ClientInterface {
   final HttpClient _httpClient;
   final OfflineClient offlineClient;
   final download.Manager downloadManager;
@@ -316,7 +327,8 @@ class Client {
     required this.songsManager,
   }) : _httpClient = httpClient;
 
-  HttpClient? get httpClient {
+  @override
+  HttpClientInterface? get httpClient {
     if (connectionManager.isConnected()) {
       return _httpClient;
     }

@@ -47,7 +47,7 @@ class _RandomAlbumsState extends State<RandomAlbums> with AutomaticKeepAliveClie
       _error = null;
     });
     try {
-      final polaris.HttpClient? client = getIt<polaris.Client>().httpClient;
+      final polaris.HttpClientInterface? client = getIt<polaris.Client>().httpClient;
       if (client != null) {
         final albums = await client.random();
         setState(() {
