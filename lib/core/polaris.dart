@@ -175,6 +175,7 @@ class HttpClient extends _BaseHttpClient implements HttpClientInterface {
     }
   }
 
+  @override
   Future<dto.SongList> flatten(String path) async {
     final url = makeURL(flattenEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -197,6 +198,7 @@ class HttpClient extends _BaseHttpClient implements HttpClientInterface {
     }
   }
 
+  @override
   Future<dto.Album> getAlbum(String name, List<String> mainArtists) async {
     final host = _getHost();
     final url =
@@ -211,6 +213,7 @@ class HttpClient extends _BaseHttpClient implements HttpClientInterface {
     }
   }
 
+  @override
   Future<List<dto.AlbumHeader>> random() async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
@@ -221,6 +224,7 @@ class HttpClient extends _BaseHttpClient implements HttpClientInterface {
     }
   }
 
+  @override
   Future<List<dto.AlbumHeader>> recent() async {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(_Method.get, url, authenticationToken: authenticationManager.token);
