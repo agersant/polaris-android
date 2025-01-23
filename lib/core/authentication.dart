@@ -3,9 +3,9 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/dto.dart';
 import 'package:polaris/core/client/guest_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String authHostPreferenceKey = "polaris_auth_host";

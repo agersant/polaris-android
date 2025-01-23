@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/client/dto.dart';
 
 const goodHost = 'my-polaris-server';
 const badHost = 'not-a-polaris-server';

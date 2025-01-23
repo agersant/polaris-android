@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/client/base_http.dart';
 import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 
 class GuestClient extends BaseHttpClient {
   GuestClient({

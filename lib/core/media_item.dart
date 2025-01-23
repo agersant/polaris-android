@@ -1,5 +1,5 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/client/dto.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/utils.dart';
 

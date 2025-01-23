@@ -4,8 +4,8 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/base_http.dart';
 import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 
 abstract class APIClientInterface {
   Future<dto.SongList> flatten(String path);

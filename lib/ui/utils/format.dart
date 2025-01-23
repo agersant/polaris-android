@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/client/dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/utils.dart';
 

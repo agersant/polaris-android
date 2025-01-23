@@ -3,8 +3,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/dto.dart' as dto;
 
 class OfflineClient {
   final MediaCacheInterface mediaCache;

@@ -2,8 +2,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:rxdart/rxdart.dart';
 

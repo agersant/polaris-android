@@ -1,6 +1,6 @@
 import 'package:polaris/core/client/api_client.dart';
 import 'package:polaris/core/client/app_client.dart';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/client/dto.dart';
 
 class APIClient implements APIClientInterface {
   @override

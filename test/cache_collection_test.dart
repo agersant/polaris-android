@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:polaris/core/cache/collection.dart';
-import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/client/dto.dart' as dto;
 
 void main() {
   test('Canot read a missing directory', () async {

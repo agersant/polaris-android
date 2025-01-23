@@ -5,7 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/client/constants.dart';
-import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/strings.dart';

@@ -3,8 +3,8 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/dto.dart' as dto;
 import 'package:polaris/core/client/guest_client.dart';
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String hostPreferenceKey = "polaris_server_url";
