@@ -42,6 +42,11 @@ class BrowserEntry {
   factory BrowserEntry.fromJson(Map<String, dynamic> json) {
     return BrowserEntry(path: json['path'], isDirectory: json['is_directory']);
   }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'path': path,
+        'is_directory': isDirectory,
+      };
 }
 
 class SongList {
@@ -78,6 +83,11 @@ class SongBatch {
       notFound: (json['not_found'] as List<dynamic>).cast<String>(),
     );
   }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'songs': songs.map((s) => s.toJson()).toList(),
+        'not_found': notFound,
+      };
 }
 
 class AlbumHeader {

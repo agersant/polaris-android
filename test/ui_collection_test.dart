@@ -50,10 +50,10 @@ void main() {
     expect(heronBreadcrumb, findsNothing);
     await tester.tap(heronDirectory);
     await tester.pumpAndSettle();
-    expect(heronBreadcrumb, findsOneWidget);
+    expect(heronBreadcrumb, findsNothing);
 
-    await tester.pumpAndSettle();
     await tester.tap(aegeusDirectory);
+    await tester.pumpAndSettle();
     expect(heronBreadcrumb, findsOneWidget);
   });
 

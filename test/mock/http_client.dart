@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart' as mocktail;
@@ -14,7 +13,7 @@ const badHostURI = 'http://$badHost';
 const incompatibleHostURI = 'http://$incompatibleHost';
 const trailingSlashHostURI = '$goodHostURI/';
 
-const compatibleAPIVersion = '{"major": 6, "minor": 0}';
+const compatibleAPIVersion = '{"major": 8, "minor": 0}';
 const incompatibleAPIVersion = '{"major": 5, "minor": 0}';
 const authorization = '{"username": "test-user", "token": "0xDEADBEEF", "is_admin": false}';
 
@@ -73,50 +72,33 @@ class HttpClient extends mocktail.Mock implements http.Client {
         return http.StreamedResponse(Stream<List<int>>.value(authorization.codeUnits), 200);
       } else if (endpoint.startsWith(browseEndpoint)) {
         final String path = Uri.decodeComponent(endpoint.substring(browseEndpoint.length));
-        final List<CollectionFile>? files = _browseData[path];
+        final List<BrowserEntry>? files = _browseData[path];
         if (files != null) {
           final String payload = jsonEncode(files);
           return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);
         }
+      } else if (endpoint.startsWith(songsEndpoint)) {
+        final songs = SongBatch(songs: [], notFound: []);
+        final String payload = jsonEncode(songs);
+        return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);
       }
       return http.StreamedResponse(Stream<List<int>>.value([]), 404);
     });
   }
 }
 
-Map<String, List<CollectionFile>> _browseData = {
+Map<String, List<BrowserEntry>> _browseData = {
   '': [
-    CollectionFile(Right(
-      Directory(path: rootDirectoryPath),
-    ))
+    BrowserEntry(path: rootDirectoryPath, isDirectory: true),
   ],
   rootDirectoryPath: [
-    CollectionFile(Right(
-      Directory(path: heronDirectoryPath),
-    ))
+    BrowserEntry(path: heronDirectoryPath, isDirectory: true),
   ],
   heronDirectoryPath: [
-    CollectionFile(Right(
-      Directory(path: aegeusDirectoryPath)
-        ..album = 'Aegeus'
-        ..artist = 'Heron'
-        ..year = 2016,
-    ))
+    BrowserEntry(path: aegeusDirectoryPath, isDirectory: true),
   ],
   aegeusDirectoryPath: [
-    CollectionFile(Left(
-      Song(path: labyrinthFilePath)
-        ..title = labyrinthSongName
-        ..artists = [heronDirectoryName]
-        ..trackNumber = 1
-        ..album = aegeusDirectoryName,
-    )),
-    CollectionFile(Left(
-      Song(path: fallInwardsFilePath)
-        ..title = fallInwardsSongName
-        ..artists = [heronDirectoryName]
-        ..trackNumber = 2
-        ..album = aegeusDirectoryName,
-    )),
+    BrowserEntry(path: labyrinthFilePath, isDirectory: false),
+    BrowserEntry(path: fallInwardsFilePath, isDirectory: false),
   ],
 };
