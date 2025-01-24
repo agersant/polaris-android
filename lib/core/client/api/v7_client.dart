@@ -22,12 +22,14 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }) : super(httpClient: httpClient, connectionManager: connectionManager);
 
   Future<List<dto8.BrowserEntry>> browse(String path) async {
+    final host = _getHost();
     final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       final collectionFiles =
           (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto7.CollectionFile.fromJson(c)).toList();
-      // TODO v8 this needs to call collectionCache.putSongs since APIClient doesnt do it
+      final songs = collectionFiles.where((f) => f.isSong()).map((f) => f.asSong().toV8()).toList();
+      collectionCache.putSongs(host, songs);
       return collectionFiles.map((f) => f.toBrowserEntry()).toList();
     } catch (e) {
       throw APIError.responseParseError;
@@ -100,6 +102,14 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
       url += '?auth_token=$token';
     }
     return Uri.parse(url);
+  }
+
+  String _getHost() {
+    final String? host = connectionManager.url;
+    if (host == null) {
+      throw APIError.unspecifiedHost;
+    }
+    return host;
   }
 }
 
