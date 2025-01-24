@@ -127,6 +127,9 @@ void main() {
     cache.putDirectory('host', 'root/Heron', [labyrinthSong, fallInwardsSong]);
     final cachedContent = cache.flattenDirectory('host', 'root/Heron');
     assert(cachedContent != null);
-    assert(cachedContent!.length == 2);
+    assert(listEquals(cachedContent, [
+      'root/Heron/Fall Inwards.mp3',
+      'root/Heron/Labyrinth.mp3',
+    ]));
   });
 }

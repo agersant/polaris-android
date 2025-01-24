@@ -9,7 +9,7 @@ import 'package:polaris/core/playlist.dart';
 import 'package:polaris/core/songs.dart' as songs;
 import 'package:rxdart/rxdart.dart';
 
-const _currentVersion = 1;
+const _currentVersion = 2;
 
 class PlaylistState {
   final String host;

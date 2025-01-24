@@ -13,6 +13,7 @@ import 'package:polaris/core/songs.dart' as songs;
 
 abstract class AppClientInterface {
   APIClientInterface? get apiClient;
+  Future<dto.SongList> flatten(String path);
 }
 
 class AppClient implements AppClientInterface {

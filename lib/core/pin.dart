@@ -274,10 +274,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     if (host == null) {
       return;
     }
-    final songList = await appClient.apiClient?.flatten(path);
-    if (songList == null) {
-      return;
-    }
+    final songList = await appClient.flatten(path);
     _pins.byHost.putIfAbsent(host, () => {}).add(DirectoryPin(path, songList.paths));
     notifyListeners();
     await saveToDisk();
