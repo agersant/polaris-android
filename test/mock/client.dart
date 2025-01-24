@@ -31,4 +31,7 @@ class AppClient implements AppClientInterface {
 
   @override
   APIClientInterface? get apiClient => _apiClient;
+
+  @override
+  Future<SongList> flatten(String path) async => SongList(paths: [], firstSongs: []);
 }

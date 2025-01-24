@@ -64,6 +64,7 @@ class AppClient implements AppClientInterface {
     });
   }
 
+  @override
   Future<dto.SongList> flatten(String path) async {
     final String host = _getHost();
     if (connectionManager.isConnected()) {
