@@ -49,9 +49,6 @@ class _OfflineMusicPageState extends State<OfflineMusicPage> {
     int size = 0;
     for (String host in _pinManager.hosts) {
       final songs = _pinManager.getSongsInHost(host);
-      if (songs == null) {
-        continue;
-      }
       size += await computeSizeOnDisk(songs, host, onProgress: (s) {
         if (!_fullyComputedSizeOnDisk) {
           setState(() => _sizeOnDisk = size + s);
@@ -116,7 +113,7 @@ class PinsByServer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pins = getIt<pin.Manager>().getPinsForHost(host) ?? [];
+    final pins = getIt<pin.Manager>().getPinsForHost(host);
 
     return Column(
       children: [
@@ -264,14 +261,17 @@ class _PinListTileState extends State<PinListTile> {
       ),
       trailing: switch (widget.myPin) {
         pin.SongPin p => SongContextMenuButton(
+            host: p.host,
             path: p.path,
             actions: const [SongAction.togglePin],
           ),
         pin.DirectoryPin p => DirectoryContextMenuButton(
+            host: p.host,
             path: p.path,
             actions: const [DirectoryAction.togglePin],
           ),
         pin.AlbumPin p => AlbumContextMenuButton(
+            host: p.host,
             name: p.name,
             mainArtists: p.mainArtists,
             actions: const [AlbumAction.togglePin],

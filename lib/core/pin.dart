@@ -30,14 +30,20 @@ sealed class Pin {
     };
   }
 
+  String get host;
   String get key;
   List<String> get songs;
   Map<String, dynamic> toJson();
 }
 
 class SongPin extends Pin {
+  final String _host;
   final String path;
-  SongPin(this.path);
+
+  SongPin(this._host, this.path);
+
+  @override
+  String get host => _host;
 
   @override
   String get key => path;
@@ -45,20 +51,28 @@ class SongPin extends Pin {
   @override
   List<String> get songs => [path];
 
-  factory SongPin.fromJson(Map<String, dynamic> json) => SongPin(json['path']);
+  factory SongPin.fromJson(Map<String, dynamic> json) => SongPin(
+        json['host'],
+        json['path'],
+      );
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'type': 'song',
+        'host': host,
         'path': path,
       };
 }
 
 class DirectoryPin extends Pin {
+  final String _host;
   final String path;
   final List<String> _songs;
 
-  DirectoryPin(this.path, this._songs);
+  DirectoryPin(this._host, this.path, this._songs);
+
+  @override
+  String get host => _host;
 
   @override
   String get key => path;
@@ -67,6 +81,7 @@ class DirectoryPin extends Pin {
   List<String> get songs => _songs;
 
   factory DirectoryPin.fromJson(Map<String, dynamic> json) => DirectoryPin(
+        json['host'],
         json['path'],
         (json['songs'] as List<dynamic>).cast<String>().toList(),
       );
@@ -74,18 +89,23 @@ class DirectoryPin extends Pin {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'type': 'directory',
+        'host': host,
         'path': path,
         'songs': songs,
       };
 }
 
 class AlbumPin extends Pin {
+  final String _host;
   final String name;
   final String? artwork;
   final List<String> mainArtists;
   final List<String> _songs;
 
-  AlbumPin(this.name, this.mainArtists, this._songs, this.artwork);
+  AlbumPin(this._host, this.name, this.mainArtists, this._songs, this.artwork);
+
+  @override
+  String get host => _host;
 
   @override
   String get key => name + mainArtists.join('');
@@ -94,6 +114,7 @@ class AlbumPin extends Pin {
   List<String> get songs => _songs;
 
   factory AlbumPin.fromJson(Map<String, dynamic> json) => AlbumPin(
+        json['host'],
         json['name'],
         (json['mainArtists'] as List<dynamic>).cast<String>().toList(),
         (json['songs'] as List<dynamic>).cast<String>().toList(),
@@ -103,6 +124,7 @@ class AlbumPin extends Pin {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         'type': 'album',
+        'host': host,
         'name': name,
         'mainArtists': mainArtists,
         'songs': songs,
@@ -111,9 +133,9 @@ class AlbumPin extends Pin {
 }
 
 class Pins {
-  final Map<String, Set<Pin>> byHost = {};
+  final List<Pin> pins;
 
-  Pins();
+  Pins(this.pins);
 
   factory Pins.fromBytes(List<int> bytes) {
     return Pins.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
@@ -123,20 +145,11 @@ class Pins {
     return io.gzip.encode(utf8.encode(jsonEncode(this)));
   }
 
-  Pins.fromJson(Map<String, dynamic> json) {
-    json['byHost'].forEach((String host, dynamic pins) {
-      byHost[host] = (pins as List<dynamic>).map((p) => Pin.fromJson(p)).toSet();
-    });
+  factory Pins.fromJson(Map<String, dynamic> json) {
+    return Pins((json['pins'] as List<dynamic>).map((p) => Pin.fromJson(p)).toList());
   }
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'byHost': byHost.map(
-          (host, pins) => MapEntry(
-            host,
-            pins.map((p) => p.toJson()).toList(),
-          ),
-        )
-      };
+  Map<String, dynamic> toJson() => <String, dynamic>{'pins': pins.map((p) => p.toJson()).toList()};
 }
 
 class Manager extends ChangeNotifier implements ManagerInterface {
@@ -157,7 +170,7 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       });
     }
 
-    Pins pins = Pins();
+    Pins pins = Pins([]);
     final cachedFile = await _getPinsFile(_currentVersion);
     try {
       if (await cachedFile.exists()) {
@@ -189,15 +202,16 @@ class Manager extends ChangeNotifier implements ManagerInterface {
 
   @override
   List<String> get hosts {
-    final hosts = _pins.byHost.entries.where((e) => e.value.isNotEmpty).map((e) => e.key).toList();
+    final hosts = _pins.pins.map((p) => p.host).toSet().toList();
     hosts.sort();
     return hosts;
   }
 
   @override
-  Set<String>? getSongsInHost(String host) {
-    return _pins.byHost[host]
-        ?.map((p) => switch (p) {
+  Set<String> getSongsInHost(String host) {
+    return _pins.pins
+        .where((p) => p.host == host)
+        .map((p) => switch (p) {
               final SongPin p => [p.path],
               final DirectoryPin p => p.songs,
               final AlbumPin p => p.songs,
@@ -207,8 +221,8 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   @override
-  List<Pin>? getPinsForHost(String host) {
-    final list = _pins.byHost[host]?.toList() ?? [];
+  List<Pin> getPinsForHost(String host) {
+    final list = _pins.pins.where((p) => p.host == host).toList();
     list.sort(
       (a, b) => switch ((a, b)) {
         (final DirectoryPin _, final AlbumPin _) => -1,
@@ -228,85 +242,83 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   @override
   int countSongs() {
     int count = 0;
-    for (Set<Pin> pins in _pins.byHost.values) {
-      count += pins.fold(0, (a, b) => a + b.songs.length);
+    for (Pin pin in _pins.pins) {
+      count += pin.songs.length;
     }
     return count;
   }
 
-  Future<void> pinSong(String song) async {
-    final host = connectionManager.url;
+  Future<void> pinSong(String? explicitHost, String song) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
-    _pins.byHost.putIfAbsent(host, () => {}).add(SongPin(song));
+    _pins.pins.add(SongPin(host, song));
     notifyListeners();
     await saveToDisk();
   }
 
-  Future<void> unpinSong(String song) async {
-    final host = connectionManager.url;
+  Future<void> unpinSong(String? explicitHost, String song) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
-    _pins.byHost[host]?.removeWhere((p) => switch (p) {
-          final SongPin p => p.path == song,
+    _pins.pins.removeWhere((p) => switch (p) {
+          final SongPin p => p.path == song && p.host == host,
           _ => false,
         });
     notifyListeners();
     await saveToDisk();
   }
 
-  bool isSongPinned(String song) {
-    final host = connectionManager.url;
+  bool isSongPinned(String? explicitHost, String song) {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return false;
     }
-    return _pins.byHost[host]?.any((p) => switch (p) {
-              final SongPin p => p.path == song,
-              _ => false,
-            }) ??
-        false;
+    return _pins.pins.any((p) => switch (p) {
+          final SongPin p => p.path == song && p.host == host,
+          _ => false,
+        });
   }
 
-  Future<void> pinDirectory(String path) async {
-    final host = connectionManager.url;
+  Future<void> pinDirectory(String? explicitHost, String path) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
     final songList = await appClient.flatten(path);
-    _pins.byHost.putIfAbsent(host, () => {}).add(DirectoryPin(path, songList.paths));
+    _pins.pins.add(DirectoryPin(host, path, songList.paths));
     notifyListeners();
     await saveToDisk();
   }
 
-  Future<void> unpinDirectory(String path) async {
-    final host = connectionManager.url;
+  Future<void> unpinDirectory(String? explicitHost, String path) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
-    _pins.byHost[host]?.removeWhere((p) => switch (p) {
-          final DirectoryPin p => p.path == path,
+    _pins.pins.removeWhere((p) => switch (p) {
+          final DirectoryPin p => p.path == path && p.host == host,
           _ => false,
         });
     notifyListeners();
     await saveToDisk();
   }
 
-  bool isDirectoryPinned(String path) {
-    final host = connectionManager.url;
+  bool isDirectoryPinned(String? explicitHost, String path) {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return false;
     }
-    return _pins.byHost[host]?.any((p) => switch (p) {
-              final DirectoryPin p => p.path == path,
-              _ => false,
-            }) ??
-        false;
+    return _pins.pins.any((p) => switch (p) {
+          final DirectoryPin p => p.path == path && p.host == host,
+          _ => false,
+        });
   }
 
-  Future<void> pinAlbum(String name, List<String> mainArtists) async {
-    final host = connectionManager.url;
+  Future<void> pinAlbum(String? explicitHost, String name, List<String> mainArtists) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
@@ -315,34 +327,33 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       return;
     }
     final songs = album.songs.map((s) => s.path).toList();
-    _pins.byHost.putIfAbsent(host, () => {}).add(AlbumPin(name, mainArtists, songs, album.artwork));
+    _pins.pins.add(AlbumPin(host, name, mainArtists, songs, album.artwork));
     notifyListeners();
     await saveToDisk();
   }
 
-  Future<void> unpinAlbum(String name, List<String> mainArtists) async {
-    final host = connectionManager.url;
+  Future<void> unpinAlbum(String? explicitHost, String name, List<String> mainArtists) async {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return;
     }
-    _pins.byHost[host]?.removeWhere((p) => switch (p) {
-          final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists),
+    _pins.pins.removeWhere((p) => switch (p) {
+          final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists) && p.host == host,
           _ => false,
         });
     notifyListeners();
     await saveToDisk();
   }
 
-  bool isAlbumPinned(String name, List<String> mainArtists) {
-    final host = connectionManager.url;
+  bool isAlbumPinned(String? explicitHost, String name, List<String> mainArtists) {
+    final host = explicitHost ?? connectionManager.url;
     if (host == null) {
       return false;
     }
-    return _pins.byHost[host]?.any((p) => switch (p) {
-              final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists),
-              _ => false,
-            }) ??
-        false;
+    return _pins.pins.any((p) => switch (p) {
+          final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists) && p.host == host,
+          _ => false,
+        });
   }
 
   Future saveToDisk() async {

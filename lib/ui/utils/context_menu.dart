@@ -17,13 +17,16 @@ abstract class ContextMenuButton<T> extends StatelessWidget {
   final IconData icon;
   final bool compact;
   final List<T> actions;
+  final String? host;
 
-  const ContextMenuButton({
+  ContextMenuButton({
     required this.actions,
     this.icon = Icons.more_vert,
     this.compact = false,
+    String? host,
     Key? key,
-  }) : super(key: key);
+  })  : host = host ?? getIt<connection.Manager>().url,
+        super(key: key);
 
   (IconData, String) getActionVisuals(T action);
 
@@ -83,11 +86,12 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   final String path;
   final void Function() onRefresh;
 
-  const DirectoryContextMenuButton({
+  DirectoryContextMenuButton({
     required this.path,
     required super.actions,
     super.compact,
     super.icon,
+    super.host,
     this.onRefresh = noop,
     Key? key,
   }) : super(key: key);
@@ -117,9 +121,9 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
       case DirectoryAction.togglePin:
         final pinManager = getIt<pin.Manager>();
         if (_isPinned()) {
-          pinManager.unpinDirectory(path);
+          pinManager.unpinDirectory(host, path);
         } else {
-          pinManager.pinDirectory(path);
+          pinManager.pinDirectory(host, path);
         }
         break;
     }
@@ -127,7 +131,7 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
 
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    return pinManager.isDirectoryPinned(path);
+    return pinManager.isDirectoryPinned(host, path);
   }
 
   Future<List<String>> _listSongs() async {
@@ -153,13 +157,14 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   SongContextMenuButton({
     required this.path,
     required super.actions,
+    super.host,
     super.compact,
     this.onRemoveFromQueue = noop,
     Key? key,
   }) : super(key: key) {
-    final String? host = getIt<connection.Manager>().url;
-    if (host != null) {
-      song = getIt<CollectionCache>().getSong(host, path);
+    final String? useHost = host;
+    if (useHost != null) {
+      song = getIt<CollectionCache>().getSong(useHost, path);
     }
   }
 
@@ -195,9 +200,9 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       case SongAction.togglePin:
         final pinManager = getIt<pin.Manager>();
         if (_isPinned()) {
-          pinManager.unpinSong(path);
+          pinManager.unpinSong(host, path);
         } else {
-          pinManager.pinSong(path);
+          pinManager.pinSong(host, path);
         }
         break;
     }
@@ -205,7 +210,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
 
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    return pinManager.isSongPinned(path);
+    return pinManager.isSongPinned(host, path);
   }
 }
 
@@ -222,12 +227,13 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   final List<dto.Song>? songs;
   final void Function() onRefresh;
 
-  const AlbumContextMenuButton({
+  AlbumContextMenuButton({
     required this.name,
     required this.mainArtists,
     required super.actions,
     super.compact,
     super.icon,
+    super.host,
     this.onRefresh = noop,
     this.songs,
     Key? key,
@@ -258,9 +264,9 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
       case AlbumAction.togglePin:
         final pinManager = getIt<pin.Manager>();
         if (_isPinned()) {
-          pinManager.unpinAlbum(name, mainArtists);
+          pinManager.unpinAlbum(host, name, mainArtists);
         } else {
-          pinManager.pinAlbum(name, mainArtists);
+          pinManager.pinAlbum(host, name, mainArtists);
         }
         break;
     }
@@ -278,6 +284,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
 
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
-    return pinManager.isAlbumPinned(name, mainArtists);
+    return pinManager.isAlbumPinned(host, name, mainArtists);
   }
 }
