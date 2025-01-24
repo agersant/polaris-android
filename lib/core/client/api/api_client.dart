@@ -65,6 +65,7 @@ class APIClient implements APIClientInterface {
   Future<dto.Album> getAlbum(String name, List<String> mainArtists) async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.getAlbum(name, mainArtists),
+      7 => await v7.getAlbum(name, mainArtists),
       _ => throw APIError.notImplemented,
     };
   }

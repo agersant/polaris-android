@@ -13,6 +13,7 @@ import 'package:polaris/ui/strings.dart';
 class V7Client extends BaseHttpClient implements APIClientInterface {
   final authentication.Manager authenticationManager;
   final CollectionCache collectionCache;
+  final Map<(String, String), String> albumsSeen = {}; // (name, artist) -> path
 
   V7Client({
     required http.Client httpClient,
@@ -51,8 +52,26 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
-  Future<dto8.Album> getAlbum(String name, List<String> mainArtists) {
-    throw APIError.notImplemented;
+  Future<dto8.Album> getAlbum(String name, List<String> mainArtists) async {
+    final host = _getHost();
+    final path = albumsSeen[(name, mainArtists.join(''))];
+    if (path == null) {
+      throw APIError.unexpectedCacheMiss;
+    }
+    final url = makeURL(browseEndpoint + Uri.encodeComponent(path));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      final collectionFiles =
+          (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto7.CollectionFile.fromJson(c)).toList();
+      final songs = collectionFiles.where((f) => f.isSong()).map((f) => f.asSong().toV8()).toList();
+      collectionCache.putSongs(host, songs);
+      return dto8.Album(name: name, mainArtists: mainArtists)
+        ..songs = songs
+        ..artwork = songs.firstOrNull?.artwork
+        ..year = songs.firstOrNull?.year;
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
   }
 
   @override
@@ -62,6 +81,13 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
     try {
       final directories =
           (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto7.Directory.fromJson(d)).toList();
+      for (dto7.Directory directory in directories) {
+        final album = directory.album;
+        final artist = directory.artist;
+        if (album != null && artist != null) {
+          albumsSeen[(album, artist)] = directory.path;
+        }
+      }
       return directories.map((d) => d.toAlbumHeader()).toList();
     } catch (e) {
       throw APIError.responseParseError;
@@ -75,6 +101,13 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
     try {
       final directories =
           (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto7.Directory.fromJson(d)).toList();
+      for (dto7.Directory directory in directories) {
+        final album = directory.album;
+        final artist = directory.artist;
+        if (album != null && artist != null) {
+          albumsSeen[(album, artist)] = directory.path;
+        }
+      }
       return directories.map((d) => d.toAlbumHeader()).toList();
     } catch (e) {
       throw APIError.responseParseError;
