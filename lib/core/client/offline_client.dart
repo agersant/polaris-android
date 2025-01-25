@@ -37,8 +37,9 @@ class OfflineClient {
     return dto.SongList(paths: paths, firstSongs: []);
   }
 
-  Future<Uint8List?> getImage(String host, String path) async {
-    final cacheFile = await mediaCache.getImage(host, path);
+  Future<Uint8List?> getImage(String host, String path, ArtworkSize preferredSize) async {
+    var cacheFile = await mediaCache.getImage(host, path, preferredSize);
+    cacheFile ??= await mediaCache.getImageAnySize(host, path);
     return cacheFile?.readAsBytes();
   }
 

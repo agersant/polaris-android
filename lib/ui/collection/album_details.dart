@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
@@ -114,7 +115,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           StretchMode.zoomBackground,
           StretchMode.fadeTitle,
         ],
-        background: Thumbnail(widget.album.artwork),
+        background: Thumbnail(widget.album.artwork, ArtworkSize.small),
       ),
     ));
 

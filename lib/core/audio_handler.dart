@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
@@ -65,7 +66,7 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
       final String? artwork = song.artwork;
       Uri? artworkUri;
       if (artwork != null) {
-        artworkUri = await appClient.getImageURI(artwork);
+        artworkUri = await appClient.getImageURI(artwork, ArtworkSize.small);
       }
       mediaItem.add(song.toMediaItem(currentMediaItem.id, artworkUri));
     });

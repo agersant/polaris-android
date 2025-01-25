@@ -12,14 +12,20 @@ import 'package:polaris/core/unique_timer.dart';
 import 'package:polaris/utils.dart';
 
 const _firstVersion = 1;
-const _currentVersion = 4;
+const _currentVersion = 5;
+
+enum ArtworkSize {
+  tiny,
+  small,
+}
 
 abstract class MediaCacheInterface {
   void dispose();
-  Future<bool> hasImage(String host, String path);
-  Future<io.File?> getImage(String host, String path);
-  io.File getImageLocation(String host, String path);
-  Future<void> putImage(String host, String path, Uint8List bytes);
+  Future<bool> hasImage(String host, String path, ArtworkSize size);
+  Future<io.File?> getImage(String host, String path, ArtworkSize size);
+  Future<io.File?> getImageAnySize(String host, String path);
+  io.File getImageLocation(String host, String path, ArtworkSize size);
+  Future<void> putImage(String host, String path, ArtworkSize size, Uint8List bytes);
   Future<bool> hasAudio(String host, String path);
   Future<void> putAudio(String host, String path, io.File source);
   bool hasAudioSync(String host, String path);
@@ -91,31 +97,42 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
-  Future<bool> hasImage(String host, String path) async {
-    final file = getImageLocation(host, path);
+  Future<bool> hasImage(String host, String path, ArtworkSize size) async {
+    final file = getImageLocation(host, path, size);
     return file.exists();
   }
 
   @override
-  Future<io.File?> getImage(String host, String path) async {
-    final fullPath = _buildImagePath(host, path);
+  Future<io.File?> getImage(String host, String path, ArtworkSize size) async {
+    final fullPath = _buildImagePath(host, path, size);
     final file = io.File(fullPath);
     try {
       if (await file.exists()) {
-        developer.log('Found image in disk cache: $path');
+        developer.log('Found ${size.name} image in disk cache: $path');
         _lru.upsert(fullPath);
         _lruWriteTimer.reset();
         return file;
       }
     } catch (e) {
-      developer.log('Error while accessing image from disk cache: $path', error: e);
+      developer.log('Error while accessing ${size.name} image from disk cache: $path', error: e);
     }
     return null;
   }
 
   @override
-  io.File getImageLocation(String host, String path) {
-    final fullPath = _buildImagePath(host, path);
+  Future<io.File?> getImageAnySize(String host, String path) async {
+    for (ArtworkSize size in ArtworkSize.values.reversed) {
+      final file = await getImage(host, path, size);
+      if (file != null) {
+        return file;
+      }
+    }
+    return null;
+  }
+
+  @override
+  io.File getImageLocation(String host, String path, ArtworkSize size) {
+    final fullPath = _buildImagePath(host, path, size);
     return io.File(fullPath);
   }
 
@@ -171,16 +188,16 @@ class MediaCache implements MediaCacheInterface {
   }
 
   @override
-  putImage(String host, String path, Uint8List bytes) async {
-    developer.log('Adding image to disk cache: $path');
-    final fullPath = _buildImagePath(host, path);
+  putImage(String host, String path, ArtworkSize size, Uint8List bytes) async {
+    developer.log('Adding ${size.name} image to disk cache: $path');
+    final fullPath = _buildImagePath(host, path, size);
     final file = io.File(fullPath);
     try {
       _lru.upsert(fullPath);
       _lruWriteTimer.reset();
       await file.writeAsBytes(bytes, mode: io.FileMode.writeOnly, flush: true);
     } catch (e) {
-      developer.log('Error while adding image to disk cache: $path', error: e);
+      developer.log('Error while adding ${size.name} image to disk cache: $path', error: e);
     }
   }
 
@@ -234,7 +251,9 @@ class MediaCache implements MediaCacheInterface {
       filesToPreserve.addAll(songs.map((path) => _buildAudioPath(host, path)));
     });
     imagesToPreserve.forEach((host, images) {
-      filesToPreserve.addAll(images.map((path) => _buildImagePath(host, path)));
+      for (var size in ArtworkSize.values) {
+        filesToPreserve.addAll(images.map((path) => _buildImagePath(host, path, size)));
+      }
     });
 
     final List<String> deletionCandidates = [];
@@ -258,8 +277,8 @@ class MediaCache implements MediaCacheInterface {
     return sha1.convert(utf8.encode(input)).toString();
   }
 
-  String _buildImagePath(String host, String path) {
-    final fullPath = '$host::$path';
+  String _buildImagePath(String host, String path, ArtworkSize size) {
+    final fullPath = '$host::$path::$size';
     return p.join(_root.path, 'image_${_sanitize(fullPath)}');
   }
 

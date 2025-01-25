@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/v7_client.dart';
 import 'package:polaris/core/client/api/v8_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
@@ -108,18 +109,18 @@ class APIClient implements APIClientInterface {
     };
   }
 
-  Future<http.StreamedResponse> getImage(String path) {
+  Future<http.StreamedResponse> getImage(String path, ArtworkSize size) {
     return switch (connectionManager.apiVersion) {
-      8 => v8.getImage(path),
-      7 => v7.getImage(path),
+      8 => v8.getImage(path, size),
+      7 => v7.getImage(path, size),
       _ => throw APIError.notImplemented,
     };
   }
 
-  Uri getImageURI(String path) {
+  Uri getImageURI(String path, ArtworkSize size) {
     return switch (connectionManager.apiVersion) {
-      8 => v8.getImageURI(path),
-      7 => v7.getImageURI(path),
+      8 => v8.getImageURI(path, size),
+      7 => v7.getImageURI(path, size),
       _ => throw APIError.notImplemented,
     };
   }

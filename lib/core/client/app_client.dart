@@ -72,19 +72,19 @@ class AppClient implements AppClientInterface {
     return offlineClient.flatten(host, path);
   }
 
-  Future<Uri?> getImageURI(String path) async {
+  Future<Uri?> getImageURI(String path, ArtworkSize size) async {
     try {
       final String host = _getHost();
-      if (await mediaCache.hasImage(host, path)) {
-        return mediaCache.getImageLocation(host, path).uri;
+      if (await mediaCache.hasImage(host, path, size)) {
+        return mediaCache.getImageLocation(host, path, size).uri;
       }
       if (connectionManager.isConnected()) {
-        return _apiClient.getImageURI(path);
+        return _apiClient.getImageURI(path, size);
       }
+      return (await mediaCache.getImageAnySize(host, path))?.uri;
     } catch (e) {
       return null;
     }
-    return null;
   }
 
   Future<AudioSource?> getAudio(String path, String id) async {
@@ -101,13 +101,13 @@ class AppClient implements AppClientInterface {
     }
   }
 
-  Future<Uint8List?> getImage(String path) async {
+  Future<Uint8List?> getImage(String path, ArtworkSize size) async {
     try {
       final String host = _getHost();
       if (connectionManager.isConnected()) {
-        return await downloadManager.getImage(host, path);
+        return await downloadManager.getImage(host, path, size);
       } else {
-        return await offlineClient.getImage(host, path);
+        return await offlineClient.getImage(host, path, size);
       }
     } catch (e) {
       return null;

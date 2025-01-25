@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/base_http.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
@@ -20,7 +21,7 @@ String albumEndpoint(String name, List<String> mainArtists) =>
     '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
 String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
 String thumbnailEndpoint(String path, dto.ThumbnailSize size) =>
-    '/api/thumbnail/${Uri.encodeComponent(path)}?size=$size&pad=false';
+    '/api/thumbnail/${Uri.encodeComponent(path)}?size=${size.name}&pad=false';
 
 class V8Client extends BaseHttpClient implements APIClientInterface {
   final authentication.Manager authenticationManager;
@@ -122,13 +123,17 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
     }
   }
 
-  Future<http.StreamedResponse> getImage(String path) {
-    final uri = getImageURI(path);
+  Future<http.StreamedResponse> getImage(String path, ArtworkSize size) {
+    final uri = getImageURI(path, size);
     return makeRequest(Method.get, uri.toString());
   }
 
-  Uri getImageURI(String path) {
-    String url = makeURL('$thumbnailEndpoint${Uri.encodeComponent(path)}?pad=false');
+  Uri getImageURI(String path, ArtworkSize size) {
+    final dtoSize = switch (size) {
+      ArtworkSize.tiny => dto.ThumbnailSize.tiny,
+      ArtworkSize.small => dto.ThumbnailSize.small,
+    };
+    String url = makeURL(thumbnailEndpoint(path, dtoSize));
     String? token = authenticationManager.token;
     if (token != null && token.isNotEmpty) {
       url += '&auth_token=$token';

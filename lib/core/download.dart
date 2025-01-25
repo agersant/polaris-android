@@ -9,9 +9,8 @@ import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 
 class _ImageJob {
-  String path;
   Future<Uint8List> imageData;
-  _ImageJob(this.path, this.imageData);
+  _ImageJob(this.imageData);
 }
 
 class _AudioJob {
@@ -26,7 +25,7 @@ class Manager {
   final MediaCacheInterface mediaCache;
   final APIClient apiClient;
 
-  final Map<String, _ImageJob> _imageJobs = {};
+  final Map<(String, ArtworkSize), _ImageJob> _imageJobs = {};
   final Map<String, _AudioJob> _audioJobs = {};
 
   Manager({
@@ -34,25 +33,25 @@ class Manager {
     required this.apiClient,
   });
 
-  Future<Uint8List?> getImage(String host, String path) async {
-    final cacheHit = await mediaCache.getImage(host, path);
+  Future<Uint8List?> getImage(String host, String path, ArtworkSize size) async {
+    final cacheHit = await mediaCache.getImage(host, path, size);
     if (cacheHit != null) {
       return cacheHit.readAsBytes();
     }
 
-    final _ImageJob? existingJob = _imageJobs[path];
+    final _ImageJob? existingJob = _imageJobs[(path, size)];
     if (existingJob != null) {
       return existingJob.imageData;
     }
 
-    developer.log('Downloading image: $path');
-    final imageData = apiClient.getImage(path).then((r) => http.Response.fromStream(r)).then((r) {
-      mediaCache.putImage(host, path, r.bodyBytes);
+    developer.log('Downloading ${size.name} image: $path');
+    final imageData = apiClient.getImage(path, size).then((r) => http.Response.fromStream(r)).then((r) {
+      mediaCache.putImage(host, path, size, r.bodyBytes);
       return r.bodyBytes;
     });
 
-    final job = _ImageJob(path, imageData);
-    _imageJobs[path] = job;
+    final job = _ImageJob(imageData);
+    _imageJobs[(path, size)] = job;
     job.imageData.whenComplete(() => _imageJobs.remove(job));
 
     return job.imageData;
