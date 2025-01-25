@@ -85,7 +85,9 @@ class QueuePage extends StatelessWidget {
     return (Stream.value(null), null);
   }
   final song = collectionCache.getSong(host, path);
-  final stream = collectionCache.onSongsIngested.map((_) => collectionCache.getSong(host, path)).whereNotNull().take(1);
+  final stream = song != null
+      ? Stream.value(song)
+      : collectionCache.onSongsIngested.map((_) => collectionCache.getSong(host, path)).whereNotNull().take(1);
   return (stream, song);
 }
 
