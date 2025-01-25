@@ -10,7 +10,6 @@ class Manager {
   final CollectionCache collectionCache;
   final APIClient apiClient;
 
-  final Set<String> _requested = {};
   final Set<String> _failed = {};
   final List<CancelableOperation<dto.SongBatch?>> _activeFetches = [];
 
@@ -20,10 +19,10 @@ class Manager {
     required this.apiClient,
   }) {
     connectionManager.addListener(reset);
+    collectionCache.onSongsRequested.listen((_) => _fetch());
   }
 
   void reset() {
-    _requested.clear();
     _failed.clear();
     for (CancelableOperation<dto.SongBatch?> activeFetch in _activeFetches) {
       activeFetch.cancel();
@@ -31,23 +30,8 @@ class Manager {
     _activeFetches.clear();
   }
 
-  void request(List<String> paths) {
-    final String? host = connectionManager.url;
-    if (host == null) {
-      return;
-    }
-
-    for (String path in paths) {
-      if (!_failed.contains(path) && !collectionCache.hasSong(host, path)) {
-        _requested.add(path);
-      }
-    }
-
-    _fetch();
-  }
-
   void _fetch() async {
-    if (_requested.isEmpty || _activeFetches.isNotEmpty) {
+    if (_activeFetches.isNotEmpty) {
       return;
     }
 
@@ -60,8 +44,9 @@ class Manager {
     int songCount = 0;
     List<Future> fetches = [];
 
-    for (String path in _requested) {
-      if (collectionCache.hasSong(host, path) || _failed.contains(path)) {
+    final missingSongs = collectionCache.getMissingSongs(host);
+    for (String path in missingSongs) {
+      if (_failed.contains(path)) {
         continue;
       }
       songCount += 1;
@@ -102,6 +87,5 @@ class Manager {
     }
     collectionCache.putSongs(host, batch.songs);
     _failed.addAll(batch.notFound);
-    _requested.removeAll(paths);
   }
 }

@@ -12,6 +12,7 @@ abstract class APIClientInterface {
   Future<dto.Album> getAlbum(String name, List<String> mainArtists);
   Future<List<dto.AlbumHeader>> random();
   Future<List<dto.AlbumHeader>> recent();
+  Future<dto.SongList> search(String query);
 }
 
 class APIClient implements APIClientInterface {
@@ -84,6 +85,15 @@ class APIClient implements APIClientInterface {
     return switch (connectionManager.apiVersion) {
       8 => await v8.recent(),
       7 => await v7.recent(),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<dto.SongList> search(String query) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.search(query),
+      7 => await v7.search(query),
       _ => throw APIError.notImplemented,
     };
   }

@@ -12,8 +12,10 @@ const _currentVersion = 2;
 
 class CollectionCache {
   final Collection _collection;
-  final BehaviorSubject<()> _ingestion = BehaviorSubject<()>();
-  Stream<()> get onSongsIngested => _ingestion.stream;
+  final BehaviorSubject<()> _songIngestion = BehaviorSubject<()>();
+  final BehaviorSubject<()> _songRequest = BehaviorSubject<()>();
+  Stream<()> get onSongsIngested => _songIngestion.stream;
+  Stream<()> get onSongsRequested => _songRequest.stream;
 
   CollectionCache(this._collection);
 
@@ -63,28 +65,42 @@ class CollectionCache {
     final server = _collection.servers.putIfAbsent(host, () => Server());
     server.directoryChildren[path] = {};
     server.directorySongs[path] = {};
+    bool hasNewSongs = false;
+
     for (dto.BrowserEntry entry in entries) {
       if (entry.isDirectory) {
         server.directoryChildren[path]!.add(entry.path);
       } else {
         server.directorySongs[path]!.add(entry.path);
+        hasNewSongs |= !server.songs.containsKey(entry.path);
       }
     }
+
     server.populatedDirectories.add(path);
+    if (hasNewSongs) {
+      _songRequest.value = ();
+    }
     await saveToDisk();
   }
 
   Future putFiles(String host, List<String> files) async {
     final server = _collection.servers.putIfAbsent(host, () => Server());
+    bool hasNewSongs = false;
+
     for (String path in files) {
       final components = splitPath(path);
       server.directorySongs.putIfAbsent(components.length > 1 ? dirname(path) : "", () => {}).add(path);
+      hasNewSongs |= !server.songs.containsKey(path);
       String parent = components[0];
       for (int i = 1; i < components.length - 1; i++) {
         final child = '$parent/${components[i]}';
         server.directoryChildren.putIfAbsent(parent, () => {}).add(child);
         parent = child;
       }
+    }
+
+    if (hasNewSongs) {
+      _songRequest.value = ();
     }
     await saveToDisk();
   }
@@ -102,8 +118,26 @@ class CollectionCache {
         parent = child;
       }
     }
-    _ingestion.value = ();
+    _songIngestion.value = ();
     await saveToDisk();
+  }
+
+  Set<String> getMissingSongs(String host) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return {};
+    }
+
+    final Set<String> missing = {};
+    server.directorySongs.forEach((_, paths) {
+      for (final path in paths) {
+        if (!server.songs.containsKey(path)) {
+          missing.add(path);
+        }
+      }
+    });
+
+    return missing;
   }
 
   bool hasSong(String host, String path) {

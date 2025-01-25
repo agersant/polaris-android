@@ -9,7 +9,6 @@ import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/media_item.dart';
-import 'package:polaris/core/songs.dart' as songs;
 
 abstract class AppClientInterface {
   APIClientInterface? get apiClient;
@@ -23,7 +22,6 @@ class AppClient implements AppClientInterface {
   final connection.Manager connectionManager;
   final CollectionCache collectionCache;
   final MediaCacheInterface mediaCache;
-  final songs.Manager songsManager;
 
   AppClient({
     required APIClient apiClient,
@@ -32,7 +30,6 @@ class AppClient implements AppClientInterface {
     required this.downloadManager,
     required this.collectionCache,
     required this.mediaCache,
-    required this.songsManager,
   }) : _apiClient = apiClient;
 
   @override
@@ -59,7 +56,6 @@ class AppClient implements AppClientInterface {
 
     return _apiClient.browse(path).then((content) {
       collectionCache.putDirectory(host, path, content);
-      songsManager.request(content.where((entry) => !entry.isDirectory).map((e) => e.path).toList());
       return content;
     });
   }
@@ -69,9 +65,8 @@ class AppClient implements AppClientInterface {
     final String host = _getHost();
     if (connectionManager.isConnected()) {
       return _apiClient.flatten(path).then((songList) {
-        collectionCache.putFiles(host, songList.paths);
         collectionCache.putSongs(host, songList.firstSongs);
-        songsManager.request(songList.paths);
+        collectionCache.putFiles(host, songList.paths);
         return songList;
       });
     }

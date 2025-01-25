@@ -34,8 +34,11 @@ const emptyAlbum = 'There are no songs on this album.';
 const browseError = 'There was an error while reading this directory.';
 const randomError = 'There was an error while listing albums.';
 const recentError = 'There was an error while listing albums.';
+const searchError = 'There was an error while searching for songs.';
 const albumDetailsError = 'There was an error while reading this album.';
 const goBackButtonLabel = 'GO BACK';
+const noSearchResults = 'No songs were found.';
+String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu
 const contextMenuQueueLast = 'Play Last';

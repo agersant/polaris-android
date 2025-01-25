@@ -22,6 +22,11 @@ class APIClient implements APIClientInterface {
   Future<List<AlbumHeader>> recent() async {
     return [];
   }
+
+  @override
+  Future<SongList> search(String path) async {
+    return SongList(paths: [], firstSongs: []);
+  }
 }
 
 class AppClient implements AppClientInterface {

@@ -7,6 +7,7 @@ import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/random.dart';
 import 'package:polaris/ui/collection/recent.dart';
+import 'package:polaris/ui/collection/search.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:provider/provider.dart';
 import '../strings.dart';
@@ -20,11 +21,18 @@ class CollectionPage extends StatefulWidget {
   State<CollectionPage> createState() => _CollectionPageState();
 }
 
+enum CollectionTab {
+  browse,
+  recent,
+  random,
+  search,
+}
+
 class _CollectionPageState extends State<CollectionPage> with TickerProviderStateMixin {
   final _connectionManager = getIt<connection.Manager>();
   final _browserModel = getIt<BrowserModel>();
   late TabController _tabController = TabController(vsync: this, length: 0);
-  late bool isOnline;
+  late Set<CollectionTab> visibleTabs;
 
   @override
   void initState() {
@@ -35,11 +43,17 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
 
   void _handleConnectionStateChanged() {
     setState(() {
-      isOnline = _connectionManager.isConnected();
+      final isOnline = _connectionManager.isConnected();
+      visibleTabs = {
+        CollectionTab.browse,
+        if (isOnline) CollectionTab.recent,
+        if (isOnline) CollectionTab.random,
+        if (isOnline) CollectionTab.search,
+      };
 
       _tabController.dispose();
       // TODO slightly buggy due to https://github.com/flutter/flutter/issues/93237
-      _tabController = TabController(vsync: this, length: isOnline ? 3 : 1);
+      _tabController = TabController(vsync: this, length: visibleTabs.length);
       if (!isOnline) {
         _tabController.index = 0;
       }
@@ -65,18 +79,20 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       appBar: AppBar(
         title: const Text(collectionTitle),
         bottom: TabBar(tabs: <Tab>[
-          const Tab(text: collectionTabBrowseTitle),
-          if (isOnline) const Tab(text: collectionTabRandomTitle),
-          if (isOnline) const Tab(text: collectionTabRecentTitle),
+          if (visibleTabs.contains(CollectionTab.browse)) const Tab(text: collectionTabBrowseTitle),
+          if (visibleTabs.contains(CollectionTab.random)) const Tab(text: collectionTabRandomTitle),
+          if (visibleTabs.contains(CollectionTab.recent)) const Tab(text: collectionTabRecentTitle),
+          if (visibleTabs.contains(CollectionTab.search)) const Tab(text: "SEARCH"),
         ], controller: _tabController),
       ),
       drawer: _buildDrawer(context),
       body: TabBarView(
         controller: _tabController,
         children: [
-          const Browser(),
-          if (isOnline) const RandomAlbums(),
-          if (isOnline) const RecentAlbums(),
+          if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
+          if (visibleTabs.contains(CollectionTab.random)) const RandomAlbums(),
+          if (visibleTabs.contains(CollectionTab.recent)) const RecentAlbums(),
+          if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],
       ),
     );

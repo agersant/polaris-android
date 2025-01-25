@@ -85,7 +85,6 @@ Future _registerSingletons() async {
     connectionManager: connectionManager,
     collectionCache: collectionCache,
     mediaCache: mediaCache,
-    songsManager: songsManager,
   );
   final audioHandler = await initAudioService(
     connectionManager: connectionManager,
@@ -101,9 +100,9 @@ Future _registerSingletons() async {
   );
   final savestateManager = savestate.Manager(
     connectionManager: connectionManager,
+    collectionCache: collectionCache,
     audioPlayer: audioPlayer,
     playlist: playlist,
-    songsManager: songsManager,
   );
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,

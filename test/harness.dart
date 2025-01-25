@@ -83,7 +83,6 @@ class Harness {
       connectionManager: connectionManager,
       collectionCache: collectionCache,
       mediaCache: mediaCache,
-      songsManager: songsManager,
     );
     final audioPlayer = AudioPlayer();
     final playlist = Playlist(
@@ -94,9 +93,9 @@ class Harness {
     );
     final savestateManager = savestate.Manager(
       connectionManager: connectionManager,
+      collectionCache: collectionCache,
       audioPlayer: audioPlayer,
       playlist: playlist,
-      songsManager: songsManager,
     );
     final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(

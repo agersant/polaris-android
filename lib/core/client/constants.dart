@@ -23,3 +23,5 @@ String albumEndpoint(String name, List<String> mainArtists) =>
 String randomEndpoint(int apiVersion) => apiVersion == 8 ? '/api/albums/random/' : '/api/random';
 
 String recentEndpoint(int apiVersion) => apiVersion == 8 ? '/api/albums/recent/' : '/api/recent';
+
+String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';

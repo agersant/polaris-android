@@ -4,9 +4,9 @@ import 'dart:io' as io;
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/songs.dart' as songs;
 import 'package:rxdart/rxdart.dart';
 
 const _currentVersion = 2;
@@ -77,15 +77,15 @@ class PlaybackState {
 
 class Manager {
   final connection.Manager connectionManager;
+  final CollectionCache collectionCache;
   final AudioPlayer audioPlayer;
   final Playlist playlist;
-  final songs.Manager songsManager;
 
   Manager({
     required this.connectionManager,
+    required this.collectionCache,
     required this.audioPlayer,
     required this.playlist,
-    required this.songsManager,
   });
 
   static Future<io.File> _getPlaylistStateFile(int version) async {
@@ -166,7 +166,7 @@ class Manager {
         }
         await playlist.clear();
         await playlist.queueLast(playlistState.songs, autoPlay: false);
-        songsManager.request(playlistState.songs);
+        collectionCache.putFiles(playlistState.host, playlistState.songs);
         developer.log('Read playlist state from: $playlistStateFile');
       }
     } catch (e) {

@@ -2,5 +2,5 @@
 - 📁 File browser now shows the title of the current folder
 - 📁 File browser now has a hamburger menu with options to queue the entire folder or save its content for offline listening
 - 📁 File browser no longer assumes some directories are albums, and always displays their content plainly
+- 🔍️ Added a new page to search for songs
 - 🐛 Fixed a bug album art for some songs would sometimes be missing in offline mode
-

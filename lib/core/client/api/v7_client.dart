@@ -114,6 +114,29 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
     }
   }
 
+  @override
+  Future<dto8.SongList> search(String query) async {
+    if (query.isEmpty) {
+      return dto8.SongList(paths: [], firstSongs: []);
+    }
+
+    final host = _getHost();
+    final url = makeURL(searchEndpoint(query));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+
+    try {
+      final collectionFiles =
+          (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto7.CollectionFile.fromJson(c)).toList();
+      final songs = collectionFiles.where((f) => f.isSong()).map((f) => f.asSong().toV8()).toList();
+      final paths = songs.map((s) => s.path).toList();
+      collectionCache.putSongs(host, songs);
+      collectionCache.putFiles(host, paths);
+      return dto8.SongList(paths: paths, firstSongs: songs);
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
   Future<http.StreamedResponse> getImage(String path) {
     final uri = getImageURI(path);
     return makeRequest(Method.get, uri.toString());
