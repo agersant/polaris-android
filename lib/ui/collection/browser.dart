@@ -213,6 +213,7 @@ class Directory extends StatelessWidget {
   ListTile _buildTile({void Function()? onTap}) {
     return ListTile(
       leading: const Icon(Icons.folder),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
       title: Text(entry.formatName()),
       trailing: DirectoryContextMenuButton(
         path: entry.path,
@@ -243,6 +244,7 @@ class Song extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.audio_file),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
       title: Text(entry.formatName(), overflow: TextOverflow.ellipsis),
       trailing: SongContextMenuButton(
         path: entry.path,
