@@ -211,6 +211,43 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   }
 }
 
+enum SongsAction {
+  queueLast,
+  queueNext,
+}
+
+class SongsContextMenuButton extends ContextMenuButton<SongsAction> {
+  final List<String> paths;
+
+  SongsContextMenuButton({
+    required this.paths,
+    required super.actions,
+    super.compact,
+    super.icon,
+    Key? key,
+  }) : super(key: key) {}
+
+  @override
+  (IconData, String) getActionVisuals(SongsAction action) {
+    return switch (action) {
+      SongsAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
+      SongsAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+    };
+  }
+
+  @override
+  void executeAction(BuildContext context, SongsAction action) async {
+    switch (action) {
+      case SongsAction.queueLast:
+        getIt<Playlist>().queueLast(paths);
+        break;
+      case SongsAction.queueNext:
+        getIt<Playlist>().queueNext(paths);
+        break;
+    }
+  }
+}
+
 enum AlbumAction {
   queueLast,
   queueNext,

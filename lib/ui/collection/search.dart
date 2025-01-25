@@ -65,14 +65,11 @@ class _SearchState extends State<Search> {
       padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: SearchBar(
-              leading: const Icon(Icons.search),
-              padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
-              autoFocus: true,
-              onSubmitted: (value) => _startQuery(value),
-            ),
+          SearchBar(
+            leading: const Icon(Icons.search),
+            padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
+            autoFocus: true,
+            onSubmitted: (value) => _startQuery(value),
           ),
           Expanded(child: buildResults(context))
         ],
@@ -97,12 +94,35 @@ class _SearchState extends State<Search> {
       if (_results.isEmpty) {
         return const ErrorMessage(noSearchResults);
       } else {
-        // TODO v8 add num results (and play all?)
-        return ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          controller: _scrollController,
-          itemCount: _results.length,
-          itemBuilder: (context, index) => _songWidget(context, _results[index]),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    numSearchResults(_results.length),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  SongsContextMenuButton(
+                    paths: _results,
+                    icon: Icons.menu,
+                    actions: const [SongsAction.queueLast, SongsAction.queueNext],
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                controller: _scrollController,
+                itemCount: _results.length,
+                itemBuilder: (context, index) => _songWidget(context, _results[index]),
+              ),
+            ),
+          ],
         );
       }
     }
@@ -132,6 +152,7 @@ Widget _songWidget(BuildContext context, String path) {
                   },
                   child: ListTile(
                     dense: true,
+                    contentPadding: EdgeInsets.zero,
                     leading: ListThumbnail(song?.artwork),
                     title: song == null
                         ? const Placeholder(width: 100, height: 8)
