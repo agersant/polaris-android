@@ -259,24 +259,10 @@ class _PinListTileState extends State<PinListTile> {
           ),
         ],
       ),
-      trailing: switch (widget.myPin) {
-        pin.SongPin p => SongContextMenuButton(
-            host: p.host,
-            path: p.path,
-            actions: const [SongAction.togglePin],
-          ),
-        pin.DirectoryPin p => DirectoryContextMenuButton(
-            host: p.host,
-            path: p.path,
-            actions: const [DirectoryAction.togglePin],
-          ),
-        pin.AlbumPin p => AlbumContextMenuButton(
-            host: p.host,
-            name: p.name,
-            mainArtists: p.mainArtists,
-            actions: const [AlbumAction.togglePin],
-          ),
-      },
+      trailing: PinContextMenuButton(
+        myPin: widget.myPin,
+        actions: const [PinAction.unpin],
+      ),
     );
   }
 }

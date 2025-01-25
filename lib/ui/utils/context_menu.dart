@@ -23,9 +23,8 @@ abstract class ContextMenuButton<T> extends StatelessWidget {
     required this.actions,
     this.icon = Icons.more_vert,
     this.compact = false,
-    String? host,
     Key? key,
-  })  : host = host ?? getIt<connection.Manager>().url,
+  })  : host = getIt<connection.Manager>().url,
         super(key: key);
 
   (IconData, String) getActionVisuals(T action);
@@ -91,7 +90,6 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
     required super.actions,
     super.compact,
     super.icon,
-    super.host,
     this.onRefresh = noop,
     Key? key,
   }) : super(key: key);
@@ -157,7 +155,6 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   SongContextMenuButton({
     required this.path,
     required super.actions,
-    super.host,
     super.compact,
     this.onRemoveFromQueue = noop,
     Key? key,
@@ -233,7 +230,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     required super.actions,
     super.compact,
     super.icon,
-    super.host,
     this.onRefresh = noop,
     this.songs,
     Key? key,
@@ -285,5 +281,45 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   bool _isPinned() {
     final pinManager = getIt<pin.Manager>();
     return pinManager.isAlbumPinned(host, name, mainArtists);
+  }
+}
+
+enum PinAction {
+  unpin,
+}
+
+class PinContextMenuButton extends ContextMenuButton<PinAction> {
+  final pin.Pin myPin;
+
+  PinContextMenuButton({
+    required this.myPin,
+    required super.actions,
+    super.compact,
+    super.icon,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  (IconData, String) getActionVisuals(PinAction action) {
+    return switch (action) {
+      PinAction.unpin => (Icons.offline_pin, contextMenuUnpin),
+    };
+  }
+
+  @override
+  void executeAction(BuildContext context, PinAction action) async {
+    switch (action) {
+      case PinAction.unpin:
+        final pinManager = getIt<pin.Manager>();
+        switch (myPin) {
+          case final pin.DirectoryPin p:
+            pinManager.unpinDirectory(p.host, p.path);
+          case final pin.SongPin p:
+            pinManager.unpinSong(p.host, p.path);
+          case final pin.AlbumPin p:
+            pinManager.unpinAlbum(p.host, p.name, p.mainArtists);
+        }
+        break;
+    }
   }
 }
