@@ -176,3 +176,9 @@ class CollectionFile implements Comparable<CollectionFile> {
         (directory) => <String, dynamic>{'Directory': directory.toJson()},
       );
 }
+
+enum ThumbnailSize {
+  small,
+  large,
+  native,
+}

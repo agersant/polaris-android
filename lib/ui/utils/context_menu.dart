@@ -225,7 +225,7 @@ class SongsContextMenuButton extends ContextMenuButton<SongsAction> {
     super.compact,
     super.icon,
     Key? key,
-  }) : super(key: key) {}
+  }) : super(key: key);
 
   @override
   (IconData, String) getActionVisuals(SongsAction action) {

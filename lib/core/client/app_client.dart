@@ -4,7 +4,6 @@ import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
-import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;

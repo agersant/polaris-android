@@ -4,9 +4,23 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/base_http.dart';
-import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
+
+const apiVersionEndpoint = '/api/version/';
+const audioEndpoint = '/api/audio/';
+const browseEndpoint = '/api/browse/';
+const flattenEndpoint = '/api/flatten/';
+const loginEndpoint = '/api/auth/';
+const randomEndpoint = '/api/albums/random/';
+const recentEndpoint = '/api/albums/recent/';
+const songsEndpoint = '/api/songs/';
+
+String albumEndpoint(String name, List<String> mainArtists) =>
+    '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
+String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
+String thumbnailEndpoint(String path, dto.ThumbnailSize size) =>
+    '/api/thumbnail/${Uri.encodeComponent(path)}?size=$size&pad=false';
 
 class V8Client extends BaseHttpClient implements APIClientInterface {
   final authentication.Manager authenticationManager;
@@ -68,7 +82,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto.AlbumHeader>> random() async {
-    final url = makeURL(randomEndpoint(8));
+    final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
@@ -79,7 +93,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto.AlbumHeader>> recent() async {
-    final url = makeURL(recentEndpoint(8));
+    final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();

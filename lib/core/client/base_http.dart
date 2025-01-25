@@ -3,7 +3,7 @@ import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:polaris/core/client/constants.dart';
+import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 
 enum Method {

@@ -169,3 +169,10 @@ class Song {
         'duration': duration,
       };
 }
+
+enum ThumbnailSize {
+  tiny,
+  small,
+  large,
+  native,
+}

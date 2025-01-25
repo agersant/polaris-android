@@ -4,11 +4,23 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/base_http.dart';
-import 'package:polaris/core/client/constants.dart';
 import 'package:polaris/core/client/api/v7_dto.dart' as dto7;
 import 'package:polaris/core/client/api/v8_dto.dart' as dto8;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/strings.dart';
+
+const apiVersionEndpoint = '/api/version/';
+const audioEndpoint = '/api/audio/';
+const browseEndpoint = '/api/browse/';
+const flattenEndpoint = '/api/flatten/';
+const loginEndpoint = '/api/auth/';
+const randomEndpoint = '/api/random';
+const recentEndpoint = '/api/recent';
+const songsEndpoint = '/api/songs/';
+
+String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
+String thumbnailEndpoint(String path, dto7.ThumbnailSize size) =>
+    '/api/thumbnail/${Uri.encodeComponent(path)}?size=$size&pad=false';
 
 class V7Client extends BaseHttpClient implements APIClientInterface {
   final authentication.Manager authenticationManager;
@@ -76,7 +88,7 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto8.AlbumHeader>> random() async {
-    final url = makeURL(randomEndpoint(7));
+    final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       final directories =
@@ -96,7 +108,7 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto8.AlbumHeader>> recent() async {
-    final url = makeURL(recentEndpoint(7));
+    final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       final directories =
