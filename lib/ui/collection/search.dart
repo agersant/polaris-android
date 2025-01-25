@@ -15,7 +15,6 @@ import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/utils/placeholder.dart';
 import 'package:polaris/ui/utils/thumbnail.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -112,22 +111,10 @@ class _SearchState extends State<Search> {
   }
 }
 
-// TODO v8 this is copy pasta
-(Stream<dto.Song?>, dto.Song?) makeSongStream(String path) {
-  final collectionCache = getIt<CollectionCache>();
-  final host = getIt<connection.Manager>().url;
-  if (host == null) {
-    return (Stream.value(null), null);
-  }
-  final song = collectionCache.getSong(host, path);
-  final stream = song != null
-      ? Stream.value(song)
-      : collectionCache.onSongsIngested.map((_) => collectionCache.getSong(host, path)).whereNotNull().take(1);
-  return (stream, song);
-}
-
 Widget _songWidget(BuildContext context, String path) {
-  final (songStream, initialSong) = makeSongStream(path);
+  final collectionCache = getIt<CollectionCache>();
+  final host = getIt<connection.Manager>().url!;
+  final (songStream, initialSong) = collectionCache.getSongStream(host, path);
   return StreamProvider<dto.Song?>.value(
       key: Key(path),
       value: songStream,

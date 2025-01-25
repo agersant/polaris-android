@@ -15,7 +15,6 @@ import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
 import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
 
 final getIt = GetIt.instance;
 
@@ -78,21 +77,11 @@ class QueuePage extends StatelessWidget {
   }
 }
 
-(Stream<dto.Song?>, dto.Song?) makeSongStream(String path) {
-  final collectionCache = getIt<CollectionCache>();
-  final host = getIt<connection.Manager>().url;
-  if (host == null) {
-    return (Stream.value(null), null);
-  }
-  final song = collectionCache.getSong(host, path);
-  final stream = song != null
-      ? Stream.value(song)
-      : collectionCache.onSongsIngested.map((_) => collectionCache.getSong(host, path)).whereNotNull().take(1);
-  return (stream, song);
-}
-
 Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool isCurrent, Function() onTap) {
-  final (songStream, initialSong) = makeSongStream(mediaItem.getSongPath());
+  final collectionCache = getIt<CollectionCache>();
+  final host = getIt<connection.Manager>().url!;
+  final path = mediaItem.getSongPath();
+  final (songStream, initialSong) = collectionCache.getSongStream(host, path);
   return StreamProvider<dto.Song?>.value(
       key: Key(mediaItem.id),
       value: songStream,
@@ -125,7 +114,7 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
                         ? const Placeholder(width: 100, height: 8)
                         : Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
                     trailing: SongContextMenuButton(
-                      path: mediaItem.getSongPath(),
+                      path: path,
                       actions: const [
                         SongAction.removeFromQueue,
                         SongAction.togglePin,

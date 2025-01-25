@@ -156,6 +156,13 @@ class CollectionCache {
     return server.songs[path];
   }
 
+  (Stream<dto.Song?>, dto.Song?) getSongStream(String host, String path) {
+    final song = getSong(host, path);
+    final stream =
+        song != null ? Stream.value(song) : onSongsIngested.map((_) => getSong(host, path)).whereNotNull().take(1);
+    return (stream, song);
+  }
+
   List<dto.BrowserEntry>? getDirectory(String host, String path) {
     final server = _collection.servers[host];
     if (server == null) {
