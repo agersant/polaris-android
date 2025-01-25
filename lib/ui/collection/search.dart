@@ -66,11 +66,13 @@ class _SearchState extends State<Search> {
       child: Column(
         children: [
           SearchBar(
-            leading: const Icon(Icons.search),
-            padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
-            autoFocus: true,
-            onSubmitted: (value) => _startQuery(value),
-          ),
+              leading: const Icon(Icons.search),
+              padding: const WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
+              autoFocus: true,
+              onSubmitted: (value) => _startQuery(value),
+              elevation: const WidgetStatePropertyAll(3.0),
+              shape: const WidgetStatePropertyAll(
+                  RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))))),
           Expanded(child: buildResults(context))
         ],
       ),
@@ -166,6 +168,7 @@ Widget _songWidget(BuildContext context, String path) {
                         SongAction.queueLast,
                         SongAction.queueNext,
                         SongAction.togglePin,
+                        SongAction.songInfo,
                       ],
                     ),
                   ),
