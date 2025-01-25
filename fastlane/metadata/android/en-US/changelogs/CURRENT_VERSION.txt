@@ -1,1 +1,6 @@
-- Updated Flutter framework to version 3.27
+- 🚀 Added compatibility with Polaris version 0.15
+- 📁 File browser now shows the title of the current folder
+- 📁 File browser now has a hamburger menu with options to queue the entire folder or save its content for offline listening
+- 📁 File browser no longer assumes some directories are albums, and always displays their content plainly
+- 🐛 Fixed a bug album art for some songs would sometimes be missing in offline mode
+
