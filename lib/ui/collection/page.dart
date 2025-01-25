@@ -79,10 +79,10 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       appBar: AppBar(
         title: const Text(collectionTitle),
         bottom: TabBar(tabs: <Tab>[
-          if (visibleTabs.contains(CollectionTab.browse)) const Tab(text: collectionTabBrowseTitle),
-          if (visibleTabs.contains(CollectionTab.random)) const Tab(text: collectionTabRandomTitle),
-          if (visibleTabs.contains(CollectionTab.recent)) const Tab(text: collectionTabRecentTitle),
-          if (visibleTabs.contains(CollectionTab.search)) const Tab(text: "SEARCH"),
+          if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
+          if (visibleTabs.contains(CollectionTab.random)) const Tab(icon: Icon(Icons.shuffle)),
+          if (visibleTabs.contains(CollectionTab.recent)) const Tab(icon: Icon(Icons.new_releases)),
+          if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
       ),
       drawer: _buildDrawer(context),
