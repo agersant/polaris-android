@@ -86,7 +86,8 @@ class _ArtistState extends State<Artist> {
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        child: ListBody(
+        child: Column(
+          spacing: 16,
           children: [
             // TODO v8 add genres
             if (mainReleases.isNotEmpty) _buildAlbumSection(mainAlbumsSectionTitle, mainReleases),

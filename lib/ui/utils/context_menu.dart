@@ -251,7 +251,6 @@ class SongsContextMenuButton extends ContextMenuButton<SongsAction> {
 enum AlbumAction {
   queueLast,
   queueNext,
-  refresh,
   togglePin,
 }
 
@@ -259,7 +258,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   final String name;
   final List<String> mainArtists;
   final List<dto.Song>? songs;
-  final void Function() onRefresh;
 
   AlbumContextMenuButton({
     required this.name,
@@ -267,7 +265,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     required super.actions,
     super.compact,
     super.icon,
-    this.onRefresh = noop,
     this.songs,
     Key? key,
   }) : super(key: key);
@@ -277,7 +274,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
     return switch (action) {
       AlbumAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
       AlbumAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
-      AlbumAction.refresh => (Icons.refresh, contextMenuRefresh),
       AlbumAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
     };
   }
@@ -290,9 +286,6 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
         break;
       case AlbumAction.queueNext:
         getIt<Playlist>().queueNext(await _listSongs());
-        break;
-      case AlbumAction.refresh:
-        onRefresh();
         break;
       case AlbumAction.togglePin:
         final pinManager = getIt<pin.Manager>();

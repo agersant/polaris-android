@@ -141,7 +141,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     actions: const [
                       AlbumAction.queueLast,
                       AlbumAction.queueNext,
-                      AlbumAction.refresh,
                       AlbumAction.togglePin,
                     ],
                     onRefresh: () => _fetchData(useCache: false),
@@ -223,7 +222,6 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 actions: const [
                   AlbumAction.queueLast,
                   AlbumAction.queueNext,
-                  AlbumAction.refresh,
                   AlbumAction.togglePin,
                 ],
                 onRefresh: () => _fetchData(useCache: false),
