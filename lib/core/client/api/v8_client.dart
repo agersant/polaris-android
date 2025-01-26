@@ -9,6 +9,7 @@ import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/connection.dart' as connection;
 
 const apiVersionEndpoint = '/api/version/';
+const artistsEndpoint = '/api/artists/';
 const audioEndpoint = '/api/audio/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
@@ -18,6 +19,7 @@ const songsEndpoint = '/api/songs/';
 
 String albumEndpoint(String name, List<String> mainArtists) =>
     '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
+String artistEndpoint(String name) => '/api/artist/${Uri.encodeComponent(name)}';
 String playlistEndpoint(String name) => '/api/playlist/${Uri.encodeComponent(name)}';
 String randomEndpoint({required int seed, required int offset}) => '/api/albums/random?seed=$seed&offset=$offset';
 String recentEndpoint({required int offset}) => '/api/albums/recent?offset=$offset';
@@ -100,6 +102,28 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<dto.ArtistHeader>> getArtists() async {
+    final url = makeURL(artistsEndpoint);
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.ArtistHeader.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<dto.Artist> getArtist(String name) async {
+    final url = makeURL(artistEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return dto.Artist.fromJson(json.decode(utf8.decode(responseBody)));
     } catch (e) {
       throw APIError.responseParseError;
     }

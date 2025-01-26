@@ -117,6 +117,112 @@ class Album extends AlbumHeader {
   }
 }
 
+class ArtistHeader {
+  String name;
+  int numAlbumsAsPerformer;
+  int numAlbumsAsAdditionalPerformer;
+  int numAlbumsAsComposer;
+  int numAlbumsAsLyricist;
+  Map<String, int> numSongsByGenre;
+  int numSongs;
+
+  ArtistHeader({
+    required this.name,
+    required this.numAlbumsAsPerformer,
+    required this.numAlbumsAsAdditionalPerformer,
+    required this.numAlbumsAsComposer,
+    required this.numAlbumsAsLyricist,
+    required this.numSongsByGenre,
+    required this.numSongs,
+  });
+
+  factory ArtistHeader.fromJson(Map<String, dynamic> json) {
+    return ArtistHeader(
+      name: json['name'],
+      numAlbumsAsPerformer: json['num_albums_as_performer'],
+      numAlbumsAsAdditionalPerformer: json['num_albums_as_performer'],
+      numAlbumsAsComposer: json['num_albums_as_composer'],
+      numAlbumsAsLyricist: json['num_albums_as_lyricist'],
+      numSongsByGenre: Map.from(json['num_songs_by_genre']),
+      numSongs: json['num_songs'],
+    );
+  }
+}
+
+class Artist extends ArtistHeader {
+  List<ArtistAlbum> albums;
+
+  Artist({
+    required name,
+    required numAlbumsAsPerformer,
+    required numAlbumsAsAdditionalPerformer,
+    required numAlbumsAsComposer,
+    required numAlbumsAsLyricist,
+    required numSongsByGenre,
+    required numSongs,
+    required this.albums,
+  }) : super(
+          name: name,
+          numAlbumsAsPerformer: numAlbumsAsPerformer,
+          numAlbumsAsAdditionalPerformer: numAlbumsAsAdditionalPerformer,
+          numAlbumsAsComposer: numAlbumsAsComposer,
+          numAlbumsAsLyricist: numAlbumsAsLyricist,
+          numSongsByGenre: numSongsByGenre,
+          numSongs: numSongs,
+        );
+
+  factory Artist.fromJson(Map<String, dynamic> json) {
+    final header = ArtistHeader.fromJson(json);
+    return Artist(
+      name: header.name,
+      numAlbumsAsPerformer: header.numAlbumsAsPerformer,
+      numAlbumsAsAdditionalPerformer: header.numAlbumsAsAdditionalPerformer,
+      numAlbumsAsComposer: header.numAlbumsAsComposer,
+      numAlbumsAsLyricist: header.numAlbumsAsLyricist,
+      numSongsByGenre: header.numSongsByGenre,
+      numSongs: header.numSongs,
+      albums: (json['albums'] as List<dynamic>).map((a) => ArtistAlbum.fromJson(a)).toList(),
+    );
+  }
+}
+
+class ArtistAlbum extends AlbumHeader {
+  List<Contribution> contributions;
+
+  ArtistAlbum({
+    required name,
+    required mainArtists,
+    required this.contributions,
+  }) : super(name: name, mainArtists: mainArtists);
+
+  factory ArtistAlbum.fromJson(Map<String, dynamic> json) {
+    final header = AlbumHeader.fromJson(json);
+    return ArtistAlbum(
+      name: header.name,
+      mainArtists: header.mainArtists,
+      contributions: (json['contributions'] as List<dynamic>).map((c) => Contribution.fromJson(c)).toList(),
+    )
+      ..artwork = header.artwork
+      ..year = header.year;
+  }
+}
+
+class Contribution {
+  bool performer;
+  bool composer;
+  bool lyricist;
+
+  Contribution({required this.performer, required this.composer, required this.lyricist});
+
+  factory Contribution.fromJson(Map<String, dynamic> json) {
+    return Contribution(
+      performer: json['performer'],
+      composer: json['composer'],
+      lyricist: json['lyricist'],
+    );
+  }
+}
+
 class PlaylistHeader {
   String name;
   int duration; // in seconds

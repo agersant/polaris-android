@@ -23,6 +23,8 @@ abstract class APIClientInterface {
   Future<dto.Album> getAlbum(String name, List<String> mainArtists);
   Future<List<dto.AlbumHeader>> random({required int offset, required int seed});
   Future<List<dto.AlbumHeader>> recent({required int offset});
+  Future<List<dto.ArtistHeader>> getArtists();
+  Future<dto.Artist> getArtist(String name);
   Future<dto.SongList> search(String query);
   Future<List<dto.PlaylistHeader>> listPlaylists();
   Future<dto.Playlist> getPlaylist(String name);
@@ -100,6 +102,24 @@ class APIClient implements APIClientInterface {
     return switch (connectionManager.apiVersion) {
       8 => await v8.recent(offset: offset),
       7 => await v7.recent(offset: offset),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<List<dto.ArtistHeader>> getArtists() async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getArtists(),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<dto.Artist> getArtist(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getArtist(name),
+      7 => throw APIError.notImplemented,
       _ => throw APIError.notImplemented,
     };
   }

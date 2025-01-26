@@ -128,6 +128,16 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
+  Future<List<dto8.ArtistHeader>> getArtists() {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<dto8.Artist> getArtist(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
   Future<dto8.SongList> search(String query) async {
     if (query.isEmpty) {
       return dto8.SongList(paths: [], firstSongs: []);
