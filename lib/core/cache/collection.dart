@@ -12,10 +12,12 @@ const _currentVersion = 2;
 
 class CollectionCache {
   final Collection _collection;
-  final BehaviorSubject<()> _songIngestion = BehaviorSubject<()>();
-  final BehaviorSubject<()> _songRequest = BehaviorSubject<()>();
+  final BehaviorSubject<()> _songIngestion = BehaviorSubject();
+  final BehaviorSubject<()> _songRequest = BehaviorSubject();
+  final BehaviorSubject<()> _playlists = BehaviorSubject();
   Stream<()> get onSongsIngested => _songIngestion.stream;
   Stream<()> get onSongsRequested => _songRequest.stream;
+  Stream<()> get onPlaylistsUpdated => _playlists.stream;
 
   CollectionCache(this._collection);
 
@@ -122,6 +124,12 @@ class CollectionCache {
     await saveToDisk();
   }
 
+  void putPlaylists(String host, List<dto.PlaylistHeader> playlists) {
+    final server = _collection.servers.putIfAbsent(host, () => Server());
+    server.playlists = playlists;
+    _playlists.value = ();
+  }
+
   Set<String> getMissingSongs(String host) {
     final server = _collection.servers[host];
     if (server == null) {
@@ -176,6 +184,10 @@ class CollectionCache {
         .map((path) => dto.BrowserEntry(path: path, isDirectory: true))
         .followedBy(songs.map((path) => dto.BrowserEntry(path: path, isDirectory: false)))
         .toList(growable: false);
+  }
+
+  List<dto.PlaylistHeader>? getPlaylists(String host) {
+    return _collection.servers[host]?.playlists;
   }
 
   bool hasPopulatedDirectory(String host, String path) {
@@ -234,6 +246,7 @@ class Server {
   Map<String, Set<String>> directoryChildren = {};
   Map<String, Set<String>> directorySongs = {};
   Map<String, dto.Song> songs = {};
+  List<dto.PlaylistHeader>? playlists; // not serialized
 
   Server();
 

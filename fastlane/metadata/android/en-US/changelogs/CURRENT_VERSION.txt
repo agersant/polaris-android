@@ -1,8 +1,10 @@
-- 🚀 Added compatibility with Polaris version 0.15
-- ⚠️ Breaking change: Upon first launch, this update clears the current playlist and music saved for offline use
-- 📁 File browser now shows the title of the current folder
-- 📁 File browser now has a hamburger menu with options to queue the entire folder or save its content for offline listening
-- 📁 File browser no longer assumes some directories are albums, and always displays their content plainly
-- ⚡️ Small album art images now use less bandwidth and memory
-- 🔍️ Added a new page to search for songs
-- 🐛 Fixed a bug album art for some songs would sometimes be missing in offline mode
+- 🚀 Added compatibility with Polaris server version 0.15.
+- ⚠️ Breaking change: Upon first launch, this update clears the current playlist and music saved for offline use.
+- 📁 File browser now shows the title of the current folder.
+- 📁 File browser now has a hamburger menu with options to queue the entire folder or save its content for offline listening.
+- 📁 File browser no longer assumes some directories are albums. All content is always displayed as plain files.
+- ⚡️ Small album art images now use less bandwidth and memory.
+- 🔍️ Added a new page to search for songs.
+- 🎶 Added a page to see saved playlists (requires 0.15+ server).
+- 🎶 Added a button to save the current queue as a playlist (requires 0.15+ server).
+- 🐛 Fixed a bug album art for some songs would sometimes be missing in offline mode.

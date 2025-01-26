@@ -367,11 +367,9 @@ enum PlaylistAction {
 
 class PlaylistContextMenuButton extends ContextMenuButton<PlaylistAction> {
   final String name;
-  final void Function(PlaylistAction)? andThen;
 
   PlaylistContextMenuButton({
     required this.name,
-    this.andThen,
     required super.actions,
     super.compact,
     super.icon,
@@ -392,10 +390,6 @@ class PlaylistContextMenuButton extends ContextMenuButton<PlaylistAction> {
         final client = getIt<AppClient>();
         await client.apiClient?.deletePlaylist(name);
         break;
-    }
-    final postAction = andThen;
-    if (postAction != null) {
-      postAction(action);
     }
   }
 }

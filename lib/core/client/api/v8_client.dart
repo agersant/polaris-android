@@ -129,6 +129,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
   Future<void> deletePlaylist(String name) async {
     final url = makeURL(playlistEndpoint(name));
     await completeRequest(Method.delete, url, authenticationToken: authenticationManager.token);
+    listPlaylists();
   }
 
   @override
@@ -148,12 +149,14 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
 
   @override
   Future<List<dto.PlaylistHeader>> listPlaylists() async {
+    final host = _getHost();
     final url = makeURL(playlistsEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
-      return (json.decode(utf8.decode(responseBody)) as List)
-          .map((dynamic p) => dto.PlaylistHeader.fromJson(p))
-          .toList();
+      final playlists =
+          (json.decode(utf8.decode(responseBody)) as List).map((dynamic p) => dto.PlaylistHeader.fromJson(p)).toList();
+      collectionCache.putPlaylists(host, playlists);
+      return playlists;
     } catch (e) {
       throw APIError.responseParseError;
     }
@@ -164,6 +167,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
     final url = makeURL(playlistEndpoint(name));
     final payload = dto.SavePlaylistInput(tracks: tracks).toJson();
     await completeRequest(Method.put, url, authenticationToken: authenticationManager.token, body: payload);
+    listPlaylists();
   }
 
   Future<http.StreamedResponse> getImage(String path, ArtworkSize size) {
