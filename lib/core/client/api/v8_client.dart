@@ -162,7 +162,7 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
   @override
   Future<void> savePlaylist(String name, List<String> tracks) async {
     final url = makeURL(playlistEndpoint(name));
-    final payload = dto.SavePlaylistInput(tracks: tracks);
+    final payload = dto.SavePlaylistInput(tracks: tracks).toJson();
     await completeRequest(Method.put, url, authenticationToken: authenticationManager.token, body: payload);
   }
 

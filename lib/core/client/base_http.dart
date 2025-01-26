@@ -47,7 +47,7 @@ abstract class BaseHttpClient {
 
     request.headers["Accept-Version"] = '8';
 
-    if (method == Method.post) {
+    if (method == Method.post || method == Method.put) {
       request.headers[HttpHeaders.contentTypeHeader] = 'application/json';
       request.body = jsonEncode(body);
     }

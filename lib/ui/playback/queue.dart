@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:polaris/core/cache/collection.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/utils/animated_equalizer.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
@@ -23,7 +24,9 @@ class QueuePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final connection.Manager connectionManager = getIt<connection.Manager>();
     final AudioPlayer audioPlayer = getIt<AudioPlayer>();
+    final Playlist playlist = getIt<Playlist>();
 
     // TODO autoscroll to current song
     // TODO display number of songs and total duration
@@ -44,23 +47,28 @@ class QueuePage extends StatelessWidget {
               final SequenceState sequenceState = snapshot.data!;
               final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
               final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
-              onTap() => getIt<AudioPlayer>().seek(null, index: index);
+              onTap() => audioPlayer.seek(null, index: index);
               return _songWidget(context, index, mediaItem, isCurrent, onTap);
             },
             itemCount: snapshot.data?.sequence.length ?? 0,
             onReorder: (int oldIndex, int newIndex) {
-              getIt<Playlist>().moveSong(oldIndex, newIndex);
+              playlist.moveSong(oldIndex, newIndex);
             },
             physics: const BouncingScrollPhysics(),
           );
         }
 
         final clearAction = isEmpty ? null : _clearQueue;
+        final saveAction = isEmpty ? null : () => _save(context, playlist.name);
+        final bool canSavePlaylist = (connectionManager.apiVersion ?? 0) >= 8;
 
         return Scaffold(
           appBar: AppBar(
             title: const Text(queueTitle),
-            actions: [IconButton(onPressed: clearAction, icon: const Icon(Icons.delete))],
+            actions: [
+              if (canSavePlaylist) IconButton(onPressed: saveAction, icon: const Icon(Icons.save)),
+              IconButton(onPressed: clearAction, icon: const Icon(Icons.delete)),
+            ],
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             foregroundColor: Theme.of(context).colorScheme.onSurface,
             elevation: 0,
@@ -69,6 +77,14 @@ class QueuePage extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _save(BuildContext context, String? suggestedName) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SavePlaylistDialog(suggestedName: suggestedName);
+        });
   }
 
   void _clearQueue() {
@@ -152,5 +168,69 @@ Widget _currentSongIcon(BuildContext context, bool isPlaying, ProcessingState st
             )));
   } else {
     return AnimatedEqualizer(color, const Size(16, 12), isPlaying);
+  }
+}
+
+class SavePlaylistDialog extends StatefulWidget {
+  final String? suggestedName;
+
+  const SavePlaylistDialog({required this.suggestedName, Key? key}) : super(key: key);
+
+  @override
+  State<SavePlaylistDialog> createState() => _SavePlaylistDialogState();
+}
+
+class _SavePlaylistDialogState extends State<SavePlaylistDialog> {
+  late final TextEditingController _controller;
+  bool isValidName = false;
+
+  @override
+  initState() {
+    super.initState();
+    _controller = TextEditingController()..text = widget.suggestedName ?? '';
+    _controller.addListener(_validate);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.removeListener(_validate);
+  }
+
+  _validate() {
+    setState(() {
+      isValidName = _controller.text.trim().isNotEmpty;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(queueSavePopupTitle),
+      content: TextField(
+        controller: _controller,
+        maxLines: 1,
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text(queueSaveCancel)),
+        TextButton(
+          onPressed: !isValidName
+              ? null
+              : () async {
+                  final client = getIt<AppClient>();
+                  final AudioPlayer audioPlayer = getIt<AudioPlayer>();
+                  final Playlist playlist = getIt<Playlist>();
+                  final tracks =
+                      audioPlayer.sequenceState?.sequence.map((e) => (e.tag as MediaItem).getSongPath()).toList();
+                  if (tracks != null) {
+                    client.apiClient?.savePlaylist(_controller.text, tracks);
+                    playlist.setName(_controller.text);
+                  }
+                  Navigator.of(context).pop();
+                },
+          child: const Text(queueSave),
+        ),
+      ],
+    );
   }
 }

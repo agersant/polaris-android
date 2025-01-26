@@ -60,6 +60,9 @@ const unknownHost = 'Unknown Host';
 // Playback
 const queueTitle = 'Queue';
 const queueEmpty = 'There are no songs in the queue.';
+const queueSavePopupTitle = 'Playlist Name';
+const queueSave = 'Save';
+const queueSaveCancel = 'Cancel';
 const nowPlaying = 'Now Playing';
 const upNext = 'Up Next';
 const upNextNothing = 'End of the queue';

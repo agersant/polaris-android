@@ -6,12 +6,14 @@ import 'package:polaris/core/media_item.dart';
 import 'package:uuid/uuid.dart';
 
 class Playlist {
+  String? _name;
   ConcatenatingAudioSource _audioSource = ConcatenatingAudioSource(children: []);
   final Uuid uuid;
   final connection.Manager connectionManager;
   final AppClient appClient;
   final AudioPlayer audioPlayer;
 
+  String? get name => _name;
   ConcatenatingAudioSource get audioSource => _audioSource;
 
   Playlist({
@@ -60,7 +62,12 @@ class Playlist {
     await _audioSource.removeAt(index);
   }
 
+  setName(String? newName) {
+    _name = newName;
+  }
+
   Future clear() async {
+    _name = null;
     _audioSource = ConcatenatingAudioSource(children: []);
     await audioPlayer.setAudioSource(_audioSource);
   }

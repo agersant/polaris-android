@@ -13,9 +13,14 @@ const _currentVersion = 2;
 
 class PlaylistState {
   final String host;
+  final String? name;
   final List<String> songs;
 
-  PlaylistState({required this.host, required this.songs});
+  PlaylistState({
+    required this.host,
+    required this.name,
+    required this.songs,
+  });
 
   factory PlaylistState.fromBytes(List<int> bytes) {
     return PlaylistState.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
@@ -28,12 +33,14 @@ class PlaylistState {
   factory PlaylistState.fromJson(Map<String, dynamic> json) {
     return PlaylistState(
       host: json['host'],
+      name: json['name'],
       songs: (json['songs'] as List<dynamic>).cast<String>(),
     );
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'host': host,
+        'name': name,
         'songs': songs,
       };
 }
@@ -123,6 +130,7 @@ class Manager {
     List<String> songs = playlist.getSongs();
     PlaylistState playlistState = PlaylistState(
       host: connectionManager.url ?? "",
+      name: playlist.name,
       songs: songs,
     );
     try {
@@ -166,6 +174,7 @@ class Manager {
         }
         await playlist.clear();
         await playlist.queueLast(playlistState.songs, autoPlay: false);
+        playlist.setName(playlistState.name);
         collectionCache.putFiles(playlistState.host, playlistState.songs);
         developer.log('Read playlist state from: $playlistStateFile');
       }

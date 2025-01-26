@@ -29,6 +29,7 @@ class _PlaylistsState extends State<Playlists> {
   }
 
   void _fetchData() async {
+    // TODO v8 needs to refresh after saving a playlist 😭
     setState(() {
       _playlists = null;
       _error = null;
@@ -83,6 +84,7 @@ Widget _playlistWidget(BuildContext context, dto.PlaylistHeader playlist, void F
         }
         await queue.clear();
         await queue.queueLast(playlistDetails.songs.paths);
+        queue.setName(playlist.name);
       },
       icon: const Icon(Icons.play_arrow),
     ),
