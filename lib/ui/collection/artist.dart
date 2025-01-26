@@ -10,9 +10,9 @@ import 'package:polaris/ui/utils/error_message.dart';
 final getIt = GetIt.instance;
 
 class Artist extends StatefulWidget {
-  final String name;
+  final String artistName;
 
-  const Artist(this.name, {Key? key}) : super(key: key);
+  const Artist(this.artistName, {Key? key}) : super(key: key);
 
   @override
   State<Artist> createState() => _ArtistState();
@@ -35,17 +35,33 @@ class _ArtistState extends State<Artist> {
       _error = null;
     });
     try {
-      final artist = await client.apiClient?.getArtist(widget.name);
+      final artist = await client.apiClient?.getArtist(widget.artistName);
       setState(() => _artist = artist);
     } on APIError catch (e) {
       setState(() => _error = e);
     }
   }
 
+  (List<dto.ArtistAlbum>, List<dto.ArtistAlbum>) _splitReleases(List<dto.ArtistAlbum> allReleases) {
+    final List<dto.ArtistAlbum> mainReleases = [];
+    final List<dto.ArtistAlbum> otherReleases = [];
+    for (final release in allReleases) {
+      final isMainArtist = release.mainArtists.contains(widget.artistName);
+      final numContributions = release.contributions.where((c) => c.composer || c.lyricist || c.performer).length;
+      final isMajorContributor = numContributions >= release.contributions.length / 2;
+      if (isMainArtist || isMajorContributor) {
+        mainReleases.add(release);
+      } else {
+        otherReleases.add(release);
+      }
+    }
+    return (mainReleases, otherReleases);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.name)),
+      appBar: AppBar(title: Text(widget.artistName)),
       body: _buildContent(),
     );
   }
@@ -64,16 +80,36 @@ class _ArtistState extends State<Artist> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return SingleChildScrollView(
-      child: ListBody(
-        children: [
-          // TODO v8 add genres
-          Text('Main Releases'),
-          AlbumGrid(artist.albums, null),
-          Text('Featured On'),
-          AlbumGrid(artist.albums, null),
-        ],
+    final (mainReleases, otherReleases) = _splitReleases(artist.albums);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        child: ListBody(
+          children: [
+            // TODO v8 add genres
+            if (mainReleases.isNotEmpty) _buildAlbumSection(mainAlbumsSectionTitle, mainReleases),
+            if (otherReleases.isNotEmpty) _buildAlbumSection(otherAlbumsSectionTitle, otherReleases),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildAlbumSection(String title, List<dto.ArtistAlbum> albums) {
+    return Builder(builder: (context) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 16,
+        children: [
+          Text(
+            title.toUpperCase(),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          AlbumGrid(albums, null), // TODO v8 show year instead of artists for main releases
+        ],
+      );
+    });
   }
 }
