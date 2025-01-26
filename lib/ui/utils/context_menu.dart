@@ -360,3 +360,42 @@ class PinContextMenuButton extends ContextMenuButton<PinAction> {
     }
   }
 }
+
+enum PlaylistAction {
+  delete,
+}
+
+class PlaylistContextMenuButton extends ContextMenuButton<PlaylistAction> {
+  final String name;
+  final void Function(PlaylistAction)? andThen;
+
+  PlaylistContextMenuButton({
+    required this.name,
+    this.andThen,
+    required super.actions,
+    super.compact,
+    super.icon,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  (IconData, String) getActionVisuals(PlaylistAction action) {
+    return switch (action) {
+      PlaylistAction.delete => (Icons.delete, contextMenuDeletePlaylist),
+    };
+  }
+
+  @override
+  void executeAction(BuildContext context, PlaylistAction action) async {
+    switch (action) {
+      case PlaylistAction.delete:
+        final client = getIt<AppClient>();
+        await client.apiClient?.deletePlaylist(name);
+        break;
+    }
+    final postAction = andThen;
+    if (postAction != null) {
+      postAction(action);
+    }
+  }
+}

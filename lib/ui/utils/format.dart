@@ -19,6 +19,29 @@ String formatDuration(Duration? d) {
   }
 }
 
+String formatLongDuration(Duration d) {
+  final totalSeconds = d.inSeconds;
+  var seconds = d.inSeconds;
+  final days = (seconds / 3600 / 24).floor();
+  seconds -= days * 3600 * 24;
+  final hours = (seconds / 3600).floor();
+  seconds -= hours * 3600;
+  final minutes = (seconds / 60).floor();
+  seconds -= minutes * 60;
+  String output = '';
+  if (totalSeconds >= 3600 * 24) {
+    output += '${days}d';
+  }
+  if (totalSeconds >= 3600) {
+    output += '${hours}h';
+  }
+  if (totalSeconds >= 60) {
+    output += '${minutes}m';
+  }
+  output += '${seconds}s';
+  return output;
+}
+
 String formatBytes(int bytes, int decimals) {
   if (bytes <= 0) {
     return "0 B";

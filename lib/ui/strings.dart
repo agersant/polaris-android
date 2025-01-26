@@ -36,6 +36,7 @@ const albumDetailsError = 'There was an error while reading this album.';
 const listPlaylistsError = 'There was an error while listing playlists.';
 const goBackButtonLabel = 'GO BACK';
 const noSearchResults = 'No songs were found.';
+const noSavedPlaylists = 'You have not saved any playlists';
 String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu
@@ -46,6 +47,7 @@ const contextMenuRemoveFromQueue = 'Remove';
 const contextMenuPin = 'Add to Offline Music';
 const contextMenuUnpin = 'Remove from Offline Music';
 const contextMenuSongInfo = 'Song Details';
+const contextMenuDeletePlaylist = 'Delete Playlist';
 
 // Collection drawer
 const drawerSettings = 'Settings';

@@ -90,7 +90,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
           if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
           if (visibleTabs.contains(CollectionTab.random)) const Tab(icon: Icon(Icons.shuffle)),
           if (visibleTabs.contains(CollectionTab.recent)) const Tab(icon: Icon(Icons.new_releases)),
-          if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.queue)),
+          if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.playlist_play)),
           if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
       ),
