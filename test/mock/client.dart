@@ -24,6 +24,24 @@ class APIClient implements APIClientInterface {
   }
 
   @override
+  Future<List<ArtistHeader>> getArtists() async {
+    return [];
+  }
+
+  @override
+  Future<Artist> getArtist(String name) async {
+    return Artist(
+        name: 'Test Artist',
+        numAlbumsAsPerformer: 0,
+        numAlbumsAsAdditionalPerformer: 0,
+        numAlbumsAsComposer: 0,
+        numAlbumsAsLyricist: 0,
+        numSongsByGenre: {},
+        numSongs: 0,
+        albums: []);
+  }
+
+  @override
   Future<SongList> search(String path) async {
     return SongList(paths: [], firstSongs: []);
   }

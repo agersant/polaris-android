@@ -21,23 +21,28 @@ const loginButtonLabel = 'LOGIN';
 const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
 // Collection
+const albumDetailsError = 'There was an error while reading this album.';
+const albumsError = 'There was an error while listing albums.';
+const artistsError = 'There was an error while listing artists.';
+const browseError = 'There was an error while reading this directory.';
 const collectionTitle = 'Collection';
+const emptyAlbum = 'There are no songs on this album.';
+const emptyAlbumList = 'There are no albums to display.';
+const emptyDirectory = 'There is nothing in this directory.';
+const goBackButtonLabel = 'GO BACK';
+const listPlaylistsError = 'There was an error while listing playlists.';
+const noArtists = 'No artists match this filter.';
+const noSavedPlaylists = 'You have not saved any playlists';
+const noSearchResults = 'No songs were found.';
 const randomAlbums = 'RANDOM';
 const recentAlbums = 'RECENT';
-const unknownSong = 'Unknown Song';
+const roleComposer = 'COMPOSERS';
+const roleLyricist = 'LYRICISTS';
+const rolePerformer = 'PERFORMERS';
+const searchError = 'There was an error while searching for songs.';
 const unknownAlbum = 'Unknown Album';
 const unknownArtist = 'Unknown Artist';
-const emptyDirectory = 'There is nothing in this directory.';
-const emptyAlbumList = 'There are no albums to display.';
-const emptyAlbum = 'There are no songs on this album.';
-const browseError = 'There was an error while reading this directory.';
-const albumsError = 'There was an error while listing albums.';
-const searchError = 'There was an error while searching for songs.';
-const albumDetailsError = 'There was an error while reading this album.';
-const listPlaylistsError = 'There was an error while listing playlists.';
-const goBackButtonLabel = 'GO BACK';
-const noSearchResults = 'No songs were found.';
-const noSavedPlaylists = 'You have not saved any playlists';
+const unknownSong = 'Unknown Song';
 String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu

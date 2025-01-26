@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
+import 'package:polaris/ui/collection/artists.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/playlists.dart';
@@ -24,6 +25,7 @@ class CollectionPage extends StatefulWidget {
 enum CollectionTab {
   browse,
   albums,
+  artists,
   playlists,
   search,
 }
@@ -45,14 +47,12 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
     setState(() {
       final isOnline = _connectionManager.isConnected();
       // TODO legacy API cleanup
-      final supportsPlaylists = switch (_connectionManager.apiVersion) {
-        8 => true,
-        7 => false,
-        _ => false,
-      };
+      final supportsPlaylists = (_connectionManager.apiVersion ?? 0) >= 8;
+      final supportsArtists = (_connectionManager.apiVersion ?? 0) >= 8;
       visibleTabs = {
         CollectionTab.browse,
         if (isOnline) CollectionTab.albums,
+        if (isOnline && supportsArtists) CollectionTab.artists,
         if (isOnline && supportsPlaylists) CollectionTab.playlists,
         if (isOnline) CollectionTab.search,
       };
@@ -85,8 +85,10 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       appBar: AppBar(
         title: const Text(collectionTitle),
         bottom: TabBar(tabs: <Tab>[
+          // TODO v8 add label for current tab?
           if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
           if (visibleTabs.contains(CollectionTab.albums)) const Tab(icon: Icon(Icons.album)),
+          if (visibleTabs.contains(CollectionTab.artists)) const Tab(icon: Icon(Icons.person)),
           if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.playlist_play)),
           if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
@@ -97,6 +99,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
         children: [
           if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
           if (visibleTabs.contains(CollectionTab.albums)) const Albums(),
+          if (visibleTabs.contains(CollectionTab.artists)) const Artists(),
           if (visibleTabs.contains(CollectionTab.playlists)) const Playlists(),
           if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],
