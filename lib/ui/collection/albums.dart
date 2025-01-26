@@ -25,8 +25,8 @@ class Albums extends StatefulWidget {
 }
 
 class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
-  SortMode sortMode = SortMode.random;
-  int seed = 0;
+  SortMode _sortMode = SortMode.random;
+  int _seed = 0;
   List<AlbumHeader>? _albums;
   APIError? _error;
   final ScrollController _scrollController = ScrollController();
@@ -34,7 +34,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    seed = Random().nextInt(1 << 32);
+    _seed = Random().nextInt(1 << 32);
     _scrollController.addListener(onScroll);
     _fetchAlbums();
   }
@@ -46,13 +46,13 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
   }
 
   void setSortMode(SortMode newMode) {
-    if (newMode == sortMode) {
+    if (newMode == _sortMode) {
       return;
     }
-    seed = Random().nextInt(1 << 32);
+    _seed = Random().nextInt(1 << 32);
     _scrollController.jumpTo(0.0);
     setState(() {
-      sortMode = newMode;
+      _sortMode = newMode;
       _albums = null;
       _error = null;
     });
@@ -79,7 +79,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
           ToggleButtons(
             borderRadius: BorderRadius.circular(4),
             textStyle: Theme.of(context).textTheme.labelLarge,
-            isSelected: SortMode.values.map((m) => m == sortMode).toList(),
+            isSelected: SortMode.values.map((m) => m == _sortMode).toList(),
             children: SortMode.values
                 .map((m) => Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -120,7 +120,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
     final connectionManager = getIt<connection.Manager>();
     final hasAlbums = _albums?.isNotEmpty ?? false;
     final supportsInfiniteFeed = (connectionManager.apiVersion ?? 0) >= 8;
-    if (hasAlbums && sortMode == SortMode.recent && !supportsInfiniteFeed) {
+    if (hasAlbums && _sortMode == SortMode.recent && !supportsInfiniteFeed) {
       return;
     }
 
@@ -131,9 +131,9 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
 
       final APIClientInterface? client = getIt<AppClient>().apiClient;
       if (client != null) {
-        final albums = await switch (sortMode) {
+        final albums = await switch (_sortMode) {
           SortMode.recent => client.recent(offset: _albums?.length ?? 0),
-          SortMode.random => client.random(seed: seed, offset: _albums?.length ?? 0),
+          SortMode.random => client.random(seed: _seed, offset: _albums?.length ?? 0),
         };
         setState(() {
           _albums ??= [];
