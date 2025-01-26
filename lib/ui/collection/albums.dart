@@ -78,7 +78,6 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
         children: [
           ToggleButtons(
             borderRadius: BorderRadius.circular(4),
-            textStyle: Theme.of(context).textTheme.labelLarge,
             isSelected: SortMode.values.map((m) => m == _sortMode).toList(),
             children: SortMode.values
                 .map((m) => Padding(
