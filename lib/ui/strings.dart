@@ -22,6 +22,8 @@ const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
 // Collection
 const collectionTitle = 'Collection';
+const randomAlbums = 'RANDOM';
+const recentAlbums = 'RECENT';
 const unknownSong = 'Unknown Song';
 const unknownAlbum = 'Unknown Album';
 const unknownArtist = 'Unknown Artist';
@@ -29,8 +31,7 @@ const emptyDirectory = 'There is nothing in this directory.';
 const emptyAlbumList = 'There are no albums to display.';
 const emptyAlbum = 'There are no songs on this album.';
 const browseError = 'There was an error while reading this directory.';
-const randomError = 'There was an error while listing albums.';
-const recentError = 'There was an error while listing albums.';
+const albumsError = 'There was an error while listing albums.';
 const searchError = 'There was an error while searching for songs.';
 const albumDetailsError = 'There was an error while reading this album.';
 const listPlaylistsError = 'There was an error while listing playlists.';

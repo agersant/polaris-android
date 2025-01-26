@@ -17,9 +17,9 @@ const double _detailsSpacing = 8.0;
 
 class AlbumGrid extends StatelessWidget {
   final List<dto.AlbumHeader> albums;
-  final Future<void> Function()? onRefresh;
+  final ScrollController? scrollController;
 
-  const AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
+  const AlbumGrid(this.albums, this.scrollController, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,6 @@ class AlbumGrid extends StatelessWidget {
             final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
             const mainAxisSpacing = 24.0;
             const crossAxisSpacing = 16.0;
-            const padding = 24.0;
 
             final titleStyle = Theme.of(context).textTheme.bodyLarge ?? const TextStyle();
             final artistStyle = Theme.of(context).textTheme.bodySmall ?? const TextStyle();
@@ -59,39 +58,30 @@ class AlbumGrid extends StatelessWidget {
             final titleHeight = titlePainter.size.height;
             final artistHeight = artistPainter.size.height;
 
-            final childWidth =
-                ((screenWidth - 2 * padding) - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
+            final childWidth = (screenWidth - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
             final childHeight = childWidth + _detailsSpacing + titleHeight + artistHeight;
             final childAspectRatio = childWidth / childHeight;
 
-            final gridView = GridView.count(
+            final gridView = GridView.builder(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              crossAxisCount: crossAxisCount,
-              padding: const EdgeInsets.all(padding),
-              mainAxisSpacing: mainAxisSpacing,
-              crossAxisSpacing: crossAxisSpacing,
-              childAspectRatio: childAspectRatio,
-              children: albums.map((album) {
-                return Album(
-                  album,
-                  titleStyle: titleStyle,
-                  artistStyle: artistStyle,
-                  titleStrutStyle: titleStrutStyle,
-                  artistStrutStyle: artistStrutStyle,
-                );
-              }).toList(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: childAspectRatio,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+              ),
+              controller: scrollController,
+              itemCount: albums.length,
+              itemBuilder: (context, index) => Album(
+                albums[index],
+                titleStyle: titleStyle,
+                artistStyle: artistStyle,
+                titleStrutStyle: titleStrutStyle,
+                artistStrutStyle: artistStrutStyle,
+              ),
             );
 
-            Future<void> Function()? refresh = onRefresh;
-            if (refresh == null) {
-              return gridView;
-            } else {
-              // TODO add some refresh functionality at the bottom
-              return RefreshIndicator(
-                onRefresh: refresh,
-                child: gridView,
-              );
-            }
+            return gridView;
           },
         );
       },

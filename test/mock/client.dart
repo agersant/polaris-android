@@ -14,12 +14,12 @@ class APIClient implements APIClientInterface {
   }
 
   @override
-  Future<List<AlbumHeader>> random() async {
+  Future<List<AlbumHeader>> random({required int seed, required int offset}) async {
     return [];
   }
 
   @override
-  Future<List<AlbumHeader>> recent() async {
+  Future<List<AlbumHeader>> recent({required int offset}) async {
     return [];
   }
 

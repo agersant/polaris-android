@@ -6,8 +6,7 @@ import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
 import 'package:polaris/ui/collection/playlists.dart';
-import 'package:polaris/ui/collection/random.dart';
-import 'package:polaris/ui/collection/recent.dart';
+import 'package:polaris/ui/collection/albums.dart';
 import 'package:polaris/ui/collection/search.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +23,7 @@ class CollectionPage extends StatefulWidget {
 
 enum CollectionTab {
   browse,
-  recent,
-  random,
+  albums,
   playlists,
   search,
 }
@@ -46,6 +44,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
   void _handleConnectionStateChanged() {
     setState(() {
       final isOnline = _connectionManager.isConnected();
+      // TODO legacy API cleanup
       final supportsPlaylists = switch (_connectionManager.apiVersion) {
         8 => true,
         7 => false,
@@ -53,8 +52,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       };
       visibleTabs = {
         CollectionTab.browse,
-        if (isOnline) CollectionTab.recent,
-        if (isOnline) CollectionTab.random,
+        if (isOnline) CollectionTab.albums,
         if (isOnline && supportsPlaylists) CollectionTab.playlists,
         if (isOnline) CollectionTab.search,
       };
@@ -88,8 +86,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
         title: const Text(collectionTitle),
         bottom: TabBar(tabs: <Tab>[
           if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
-          if (visibleTabs.contains(CollectionTab.random)) const Tab(icon: Icon(Icons.shuffle)),
-          if (visibleTabs.contains(CollectionTab.recent)) const Tab(icon: Icon(Icons.new_releases)),
+          if (visibleTabs.contains(CollectionTab.albums)) const Tab(icon: Icon(Icons.album)),
           if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.playlist_play)),
           if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
@@ -99,8 +96,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
         controller: _tabController,
         children: [
           if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
-          if (visibleTabs.contains(CollectionTab.random)) const RandomAlbums(),
-          if (visibleTabs.contains(CollectionTab.recent)) const RecentAlbums(),
+          if (visibleTabs.contains(CollectionTab.albums)) const Albums(),
           if (visibleTabs.contains(CollectionTab.playlists)) const Playlists(),
           if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],

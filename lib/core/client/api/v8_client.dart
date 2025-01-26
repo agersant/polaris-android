@@ -14,14 +14,14 @@ const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
 const loginEndpoint = '/api/auth/';
 const playlistsEndpoint = '/api/playlists/';
-const randomEndpoint = '/api/albums/random/';
-const recentEndpoint = '/api/albums/recent/';
 const songsEndpoint = '/api/songs/';
 
 String albumEndpoint(String name, List<String> mainArtists) =>
     '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
-String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
 String playlistEndpoint(String name) => '/api/playlist/${Uri.encodeComponent(name)}';
+String randomEndpoint({required int seed, required int offset}) => '/api/albums/random?seed=$seed&offset=$offset';
+String recentEndpoint({required int offset}) => '/api/albums/recent?offset=$offset';
+String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
 String thumbnailEndpoint(String path, dto.ThumbnailSize size) =>
     '/api/thumbnail/${Uri.encodeComponent(path)}?size=${size.name}&pad=false';
 
@@ -84,8 +84,8 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
-  Future<List<dto.AlbumHeader>> random() async {
-    final url = makeURL(randomEndpoint);
+  Future<List<dto.AlbumHeader>> random({required int seed, required int offset}) async {
+    final url = makeURL(randomEndpoint(seed: seed, offset: offset));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
@@ -95,8 +95,8 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
-  Future<List<dto.AlbumHeader>> recent() async {
-    final url = makeURL(recentEndpoint);
+  Future<List<dto.AlbumHeader>> recent({required int offset}) async {
+    final url = makeURL(recentEndpoint(offset: offset));
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();

@@ -88,7 +88,7 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
-  Future<List<dto8.AlbumHeader>> random() async {
+  Future<List<dto8.AlbumHeader>> random({required int seed, required int offset}) async {
     final url = makeURL(randomEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
@@ -108,7 +108,7 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
-  Future<List<dto8.AlbumHeader>> recent() async {
+  Future<List<dto8.AlbumHeader>> recent({required int offset}) async {
     final url = makeURL(recentEndpoint);
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {

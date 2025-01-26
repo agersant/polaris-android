@@ -21,8 +21,8 @@ enum APIError {
 abstract class APIClientInterface {
   Future<dto.SongList> flatten(String path);
   Future<dto.Album> getAlbum(String name, List<String> mainArtists);
-  Future<List<dto.AlbumHeader>> random();
-  Future<List<dto.AlbumHeader>> recent();
+  Future<List<dto.AlbumHeader>> random({required int offset, required int seed});
+  Future<List<dto.AlbumHeader>> recent({required int offset});
   Future<dto.SongList> search(String query);
   Future<List<dto.PlaylistHeader>> listPlaylists();
   Future<dto.Playlist> getPlaylist(String name);
@@ -87,19 +87,19 @@ class APIClient implements APIClientInterface {
   }
 
   @override
-  Future<List<dto.AlbumHeader>> random() async {
+  Future<List<dto.AlbumHeader>> random({required int seed, required int offset}) async {
     return switch (connectionManager.apiVersion) {
-      8 => await v8.random(),
-      7 => await v7.random(),
+      8 => await v8.random(seed: seed, offset: offset),
+      7 => await v7.random(seed: seed, offset: offset),
       _ => throw APIError.notImplemented,
     };
   }
 
   @override
-  Future<List<dto.AlbumHeader>> recent() async {
+  Future<List<dto.AlbumHeader>> recent({required int offset}) async {
     return switch (connectionManager.apiVersion) {
-      8 => await v8.recent(),
-      7 => await v7.recent(),
+      8 => await v8.recent(offset: offset),
+      7 => await v7.recent(offset: offset),
       _ => throw APIError.notImplemented,
     };
   }
