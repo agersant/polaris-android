@@ -30,7 +30,7 @@ class _PlaylistsState extends State<Playlists> {
 
     final connectionManager = getIt<connection.Manager>();
     final collectionCache = getIt<CollectionCache>();
-    collectionCache.onPlaylistsUpdated.listen((_) {
+    playlistsSubscription = collectionCache.onPlaylistsUpdated.listen((_) {
       final host = connectionManager.url;
       if (host != null) {
         setState(() => _playlists = collectionCache.getPlaylists(host));
