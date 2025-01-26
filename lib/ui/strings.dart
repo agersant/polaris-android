@@ -23,6 +23,7 @@ const offlineModeButtonLabel = 'BROWSE OFFLINE';
 // Collection
 const albumDetailsError = 'There was an error while reading this album.';
 const albumsError = 'There was an error while listing albums.';
+const artistError = 'There was an error while reading artist information.';
 const artistsError = 'There was an error while listing artists.';
 const browseError = 'There was an error while reading this directory.';
 const collectionTitle = 'Collection';

@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 
@@ -129,26 +130,31 @@ class _ArtistsState extends State<Artists> {
       return const ErrorMessage(noArtists);
     }
 
+    final pagesModel = getIt<PagesModel>();
+
     return ListView.builder(
       controller: _scrollController,
       itemCount: filteredArtists.length,
       itemBuilder: (BuildContext context, int index) {
         final artist = filteredArtists[index];
-        return ListTile(
-          leading: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.1),
+        return InkWell(
+          onTap: () => pagesModel.openArtistPage(artist.name),
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.1),
+              ),
+              child: const Icon(Icons.person),
             ),
-            child: const Icon(Icons.person),
+            title: Text(
+              artist.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(nSongs(artist.numSongs)),
+            dense: true,
           ),
-          title: Text(
-            artist.name,
-            overflow: TextOverflow.ellipsis,
-          ),
-          subtitle: Text(nSongs(artist.numSongs)),
-          dense: true,
         );
       },
     );

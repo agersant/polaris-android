@@ -21,6 +21,7 @@ import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/core/songs.dart' as songs;
+import 'package:polaris/ui/collection/artist.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
@@ -195,6 +196,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
+          final showArtist = isStartupComplete && pagesModel.artist != null;
 
           return Column(
             children: [
@@ -222,6 +224,15 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
                               pagesModel.closeOfflineMusic();
+                            }
+                          }),
+
+                    if (showArtist)
+                      MaterialPage<dynamic>(
+                          child: Artist(pagesModel.artist!),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closeArtistPage();
                             }
                           }),
 

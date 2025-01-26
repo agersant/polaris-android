@@ -13,6 +13,9 @@ class PagesModel extends ChangeNotifier {
   bool _isSettingsOpen = false;
   bool get isSettingsOpen => _isSettingsOpen;
 
+  String? _artist;
+  String? get artist => _artist;
+
   void openPlayer() {
     _isPlayerOpen = true;
     notifyListeners();
@@ -50,6 +53,16 @@ class PagesModel extends ChangeNotifier {
 
   void closeSettings() {
     _isSettingsOpen = false;
+    notifyListeners();
+  }
+
+  void openArtistPage(String name) {
+    _artist = name;
+    notifyListeners();
+  }
+
+  void closeArtistPage() {
+    _artist = null;
     notifyListeners();
   }
 }
