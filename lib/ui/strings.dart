@@ -22,9 +22,6 @@ const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
 // Collection
 const collectionTitle = 'Collection';
-const collectionTabBrowseTitle = 'BROWSE';
-const collectionTabRandomTitle = 'RANDOM';
-const collectionTabRecentTitle = 'RECENT';
 const unknownSong = 'Unknown Song';
 const unknownAlbum = 'Unknown Album';
 const unknownArtist = 'Unknown Artist';
@@ -36,6 +33,7 @@ const randomError = 'There was an error while listing albums.';
 const recentError = 'There was an error while listing albums.';
 const searchError = 'There was an error while searching for songs.';
 const albumDetailsError = 'There was an error while reading this album.';
+const listPlaylistsError = 'There was an error while listing playlists.';
 const goBackButtonLabel = 'GO BACK';
 const noSearchResults = 'No songs were found.';
 String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';

@@ -9,16 +9,18 @@ import 'package:polaris/core/connection.dart' as connection;
 enum Method {
   get,
   post,
+  put,
+  delete,
 }
 
 extension MethodToString on Method {
   String toHTTPMethod() {
-    switch (this) {
-      case Method.get:
-        return 'GET';
-      case Method.post:
-        return 'POST';
-    }
+    return switch (this) {
+      Method.get => 'GET',
+      Method.post => 'POST',
+      Method.put => 'PUT',
+      Method.delete => 'DELETE',
+    };
   }
 }
 

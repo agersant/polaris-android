@@ -27,6 +27,27 @@ class APIClient implements APIClientInterface {
   Future<SongList> search(String path) async {
     return SongList(paths: [], firstSongs: []);
   }
+
+  @override
+  Future<void> deletePlaylist(String name) async {}
+
+  @override
+  Future<Playlist> getPlaylist(String name) async {
+    return Playlist(
+      name: 'Test Playlist',
+      duration: 0,
+      numSongsByGenre: {},
+      songs: SongList(paths: [], firstSongs: []),
+    );
+  }
+
+  @override
+  Future<List<PlaylistHeader>> listPlaylists() async {
+    return [];
+  }
+
+  @override
+  Future<void> savePlaylist(String name, List<String> tracks) async {}
 }
 
 class AppClient implements AppClientInterface {

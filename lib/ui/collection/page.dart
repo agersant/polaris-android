@@ -5,6 +5,7 @@ import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
+import 'package:polaris/ui/collection/playlists.dart';
 import 'package:polaris/ui/collection/random.dart';
 import 'package:polaris/ui/collection/recent.dart';
 import 'package:polaris/ui/collection/search.dart';
@@ -25,6 +26,7 @@ enum CollectionTab {
   browse,
   recent,
   random,
+  playlists,
   search,
 }
 
@@ -44,10 +46,16 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
   void _handleConnectionStateChanged() {
     setState(() {
       final isOnline = _connectionManager.isConnected();
+      final supportsPlaylists = switch (_connectionManager.apiVersion) {
+        8 => true,
+        7 => false,
+        _ => false,
+      };
       visibleTabs = {
         CollectionTab.browse,
         if (isOnline) CollectionTab.recent,
         if (isOnline) CollectionTab.random,
+        if (isOnline && supportsPlaylists) CollectionTab.playlists,
         if (isOnline) CollectionTab.search,
       };
 
@@ -82,6 +90,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
           if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
           if (visibleTabs.contains(CollectionTab.random)) const Tab(icon: Icon(Icons.shuffle)),
           if (visibleTabs.contains(CollectionTab.recent)) const Tab(icon: Icon(Icons.new_releases)),
+          if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.queue)),
           if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
       ),
@@ -92,6 +101,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
           if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
           if (visibleTabs.contains(CollectionTab.random)) const RandomAlbums(),
           if (visibleTabs.contains(CollectionTab.recent)) const RecentAlbums(),
+          if (visibleTabs.contains(CollectionTab.playlists)) const Playlists(),
           if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],
       ),

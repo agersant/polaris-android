@@ -13,6 +13,7 @@ const audioEndpoint = '/api/audio/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
 const loginEndpoint = '/api/auth/';
+const playlistsEndpoint = '/api/playlists/';
 const randomEndpoint = '/api/albums/random/';
 const recentEndpoint = '/api/albums/recent/';
 const songsEndpoint = '/api/songs/';
@@ -20,6 +21,7 @@ const songsEndpoint = '/api/songs/';
 String albumEndpoint(String name, List<String> mainArtists) =>
     '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
 String searchEndpoint(String query) => '/api/search/${Uri.encodeComponent(query)}';
+String playlistEndpoint(String name) => '/api/playlist/${Uri.encodeComponent(name)}';
 String thumbnailEndpoint(String path, dto.ThumbnailSize size) =>
     '/api/thumbnail/${Uri.encodeComponent(path)}?size=${size.name}&pad=false';
 
@@ -121,6 +123,47 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
     } catch (e) {
       throw APIError.responseParseError;
     }
+  }
+
+  @override
+  Future<void> deletePlaylist(String name) async {
+    final url = makeURL(playlistEndpoint(name));
+    await completeRequest(Method.delete, url, authenticationToken: authenticationManager.token);
+  }
+
+  @override
+  Future<dto.Playlist> getPlaylist(String name) async {
+    final host = _getHost();
+    final url = makeURL(playlistEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      final playlist = dto.Playlist.fromJson(json.decode(utf8.decode(responseBody)));
+      collectionCache.putSongs(host, playlist.songs.firstSongs);
+      collectionCache.putFiles(host, playlist.songs.paths);
+      return playlist;
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<dto.PlaylistHeader>> listPlaylists() async {
+    final url = makeURL(playlistsEndpoint);
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List)
+          .map((dynamic p) => dto.PlaylistHeader.fromJson(p))
+          .toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<void> savePlaylist(String name, List<String> tracks) async {
+    final url = makeURL(playlistEndpoint(name));
+    final payload = dto.SavePlaylistInput(tracks: tracks);
+    await completeRequest(Method.put, url, authenticationToken: authenticationManager.token, body: payload);
   }
 
   Future<http.StreamedResponse> getImage(String path, ArtworkSize size) {

@@ -117,6 +117,50 @@ class Album extends AlbumHeader {
   }
 }
 
+class PlaylistHeader {
+  String name;
+  int duration; // in seconds
+  Map<String, int> numSongsByGenre;
+
+  PlaylistHeader({required this.name, required this.numSongsByGenre, required this.duration});
+
+  factory PlaylistHeader.fromJson(Map<String, dynamic> json) {
+    return PlaylistHeader(
+      name: json['name'],
+      duration: json['duration'],
+      numSongsByGenre: Map.from(json['num_songs_by_genre']),
+    );
+  }
+}
+
+class Playlist extends PlaylistHeader {
+  SongList songs;
+
+  Playlist({required name, required duration, required numSongsByGenre, required this.songs})
+      : super(name: name, duration: duration, numSongsByGenre: numSongsByGenre);
+
+  factory Playlist.fromJson(Map<String, dynamic> json) {
+    final header = PlaylistHeader.fromJson(json);
+    final songs = SongList.fromJson(json['songs']);
+    return Playlist(
+      name: header.name,
+      duration: header.duration,
+      numSongsByGenre: header.numSongsByGenre,
+      songs: songs,
+    );
+  }
+}
+
+class SavePlaylistInput {
+  List<String> tracks;
+
+  SavePlaylistInput({required this.tracks});
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'tracks': tracks,
+      };
+}
+
 class Song {
   String path;
   int? trackNumber;

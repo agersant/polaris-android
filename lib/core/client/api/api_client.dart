@@ -24,6 +24,10 @@ abstract class APIClientInterface {
   Future<List<dto.AlbumHeader>> random();
   Future<List<dto.AlbumHeader>> recent();
   Future<dto.SongList> search(String query);
+  Future<List<dto.PlaylistHeader>> listPlaylists();
+  Future<dto.Playlist> getPlaylist(String name);
+  Future<void> savePlaylist(String name, List<String> tracks);
+  Future<void> deletePlaylist(String name);
 }
 
 class APIClient implements APIClientInterface {
@@ -105,6 +109,38 @@ class APIClient implements APIClientInterface {
     return switch (connectionManager.apiVersion) {
       8 => await v8.search(query),
       7 => await v7.search(query),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<List<dto.PlaylistHeader>> listPlaylists() async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.listPlaylists(),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<dto.Playlist> getPlaylist(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getPlaylist(name),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<void> savePlaylist(String name, List<String> tracks) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.savePlaylist(name, tracks),
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<void> deletePlaylist(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.deletePlaylist(name),
       _ => throw APIError.notImplemented,
     };
   }

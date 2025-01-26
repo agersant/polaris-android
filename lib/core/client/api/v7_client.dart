@@ -150,6 +150,26 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
     }
   }
 
+  @override
+  Future<()> deletePlaylist(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<dto8.Playlist> getPlaylist(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<List<dto8.PlaylistHeader>> listPlaylists() {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<()> savePlaylist(String name, List<String> tracks) {
+    throw APIError.notImplemented;
+  }
+
   Future<http.StreamedResponse> getImage(String path, ArtworkSize size) {
     final uri = getImageURI(path, size);
     return makeRequest(Method.get, uri.toString());
