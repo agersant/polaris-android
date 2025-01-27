@@ -18,8 +18,16 @@ const double _detailsSpacing = 8.0;
 class AlbumGrid extends StatelessWidget {
   final List<dto.AlbumHeader> albums;
   final ScrollController? scrollController;
+  final bool showArtistNames;
+  final bool showReleaseDates;
 
-  const AlbumGrid(this.albums, this.scrollController, {Key? key}) : super(key: key);
+  const AlbumGrid(
+    this.albums,
+    this.scrollController, {
+    Key? key,
+    this.showArtistNames = true,
+    this.showReleaseDates = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +89,8 @@ class AlbumGrid extends StatelessWidget {
                 artistStyle: artistStyle,
                 titleStrutStyle: titleStrutStyle,
                 artistStrutStyle: artistStrutStyle,
+                showArtistNames: showArtistNames,
+                showReleaseDate: showReleaseDates,
               ),
             );
 
@@ -98,12 +108,16 @@ class Album extends StatelessWidget {
   final TextStyle artistStyle;
   final StrutStyle titleStrutStyle;
   final StrutStyle artistStrutStyle;
+  final bool showArtistNames;
+  final bool showReleaseDate;
 
   const Album(this.album,
       {required this.titleStyle,
       required this.artistStyle,
       required this.titleStrutStyle,
       required this.artistStrutStyle,
+      required this.showArtistNames,
+      required this.showReleaseDate,
       Key? key})
       : super(key: key);
 
@@ -144,13 +158,22 @@ class Album extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               softWrap: false,
                             ),
-                            Text(
-                              album.mainArtists.isEmpty ? unknownArtist : album.mainArtists.join(', '),
-                              strutStyle: artistStrutStyle,
-                              style: artistStyle,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                            ),
+                            if (showArtistNames)
+                              Text(
+                                album.mainArtists.isEmpty ? unknownArtist : album.mainArtists.join(', '),
+                                strutStyle: artistStrutStyle,
+                                style: artistStyle,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                              ),
+                            if (showReleaseDate && album.year != null)
+                              Text(
+                                album.year!.toString(),
+                                strutStyle: artistStrutStyle,
+                                style: artistStyle,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                              ),
                           ],
                         ),
                       ),

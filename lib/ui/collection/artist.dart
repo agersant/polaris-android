@@ -110,15 +110,18 @@ class _ArtistState extends State<Artist> {
           spacing: 16,
           children: [
             // TODO v8 add genres
-            if (mainReleases.isNotEmpty) buildAlbumSection(mainAlbumsSectionTitle, mainReleases),
-            if (otherReleases.isNotEmpty) buildAlbumSection(otherAlbumsSectionTitle, otherReleases),
+            if (mainReleases.isNotEmpty) buildAlbumSection(mainReleases, isMainAlbums: true),
+            if (otherReleases.isNotEmpty) buildAlbumSection(otherReleases, isMainAlbums: false),
           ],
         ),
       ),
     );
   }
 
-  Widget buildAlbumSection(String title, List<dto.ArtistAlbum> albums) {
+  Widget buildAlbumSection(List<dto.ArtistAlbum> albums, {required bool isMainAlbums}) {
+    final title = isMainAlbums ? mainAlbumsSectionTitle : otherAlbumsSectionTitle;
+    final showArtistNames = !isMainAlbums;
+    final showReleaseDates = isMainAlbums;
     return Builder(builder: (context) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,9 +151,13 @@ class _ArtistState extends State<Artist> {
               ),
             ],
           ),
-          // TODO v8 show year instead of artists for main releases
           // TODO v8 landscape mode should switch to 4 columns
-          AlbumGrid(albums, null),
+          AlbumGrid(
+            albums,
+            null,
+            showArtistNames: showArtistNames,
+            showReleaseDates: showReleaseDates,
+          ),
         ],
       );
     });
