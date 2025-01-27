@@ -132,6 +132,8 @@ class _ArtistsState extends State<Artists> {
 
     final pagesModel = getIt<PagesModel>();
 
+    // TODO add some way to filter artists? (floating action button?)
+
     return ListView.builder(
       controller: _scrollController,
       itemCount: filteredArtists.length,
