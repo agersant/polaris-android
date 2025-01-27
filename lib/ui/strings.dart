@@ -30,6 +30,7 @@ const collectionTitle = 'Collection';
 const emptyAlbum = 'There are no songs on this album.';
 const emptyAlbumList = 'There are no albums to display.';
 const emptyDirectory = 'There is nothing in this directory.';
+const filterFieldLabel = 'Filter';
 const goBackButtonLabel = 'GO BACK';
 const listPlaylistsError = 'There was an error while listing playlists.';
 const mainAlbumsSectionTitle = 'Main Releases';

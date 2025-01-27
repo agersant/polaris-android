@@ -26,12 +26,25 @@ class _ArtistsState extends State<Artists> {
   Role _role = Role.performer;
   List<dto.ArtistHeader>? _artists;
   APIError? _error;
+  String _filter = '';
+  final TextEditingController _filterController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _fetchArtists();
+    _filterController.addListener(refresh);
+    fetchArtists();
+  }
+
+  @override
+  void dispose() {
+    _filterController.removeListener(refresh);
+    super.dispose();
+  }
+
+  void refresh() {
+    setState(() {});
   }
 
   void setRole(Role newRole) {
@@ -46,6 +59,18 @@ class _ArtistsState extends State<Artists> {
     });
   }
 
+  void setFilter(String newFilter) {
+    if (newFilter == _filter) {
+      return;
+    }
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0.0);
+    }
+    setState(() {
+      _filter = newFilter;
+    });
+  }
+
   bool isRelevant(dto.ArtistHeader artist) {
     return artist.numAlbumsAsPerformer > 0 ||
         artist.numAlbumsAsComposer > 0 ||
@@ -53,23 +78,33 @@ class _ArtistsState extends State<Artists> {
         artist.numAlbumsAsAdditionalPerformer > 1;
   }
 
-  List<dto.ArtistHeader> _filter(List<dto.ArtistHeader> allArtists, Role role) {
+  List<dto.ArtistHeader> filter(List<dto.ArtistHeader> allArtists, Role role) {
     return allArtists.where((a) {
       if (!isRelevant(a)) {
         return false;
       }
       switch (_role) {
         case Role.performer:
-          return a.numAlbumsAsPerformer > 0 || a.numAlbumsAsAdditionalPerformer > 1;
+          if (a.numAlbumsAsPerformer <= 0 && a.numAlbumsAsAdditionalPerformer <= 1) {
+            return false;
+          }
         case Role.composer:
-          return a.numAlbumsAsComposer > 0;
+          if (a.numAlbumsAsComposer <= 0) {
+            return false;
+          }
         case Role.lyricist:
-          return a.numAlbumsAsLyricist > 0;
+          if (a.numAlbumsAsLyricist <= 0) {
+            return false;
+          }
       }
+      if (_filter.isEmpty) {
+        return true;
+      }
+      return a.name.toLowerCase().contains(_filter.toLowerCase());
     }).toList();
   }
 
-  void _fetchArtists() async {
+  void fetchArtists() async {
     final APIClientInterface? client = getIt<AppClient>().apiClient;
     if (client == null) {
       return;
@@ -88,7 +123,6 @@ class _ArtistsState extends State<Artists> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       child: Column(
-        spacing: 24,
         children: [
           ToggleButtons(
             borderRadius: BorderRadius.circular(4),
@@ -105,6 +139,24 @@ class _ArtistsState extends State<Artists> {
                 .toList(),
             onPressed: (index) => setRole(Role.values[index]),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
+            child: TextField(
+              maxLines: 1,
+              controller: _filterController,
+              decoration: InputDecoration(
+                icon: const Icon(Icons.filter_alt),
+                hintText: filterFieldLabel,
+                suffixIcon: _filterController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        onPressed: () => _filterController.clear(),
+                        icon: const Icon(Icons.clear),
+                      ),
+              ),
+              onChanged: (value) => setFilter(value),
+            ),
+          ),
           Expanded(child: _buildResults(context))
         ],
       ),
@@ -115,7 +167,7 @@ class _ArtistsState extends State<Artists> {
     if (_error != null) {
       return ErrorMessage(
         artistsError,
-        action: _fetchArtists,
+        action: fetchArtists,
         actionLabel: retryButtonLabel,
       );
     }
@@ -125,14 +177,12 @@ class _ArtistsState extends State<Artists> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final filteredArtists = _filter(allArtists, _role);
+    final filteredArtists = filter(allArtists, _role);
     if (filteredArtists.isEmpty) {
       return const ErrorMessage(noArtists);
     }
 
     final pagesModel = getIt<PagesModel>();
-
-    // TODO add some way to filter artists? (floating action button?)
 
     return ListView.builder(
       controller: _scrollController,
