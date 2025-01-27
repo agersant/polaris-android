@@ -33,18 +33,18 @@ class _ArtistsState extends State<Artists> {
   @override
   void initState() {
     super.initState();
-    _filterController.addListener(refresh);
+    _filterController.addListener(refreshFilter);
     fetchArtists();
   }
 
   @override
   void dispose() {
-    _filterController.removeListener(refresh);
+    _filterController.removeListener(refreshFilter);
     super.dispose();
   }
 
-  void refresh() {
-    setState(() {});
+  void refreshFilter() {
+    setFilter(_filterController.text);
   }
 
   void setRole(Role newRole) {
