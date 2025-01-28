@@ -6,6 +6,7 @@ import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/collection/artists.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
+import 'package:polaris/ui/collection/genres.dart';
 import 'package:polaris/ui/collection/playlists.dart';
 import 'package:polaris/ui/collection/albums.dart';
 import 'package:polaris/ui/collection/search.dart';
@@ -26,6 +27,7 @@ enum CollectionTab {
   browse,
   albums,
   artists,
+  genres,
   playlists,
   search,
 }
@@ -49,11 +51,13 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
       // TODO legacy API cleanup
       final supportsPlaylists = (_connectionManager.apiVersion ?? 0) >= 8;
       final supportsArtists = (_connectionManager.apiVersion ?? 0) >= 8;
+      final supportsGenres = (_connectionManager.apiVersion ?? 0) >= 8;
       visibleTabs = {
         CollectionTab.browse,
         if (isOnline) CollectionTab.albums,
         if (isOnline && supportsArtists) CollectionTab.artists,
         if (isOnline && supportsPlaylists) CollectionTab.playlists,
+        if (isOnline && supportsGenres) CollectionTab.genres,
         if (isOnline) CollectionTab.search,
       };
 
@@ -89,6 +93,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
           if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
           if (visibleTabs.contains(CollectionTab.albums)) const Tab(icon: Icon(Icons.album)),
           if (visibleTabs.contains(CollectionTab.artists)) const Tab(icon: Icon(Icons.person)),
+          if (visibleTabs.contains(CollectionTab.genres)) const Tab(icon: Icon(Icons.label)),
           if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.playlist_play)),
           if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
         ], controller: _tabController),
@@ -100,6 +105,7 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
           if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
           if (visibleTabs.contains(CollectionTab.albums)) const Albums(),
           if (visibleTabs.contains(CollectionTab.artists)) const Artists(),
+          if (visibleTabs.contains(CollectionTab.genres)) const Genres(),
           if (visibleTabs.contains(CollectionTab.playlists)) const Playlists(),
           if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],
