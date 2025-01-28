@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/collection/album_widget.dart';
 import 'package:polaris/ui/collection/genre_badge.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -74,20 +75,62 @@ class _GenreOverviewState extends State<GenreOverview> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 32,
-          children: [
-            if (genre.relatedGenres.isNotEmpty) _relatedGenres(genre),
-            if (genre.mainArtists.isNotEmpty) _mainArtists(genre),
-            if (genre.recentlyAdded.isNotEmpty) _recentlyAdded(genre),
-          ],
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      // Layout tricks to scroll if content doesn't fit, evenly space otherwise:
+      // See `Sample code: Using SingleChildScrollView with a Column`
+      // from https://api.flutter.dev/flutter/widgets/SingleChildScrollView-class.html
+      child: LayoutBuilder(builder: (context, viewportConstraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: viewportConstraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 32,
+              children: [
+                if (genre.relatedGenres.isNotEmpty) _relatedGenres(genre),
+                if (genre.mainArtists.isNotEmpty) _mainArtists(genre),
+                if (genre.recentlyAdded.isNotEmpty) _recentlyAdded(genre),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: playAll,
+                      label: Text(genrePlayAll.toUpperCase()),
+                      icon: const Icon(Icons.play_arrow),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: queueAll,
+                      label: Text(genreQueueAll.toUpperCase()),
+                      icon: const Icon(Icons.playlist_add),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
     );
+  }
+
+  void playAll() async {
+    final songs = await listSongs();
+    final playlist = getIt<Playlist>();
+    await playlist.clear();
+    await playlist.queueLast(songs);
+  }
+
+  void queueAll() async {
+    final songs = await listSongs();
+    await getIt<Playlist>().queueLast(songs);
+  }
+
+  Future<List<String>> listSongs() async {
+    final client = getIt<AppClient>().apiClient!;
+    final songList = await client.getGenreSongs(widget.genreName);
+    return songList.paths;
   }
 
   Widget _relatedGenres(dto.Genre genre) {

@@ -44,8 +44,8 @@ class _GenreState extends State<Genre> with TickerProviderStateMixin {
         controller: _tabController,
         children: [
           GenreOverview(widget.genreName),
-          GenreOverview(widget.genreName),
-          GenreOverview(widget.genreName),
+          GenreOverview(widget.genreName), // TODO v8 implement full list of genre artists
+          GenreOverview(widget.genreName), // TODO v8 implement full list of genre albums
         ],
       ),
     );
