@@ -3,6 +3,10 @@ import 'package:polaris/core/client/api/v8_dto.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/utils.dart';
 
+bool isFakeArtist(String name) {
+  return name == "Various Artists" || name == "VA";
+}
+
 String formatDuration(Duration? d) {
   if (d == null) {
     return '-:--';

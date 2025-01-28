@@ -10,6 +10,7 @@ import 'package:polaris/ui/collection/genre_badge.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
+import 'package:polaris/ui/utils/format.dart';
 
 final getIt = GetIt.instance;
 
@@ -24,6 +25,7 @@ class GenreOverview extends StatefulWidget {
 
 class _GenreOverviewState extends State<GenreOverview> {
   dto.Genre? _genre;
+  List<dto.ArtistHeader>? _mainArtists;
   APIError? _error;
 
   @override
@@ -46,14 +48,21 @@ class _GenreOverviewState extends State<GenreOverview> {
   }
 
   void fetchGenre() async {
-    final client = getIt<AppClient>();
+    final client = getIt<AppClient>().apiClient;
+    if (client == null) {
+      return;
+    }
     setState(() {
       _genre = null;
+      _mainArtists = null;
       _error = null;
     });
     try {
-      final genre = await client.apiClient?.getGenre(widget.genreName);
-      setState(() => _genre = genre);
+      final genre = await client.getGenre(widget.genreName);
+      setState(() {
+        _genre = genre;
+        _mainArtists = genre.mainArtists.where((a) => !isFakeArtist(a.name)).toList();
+      });
     } on APIError catch (e) {
       setState(() => _error = e);
     }
@@ -85,12 +94,11 @@ class _GenreOverviewState extends State<GenreOverview> {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: viewportConstraints.maxHeight),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 32,
               children: [
                 if (genre.relatedGenres.isNotEmpty) relatedGenres(genre),
-                if (genre.mainArtists.isNotEmpty) mainArtists(genre),
+                if (_mainArtists?.isNotEmpty == true) mainArtists(_mainArtists!),
                 if (genre.recentlyAdded.isNotEmpty) recentlyAdded(genre),
                 playButtons(),
               ],
@@ -133,35 +141,63 @@ class _GenreOverviewState extends State<GenreOverview> {
     );
   }
 
-  Widget mainArtists(dto.Genre genre) {
-    final pagesModel = getIt<PagesModel>();
+  Widget mainArtists(List<dto.ArtistHeader> mainArtists) {
+    final numRows = mainArtists.length > 4 ? 2 : 1;
 
     return Column(
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         sectionTitle(genreMainArtists),
-        SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            spacing: 8,
-            children: genre.mainArtists
-                .map((artist) => OutlinedButton(
-                      onPressed: () => pagesModel.openArtistPage(artist.name),
-                      child: SizedBox(
-                        width: 120,
-                        child: ListTile(
-                          title: Text(artist.name),
-                          subtitle: Text(nSongs(artist.numSongsByGenre[genre.name] ?? 0)),
-                        ),
-                      ),
-                    ))
-                .toList(),
+        SizedBox(
+          height: 72.0 * numRows,
+          child: MasonryGridView.count(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            scrollDirection: Axis.horizontal,
+            crossAxisCount: numRows,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            itemCount: mainArtists.length,
+            itemBuilder: (context, index) => artistWidget(mainArtists[index]),
           ),
-        ),
+        )
       ],
+    );
+  }
+
+  Widget artistWidget(dto.ArtistHeader artist) {
+    final pagesModel = getIt<PagesModel>();
+    final textTheme = Theme.of(context).textTheme;
+
+    return OutlinedButton(
+      onPressed: () => pagesModel.openArtistPage(artist.name),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Row(
+          spacing: 20,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.1),
+              ),
+              child: Icon(Icons.person, color: textTheme.bodySmall?.color),
+            ),
+            Column(
+              spacing: 4,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(artist.name, style: textTheme.titleMedium?.copyWith(fontSize: 13.0)),
+                Text(nSongs(artist.numSongsByGenre[widget.genreName] ?? 0),
+                    style: textTheme.bodyMedium?.copyWith(color: textTheme.bodySmall?.color, fontSize: 12.0)),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -202,7 +238,7 @@ class _GenreOverviewState extends State<GenreOverview> {
 
   Widget playButtons() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
