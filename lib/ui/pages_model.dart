@@ -16,6 +16,9 @@ class PagesModel extends ChangeNotifier {
   String? _artist;
   String? get artist => _artist;
 
+  String? _genre;
+  String? get genre => _genre;
+
   void openPlayer() {
     _isPlayerOpen = true;
     notifyListeners();
@@ -53,6 +56,16 @@ class PagesModel extends ChangeNotifier {
 
   void closeSettings() {
     _isSettingsOpen = false;
+    notifyListeners();
+  }
+
+  void openGenrePage(String name) {
+    _genre = name;
+    notifyListeners();
+  }
+
+  void closeGenrePage() {
+    _genre = null;
     notifyListeners();
   }
 

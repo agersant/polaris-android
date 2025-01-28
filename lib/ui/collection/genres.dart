@@ -132,8 +132,13 @@ class _GenresState extends State<Genres> {
         padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
         child: Wrap(
           spacing: 8,
-          runSpacing: -8,
-          children: filteredGenres.map((genre) => GenreBadge(genre.name)).toList(),
+          runSpacing: -4,
+          children: filteredGenres
+              .map((genre) => GenreBadge(
+                    genre.name,
+                    onTap: () => pagesModel.openGenrePage(genre.name),
+                  ))
+              .toList(),
         ),
       ),
     );

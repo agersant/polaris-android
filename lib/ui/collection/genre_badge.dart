@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class GenreBadge extends StatelessWidget {
   final String name;
+  final void Function() onTap;
 
   // Tailwind palette
   static const List<Color> palette = [
@@ -25,7 +26,7 @@ class GenreBadge extends StatelessWidget {
   ];
   static final lut = List.generate(256, (i) => i);
 
-  const GenreBadge(this.name, {Key? key}) : super(key: key);
+  const GenreBadge(this.name, {required this.onTap, Key? key}) : super(key: key);
 
   static Color pickColor(String s) {
     final initialValue = s.length % (lut.length - 1);
@@ -38,26 +39,18 @@ class GenreBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final acentColor = pickColor(name);
-    final borderColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: .2);
-
-    return Chip(
-      padding: EdgeInsets.zero,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: borderColor, width: 0.5),
-        borderRadius: BorderRadius.circular(4),
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Container(
+        width: 7,
+        height: 7,
+        decoration: BoxDecoration(color: acentColor, shape: BoxShape.circle),
       ),
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 8,
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(color: acentColor, shape: BoxShape.circle),
-          ),
-          Text(name, style: Theme.of(context).textTheme.labelLarge),
-        ],
+      label: Text(
+        name,
+        style: Theme.of(context).textTheme.labelLarge,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

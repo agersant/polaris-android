@@ -23,6 +23,7 @@ import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/core/songs.dart' as songs;
 import 'package:polaris/ui/collection/artist.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
+import 'package:polaris/ui/collection/genre.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -197,6 +198,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
           final showArtist = isStartupComplete && pagesModel.artist != null;
+          final showGenre = isStartupComplete && pagesModel.genre != null;
 
           return Column(
             children: [
@@ -224,6 +226,15 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
                               pagesModel.closeOfflineMusic();
+                            }
+                          }),
+
+                    if (showGenre)
+                      MaterialPage<dynamic>(
+                          child: Genre(pagesModel.genre!),
+                          onPopInvoked: (didPop, dynamic result) {
+                            if (didPop) {
+                              pagesModel.closeGenrePage();
                             }
                           }),
 
