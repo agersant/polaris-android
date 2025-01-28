@@ -75,7 +75,7 @@ class _GenreOverviewState extends State<GenreOverview> {
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      padding: const EdgeInsets.only(top: 24),
       // Layout tricks to scroll if content doesn't fit, evenly space otherwise:
       // See `Sample code: Using SingleChildScrollView with a Column`
       // from https://api.flutter.dev/flutter/widgets/SingleChildScrollView-class.html
@@ -89,24 +89,10 @@ class _GenreOverviewState extends State<GenreOverview> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 32,
               children: [
-                if (genre.relatedGenres.isNotEmpty) _relatedGenres(genre),
-                if (genre.mainArtists.isNotEmpty) _mainArtists(genre),
-                if (genre.recentlyAdded.isNotEmpty) _recentlyAdded(genre),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: playAll,
-                      label: Text(genrePlayAll.toUpperCase()),
-                      icon: const Icon(Icons.play_arrow),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: queueAll,
-                      label: Text(genreQueueAll.toUpperCase()),
-                      icon: const Icon(Icons.playlist_add),
-                    ),
-                  ],
-                ),
+                if (genre.relatedGenres.isNotEmpty) relatedGenres(genre),
+                if (genre.mainArtists.isNotEmpty) mainArtists(genre),
+                if (genre.recentlyAdded.isNotEmpty) recentlyAdded(genre),
+                playButtons(),
               ],
             ),
           ),
@@ -115,25 +101,7 @@ class _GenreOverviewState extends State<GenreOverview> {
     );
   }
 
-  void playAll() async {
-    final songs = await listSongs();
-    final playlist = getIt<Playlist>();
-    await playlist.clear();
-    await playlist.queueLast(songs);
-  }
-
-  void queueAll() async {
-    final songs = await listSongs();
-    await getIt<Playlist>().queueLast(songs);
-  }
-
-  Future<List<String>> listSongs() async {
-    final client = getIt<AppClient>().apiClient!;
-    final songList = await client.getGenreSongs(widget.genreName);
-    return songList.paths;
-  }
-
-  Widget _relatedGenres(dto.Genre genre) {
+  Widget relatedGenres(dto.Genre genre) {
     final pagesModel = getIt<PagesModel>();
     final genreNames = genre.relatedGenres.keys.toList();
     genreNames.sort((a, b) => -genre.relatedGenres[a]!.compareTo(genre.relatedGenres[b]!));
@@ -144,13 +112,12 @@ class _GenreOverviewState extends State<GenreOverview> {
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          genreRelated.toUpperCase(),
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        sectionTitle(genreRelated),
         SizedBox(
           height: 40.0 * numRows,
           child: MasonryGridView.count(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
             crossAxisCount: numRows,
             crossAxisSpacing: 8,
             mainAxisSpacing: 8,
@@ -166,18 +133,16 @@ class _GenreOverviewState extends State<GenreOverview> {
     );
   }
 
-  Widget _mainArtists(dto.Genre genre) {
+  Widget mainArtists(dto.Genre genre) {
     final pagesModel = getIt<PagesModel>();
 
     return Column(
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          genreMainArtists.toUpperCase(),
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        sectionTitle(genreMainArtists),
         SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -200,17 +165,15 @@ class _GenreOverviewState extends State<GenreOverview> {
     );
   }
 
-  Widget _recentlyAdded(dto.Genre genre) {
+  Widget recentlyAdded(dto.Genre genre) {
     const double albumSize = 150;
     return Column(
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          genreRecentlyAdded.toUpperCase(),
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        sectionTitle(genreRecentlyAdded),
         SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -225,5 +188,54 @@ class _GenreOverviewState extends State<GenreOverview> {
         ),
       ],
     );
+  }
+
+  Widget sectionTitle(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Text(
+        label.toUpperCase(),
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+    );
+  }
+
+  Widget playButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ElevatedButton.icon(
+            onPressed: playAll,
+            label: Text(genrePlayAll.toUpperCase()),
+            icon: const Icon(Icons.play_arrow),
+          ),
+          OutlinedButton.icon(
+            onPressed: queueAll,
+            label: Text(genreQueueAll.toUpperCase()),
+            icon: const Icon(Icons.playlist_add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void playAll() async {
+    final songs = await listSongs();
+    final playlist = getIt<Playlist>();
+    await playlist.clear();
+    await playlist.queueLast(songs);
+  }
+
+  void queueAll() async {
+    final songs = await listSongs();
+    await getIt<Playlist>().queueLast(songs);
+  }
+
+  Future<List<String>> listSongs() async {
+    final client = getIt<AppClient>().apiClient!;
+    final songList = await client.getGenreSongs(widget.genreName);
+    return songList.paths;
   }
 }
