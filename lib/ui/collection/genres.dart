@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/ui/collection/genre_badge.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -75,11 +76,12 @@ class _GenresState extends State<Genres> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      padding: const EdgeInsets.only(top: 24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
@@ -123,30 +125,17 @@ class _GenresState extends State<Genres> {
 
     final pagesModel = getIt<PagesModel>();
 
-    return ListView.builder(
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: _scrollController,
-      itemCount: filteredGenres.length,
-      itemBuilder: (BuildContext context, int index) {
-        final genre = filteredGenres[index];
-        return InkWell(
-          // onTap: () => pagesModel.openArtistPage(artist.name),
-          child: ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context).textTheme.labelSmall?.color?.withValues(alpha: 0.1),
-              ),
-              child: const Icon(Icons.label),
-            ),
-            title: Text(
-              genre.name,
-              overflow: TextOverflow.ellipsis,
-            ),
-            dense: true,
-          ),
-        );
-      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: -8,
+          children: filteredGenres.map((genre) => GenreBadge(genre.name)).toList(),
+        ),
+      ),
     );
   }
 }
