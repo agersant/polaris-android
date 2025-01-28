@@ -102,26 +102,35 @@ class _ArtistState extends State<Artist> {
 
     final (mainReleases, otherReleases) = _splitReleases(artist.albums);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        child: Column(
-          spacing: 16,
-          children: [
-            // TODO v8 add genres
-            if (mainReleases.isNotEmpty) buildAlbumSection(mainReleases, isMainAlbums: true),
-            if (otherReleases.isNotEmpty) buildAlbumSection(otherReleases, isMainAlbums: false),
-          ],
+    return OrientationBuilder(builder: (context, orientation) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          child: Column(
+            spacing: 16,
+            children: [
+              // TODO v8 add genres
+              if (mainReleases.isNotEmpty)
+                buildAlbumSection(mainReleases, isMainAlbums: true, orientation: orientation),
+              if (otherReleases.isNotEmpty)
+                buildAlbumSection(otherReleases, isMainAlbums: false, orientation: orientation),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  Widget buildAlbumSection(List<dto.ArtistAlbum> albums, {required bool isMainAlbums}) {
+  Widget buildAlbumSection(
+    List<dto.ArtistAlbum> albums, {
+    required bool isMainAlbums,
+    required Orientation orientation,
+  }) {
     final title = isMainAlbums ? mainAlbumsSectionTitle : otherAlbumsSectionTitle;
     final showArtistNames = !isMainAlbums;
     final showReleaseDates = isMainAlbums;
+
     return Builder(builder: (context) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,10 +160,10 @@ class _ArtistState extends State<Artist> {
               ),
             ],
           ),
-          // TODO v8 landscape mode should switch to 4 columns
           AlbumGrid(
             albums,
             null,
+            orientation: orientation,
             showArtistNames: showArtistNames,
             showReleaseDates: showReleaseDates,
           ),

@@ -18,6 +18,7 @@ const double _detailsSpacing = 8.0;
 class AlbumGrid extends StatelessWidget {
   final List<dto.AlbumHeader> albums;
   final ScrollController? scrollController;
+  final Orientation? orientation;
   final bool showArtistNames;
   final bool showReleaseDates;
 
@@ -25,6 +26,7 @@ class AlbumGrid extends StatelessWidget {
     this.albums,
     this.scrollController, {
     Key? key,
+    this.orientation,
     this.showArtistNames = true,
     this.showReleaseDates = false,
   }) : super(key: key);
@@ -40,7 +42,7 @@ class AlbumGrid extends StatelessWidget {
         return LayoutBuilder(
           builder: (context, constraints) {
             final screenWidth = constraints.maxWidth;
-            final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
+            final crossAxisCount = (this.orientation ?? orientation) == Orientation.portrait ? 2 : 4;
             const mainAxisSpacing = 24.0;
             const crossAxisSpacing = 16.0;
 
