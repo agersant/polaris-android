@@ -42,6 +42,31 @@ class APIClient implements APIClientInterface {
   }
 
   @override
+  Future<List<GenreHeader>> getGenres() async {
+    return [];
+  }
+
+  @override
+  Future<Genre> getGenre(String name) async {
+    return Genre(name: 'Test Genre', relatedGenres: {}, mainArtists: [], recentlyAdded: []);
+  }
+
+  @override
+  Future<List<AlbumHeader>> getGenreAlbums(String name) async {
+    return [];
+  }
+
+  @override
+  Future<List<ArtistHeader>> getGenreArtists(String name) async {
+    return [];
+  }
+
+  @override
+  Future<SongList> getGenreSongs(String name) async {
+    return SongList(paths: [], firstSongs: []);
+  }
+
+  @override
   Future<SongList> search(String path) async {
     return SongList(paths: [], firstSongs: []);
   }

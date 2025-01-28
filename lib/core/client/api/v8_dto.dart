@@ -223,6 +223,41 @@ class Contribution {
   }
 }
 
+class GenreHeader {
+  String name;
+
+  GenreHeader({required this.name});
+
+  factory GenreHeader.fromJson(Map<String, dynamic> json) {
+    return GenreHeader(
+      name: json['name'],
+    );
+  }
+}
+
+class Genre extends GenreHeader {
+  Map<String, int> relatedGenres;
+  List<ArtistHeader> mainArtists;
+  List<AlbumHeader> recentlyAdded;
+
+  Genre({
+    required name,
+    required this.relatedGenres,
+    required this.mainArtists,
+    required this.recentlyAdded,
+  }) : super(name: name);
+
+  factory Genre.fromJson(Map<String, dynamic> json) {
+    final header = GenreHeader.fromJson(json);
+    return Genre(
+      name: header.name,
+      relatedGenres: Map.from(json['related_genres']),
+      mainArtists: (json['main_artists'] as List<dynamic>).map((c) => ArtistHeader.fromJson(c)).toList(),
+      recentlyAdded: (json['recently_added'] as List<dynamic>).map((c) => AlbumHeader.fromJson(c)).toList(),
+    );
+  }
+}
+
 class PlaylistHeader {
   String name;
   int duration; // in seconds

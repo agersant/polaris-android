@@ -25,6 +25,11 @@ abstract class APIClientInterface {
   Future<List<dto.AlbumHeader>> recent({required int offset});
   Future<List<dto.ArtistHeader>> getArtists();
   Future<dto.Artist> getArtist(String name);
+  Future<List<dto.GenreHeader>> getGenres();
+  Future<dto.Genre> getGenre(String name);
+  Future<List<dto.AlbumHeader>> getGenreAlbums(String name);
+  Future<List<dto.ArtistHeader>> getGenreArtists(String name);
+  Future<dto.SongList> getGenreSongs(String name);
   Future<dto.SongList> search(String query);
   Future<List<dto.PlaylistHeader>> listPlaylists();
   Future<dto.Playlist> getPlaylist(String name);
@@ -119,6 +124,51 @@ class APIClient implements APIClientInterface {
   Future<dto.Artist> getArtist(String name) async {
     return switch (connectionManager.apiVersion) {
       8 => await v8.getArtist(name),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<List<dto.GenreHeader>> getGenres() async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getGenres(),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<dto.Genre> getGenre(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getGenre(name),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<List<dto.AlbumHeader>> getGenreAlbums(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getGenreAlbums(name),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<List<dto.ArtistHeader>> getGenreArtists(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getGenreArtists(name),
+      7 => throw APIError.notImplemented,
+      _ => throw APIError.notImplemented,
+    };
+  }
+
+  @override
+  Future<dto.SongList> getGenreSongs(String name) async {
+    return switch (connectionManager.apiVersion) {
+      8 => await v8.getGenreSongs(name),
       7 => throw APIError.notImplemented,
       _ => throw APIError.notImplemented,
     };

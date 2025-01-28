@@ -13,6 +13,7 @@ const artistsEndpoint = '/api/artists/';
 const audioEndpoint = '/api/audio/';
 const browseEndpoint = '/api/browse/';
 const flattenEndpoint = '/api/flatten/';
+const genresEndpoint = '/api/genres/';
 const loginEndpoint = '/api/auth/';
 const playlistsEndpoint = '/api/playlists/';
 const songsEndpoint = '/api/songs/';
@@ -20,6 +21,10 @@ const songsEndpoint = '/api/songs/';
 String albumEndpoint(String name, List<String> mainArtists) =>
     '/api/album/${Uri.encodeComponent(name)}/by/${Uri.encodeComponent(mainArtists.join('\u000c'))}';
 String artistEndpoint(String name) => '/api/artist/${Uri.encodeComponent(name)}';
+String genreEndpoint(String name) => '/api/genre/${Uri.encodeComponent(name)}';
+String genreAlbumsEndpoint(String name) => '/api/genre/${Uri.encodeComponent(name)}/albums';
+String genreArtistsEndpoint(String name) => '/api/genre/${Uri.encodeComponent(name)}/artists';
+String genreSongsEndpoint(String name) => '/api/genre/${Uri.encodeComponent(name)}/songs';
 String playlistEndpoint(String name) => '/api/playlist/${Uri.encodeComponent(name)}';
 String randomEndpoint({required int seed, required int offset}) => '/api/albums/random?seed=$seed&offset=$offset';
 String recentEndpoint({required int offset}) => '/api/albums/recent?offset=$offset';
@@ -124,6 +129,66 @@ class V8Client extends BaseHttpClient implements APIClientInterface {
     final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
     try {
       return dto.Artist.fromJson(json.decode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<dto.GenreHeader>> getGenres() async {
+    final url = makeURL(genresEndpoint);
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.GenreHeader.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<dto.Genre> getGenre(String name) async {
+    final url = makeURL(genreEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return dto.Genre.fromJson(json.decode(utf8.decode(responseBody)));
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<dto.AlbumHeader>> getGenreAlbums(String name) async {
+    final url = makeURL(genreAlbumsEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.AlbumHeader.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<List<dto.ArtistHeader>> getGenreArtists(String name) async {
+    final url = makeURL(genreArtistsEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+    try {
+      return (json.decode(utf8.decode(responseBody)) as List).map((dynamic d) => dto.ArtistHeader.fromJson(d)).toList();
+    } catch (e) {
+      throw APIError.responseParseError;
+    }
+  }
+
+  @override
+  Future<dto.SongList> getGenreSongs(String name) async {
+    final host = _getHost();
+    final url = makeURL(genreSongsEndpoint(name));
+    final responseBody = await completeRequest(Method.get, url, authenticationToken: authenticationManager.token);
+
+    try {
+      final songList = dto.SongList.fromJson(json.decode(utf8.decode(responseBody)));
+      collectionCache.putSongs(host, songList.firstSongs);
+      collectionCache.putFiles(host, songList.paths);
+      return songList;
     } catch (e) {
       throw APIError.responseParseError;
     }

@@ -138,6 +138,31 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
   }
 
   @override
+  Future<List<dto8.GenreHeader>> getGenres() {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<dto8.Genre> getGenre(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<List<dto8.AlbumHeader>> getGenreAlbums(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<List<dto8.ArtistHeader>> getGenreArtists(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
+  Future<dto8.SongList> getGenreSongs(String name) {
+    throw APIError.notImplemented;
+  }
+
+  @override
   Future<dto8.SongList> search(String query) async {
     if (query.isEmpty) {
       return dto8.SongList(paths: [], firstSongs: []);
