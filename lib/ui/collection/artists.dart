@@ -140,13 +140,13 @@ class _ArtistsState extends State<Artists> {
             onPressed: (index) => setRole(Role.values[index]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
               decoration: InputDecoration(
-                icon: const Icon(Icons.filter_alt),
                 hintText: filterFieldLabel,
+                prefixIcon: const Icon(Icons.filter_alt),
                 suffixIcon: _filterController.text.isEmpty
                     ? null
                     : IconButton(
