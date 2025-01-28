@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
@@ -94,6 +95,8 @@ class _GenreOverviewState extends State<GenreOverview> {
     final genreNames = genre.relatedGenres.keys.toList();
     genreNames.sort((a, b) => -genre.relatedGenres[a]!.compareTo(genre.relatedGenres[b]!));
 
+    final numRows = genreNames.length > 4 ? 2 : 1;
+
     return Column(
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,17 +105,18 @@ class _GenreOverviewState extends State<GenreOverview> {
           genreRelated.toUpperCase(),
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            spacing: 8,
-            children: genreNames
-                .map((name) => GenreBadge(
-                      name,
-                      onTap: () => pagesModel.openGenrePage(name),
-                    ))
-                .toList(),
+        SizedBox(
+          height: 40.0 * numRows,
+          child: MasonryGridView.count(
+            crossAxisCount: numRows,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            scrollDirection: Axis.horizontal,
+            itemCount: genreNames.length,
+            itemBuilder: (context, index) => GenreBadge(
+              genreNames[index],
+              onTap: () => pagesModel.openGenrePage(genreNames[index]),
+            ),
           ),
         ),
       ],
