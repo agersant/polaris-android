@@ -48,7 +48,7 @@ class GenreBadge extends StatelessWidget {
       ),
       label: Text(
         name,
-        style: Theme.of(context).textTheme.labelLarge,
+        style: Theme.of(context).textTheme.bodyMedium,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
