@@ -231,7 +231,7 @@ class _GenreOverviewState extends State<GenreOverview> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
         label.toUpperCase(),
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.titleSmall,
       ),
     );
   }

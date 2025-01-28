@@ -141,7 +141,7 @@ class _ArtistState extends State<Artist> {
             children: [
               Text(
                 title.toUpperCase(),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               Row(
                 spacing: 16,
