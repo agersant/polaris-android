@@ -81,7 +81,7 @@ class _GenresState extends State<Genres> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
@@ -128,18 +128,16 @@ class _GenresState extends State<Genres> {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: _scrollController,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: -4,
-          children: filteredGenres
-              .map((genre) => GenreBadge(
-                    genre.name,
-                    onTap: () => pagesModel.openGenrePage(genre.name),
-                  ))
-              .toList(),
-        ),
+      padding: const EdgeInsets.fromLTRB(32, 24, 32, 24),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: -4,
+        children: filteredGenres
+            .map((genre) => GenreBadge(
+                  genre.name,
+                  onTap: () => pagesModel.openGenrePage(genre.name),
+                ))
+            .toList(),
       ),
     );
   }

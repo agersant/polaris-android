@@ -140,7 +140,7 @@ class _ArtistsState extends State<Artists> {
             onPressed: (index) => setRole(Role.values[index]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
@@ -185,6 +185,7 @@ class _ArtistsState extends State<Artists> {
     final pagesModel = getIt<PagesModel>();
 
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 24),
       controller: _scrollController,
       itemCount: filteredArtists.length,
       itemBuilder: (BuildContext context, int index) {
