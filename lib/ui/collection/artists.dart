@@ -121,7 +121,7 @@ class _ArtistsState extends State<Artists> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      padding: const EdgeInsets.only(top: 24),
       child: Column(
         children: [
           ToggleButtons(
@@ -140,7 +140,7 @@ class _ArtistsState extends State<Artists> {
             onPressed: (index) => setRole(Role.values[index]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
@@ -192,6 +192,7 @@ class _ArtistsState extends State<Artists> {
         return InkWell(
           onTap: () => pagesModel.openArtistPage(artist.name),
           child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 32),
             leading: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
