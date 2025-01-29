@@ -104,8 +104,9 @@ class _ArtistState extends State<Artist> {
 
     return OrientationBuilder(builder: (context, orientation) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 24),
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           child: Column(
             spacing: 16,
@@ -163,6 +164,7 @@ class _ArtistState extends State<Artist> {
           AlbumGrid(
             albums,
             null,
+            shrinkWrap: true,
             orientation: orientation,
             showArtistNames: showArtistNames,
             showReleaseDates: showReleaseDates,

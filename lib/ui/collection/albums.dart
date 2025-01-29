@@ -111,7 +111,11 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
       }
     }
 
-    return AlbumGrid(albums, _scrollController);
+    return AlbumGrid(
+      albums,
+      _scrollController,
+      shrinkWrap: false,
+    );
   }
 
   Future _fetchAlbums() async {

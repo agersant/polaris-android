@@ -13,17 +13,21 @@ class GridMetrics {}
 class AlbumGrid extends StatelessWidget {
   final List<dto.AlbumHeader> albums;
   final ScrollController? scrollController;
+  final bool shrinkWrap;
   final Orientation? orientation;
   final bool showArtistNames;
   final bool showReleaseDates;
+  final EdgeInsets? padding;
 
   const AlbumGrid(
     this.albums,
     this.scrollController, {
-    Key? key,
+    required this.shrinkWrap,
     this.orientation,
+    this.padding,
     this.showArtistNames = true,
     this.showReleaseDates = false,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -46,10 +50,11 @@ class AlbumGrid extends StatelessWidget {
             final childAspectRatio = childWidth / childHeight;
 
             final gridView = GridView.builder(
-              physics: scrollController != null
-                  ? const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics())
-                  : const NeverScrollableScrollPhysics(),
-              shrinkWrap: scrollController == null,
+              padding: padding,
+              physics: shrinkWrap
+                  ? const NeverScrollableScrollPhysics()
+                  : const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              shrinkWrap: shrinkWrap,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount,
                 childAspectRatio: childAspectRatio,
