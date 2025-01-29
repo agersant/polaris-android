@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/ui/collection/genre_artists.dart';
 import 'package:polaris/ui/collection/genre_overview.dart';
 import 'package:polaris/ui/strings.dart';
 
@@ -44,7 +45,7 @@ class _GenreState extends State<Genre> with TickerProviderStateMixin {
         controller: _tabController,
         children: [
           GenreOverview(widget.genreName),
-          GenreOverview(widget.genreName), // TODO v8 implement full list of genre artists
+          GenreArtists(widget.genreName),
           GenreOverview(widget.genreName), // TODO v8 implement full list of genre albums
         ],
       ),

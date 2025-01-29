@@ -33,6 +33,7 @@ const emptyDirectory = 'There is nothing in this directory.';
 const filterFieldLabel = 'Filter';
 const genreAlbums = 'Albums';
 const genreArtists = 'Artists';
+const genreArtistsError = 'There was an error while listing artists.';
 const genreError = 'There was an error while reading genre information.';
 const genreMainArtists = 'Main Artists';
 const genreOverview = 'Overview';
