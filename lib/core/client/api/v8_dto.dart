@@ -364,7 +364,7 @@ class Song {
       return null;
     }
     final mainArtists = albumArtists.isNotEmpty ? albumArtists : artists;
-    if (mainArtists.every(isFakeArtist)) {
+    if (mainArtists.isEmpty) {
       return null;
     }
     return AlbumHeader(name: album!, mainArtists: mainArtists)
