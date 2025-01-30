@@ -155,7 +155,6 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildTrackDetails() {
     final audioHandler = getIt<PolarisAudioHandler>();
-    final pagesModel = getIt<PagesModel>();
 
     return StreamBuilder<dto.Song?>(
       stream: audioHandler.currentSong,

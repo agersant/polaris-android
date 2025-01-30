@@ -16,9 +16,9 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
-  final dto.AlbumHeader album;
+  final dto.AlbumHeader albumHeader;
 
-  const AlbumDetails(this.album, {Key? key}) : super(key: key);
+  const AlbumDetails(this.albumHeader, {Key? key}) : super(key: key);
 
   @override
   State<AlbumDetails> createState() => _AlbumDetailsState();
@@ -37,8 +37,8 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   void didUpdateWidget(AlbumDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.album.name != widget.album.name ||
-        !listEquals(oldWidget.album.mainArtists, widget.album.mainArtists)) {
+    if (oldWidget.albumHeader.name != widget.albumHeader.name ||
+        !listEquals(oldWidget.albumHeader.mainArtists, widget.albumHeader.mainArtists)) {
       _fetchData();
     }
   }
@@ -50,7 +50,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
     try {
       final client = getIt<AppClient>();
-      final album = await client.apiClient?.getAlbum(widget.album.name, widget.album.mainArtists);
+      final album = await client.apiClient?.getAlbum(widget.albumHeader.name, widget.albumHeader.mainArtists);
       final songs = album?.songs ?? [];
       setState(() => _songs = songs);
     } on APIError catch (e) {
@@ -99,7 +99,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         .map((discData) => Disc(
               discData,
               discCount: discs.length,
-              albumArtwork: widget.album.artwork,
+              albumArtwork: widget.albumHeader.artwork,
             ))
         .toList();
   }
@@ -116,7 +116,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           StretchMode.zoomBackground,
           StretchMode.fadeTitle,
         ],
-        background: Thumbnail(widget.album.artwork, ArtworkSize.small),
+        background: Thumbnail(widget.albumHeader.artwork, ArtworkSize.small),
       ),
     ));
 
@@ -131,14 +131,14 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.album.name,
+                      widget.albumHeader.name,
                       style: Theme.of(context).textTheme.headlineSmall,
                       softWrap: true,
                     ),
                   ),
                   AlbumContextMenuButton(
-                    name: widget.album.name,
-                    mainArtists: widget.album.mainArtists,
+                    name: widget.albumHeader.name,
+                    mainArtists: widget.albumHeader.mainArtists,
                     actions: const [
                       AlbumAction.queueLast,
                       AlbumAction.queueNext,
@@ -155,9 +155,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ArtistLinks(widget.album.mainArtists),
+                  ArtistLinks(widget.albumHeader.mainArtists),
                   Text(
-                    widget.album.year?.toString() ?? '',
+                    widget.albumHeader.year?.toString() ?? '',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -190,7 +190,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: LargeThumbnail(widget.album.artwork),
+          child: LargeThumbnail(widget.albumHeader.artwork),
         ),
         Row(
           children: [
@@ -199,20 +199,20 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.album.name,
+                    widget.albumHeader.name,
                     style: Theme.of(context).textTheme.bodyLarge,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  ArtistLinks(widget.album.mainArtists),
+                  ArtistLinks(widget.albumHeader.mainArtists),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8),
               child: AlbumContextMenuButton(
-                name: widget.album.name,
-                mainArtists: widget.album.mainArtists,
+                name: widget.albumHeader.name,
+                mainArtists: widget.albumHeader.mainArtists,
                 actions: const [
                   AlbumAction.queueLast,
                   AlbumAction.queueNext,
@@ -254,7 +254,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.album.name)),
+      appBar: AppBar(title: Text(widget.albumHeader.name)),
       body: body,
     );
   }
