@@ -93,15 +93,19 @@ class _GenreOverviewState extends State<GenreOverview> {
           physics: const BouncingScrollPhysics(),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: viewportConstraints.maxHeight),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (genre.relatedGenres.isNotEmpty) relatedGenres(genre),
-                if (_mainArtists?.isNotEmpty == true) mainArtists(_mainArtists!),
-                if (genre.recentlyAdded.isNotEmpty) recentlyAdded(genre),
-                playButtons(),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Column(
+                spacing: 24,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (genre.relatedGenres.isNotEmpty) relatedGenres(genre),
+                  if (_mainArtists?.isNotEmpty == true) mainArtists(_mainArtists!),
+                  if (genre.recentlyAdded.isNotEmpty) recentlyAdded(genre),
+                  playButtons(),
+                ],
+              ),
             ),
           ),
         );
