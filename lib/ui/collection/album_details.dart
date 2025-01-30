@@ -25,7 +25,7 @@ class AlbumDetails extends StatefulWidget {
 }
 
 class _AlbumDetailsState extends State<AlbumDetails> {
-  List<dto.Song>? _songs;
+  dto.Album? _album;
   APIError? _error;
 
   @override
@@ -45,14 +45,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
 
   void _fetchData({bool useCache = true}) async {
     setState(() {
-      _songs = null;
+      _album = null;
       _error = null;
     });
     try {
       final client = getIt<AppClient>();
       final album = await client.apiClient?.getAlbum(widget.albumHeader.name, widget.albumHeader.mainArtists);
-      final songs = album?.songs ?? [];
-      setState(() => _songs = songs);
+      setState(() => _album = album);
     } on APIError catch (e) {
       setState(() => _error = e);
     }
@@ -69,7 +68,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   }
 
   List<Widget> _getMainContent() {
-    List<dto.Song>? songs = _songs;
+    List<dto.Song>? songs = _album?.songs;
     if (_error != null || songs == null) {
       return [
         Padding(
@@ -144,7 +143,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                       AlbumAction.queueNext,
                       AlbumAction.togglePin,
                     ],
-                    songs: _songs,
+                    songs: _album?.songs,
                     icon: Icons.menu,
                   ),
                 ],
@@ -168,7 +167,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ),
     );
 
-    if (_songs == null && _error == null) {
+    if (_album == null && _error == null) {
       slivers.add(const SliverFillRemaining(
         child: Center(child: CircularProgressIndicator()),
       ));
@@ -218,7 +217,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                   AlbumAction.queueNext,
                   AlbumAction.togglePin,
                 ],
-                songs: _songs,
+                songs: _album?.songs,
                 icon: Icons.menu,
               ),
             ),
@@ -228,7 +227,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     Widget rightColumn;
-    if (_songs == null && _error == null) {
+    if (_album == null && _error == null) {
       rightColumn = const Center(child: CircularProgressIndicator());
     } else {
       rightColumn = Padding(
