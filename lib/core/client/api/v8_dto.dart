@@ -1,5 +1,3 @@
-import 'package:polaris/ui/utils/format.dart';
-
 class APIVersion {
   int major, minor;
   APIVersion({required this.major, required this.minor});
