@@ -56,6 +56,8 @@ class PagesModel extends ChangeNotifier {
   void openGenrePage(String name) {
     _enterZone(Zone.collection);
     _genre = name;
+    _artist = null;
+    _album = null;
     notifyListeners();
   }
 
@@ -67,6 +69,7 @@ class PagesModel extends ChangeNotifier {
   void openArtistPage(String name) {
     _enterZone(Zone.collection);
     _artist = name;
+    _album = null;
     notifyListeners();
   }
 
