@@ -5,10 +5,18 @@ import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
+import 'package:polaris/ui/collection/genre_badge.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 
 final getIt = GetIt.instance;
+
+enum ArtistTab {
+  mainReleases,
+  otherReleases,
+  genres,
+}
 
 class Artist extends StatefulWidget {
   final String artistName;
@@ -19,12 +27,14 @@ class Artist extends StatefulWidget {
   State<Artist> createState() => _ArtistState();
 }
 
-class _ArtistState extends State<Artist> {
+class _ArtistState extends State<Artist> with TickerProviderStateMixin {
+  late TabController _tabController;
   dto.Artist? _artist;
   APIError? _error;
 
   @override
   void initState() {
+    _tabController = TabController(vsync: this, length: 3);
     super.initState();
     fetchArtist();
   }
@@ -78,10 +88,37 @@ class _ArtistState extends State<Artist> {
     await getIt<Playlist>().queueLast(songs);
   }
 
+  List<ArtistTab> getApplicableTabs() {
+    final artist = _artist;
+    if (artist == null) {
+      return [];
+    }
+    final (mainReleases, otherReleases) = _splitReleases(artist.albums);
+    return [
+      if (mainReleases.isNotEmpty) ArtistTab.mainReleases,
+      if (otherReleases.isNotEmpty) ArtistTab.otherReleases,
+      if (artist.numSongsByGenre.isNotEmpty) ArtistTab.genres,
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.artistName)),
+      appBar: AppBar(
+        title: Text(widget.artistName),
+        bottom: TabBar(
+          tabs: getApplicableTabs()
+              .map((t) => Tab(
+                      text: switch (t) {
+                    ArtistTab.mainReleases => artistMainAlbums,
+                    ArtistTab.otherReleases => artistOtherAlbums,
+                    ArtistTab.genres => artistGenres,
+                  }
+                          .toUpperCase()))
+              .toList(),
+          controller: _tabController,
+        ),
+      ),
       body: _buildContent(),
     );
   }
@@ -99,78 +136,78 @@ class _ArtistState extends State<Artist> {
     if (artist == null) {
       return const Center(child: CircularProgressIndicator());
     }
-
     final (mainReleases, otherReleases) = _splitReleases(artist.albums);
 
+    return TabBarView(
+      controller: _tabController,
+      children: getApplicableTabs()
+          .map((t) => switch (t) {
+                ArtistTab.mainReleases => buildAlbumSection(mainReleases, isMainAlbums: true),
+                ArtistTab.otherReleases => buildAlbumSection(otherReleases, isMainAlbums: false),
+                ArtistTab.genres => buildGenreSection(artist.numSongsByGenre),
+              })
+          .toList(),
+    );
+  }
+
+  Widget buildAlbumSection(List<dto.ArtistAlbum> albums, {required bool isMainAlbums}) {
+    final showArtistNames = !isMainAlbums;
+    final showReleaseDates = isMainAlbums;
+
     return OrientationBuilder(builder: (context, orientation) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 24),
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          child: Column(
-            spacing: 16,
-            children: [
-              // TODO v8 add genres
-              if (mainReleases.isNotEmpty)
-                buildAlbumSection(mainReleases, isMainAlbums: true, orientation: orientation),
-              if (otherReleases.isNotEmpty)
-                buildAlbumSection(otherReleases, isMainAlbums: false, orientation: orientation),
-            ],
-          ),
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        child: Column(
+          spacing: 24,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => playAlbums(albums),
+                  icon: const Icon(Icons.play_arrow),
+                  label: Text(playAllButtonLabel.toUpperCase()),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => queueAlbums(albums),
+                  icon: const Icon(Icons.playlist_add),
+                  label: Text(queueAllButtonLabel.toUpperCase()),
+                ),
+              ],
+            ),
+            AlbumGrid(
+              albums,
+              null,
+              shrinkWrap: true,
+              orientation: orientation,
+              showArtistNames: showArtistNames,
+              showReleaseDates: showReleaseDates,
+            ),
+          ],
         ),
       );
     });
   }
 
-  Widget buildAlbumSection(
-    List<dto.ArtistAlbum> albums, {
-    required bool isMainAlbums,
-    required Orientation orientation,
-  }) {
-    final title = isMainAlbums ? mainAlbumsSectionTitle : otherAlbumsSectionTitle;
-    final showArtistNames = !isMainAlbums;
-    final showReleaseDates = isMainAlbums;
+  Widget buildGenreSection(Map<String, int> genres) {
+    final pagesModel = getIt<PagesModel>();
+    final genreNames = genres.keys.toList();
+    genreNames.sort((a, b) => -genres[a]!.compareTo(genres[b]!));
 
-    return Builder(builder: (context) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 16,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title.toUpperCase(),
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              Row(
-                spacing: 16,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: () => playAlbums(albums),
-                    icon: const Icon(Icons.play_arrow),
-                    label: Text(playButtonLabel.toUpperCase()),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => queueAlbums(albums),
-                    icon: const Icon(Icons.playlist_add),
-                    label: Text(queueButtonLabel.toUpperCase()),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          AlbumGrid(
-            albums,
-            null,
-            shrinkWrap: true,
-            orientation: orientation,
-            showArtistNames: showArtistNames,
-            showReleaseDates: showReleaseDates,
-          ),
-        ],
-      );
-    });
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      padding: const EdgeInsets.fromLTRB(32, 24, 32, 24),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: -4,
+        children: genreNames
+            .map((genre) => GenreBadge(
+                  genre,
+                  onTap: () => pagesModel.openGenrePage(genre),
+                ))
+            .toList(),
+      ),
+    );
   }
 }
