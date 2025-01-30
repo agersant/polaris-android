@@ -81,7 +81,7 @@ class _GenresState extends State<Genres> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+            padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
             child: TextField(
               maxLines: 1,
               controller: _filterController,
