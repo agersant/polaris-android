@@ -249,12 +249,12 @@ class _GenreOverviewState extends State<GenreOverview> {
         children: [
           ElevatedButton.icon(
             onPressed: playAll,
-            label: Text(genrePlayAll.toUpperCase()),
+            label: Text(playAllButtonLabel.toUpperCase()),
             icon: const Icon(Icons.play_arrow),
           ),
           OutlinedButton.icon(
             onPressed: queueAll,
-            label: Text(genreQueueAll.toUpperCase()),
+            label: Text(queueAllButtonLabel.toUpperCase()),
             icon: const Icon(Icons.playlist_add),
           ),
         ],
