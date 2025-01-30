@@ -6,7 +6,6 @@ import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/collection/album_grid.dart';
 import 'package:polaris/ui/collection/genre_badge.dart';
-import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 
@@ -191,7 +190,6 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
   }
 
   Widget buildGenreSection(Map<String, int> genres) {
-    final pagesModel = getIt<PagesModel>();
     final genreNames = genres.keys.toList();
     genreNames.sort((a, b) => -genres[a]!.compareTo(genres[b]!));
 
@@ -201,12 +199,7 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
       child: Wrap(
         spacing: 8,
         runSpacing: -4,
-        children: genreNames
-            .map((genre) => GenreBadge(
-                  genre,
-                  onTap: () => pagesModel.openGenrePage(genre),
-                ))
-            .toList(),
+        children: genreNames.map((genre) => GenreBadge(genre)).toList(),
       ),
     );
   }

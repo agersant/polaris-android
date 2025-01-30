@@ -4,7 +4,6 @@ import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/ui/collection/genre_badge.dart';
-import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 
@@ -123,8 +122,6 @@ class _GenresState extends State<Genres> {
       return const ErrorMessage(noGenres);
     }
 
-    final pagesModel = getIt<PagesModel>();
-
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       controller: _scrollController,
@@ -132,12 +129,7 @@ class _GenresState extends State<Genres> {
       child: Wrap(
         spacing: 8,
         runSpacing: -4,
-        children: filteredGenres
-            .map((genre) => GenreBadge(
-                  genre.name,
-                  onTap: () => pagesModel.openGenrePage(genre.name),
-                ))
-            .toList(),
+        children: filteredGenres.map((genre) => GenreBadge(genre.name)).toList(),
       ),
     );
   }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:polaris/ui/pages_model.dart';
+
+final getIt = GetIt.instance;
 
 class GenreBadge extends StatelessWidget {
   final String name;
-  final void Function() onTap;
 
   // Tailwind palette
   static const List<Color> palette = [
@@ -26,7 +29,7 @@ class GenreBadge extends StatelessWidget {
   ];
   static final lut = List.generate(256, (i) => i);
 
-  const GenreBadge(this.name, {required this.onTap, Key? key}) : super(key: key);
+  const GenreBadge(this.name, {Key? key}) : super(key: key);
 
   static Color pickColor(String s) {
     final initialValue = s.length % (lut.length - 1);
@@ -38,13 +41,18 @@ class GenreBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final acentColor = pickColor(name);
+    final pagesModel = getIt<PagesModel>();
+
+    final accentColor = pickColor(name);
     return OutlinedButton.icon(
-      onPressed: onTap,
+      style: const ButtonStyle(visualDensity: VisualDensity.compact),
+      onPressed: () {
+        pagesModel.openGenrePage(name);
+      },
       icon: Container(
         width: 7,
         height: 7,
-        decoration: BoxDecoration(color: acentColor, shape: BoxShape.circle),
+        decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
       ),
       label: Text(
         name,

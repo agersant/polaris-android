@@ -6,6 +6,7 @@ import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
+import 'package:polaris/ui/collection/genre_badge.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/artist_links.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
@@ -67,6 +68,35 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
+  List<String> _getGenres() {
+    final songs = _album?.songs;
+    if (songs == null) {
+      return [];
+    }
+    final Map<String, int> counts = {};
+    for (final song in songs) {
+      for (final genre in song.genres) {
+        counts.putIfAbsent(genre, () => 0);
+        counts[genre] = counts[genre]! + 1;
+      }
+    }
+    final names = counts.keys.toList();
+    names.sort((a, b) => -(counts[a] ?? 0).compareTo(counts[b] ?? 0));
+    return names;
+  }
+
+  Widget _getGenresWidget(List<String> genres) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        spacing: 8,
+        children: genres.map((g) => GenreBadge(g)).toList(),
+      ),
+    );
+  }
+
   List<Widget> _getMainContent() {
     List<dto.Song>? songs = _album?.songs;
     if (_error != null || songs == null) {
@@ -104,6 +134,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   }
 
   Widget _getPortraitLayout() {
+    final genres = _getGenres();
     var slivers = <Widget>[];
 
     slivers.add(SliverAppBar(
@@ -125,32 +156,41 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Text(
-                      widget.albumHeader.name,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      softWrap: true,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.albumHeader.name,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                            softWrap: true,
+                          ),
+                        ),
+                        AlbumContextMenuButton(
+                          name: widget.albumHeader.name,
+                          mainArtists: widget.albumHeader.mainArtists,
+                          actions: const [
+                            AlbumAction.queueLast,
+                            AlbumAction.queueNext,
+                            AlbumAction.togglePin,
+                          ],
+                          songs: _album?.songs,
+                          icon: Icons.menu,
+                        ),
+                      ],
                     ),
                   ),
-                  AlbumContextMenuButton(
-                    name: widget.albumHeader.name,
-                    mainArtists: widget.albumHeader.mainArtists,
-                    actions: const [
-                      AlbumAction.queueLast,
-                      AlbumAction.queueNext,
-                      AlbumAction.togglePin,
-                    ],
-                    songs: _album?.songs,
-                    icon: Icons.menu,
-                  ),
+                  if (genres.isNotEmpty) _getGenresWidget(genres),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -226,17 +266,19 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ],
     );
 
+    final genres = _getGenres();
     Widget rightColumn;
     if (_album == null && _error == null) {
       rightColumn = const Center(child: CircularProgressIndicator());
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
-        // Ideally this would line up with the artwork on the right,
-        // but the top padding built-in the ListTile makes it difficult
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          children: _getMainContent(),
+          children: [
+            if (genres.isNotEmpty) _getGenresWidget(genres),
+            ..._getMainContent(),
+          ],
         ),
       );
     }

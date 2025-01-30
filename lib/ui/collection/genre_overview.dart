@@ -110,7 +110,6 @@ class _GenreOverviewState extends State<GenreOverview> {
   }
 
   Widget relatedGenres(dto.Genre genre) {
-    final pagesModel = getIt<PagesModel>();
     final genreNames = genre.relatedGenres.keys.toList();
     genreNames.sort((a, b) => -genre.relatedGenres[a]!.compareTo(genre.relatedGenres[b]!));
 
@@ -134,10 +133,7 @@ class _GenreOverviewState extends State<GenreOverview> {
             mainAxisSpacing: 8,
             scrollDirection: Axis.horizontal,
             itemCount: genreNames.length,
-            itemBuilder: (context, index) => GenreBadge(
-              genreNames[index],
-              onTap: () => pagesModel.openGenrePage(genreNames[index]),
-            ),
+            itemBuilder: (context, index) => GenreBadge(genreNames[index]),
           ),
         ),
       ],
