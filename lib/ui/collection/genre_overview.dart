@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get_it/get_it.dart';
@@ -114,7 +116,10 @@ class _GenreOverviewState extends State<GenreOverview> {
     final genreNames = genre.relatedGenres.keys.toList();
     genreNames.sort((a, b) => -genre.relatedGenres[a]!.compareTo(genre.relatedGenres[b]!));
 
+    const rowHeight = 32.0;
+    const rowSpacing = 8.0;
     final numRows = genreNames.length > 4 ? 2 : 1;
+    final height = rowHeight * numRows + rowSpacing * (numRows - 1);
 
     return Column(
       spacing: 8,
@@ -122,12 +127,12 @@ class _GenreOverviewState extends State<GenreOverview> {
       children: [
         sectionTitle(genreRelated),
         SizedBox(
-          height: 40.0 * numRows,
+          height: height,
           child: MasonryGridView.count(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
             crossAxisCount: numRows,
-            crossAxisSpacing: 8,
+            crossAxisSpacing: rowSpacing,
             mainAxisSpacing: 8,
             scrollDirection: Axis.horizontal,
             itemCount: genreNames.length,
