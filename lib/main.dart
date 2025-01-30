@@ -194,7 +194,6 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showPlayer = isStartupComplete && pagesModel.isPlayerOpen;
-          final collapseMiniPlayer = !isStartupComplete || (pagesModel.isPlayerOpen && !pagesModel.isQueueOpen);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
@@ -254,6 +253,8 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                     Zone.playback => playbackPages,
                   })
               .toList();
+
+          final collapseMiniPlayer = sortedPages.lastOrNull?.child is PlayerPage;
 
           return Column(
             children: [
