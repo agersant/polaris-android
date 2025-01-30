@@ -1,5 +1,4 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
@@ -12,6 +11,7 @@ import 'package:polaris/ui/playback/playback_controls.dart';
 import 'package:polaris/ui/playback/progress_state.dart';
 import 'package:polaris/ui/playback/seekbar.dart';
 import 'package:polaris/ui/playback/streaming_indicator.dart';
+import 'package:polaris/ui/utils/artist_links.dart';
 import 'package:polaris/ui/utils/format.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
@@ -171,35 +171,6 @@ class PlayerPage extends StatelessWidget {
         );
 
         final artists = (song?.artists.isEmpty == false ? song?.artists : song?.albumArtists) ?? [];
-        final artistStyle =
-            Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).textTheme.bodySmall!.color);
-        final tappableArtistStyle = artistStyle.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          decoration: TextDecoration.underline,
-        );
-        final artistsRichText = artists.isEmpty
-            ? const Text(unknownArtist)
-            : RichText(
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: artistStyle,
-                  children: artists
-                      .map((artist) => TextSpan(
-                            text: artist,
-                            style: isFakeArtist(artist) ? null : tappableArtistStyle,
-                            recognizer: isFakeArtist(artist)
-                                ? null
-                                : (TapGestureRecognizer()
-                                  ..onTap = () {
-                                    pagesModel.openArtistPage(artist);
-                                  }),
-                          ))
-                      .expand((span) => [span, const TextSpan(text: ', ')])
-                      .toList()
-                    ..removeLast(),
-                ),
-              );
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -215,7 +186,7 @@ class PlayerPage extends StatelessWidget {
                   ],
                 ),
               ),
-              artistsRichText,
+              ArtistLinks(artists),
             ],
           ),
         );

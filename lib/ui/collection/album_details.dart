@@ -7,6 +7,7 @@ import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/artist_links.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
@@ -154,10 +155,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.album.formatArtists(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  ArtistLinks(widget.album.mainArtists),
                   Text(
                     widget.album.year?.toString() ?? '',
                     style: Theme.of(context).textTheme.bodySmall,
@@ -206,10 +204,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    widget.album.formatArtists(),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                  ArtistLinks(widget.album.mainArtists),
                 ],
               ),
             ),
