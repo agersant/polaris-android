@@ -1,3 +1,5 @@
+import 'package:polaris/ui/utils/format.dart';
+
 class APIVersion {
   int major, minor;
   APIVersion({required this.major, required this.minor});
@@ -353,6 +355,22 @@ class Song {
         'artwork': artwork,
         'duration': duration,
       };
+
+  AlbumHeader? toAlbumHeader() {
+    if (album == null) {
+      return null;
+    }
+    if (artists.isEmpty && albumArtists.isEmpty) {
+      return null;
+    }
+    final mainArtists = albumArtists.isNotEmpty ? albumArtists : artists;
+    if (mainArtists.every(isFakeArtist)) {
+      return null;
+    }
+    return AlbumHeader(name: album!, mainArtists: mainArtists)
+      ..artwork = artwork
+      ..year = year;
+  }
 }
 
 enum ThumbnailSize {

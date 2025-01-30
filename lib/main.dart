@@ -21,6 +21,7 @@ import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
 import 'package:polaris/core/songs.dart' as songs;
+import 'package:polaris/ui/collection/album_details.dart';
 import 'package:polaris/ui/collection/artist.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/genre.dart';
@@ -198,7 +199,61 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
           final showArtist = isStartupComplete && pagesModel.artist != null;
+          final showAlbum = isStartupComplete && pagesModel.album != null;
           final showGenre = isStartupComplete && pagesModel.genre != null;
+
+          final collectionPages = [
+            if (showGenre)
+              MaterialPage<dynamic>(
+                  child: Genre(pagesModel.genre!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.closeGenrePage();
+                    }
+                  }),
+            if (showArtist)
+              MaterialPage<dynamic>(
+                  child: Artist(pagesModel.artist!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.closeArtistPage();
+                    }
+                  }),
+            if (showAlbum)
+              MaterialPage<dynamic>(
+                  child: AlbumDetails(pagesModel.album!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.closeAlbumPage();
+                    }
+                  }),
+          ];
+
+          final playbackPages = [
+            if (showPlayer)
+              MaterialPage<dynamic>(
+                  child: const PlayerPage(),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.closePlayer();
+                    }
+                  }),
+            if (showQueue)
+              MaterialPage<dynamic>(
+                  child: const QueuePage(),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.closeQueue();
+                    }
+                  }),
+          ];
+
+          final sortedPages = pagesModel.zones
+              .expand((z) => switch (z) {
+                    Zone.collection => collectionPages,
+                    Zone.playback => playbackPages,
+                  })
+              .toList();
 
           return Column(
             children: [
@@ -208,9 +263,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   onDidRemovePage: (page) {},
                   pages: [
                     if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
-
                     if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-
                     if (showSettings)
                       MaterialPage<dynamic>(
                           child: const SettingsPage(),
@@ -219,7 +272,6 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                               pagesModel.closeSettings();
                             }
                           }),
-
                     if (showOfflineMusic)
                       MaterialPage<dynamic>(
                           child: const OfflineMusicPage(),
@@ -228,45 +280,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                               pagesModel.closeOfflineMusic();
                             }
                           }),
-
-                    if (showGenre)
-                      MaterialPage<dynamic>(
-                          child: Genre(pagesModel.genre!),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closeGenrePage();
-                            }
-                          }),
-
-                    if (showArtist)
-                      MaterialPage<dynamic>(
-                          child: Artist(pagesModel.artist!),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closeArtistPage();
-                            }
-                          }),
-
-                    // Ideally album details would be here but OpenContainer() can't be used with the pages API.
-                    // TODO Consider transitions that aren't the default for player and queue pages
-
-                    if (showPlayer)
-                      MaterialPage<dynamic>(
-                          child: const PlayerPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closePlayer();
-                            }
-                          }),
-
-                    if (showQueue)
-                      MaterialPage<dynamic>(
-                          child: const QueuePage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closeQueue();
-                            }
-                          }),
+                    ...sortedPages,
                   ],
                 ),
               ),

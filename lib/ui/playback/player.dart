@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
@@ -115,14 +116,24 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildArtwork() {
     final audioHandler = getIt<PolarisAudioHandler>();
+    final pagesModel = getIt<PagesModel>();
+
     return StreamBuilder<dto.Song?>(
       stream: audioHandler.currentSong,
       builder: (context, snapshot) {
         final dto.Song? song = snapshot.data;
-        return Material(
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          elevation: 2,
-          child: LargeThumbnail(song?.artwork),
+        final albumHeader = song?.toAlbumHeader();
+        return GestureDetector(
+          onTap: () {
+            if (albumHeader != null) {
+              pagesModel.openAlbumPage(albumHeader);
+            }
+          },
+          child: Material(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            elevation: 2,
+            child: LargeThumbnail(song?.artwork),
+          ),
         );
       },
     );
@@ -144,10 +155,52 @@ class PlayerPage extends StatelessWidget {
 
   Widget _buildTrackDetails() {
     final audioHandler = getIt<PolarisAudioHandler>();
+    final pagesModel = getIt<PagesModel>();
+
     return StreamBuilder<dto.Song?>(
       stream: audioHandler.currentSong,
       builder: (context, snapshot) {
         final dto.Song? song = snapshot.data;
+
+        final titleText = Text(
+          song?.formatTitle() ?? unknownSong,
+          style: Theme.of(context).textTheme.titleMedium,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          softWrap: false,
+        );
+
+        final artists = (song?.artists.isEmpty == false ? song?.artists : song?.albumArtists) ?? [];
+        final artistStyle =
+            Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).textTheme.bodySmall!.color);
+        final tappableArtistStyle = artistStyle.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          decoration: TextDecoration.underline,
+        );
+        final artistsRichText = artists.isEmpty
+            ? const Text(unknownArtist)
+            : RichText(
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: artistStyle,
+                  children: artists
+                      .map((artist) => TextSpan(
+                            text: artist,
+                            style: isFakeArtist(artist) ? null : tappableArtistStyle,
+                            recognizer: isFakeArtist(artist)
+                                ? null
+                                : (TapGestureRecognizer()
+                                  ..onTap = () {
+                                    pagesModel.openArtistPage(artist);
+                                  }),
+                          ))
+                      .expand((span) => [span, const TextSpan(text: ', ')])
+                      .toList()
+                    ..removeLast(),
+                ),
+              );
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
@@ -158,27 +211,11 @@ class PlayerPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const StreamingIndicator(),
-                    Flexible(
-                      child: Text(
-                        song?.formatTitle() ?? unknownSong,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        softWrap: false,
-                      ),
-                    ),
+                    Flexible(child: titleText),
                   ],
                 ),
               ),
-              Text(
-                song?.formatArtists() ?? unknownArtist,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: Theme.of(context).textTheme.bodySmall!.color),
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
+              artistsRichText,
             ],
           ),
         );
