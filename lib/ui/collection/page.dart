@@ -91,18 +91,23 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final scrollablesTabs = visibleTabs.length > 3;
     return Scaffold(
       appBar: AppBar(
         title: const Text(collectionTitle),
-        bottom: TabBar(tabs: <Tab>[
-          // TODO v8 add label for current tab?
-          if (visibleTabs.contains(CollectionTab.browse)) const Tab(icon: Icon(Icons.folder)),
-          if (visibleTabs.contains(CollectionTab.albums)) const Tab(icon: Icon(Icons.album)),
-          if (visibleTabs.contains(CollectionTab.artists)) const Tab(icon: Icon(Icons.person)),
-          if (visibleTabs.contains(CollectionTab.genres)) const Tab(icon: Icon(Icons.label)),
-          if (visibleTabs.contains(CollectionTab.playlists)) const Tab(icon: Icon(Icons.playlist_play)),
-          if (visibleTabs.contains(CollectionTab.search)) const Tab(icon: Icon(Icons.search)),
-        ], controller: _tabController),
+        bottom: TabBar(
+          tabs: <Tab>[
+            if (visibleTabs.contains(CollectionTab.browse)) const Tab(text: tabFiles),
+            if (visibleTabs.contains(CollectionTab.albums)) const Tab(text: tabAlbums),
+            if (visibleTabs.contains(CollectionTab.artists)) const Tab(text: tabArtists),
+            if (visibleTabs.contains(CollectionTab.genres)) const Tab(text: tabGenres),
+            if (visibleTabs.contains(CollectionTab.playlists)) const Tab(text: tabPlaylists),
+            if (visibleTabs.contains(CollectionTab.search)) const Tab(text: tabSearch),
+          ],
+          controller: _tabController,
+          isScrollable: scrollablesTabs,
+          padding: scrollablesTabs ? const EdgeInsets.symmetric(horizontal: 24) : null,
+        ),
       ),
       drawer: _buildDrawer(context),
       body: TabBarView(

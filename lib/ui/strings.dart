@@ -20,6 +20,14 @@ const disconnectButtonLabel = 'DISCONNECT';
 const loginButtonLabel = 'LOGIN';
 const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
+// Collection tabs
+const tabFiles = 'FILES';
+const tabAlbums = 'ALBUMS';
+const tabArtists = 'ARTISTS';
+const tabGenres = 'GENRES';
+const tabPlaylists = 'PLAYLISTS';
+const tabSearch = 'SEARCH';
+
 // Collection
 const albumDetailsError = 'There was an error while reading this album.';
 const albumsError = 'There was an error while listing albums.';
