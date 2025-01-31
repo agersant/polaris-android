@@ -57,7 +57,6 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
   void _handleConnectionStateChanged() {
     setState(() {
       final isOnline = _connectionManager.isConnected();
-      // TODO legacy API cleanup
       final supportsPlaylists = (_connectionManager.apiVersion ?? 0) >= 8;
       final supportsArtists = (_connectionManager.apiVersion ?? 0) >= 8;
       final supportsGenres = (_connectionManager.apiVersion ?? 0) >= 8;

@@ -119,7 +119,6 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
   }
 
   Future _fetchAlbums() async {
-    // TODO legacy API cleanup
     final connectionManager = getIt<connection.Manager>();
     final hasAlbums = _albums?.isNotEmpty ?? false;
     final supportsInfiniteFeed = (connectionManager.apiVersion ?? 0) >= 8;
