@@ -169,6 +169,7 @@ Widget _songWidget(BuildContext context, String path) {
                         SongAction.queueNext,
                         SongAction.togglePin,
                         SongAction.songInfo,
+                        SongAction.viewAlbum,
                       ],
                     ),
                   ),

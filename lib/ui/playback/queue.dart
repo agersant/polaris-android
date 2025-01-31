@@ -135,6 +135,7 @@ Widget _songWidget(BuildContext context, int index, MediaItem mediaItem, bool is
                       actions: const [
                         SongAction.removeFromQueue,
                         SongAction.togglePin,
+                        SongAction.viewAlbum,
                       ],
                       onRemoveFromQueue: () {
                         getIt<Playlist>().removeSong(index);
