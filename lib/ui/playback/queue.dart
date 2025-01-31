@@ -60,7 +60,6 @@ class QueuePage extends StatelessWidget {
 
         final clearAction = isEmpty ? null : _clearQueue;
         final saveAction = isEmpty ? null : () => _save(context, playlist.name);
-        // TODO legacy API cleanup
         final bool canSavePlaylist = (connectionManager.apiVersion ?? 0) >= 8;
 
         return Scaffold(
