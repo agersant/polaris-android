@@ -182,7 +182,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       SongAction.removeFromQueue => true,
       SongAction.togglePin => true,
       SongAction.songInfo => song != null,
-      SongAction.viewAlbum => song?.toAlbumHeader() != null,
+      SongAction.viewAlbum => song?.toAlbumHeader() != null && (getIt<connection.Manager>().apiVersion ?? 0) >= 8,
       SongAction.viewFolder => true,
     };
   }

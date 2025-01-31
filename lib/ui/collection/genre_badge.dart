@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/pages_model.dart';
 
 final getIt = GetIt.instance;
@@ -42,13 +43,13 @@ class GenreBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pagesModel = getIt<PagesModel>();
+    final connectionManager = getIt<connection.Manager>();
+    final hasLink = (connectionManager.apiVersion ?? 0) >= 8;
 
     final accentColor = pickColor(name);
     return OutlinedButton.icon(
       style: const ButtonStyle(visualDensity: VisualDensity.compact),
-      onPressed: () {
-        pagesModel.openGenrePage(name);
-      },
+      onPressed: hasLink ? () => pagesModel.openGenrePage(name) : null,
       icon: Container(
         width: 7,
         height: 7,

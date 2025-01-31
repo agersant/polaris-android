@@ -117,6 +117,7 @@ class PlayerPage extends StatelessWidget {
   Widget _buildArtwork() {
     final audioHandler = getIt<PolarisAudioHandler>();
     final pagesModel = getIt<PagesModel>();
+    final connectionManager = getIt<connection.Manager>();
 
     return StreamBuilder<dto.Song?>(
       stream: audioHandler.currentSong,
@@ -125,7 +126,7 @@ class PlayerPage extends StatelessWidget {
         final albumHeader = song?.toAlbumHeader();
         return GestureDetector(
           onTap: () {
-            if (albumHeader != null) {
+            if (albumHeader != null && (connectionManager.apiVersion ?? 0) >= 8) {
               pagesModel.openAlbumPage(albumHeader);
             }
           },

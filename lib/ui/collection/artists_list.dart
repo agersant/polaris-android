@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
+import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/error_message.dart';
@@ -127,6 +128,7 @@ class _ArtistsListState extends State<ArtistsList> {
     }
 
     final pagesModel = getIt<PagesModel>();
+    final connectionManager = getIt<connection.Manager>();
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 24),
@@ -134,8 +136,9 @@ class _ArtistsListState extends State<ArtistsList> {
       itemCount: filteredArtists.length,
       itemBuilder: (BuildContext context, int index) {
         final artist = filteredArtists[index];
+        final onTap = (connectionManager.apiVersion ?? 0) < 8 ? null : () => pagesModel.openArtistPage(artist.name);
         return InkWell(
-          onTap: () => pagesModel.openArtistPage(artist.name),
+          onTap: onTap,
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 32),
             leading: Container(
