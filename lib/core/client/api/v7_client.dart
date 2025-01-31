@@ -77,6 +77,13 @@ class V7Client extends BaseHttpClient implements APIClientInterface {
       final collectionFiles =
           (json.decode(utf8.decode(responseBody)) as List).map((dynamic c) => dto7.CollectionFile.fromJson(c)).toList();
       final songs = collectionFiles.where((f) => f.isSong()).map((f) => f.asSong().toV8()).toList();
+      songs.sort((a, b) {
+        if (a.discNumber != b.discNumber) {
+          return (a.discNumber ?? -1).compareTo((b.discNumber ?? -1));
+        } else {
+          return (a.trackNumber ?? -1).compareTo((b.trackNumber ?? -1));
+        }
+      });
       collectionCache.putSongs(host, songs);
       return dto8.Album(name: name, mainArtists: mainArtists)
         ..songs = songs
