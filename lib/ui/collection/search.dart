@@ -167,9 +167,10 @@ Widget _songWidget(BuildContext context, String path) {
                       actions: const [
                         SongAction.queueLast,
                         SongAction.queueNext,
-                        SongAction.togglePin,
                         SongAction.songInfo,
                         SongAction.viewAlbum,
+                        SongAction.viewFolder,
+                        SongAction.togglePin,
                       ],
                     ),
                   ),

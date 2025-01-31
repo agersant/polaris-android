@@ -6,9 +6,11 @@ import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
+import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
+import 'package:polaris/utils.dart';
 
 final getIt = GetIt.instance;
 
@@ -151,6 +153,7 @@ enum SongAction {
   togglePin,
   songInfo,
   viewAlbum,
+  viewFolder,
 }
 
 class SongContextMenuButton extends ContextMenuButton<SongAction> {
@@ -180,6 +183,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       SongAction.togglePin => true,
       SongAction.songInfo => song != null,
       SongAction.viewAlbum => song?.toAlbumHeader() != null,
+      SongAction.viewFolder => true,
     };
   }
 
@@ -192,6 +196,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
       SongAction.songInfo => (Icons.info_outline, contextMenuSongInfo),
       SongAction.viewAlbum => (Icons.album, contextMenuViewAlbum),
+      SongAction.viewFolder => (Icons.folder, contextMenuViewFolder),
     };
   }
 
@@ -227,6 +232,12 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
         if (albumHeader != null) {
           pagesModel.openAlbumPage(albumHeader);
         }
+        break;
+      case SongAction.viewFolder:
+        final pagesModel = getIt<PagesModel>();
+        final browserModel = getIt<BrowserModel>();
+        pagesModel.closeAll();
+        browserModel.jumpTo(dirname(path));
         break;
     }
   }

@@ -42,7 +42,16 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
   void initState() {
     super.initState();
     _connectionManager.addListener(_handleConnectionStateChanged);
+    _browserModel.onJump.addListener(_handleBrowserJumpTo);
     _handleConnectionStateChanged();
+  }
+
+  @override
+  void dispose() {
+    _connectionManager.removeListener(_handleConnectionStateChanged);
+    _browserModel.onJump.removeListener(_handleBrowserJumpTo);
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _handleConnectionStateChanged() {
@@ -72,15 +81,12 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
     });
   }
 
-  void _handleActiveTabChanged() {
-    _browserModel.setBrowserActive(_tabController.index == 0);
+  void _handleBrowserJumpTo() {
+    _tabController.animateTo(0);
   }
 
-  @override
-  void dispose() {
-    _connectionManager.removeListener(_handleConnectionStateChanged);
-    _tabController.dispose();
-    super.dispose();
+  void _handleActiveTabChanged() {
+    _browserModel.setBrowserActive(_tabController.index == 0);
   }
 
   @override

@@ -33,6 +33,17 @@ class PagesModel extends ChangeNotifier {
     _zones.add(zone);
   }
 
+  void closeAll() {
+    _isOfflineMusicOpen = false;
+    _isSettingsOpen = false;
+    _genre = null;
+    _artist = null;
+    _album = null;
+    _isPlayerOpen = false;
+    _isQueueOpen = false;
+    notifyListeners();
+  }
+
   void openOfflineMusic() {
     _isOfflineMusicOpen = true;
     notifyListeners();

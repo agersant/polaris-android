@@ -380,8 +380,9 @@ class Song extends StatelessWidget {
             actions: const [
               SongAction.queueLast,
               SongAction.queueNext,
-              SongAction.togglePin,
               SongAction.songInfo,
+              SongAction.viewFolder,
+              SongAction.togglePin,
             ],
           ),
           dense: true,

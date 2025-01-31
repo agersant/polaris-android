@@ -142,6 +142,14 @@ class _BrowserLocationState extends State<BrowserLocation> {
     _fetchData();
   }
 
+  @override
+  void didUpdateWidget(BrowserLocation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.location != widget.location) {
+      _fetchData();
+    }
+  }
+
   Future _fetchData({bool useCache = true}) async {
     setState(() {
       _entries = null;
@@ -251,9 +259,9 @@ class Song extends StatelessWidget {
         actions: const [
           SongAction.queueLast,
           SongAction.queueNext,
-          SongAction.togglePin,
           SongAction.songInfo,
           SongAction.viewAlbum,
+          SongAction.togglePin,
         ],
       ),
       dense: true,
