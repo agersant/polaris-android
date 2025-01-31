@@ -6,6 +6,7 @@ import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
+import 'package:polaris/ui/pages_model.dart';
 import 'package:polaris/ui/strings.dart';
 import 'package:polaris/ui/utils/song_info.dart';
 
@@ -26,6 +27,10 @@ abstract class ContextMenuButton<T> extends StatelessWidget {
     Key? key,
   })  : host = getIt<connection.Manager>().url,
         super(key: key);
+
+  bool isActionPossible(T action) {
+    return true;
+  }
 
   (IconData, String) getActionVisuals(T action);
 
@@ -51,7 +56,7 @@ abstract class ContextMenuButton<T> extends StatelessWidget {
       iconSize: iconSize,
       onSelected: (action) => executeAction(context, action),
       itemBuilder: (BuildContext context) {
-        return actions.map((action) {
+        return actions.where(isActionPossible).map((action) {
           final (icon, label) = getActionVisuals(action);
           return _buildButton(action, icon, label);
         }).toList();
@@ -145,6 +150,7 @@ enum SongAction {
   removeFromQueue,
   togglePin,
   songInfo,
+  viewAlbum,
 }
 
 class SongContextMenuButton extends ContextMenuButton<SongAction> {
@@ -166,6 +172,18 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   }
 
   @override
+  bool isActionPossible(SongAction action) {
+    return switch (action) {
+      SongAction.queueLast => true,
+      SongAction.queueNext => true,
+      SongAction.removeFromQueue => true,
+      SongAction.togglePin => true,
+      SongAction.songInfo => song != null,
+      SongAction.viewAlbum => song?.toAlbumHeader() != null,
+    };
+  }
+
+  @override
   (IconData, String) getActionVisuals(SongAction action) {
     return switch (action) {
       SongAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
@@ -173,6 +191,7 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
       SongAction.removeFromQueue => (Icons.clear, contextMenuRemoveFromQueue),
       SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
       SongAction.songInfo => (Icons.info_outline, contextMenuSongInfo),
+      SongAction.viewAlbum => (Icons.album, contextMenuViewAlbum),
     };
   }
 
@@ -200,6 +219,13 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
           pinManager.unpinSong(host, path);
         } else {
           pinManager.pinSong(host, path);
+        }
+        break;
+      case SongAction.viewAlbum:
+        final pagesModel = getIt<PagesModel>();
+        final albumHeader = song?.toAlbumHeader();
+        if (albumHeader != null) {
+          pagesModel.openAlbumPage(albumHeader);
         }
         break;
     }

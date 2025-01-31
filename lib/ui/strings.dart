@@ -74,6 +74,7 @@ const contextMenuPin = 'Add to Offline Music';
 const contextMenuUnpin = 'Remove from Offline Music';
 const contextMenuSongInfo = 'Song Details';
 const contextMenuDeletePlaylist = 'Delete Playlist';
+const contextMenuViewAlbum = 'View Album';
 
 // Collection drawer
 const drawerSettings = 'Settings';
