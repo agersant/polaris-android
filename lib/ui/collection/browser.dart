@@ -218,28 +218,25 @@ class Directory extends StatelessWidget {
 
   const Directory(this.entry, {this.onTap, Key? key}) : super(key: key);
 
-  ListTile _buildTile({void Function()? onTap}) {
-    return ListTile(
-      leading: const Icon(Icons.folder),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-      title: Text(entry.formatName()),
-      trailing: DirectoryContextMenuButton(
-        path: entry.path,
-        actions: const [
-          DirectoryAction.queueLast,
-          DirectoryAction.queueNext,
-          DirectoryAction.togglePin,
-        ],
-      ),
-      dense: true,
-      onTap: onTap,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final tile = _buildTile(onTap: onTap);
-    return Material(child: tile);
+    return Material(
+      child: ListTile(
+        onTap: onTap,
+        dense: true,
+        leading: const Icon(Icons.folder),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        title: Text(entry.formatName()),
+        trailing: DirectoryContextMenuButton(
+          path: entry.path,
+          actions: const [
+            DirectoryAction.queueLast,
+            DirectoryAction.queueNext,
+            DirectoryAction.togglePin,
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -250,22 +247,24 @@ class Song extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.audio_file),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-      title: Text(entry.formatName(), overflow: TextOverflow.ellipsis),
-      trailing: SongContextMenuButton(
-        path: entry.path,
-        actions: const [
-          SongAction.queueLast,
-          SongAction.queueNext,
-          SongAction.songInfo,
-          SongAction.viewAlbum,
-          SongAction.togglePin,
-        ],
+    return Material(
+      child: ListTile(
+        onTap: _onTap,
+        dense: true,
+        leading: const Icon(Icons.audio_file),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        title: Text(entry.formatName(), overflow: TextOverflow.ellipsis),
+        trailing: SongContextMenuButton(
+          path: entry.path,
+          actions: const [
+            SongAction.queueLast,
+            SongAction.queueNext,
+            SongAction.songInfo,
+            SongAction.viewAlbum,
+            SongAction.togglePin,
+          ],
+        ),
       ),
-      dense: true,
-      onTap: _onTap,
     );
   }
 
