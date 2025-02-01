@@ -1,1 +1,18 @@
-- Updated Flutter framework to version 3.27
+- 🚀 Added compatibility with Polaris server version 0.15.
+- ⚠️ Breaking change: Upon first launch, this update clears the current playlist and music saved for offline use.
+- 🆕 File browser now shows the title of the current folder.
+- 🆕 File browser now has a hamburger menu with options to queue the entire folder or save its content for offline listening.
+- 🆕 Added a new page to search for songs in the collection.
+- 🆕 Added a new page listing artists in the collection (requires 0.15+ server).
+- 🆕 Added a new page to see saved playlists (requires 0.15+ server).
+- 🆕 Added a button to save the current queue as a playlist (requires 0.15+ server).
+- 🆕 The list of random albums can now be scrolled continuously (albums may repeat when not using 0.15+ server).
+- 🆕 The list of recently added albums can now be scrolled continuously (requires 0.15+ server).
+- 🆕 Context menus now have options to jump to the corresponding folder or album.
+- 🆕 Tapping the album art on the player page now opens the corresponding album page (requires 0.15+ server).
+- 🆕 Tapping artist names on the player page now opens their page (requires 0.15+ server).
+- ⚡️ Small album art images now use less bandwidth and memory.
+- ❔ Random and recently added albums are now within the same tab.
+- ❔ File browser no longer assumes some directories are albums. All content is always displayed as plain files.
+- 🐛 Fixed a bug where switching theme would sometimes not apply until the app is restarted.
+- 🐛 Fixed a bug album art for some songs would sometimes be missing in offline mode.

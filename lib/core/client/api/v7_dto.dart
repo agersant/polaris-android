@@ -116,7 +116,7 @@ class Song {
       };
 }
 
-class CollectionFile extends Comparable<CollectionFile> {
+class CollectionFile implements Comparable<CollectionFile> {
   Either<Song, Directory> content;
 
   CollectionFile(this.content);
@@ -175,4 +175,10 @@ class CollectionFile extends Comparable<CollectionFile> {
         (song) => <String, dynamic>{'Song': song.toJson()},
         (directory) => <String, dynamic>{'Directory': directory.toJson()},
       );
+}
+
+enum ThumbnailSize {
+  small,
+  large,
+  native,
 }

@@ -4,18 +4,23 @@ import 'dart:io' as io;
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/playlist.dart';
 import 'package:rxdart/rxdart.dart';
 
-const _currentVersion = 1;
+const _currentVersion = 2;
 
 class PlaylistState {
   final String host;
-  final List<dto.Song> songs;
+  final String? name;
+  final List<String> songs;
 
-  PlaylistState({required this.host, required this.songs});
+  PlaylistState({
+    required this.host,
+    required this.name,
+    required this.songs,
+  });
 
   factory PlaylistState.fromBytes(List<int> bytes) {
     return PlaylistState.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
@@ -28,13 +33,15 @@ class PlaylistState {
   factory PlaylistState.fromJson(Map<String, dynamic> json) {
     return PlaylistState(
       host: json['host'],
-      songs: (json['songs'] as List<dynamic>).map((dynamic songJson) => dto.Song.fromJson(songJson)).toList(),
+      name: json['name'],
+      songs: (json['songs'] as List<dynamic>).cast<String>(),
     );
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'host': host,
-        'songs': songs.map((song) => song.toJson()).toList(),
+        'name': name,
+        'songs': songs,
       };
 }
 
@@ -77,11 +84,13 @@ class PlaybackState {
 
 class Manager {
   final connection.Manager connectionManager;
+  final CollectionCache collectionCache;
   final AudioPlayer audioPlayer;
   final Playlist playlist;
 
   Manager({
     required this.connectionManager,
+    required this.collectionCache,
     required this.audioPlayer,
     required this.playlist,
   });
@@ -118,9 +127,10 @@ class Manager {
   }
 
   Future<void> savePlaylistState() async {
-    List<dto.Song> songs = playlist.getSongs();
+    List<String> songs = playlist.getSongs();
     PlaylistState playlistState = PlaylistState(
       host: connectionManager.url ?? "",
+      name: playlist.name,
       songs: songs,
     );
     try {
@@ -164,6 +174,8 @@ class Manager {
         }
         await playlist.clear();
         await playlist.queueLast(playlistState.songs, autoPlay: false);
+        playlist.setName(playlistState.name);
+        collectionCache.putFiles(playlistState.host, playlistState.songs);
         developer.log('Read playlist state from: $playlistStateFile');
       }
     } catch (e) {

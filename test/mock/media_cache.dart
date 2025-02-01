@@ -11,16 +11,19 @@ class MediaCache implements MediaCacheInterface {
   void dispose() {}
 
   @override
-  Future<bool> hasImage(String host, String path) async => false;
+  Future<bool> hasImage(String host, String path, ArtworkSize size) async => false;
 
   @override
-  Future<File?> getImage(String host, String path) async => null;
+  Future<File?> getImage(String host, String path, ArtworkSize size) async => null;
 
   @override
-  File getImageLocation(String host, String path) => File("");
+  Future<File?> getImageAnySize(String host, String path) async => null;
 
   @override
-  putImage(String host, String path, Uint8List bytes) async {}
+  File getImageLocation(String host, String path, ArtworkSize size) => File("");
+
+  @override
+  putImage(String host, String path, ArtworkSize size, Uint8List bytes) async {}
 
   @override
   Future<bool> hasAudio(String host, String path) async => false;

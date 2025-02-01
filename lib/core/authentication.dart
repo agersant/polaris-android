@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:polaris/core/client/api/api_client.dart';
+import 'package:polaris/core/client/api/v8_dto.dart';
+import 'package:polaris/core/client/guest_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String authHostPreferenceKey = "polaris_auth_host";
@@ -19,18 +20,19 @@ enum Error {
   unknownError,
 }
 
-extension _ToAuthenticationError on polaris.APIError {
+extension _ToAuthenticationError on APIError {
   Error toAuthenticationError() {
     switch (this) {
-      case polaris.APIError.unauthorized:
+      case APIError.unauthorized:
         return Error.incorrectCredentials;
-      case polaris.APIError.requestFailed:
-      case polaris.APIError.networkError:
-      case polaris.APIError.unspecifiedHost:
-      case polaris.APIError.responseParseError:
-      case polaris.APIError.unexpectedCacheMiss:
+      case APIError.requestFailed:
+      case APIError.networkError:
+      case APIError.unspecifiedHost:
+      case APIError.responseParseError:
+      case APIError.unexpectedCacheMiss:
+      case APIError.notImplemented:
         return Error.requestFailed;
-      case polaris.APIError.timeout:
+      case APIError.timeout:
         return Error.requestTimeout;
     }
   }
@@ -88,9 +90,9 @@ class Manager extends ChangeNotifier {
 
     _setState(State.reauthenticating);
     try {
-      final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
-      await guestAPI.testConnection(_token);
-    } on polaris.APIError catch (e) {
+      final guestClient = GuestClient(connectionManager: connectionManager, httpClient: httpClient);
+      await guestClient.testConnection(_token);
+    } on APIError catch (e) {
       await _clear();
       _setState(State.unauthenticated);
       throw e.toAuthenticationError();
@@ -111,9 +113,9 @@ class Manager extends ChangeNotifier {
     _setState(State.authenticating);
     Authorization authorization;
     try {
-      final guestAPI = polaris.HttpGuestClient(connectionManager: connectionManager, httpClient: httpClient);
-      authorization = await guestAPI.login(newUsername, password);
-    } on polaris.APIError catch (e) {
+      final guestClient = GuestClient(connectionManager: connectionManager, httpClient: httpClient);
+      authorization = await guestClient.login(newUsername, password);
+    } on APIError catch (e) {
       _setState(State.unauthenticated);
       throw e.toAuthenticationError();
     } catch (e) {

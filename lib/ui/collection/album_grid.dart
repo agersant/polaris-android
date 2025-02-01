@@ -1,26 +1,34 @@
 import 'dart:math';
-import 'package:animations/animations.dart';
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/ui/collection/album_details.dart';
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
+import 'package:polaris/ui/collection/album_widget.dart';
 import 'package:polaris/ui/strings.dart';
-import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
-import 'package:polaris/ui/utils/thumbnail.dart';
 
 final getIt = GetIt.instance;
 
 class GridMetrics {}
 
-const double _detailsSpacing = 8.0;
-
 class AlbumGrid extends StatelessWidget {
-  final List<dto.Directory> albums;
-  final Future<void> Function()? onRefresh;
+  final List<dto.AlbumHeader> albums;
+  final ScrollController? scrollController;
+  final bool shrinkWrap;
+  final Orientation? orientation;
+  final bool showArtistNames;
+  final bool showReleaseDates;
+  final EdgeInsets? padding;
 
-  const AlbumGrid(this.albums, {this.onRefresh, Key? key}) : super(key: key);
+  const AlbumGrid(
+    this.albums,
+    this.scrollController, {
+    required this.shrinkWrap,
+    this.orientation,
+    this.padding,
+    this.showArtistNames = true,
+    this.showReleaseDates = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,150 +41,37 @@ class AlbumGrid extends StatelessWidget {
         return LayoutBuilder(
           builder: (context, constraints) {
             final screenWidth = constraints.maxWidth;
-            final crossAxisCount = orientation == Orientation.portrait ? 2 : 4;
+            final crossAxisCount = (this.orientation ?? orientation) == Orientation.portrait ? 2 : 4;
             const mainAxisSpacing = 24.0;
             const crossAxisSpacing = 16.0;
-            const padding = 24.0;
 
-            final titleStyle = Theme.of(context).textTheme.bodyLarge ?? const TextStyle();
-            final artistStyle = Theme.of(context).textTheme.bodySmall ?? const TextStyle();
-            final titleStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: titleStyle.fontSize);
-            final artistStrutStyle = StrutStyle(forceStrutHeight: true, fontSize: artistStyle.fontSize);
-
-            final TextPainter titlePainter = TextPainter(
-              maxLines: 1,
-              textDirection: TextDirection.ltr,
-              text: TextSpan(text: '', style: titleStyle),
-              strutStyle: titleStrutStyle,
-            )..layout(minWidth: 0, maxWidth: double.infinity);
-
-            final TextPainter artistPainter = TextPainter(
-              maxLines: 1,
-              textDirection: TextDirection.ltr,
-              text: TextSpan(text: '', style: artistStyle),
-              strutStyle: artistStrutStyle,
-            )..layout(minWidth: 0, maxWidth: double.infinity);
-
-            final titleHeight = titlePainter.size.height;
-            final artistHeight = artistPainter.size.height;
-
-            final childWidth =
-                ((screenWidth - 2 * padding) - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
-            final childHeight = childWidth + _detailsSpacing + titleHeight + artistHeight;
+            final childWidth = (screenWidth - max(0, crossAxisCount - 1) * crossAxisSpacing) / crossAxisCount;
+            final childHeight = AlbumWidget.computeHeightForWidth(context, childWidth);
             final childAspectRatio = childWidth / childHeight;
 
-            final gridView = GridView.count(
-              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-              crossAxisCount: crossAxisCount,
-              padding: const EdgeInsets.all(padding),
-              mainAxisSpacing: mainAxisSpacing,
-              crossAxisSpacing: crossAxisSpacing,
-              childAspectRatio: childAspectRatio,
-              children: albums.map((album) {
-                return Album(
-                  album,
-                  titleStyle: titleStyle,
-                  artistStyle: artistStyle,
-                  titleStrutStyle: titleStrutStyle,
-                  artistStrutStyle: artistStrutStyle,
-                );
-              }).toList(),
+            final gridView = GridView.builder(
+              padding: padding,
+              physics: shrinkWrap
+                  ? const NeverScrollableScrollPhysics()
+                  : const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              shrinkWrap: shrinkWrap,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: childAspectRatio,
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+              ),
+              controller: scrollController,
+              itemCount: albums.length,
+              itemBuilder: (context, index) => AlbumWidget(
+                albums[index],
+                showArtistNames: showArtistNames,
+                showReleaseDate: showReleaseDates,
+              ),
             );
 
-            Future<void> Function()? refresh = onRefresh;
-            if (refresh == null) {
-              return gridView;
-            } else {
-              // TODO add some refresh functionality at the bottom
-              return RefreshIndicator(
-                onRefresh: refresh,
-                child: gridView,
-              );
-            }
+            return gridView;
           },
-        );
-      },
-    );
-  }
-}
-
-class Album extends StatelessWidget {
-  final dto.Directory album;
-  final TextStyle titleStyle;
-  final TextStyle artistStyle;
-  final StrutStyle titleStrutStyle;
-  final StrutStyle artistStrutStyle;
-
-  const Album(this.album,
-      {required this.titleStyle,
-      required this.artistStyle,
-      required this.titleStrutStyle,
-      required this.artistStrutStyle,
-      Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return OpenContainer(
-      closedElevation: 0,
-      useRootNavigator: true,
-      transitionType: ContainerTransitionType.fade,
-      closedColor: Theme.of(context).scaffoldBackgroundColor,
-      openColor: Theme.of(context).scaffoldBackgroundColor,
-      openBuilder: (context, action) {
-        return AlbumDetails(album);
-      },
-      closedBuilder: (context, action) {
-        return Align(
-          alignment: Alignment.topCenter,
-          child: Material(
-            child: InkWell(
-              onTap: action,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: _detailsSpacing),
-                    child: LargeThumbnail(album.artwork),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              album.album ?? unknownAlbum,
-                              strutStyle: titleStrutStyle,
-                              style: titleStyle,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                            ),
-                            Text(
-                              album.artist ?? unknownArtist,
-                              strutStyle: artistStrutStyle,
-                              style: artistStyle,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                            ),
-                          ],
-                        ),
-                      ),
-                      CollectionFileContextMenuButton(
-                        file: dto.CollectionFile(dartz.Right(album)),
-                        actions: const [
-                          CollectionFileAction.queueLast,
-                          CollectionFileAction.queueNext,
-                          CollectionFileAction.togglePin,
-                        ],
-                        compact: true,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
         );
       },
     );

@@ -2,15 +2,17 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
+import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/ui/utils/fallback_artwork.dart';
 
 final getIt = GetIt.instance;
 
 class Thumbnail extends StatefulWidget {
   final String? path;
+  final ArtworkSize size;
 
-  const Thumbnail(this.path, {Key? key}) : super(key: key);
+  const Thumbnail(this.path, this.size, {Key? key}) : super(key: key);
 
   @override
   State<Thumbnail> createState() => _ThumbnailState();
@@ -38,7 +40,7 @@ class _ThumbnailState extends State<Thumbnail> {
   void _fetchImage() {
     String? path = widget.path;
     if (path != null) {
-      futureImage = getIt<polaris.Client>().getImage(path);
+      futureImage = getIt<AppClient>().getImage(path, widget.size);
     } else {
       futureImage = null;
     }
@@ -80,7 +82,7 @@ class LargeThumbnail extends StatelessWidget {
       borderRadius: BorderRadius.circular(8.0),
       child: AspectRatio(
         aspectRatio: 1.0,
-        child: Thumbnail(path),
+        child: Thumbnail(path, ArtworkSize.small),
       ),
     );
   }
@@ -98,7 +100,7 @@ class ListThumbnail extends StatelessWidget {
       child: SizedBox(
         width: 44,
         height: 44,
-        child: Thumbnail(path),
+        child: Thumbnail(path, ArtworkSize.tiny),
       ),
     );
   }

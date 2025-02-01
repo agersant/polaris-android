@@ -1,18 +1,9 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:polaris/core/dto.dart';
+import 'package:polaris/core/client/api/v8_dto.dart';
 import 'package:polaris/ui/utils/format.dart';
+import 'package:polaris/utils.dart';
 
 const String extraKeyPath = 'path';
-const String extraKeyTrackNumber = 'trackNumber';
-const String extraKeyDiscNumber = 'discNumber';
-const String extraKeyArtist = 'artist';
-const String extraKeyAlbumArtist = 'albumArtist';
-const String extraKeyYear = 'year';
-const String extraKeyArtwork = 'artwork';
-const String extraKeyLyricist = 'lyricist';
-const String extraKeyComposer = 'composer';
-const String extraKeyGenre = 'genre';
-const String extraKeyLabel = 'label';
 
 extension MediaItemConversions on Song {
   MediaItem toMediaItem(String id, Uri? artworkUri) {
@@ -21,41 +12,29 @@ extension MediaItemConversions on Song {
       playable: true,
       album: album ?? "",
       title: title ?? "",
-      artist: formatArtist(),
+      artist: formatArtists(),
       duration: duration != null ? Duration(seconds: duration!) : null,
       artUri: artworkUri,
       extras: <String, dynamic>{
         extraKeyPath: path,
-        extraKeyTrackNumber: trackNumber,
-        extraKeyDiscNumber: discNumber,
-        extraKeyArtist: artist,
-        extraKeyAlbumArtist: albumArtist,
-        extraKeyYear: year,
-        extraKeyArtwork: artwork,
-        extraKeyLyricist: lyricist,
-        extraKeyComposer: composer,
-        extraKeyGenre: genre,
-        extraKeyLabel: label,
       },
     );
   }
 }
 
-extension DTOConversions on MediaItem {
-  Song toSong() {
-    return Song(path: extras?[extraKeyPath])
-      ..trackNumber = extras?[extraKeyTrackNumber]
-      ..discNumber = extras?[extraKeyDiscNumber]
-      ..title = title
-      ..artist = extras?[extraKeyArtist]
-      ..albumArtist = extras?[extraKeyAlbumArtist]
-      ..year = extras?[extraKeyYear]
-      ..album = album
-      ..artwork = extras?[extraKeyArtwork]
-      ..duration = duration?.inSeconds
-      ..lyricist = extras?[extraKeyLyricist]
-      ..composer = extras?[extraKeyComposer]
-      ..genre = extras?[extraKeyGenre]
-      ..label = extras?[extraKeyLabel];
+MediaItem makeMediaItem(String id, String path) {
+  return MediaItem(
+    id: id,
+    playable: true,
+    title: basename(path),
+    extras: <String, dynamic>{
+      extraKeyPath: path,
+    },
+  );
+}
+
+extension PolarisMediaItem on MediaItem {
+  String getSongPath() {
+    return extras![extraKeyPath];
   }
 }

@@ -20,31 +20,70 @@ const disconnectButtonLabel = 'DISCONNECT';
 const loginButtonLabel = 'LOGIN';
 const offlineModeButtonLabel = 'BROWSE OFFLINE';
 
+// Collection tabs
+const tabFiles = 'FILES';
+const tabAlbums = 'ALBUMS';
+const tabArtists = 'ARTISTS';
+const tabGenres = 'GENRES';
+const tabPlaylists = 'PLAYLISTS';
+const tabSearch = 'SEARCH';
+
 // Collection
+const albumDetailsError = 'There was an error while reading this album.';
+const albumsError = 'There was an error while listing albums.';
+const artistError = 'There was an error while reading artist information.';
+const artistGenres = 'Genres';
+const artistMainAlbums = 'Releases';
+const artistOtherAlbums = 'Featured On';
+const artistsError = 'There was an error while listing artists.';
+const browseError = 'There was an error while reading this directory.';
 const collectionTitle = 'Collection';
-const collectionTabBrowseTitle = 'BROWSE';
-const collectionTabRandomTitle = 'RANDOM';
-const collectionTabRecentTitle = 'RECENT';
-const unknownSong = 'Unknown Song';
+const emptyAlbum = 'There are no songs on this album.';
+const emptyAlbumList = 'There are no albums to display.';
+const emptyDirectory = 'There is nothing in this directory.';
+const filterFieldLabel = 'Filter';
+const genreAlbums = 'Albums';
+const genreAlbumsError = 'There was an error while listing albums.';
+const genreArtists = 'Artists';
+const genreArtistsError = 'There was an error while listing artists.';
+const genreError = 'There was an error while reading genre information.';
+const genreMainArtists = 'Main Artists';
+const genreOverview = 'Overview';
+const genreRecentlyAdded = 'Recently Added';
+const genreRelated = 'Related Genres';
+const genresError = 'There was an error while listing genres.';
+const goBackButtonLabel = 'GO BACK';
+const listPlaylistsError = 'There was an error while listing playlists.';
+const noArtists = 'No artists match this filter.';
+const noGenres = 'No genres match this filter.';
+const noSavedPlaylists = 'You have not saved any playlists';
+const noSearchResults = 'No songs were found.';
+const playAllButtonLabel = 'Play All';
+const playButtonLabel = 'Play';
+const queueAllButtonLabel = 'Queue All';
+const queueButtonLabel = 'Queue';
+const randomAlbums = 'RANDOM';
+const recentAlbums = 'RECENT';
+const roleComposer = 'COMPOSERS';
+const roleLyricist = 'LYRICISTS';
+const rolePerformer = 'PERFORMERS';
+const searchError = 'There was an error while searching for songs.';
 const unknownAlbum = 'Unknown Album';
 const unknownArtist = 'Unknown Artist';
-const emptyDirectory = 'There is nothing in this directory.';
-const emptyAlbumList = 'There are no albums to display.';
-const emptyAlbum = 'There are no songs on this album.';
-const browseError = 'There was an error while reading this directory.';
-const randomError = 'There was an error while listing albums.';
-const recentError = 'There was an error while listing albums.';
-const albumDetailsError = 'There was an error while reading this album.';
-const goBackButtonLabel = 'GO BACK';
+const unknownSong = 'Unknown Song';
+String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu
 const contextMenuQueueLast = 'Play Last';
 const contextMenuQueueNext = 'Play Next';
 const contextMenuRefresh = 'Refresh';
 const contextMenuRemoveFromQueue = 'Remove';
-const contextMenuPinFile = 'Add to Offline Music';
-const contextMenuUnpinFile = 'Remove from Offline Music';
+const contextMenuPin = 'Add to Offline Music';
+const contextMenuUnpin = 'Remove from Offline Music';
 const contextMenuSongInfo = 'Song Details';
+const contextMenuDeletePlaylist = 'Delete Playlist';
+const contextMenuViewAlbum = 'View Album';
+const contextMenuViewFolder = 'View Folder';
 
 // Collection drawer
 const drawerSettings = 'Settings';
@@ -57,6 +96,9 @@ const unknownHost = 'Unknown Host';
 // Playback
 const queueTitle = 'Queue';
 const queueEmpty = 'There are no songs in the queue.';
+const queueSavePopupTitle = 'Playlist Name';
+const queueSave = 'Save';
+const queueSaveCancel = 'Cancel';
 const nowPlaying = 'Now Playing';
 const upNext = 'Up Next';
 const upNextNothing = 'End of the queue';
@@ -83,7 +125,6 @@ const offlineMusicTitle = 'Offline Music';
 const offlineMusicEmpty = 'You have not saved any music.';
 String xySongs(int? x, int? y) => '${x ?? "?"}/${y ?? "?"} ${(y ?? 2) > 1 ? "songs" : "song"}';
 String nSongs(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "songs" : "song"}';
-String nDirectories(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "directories" : "directory"}';
 
 // Settings
 const settingsTitle = 'Settings';

@@ -198,11 +198,20 @@ packages:
   flutter_settings_screens:
     dependency: "direct main"
     description:
-      name: flutter_settings_screens
-      sha256: b9e5ff87537fceeb67012560db6ef4bb0ff7d7a031e8184e1689538756ca99a0
+      path: "."
+      ref: nested
+      resolved-ref: b795ae30565eb4c499a66abeb0fe8dd665b0b756
+      url: "https://github.com/agersant/flutter_settings_screens.git"
+    source: git
+    version: "0.3.4"
+  flutter_staggered_grid_view:
+    dependency: "direct main"
+    description:
+      name: flutter_staggered_grid_view
+      sha256: "19e7abb550c96fbfeb546b23f3ff356ee7c59a019a651f8f102a4ba9b7349395"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.4"
+    version: "0.7.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -293,14 +302,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.43"
-  just_audio_background:
-    dependency: "direct main"
-    description:
-      name: just_audio_background
-      sha256: d147c5c51040b0abf2d7a04b16dc2e573279599bfd8e3bef7a6f7daf8d21ba87
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1-beta.14"
   just_audio_platform_interface:
     dependency: transitive
     description:
