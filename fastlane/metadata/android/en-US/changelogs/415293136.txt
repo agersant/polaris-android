@@ -1,0 +1,8 @@
+- 🚀 Added compatibility with Polaris server 0.15 (required for some features)
+- ⚠️ This update clears the current playlist and offline music
+- 🆕 Added a new pages for artists, genres, playlists and search
+- 🆕 List of albums can now be scrolled continuously
+- ⚡️ Album art images now use less bandwidth
+- ❔ File browser no longer displays some folders as albums
+- 🐛 Fixed a bug where switching theme would sometimes not work
+- 🐛 Fixed a bug where album art would be missing in offline mode
