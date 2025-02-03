@@ -207,7 +207,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: Genre(pagesModel.genre!),
                   onPopInvoked: (didPop, dynamic result) {
                     if (didPop) {
-                      pagesModel.closeGenrePage();
+                      pagesModel.handleGenrePageClosed();
                     }
                   }),
             if (showArtist)
@@ -215,7 +215,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: Artist(pagesModel.artist!),
                   onPopInvoked: (didPop, dynamic result) {
                     if (didPop) {
-                      pagesModel.closeArtistPage();
+                      pagesModel.handleArtistPageClosed();
                     }
                   }),
             if (showAlbum)
@@ -223,7 +223,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: AlbumDetails(pagesModel.album!),
                   onPopInvoked: (didPop, dynamic result) {
                     if (didPop) {
-                      pagesModel.closeAlbumPage();
+                      pagesModel.handleAlbumPageClosed();
                     }
                   }),
           ];
@@ -234,7 +234,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: const PlayerPage(),
                   onPopInvoked: (didPop, dynamic result) {
                     if (didPop) {
-                      pagesModel.closePlayer();
+                      pagesModel.handlePlayerClosed();
                     }
                   }),
             if (showQueue)
@@ -242,7 +242,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   child: const QueuePage(),
                   onPopInvoked: (didPop, dynamic result) {
                     if (didPop) {
-                      pagesModel.closeQueue();
+                      pagesModel.handleQueueClosed();
                     }
                   }),
           ];
@@ -270,7 +270,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                           child: const SettingsPage(),
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
-                              pagesModel.closeSettings();
+                              pagesModel.handleSettingsClosed();
                             }
                           }),
                     if (showOfflineMusic)
@@ -278,7 +278,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                           child: const OfflineMusicPage(),
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
-                              pagesModel.closeOfflineMusic();
+                              pagesModel.handleOfflineMusicClosed();
                             }
                           }),
                     ...sortedPages,

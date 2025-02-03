@@ -49,9 +49,8 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeOfflineMusic() {
+  void handleOfflineMusicClosed() {
     _isOfflineMusicOpen = false;
-    notifyListeners();
   }
 
   void openSettings() {
@@ -59,9 +58,8 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeSettings() {
+  void handleSettingsClosed() {
     _isSettingsOpen = false;
-    notifyListeners();
   }
 
   void openGenrePage(String name) {
@@ -72,9 +70,8 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeGenrePage() {
+  void handleGenrePageClosed() {
     _genre = null;
-    notifyListeners();
   }
 
   void openArtistPage(String name) {
@@ -84,9 +81,8 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeArtistPage() {
+  void handleArtistPageClosed() {
     _artist = null;
-    notifyListeners();
   }
 
   void openAlbumPage(dto.AlbumHeader album) {
@@ -95,20 +91,19 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeAlbumPage() {
+  void handleAlbumPageClosed() {
     _album = null;
-    notifyListeners();
   }
 
   void openPlayer() {
     _enterZone(Zone.playback);
     _isPlayerOpen = true;
+    _isQueueOpen = false;
     notifyListeners();
   }
 
-  void closePlayer() {
+  void handlePlayerClosed() {
     _isPlayerOpen = false;
-    notifyListeners();
   }
 
   void openQueue() {
@@ -117,8 +112,7 @@ class PagesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeQueue() {
+  void handleQueueClosed() {
     _isQueueOpen = false;
-    notifyListeners();
   }
 }

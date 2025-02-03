@@ -33,9 +33,17 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _tabController = TabController(vsync: this, length: 3);
+    _tabController = TabController(vsync: this, length: 0);
     super.initState();
     fetchArtist();
+  }
+
+  @override
+  void didUpdateWidget(Artist oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.artistName != widget.artistName) {
+      fetchArtist();
+    }
   }
 
   void fetchArtist() async {
@@ -43,10 +51,14 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
     setState(() {
       _artist = null;
       _error = null;
+      _tabController = TabController(vsync: this, length: 0);
     });
     try {
       final artist = await client.apiClient?.getArtist(widget.artistName);
-      setState(() => _artist = artist);
+      setState(() {
+        _artist = artist;
+        _tabController = TabController(vsync: this, length: getApplicableTabs().length);
+      });
     } on APIError catch (e) {
       setState(() => _error = e);
     }
