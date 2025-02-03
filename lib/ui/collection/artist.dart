@@ -38,6 +38,14 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
     fetchArtist();
   }
 
+  @override
+  void didUpdateWidget(Artist oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.artistName != widget.artistName) {
+      fetchArtist();
+    }
+  }
+
   void fetchArtist() async {
     final client = getIt<AppClient>();
     setState(() {
