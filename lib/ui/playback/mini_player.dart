@@ -103,9 +103,6 @@ class _MiniPlayerState extends State<MiniPlayer> with TickerProviderStateMixin {
   void _handleTap() {
     final pagesModel = getIt<PagesModel>();
     pagesModel.openPlayer();
-    if (pagesModel.isQueueOpen) {
-      pagesModel.closeQueue();
-    }
   }
 
   Curve _getAnimationCurve() {
