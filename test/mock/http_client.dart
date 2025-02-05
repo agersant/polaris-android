@@ -78,7 +78,8 @@ class HttpClient extends mocktail.Mock implements http.Client {
           return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);
         }
       } else if (endpoint.startsWith(songsEndpoint)) {
-        final songs = SongBatch(songs: [], notFound: []);
+        final songBatch = SongBatchRequest.fromJson(jsonDecode(request.body));
+        final songs = SongBatch(songs: [], notFound: songBatch.paths);
         final String payload = jsonEncode(songs);
         return http.StreamedResponse(Stream<List<int>>.value(payload.codeUnits), 200);
       }
