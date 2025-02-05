@@ -15,10 +15,10 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.9.6+415293134                   
+version: 0.10.0+415293138                       
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ^3.5.0
   flutter: 3.27.1
 
 dependencies:
@@ -32,11 +32,15 @@ dependencies:
   characters: ^1.2.0
   crypto: ^3.0.1
   dartz: ^0.10.0-nullsafety.1
-  flutter_settings_screens: ^0.3.4
+  # TODO Can use official release after merge of https://github.com/GAM3RG33K/flutter_settings_screens/pull/126
+  flutter_settings_screens:
+    git:
+      url: https://github.com/agersant/flutter_settings_screens.git
+      ref: nested
+  flutter_staggered_grid_view: ^ 0.7.0
   flutter_svg: ^1.1.0
   get_it: ^7.2.0
   just_audio: ^0.9.43
-  just_audio_background: ^0.0.1-beta.14
   http: ^0.13.1
   path: ^1.8.1
   path_provider: ^2.1.5

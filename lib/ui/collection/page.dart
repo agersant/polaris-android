@@ -3,10 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
+import 'package:polaris/ui/collection/artists.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/collection/browser.dart';
-import 'package:polaris/ui/collection/random.dart';
-import 'package:polaris/ui/collection/recent.dart';
+import 'package:polaris/ui/collection/genres.dart';
+import 'package:polaris/ui/collection/playlists.dart';
+import 'package:polaris/ui/collection/albums.dart';
+import 'package:polaris/ui/collection/search.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:provider/provider.dart';
 import '../strings.dart';
@@ -20,26 +23,55 @@ class CollectionPage extends StatefulWidget {
   State<CollectionPage> createState() => _CollectionPageState();
 }
 
+enum CollectionTab {
+  browse,
+  albums,
+  artists,
+  genres,
+  playlists,
+  search,
+}
+
 class _CollectionPageState extends State<CollectionPage> with TickerProviderStateMixin {
   final _connectionManager = getIt<connection.Manager>();
   final _browserModel = getIt<BrowserModel>();
   late TabController _tabController = TabController(vsync: this, length: 0);
-  late bool isOnline;
+  late Set<CollectionTab> visibleTabs;
 
   @override
   void initState() {
     super.initState();
     _connectionManager.addListener(_handleConnectionStateChanged);
+    _browserModel.onJump.addListener(_handleBrowserJumpTo);
     _handleConnectionStateChanged();
+  }
+
+  @override
+  void dispose() {
+    _connectionManager.removeListener(_handleConnectionStateChanged);
+    _browserModel.onJump.removeListener(_handleBrowserJumpTo);
+    _tabController.dispose();
+    super.dispose();
   }
 
   void _handleConnectionStateChanged() {
     setState(() {
-      isOnline = _connectionManager.isConnected();
+      final isOnline = _connectionManager.isConnected();
+      final supportsPlaylists = (_connectionManager.apiVersion ?? 0) >= 8;
+      final supportsArtists = (_connectionManager.apiVersion ?? 0) >= 8;
+      final supportsGenres = (_connectionManager.apiVersion ?? 0) >= 8;
+      visibleTabs = {
+        CollectionTab.browse,
+        if (isOnline) CollectionTab.albums,
+        if (isOnline && supportsArtists) CollectionTab.artists,
+        if (isOnline && supportsPlaylists) CollectionTab.playlists,
+        if (isOnline && supportsGenres) CollectionTab.genres,
+        if (isOnline) CollectionTab.search,
+      };
 
       _tabController.dispose();
       // TODO slightly buggy due to https://github.com/flutter/flutter/issues/93237
-      _tabController = TabController(vsync: this, length: isOnline ? 3 : 1);
+      _tabController = TabController(vsync: this, length: visibleTabs.length);
       if (!isOnline) {
         _tabController.index = 0;
       }
@@ -48,35 +80,44 @@ class _CollectionPageState extends State<CollectionPage> with TickerProviderStat
     });
   }
 
+  void _handleBrowserJumpTo() {
+    _tabController.animateTo(0);
+  }
+
   void _handleActiveTabChanged() {
     _browserModel.setBrowserActive(_tabController.index == 0);
   }
 
   @override
-  void dispose() {
-    _connectionManager.removeListener(_handleConnectionStateChanged);
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final scrollablesTabs = visibleTabs.length > 3;
     return Scaffold(
       appBar: AppBar(
         title: const Text(collectionTitle),
-        bottom: TabBar(tabs: <Tab>[
-          const Tab(text: collectionTabBrowseTitle),
-          if (isOnline) const Tab(text: collectionTabRandomTitle),
-          if (isOnline) const Tab(text: collectionTabRecentTitle),
-        ], controller: _tabController),
+        bottom: TabBar(
+          tabs: <Tab>[
+            if (visibleTabs.contains(CollectionTab.browse)) const Tab(text: tabFiles),
+            if (visibleTabs.contains(CollectionTab.albums)) const Tab(text: tabAlbums),
+            if (visibleTabs.contains(CollectionTab.artists)) const Tab(text: tabArtists),
+            if (visibleTabs.contains(CollectionTab.genres)) const Tab(text: tabGenres),
+            if (visibleTabs.contains(CollectionTab.playlists)) const Tab(text: tabPlaylists),
+            if (visibleTabs.contains(CollectionTab.search)) const Tab(text: tabSearch),
+          ],
+          controller: _tabController,
+          isScrollable: scrollablesTabs,
+          padding: scrollablesTabs ? const EdgeInsets.symmetric(horizontal: 24) : null,
+        ),
       ),
       drawer: _buildDrawer(context),
       body: TabBarView(
         controller: _tabController,
         children: [
-          const Browser(),
-          if (isOnline) const RandomAlbums(),
-          if (isOnline) const RecentAlbums(),
+          if (visibleTabs.contains(CollectionTab.browse)) const Browser(),
+          if (visibleTabs.contains(CollectionTab.albums)) const Albums(),
+          if (visibleTabs.contains(CollectionTab.artists)) const Artists(),
+          if (visibleTabs.contains(CollectionTab.genres)) const Genres(),
+          if (visibleTabs.contains(CollectionTab.playlists)) const Playlists(),
+          if (visibleTabs.contains(CollectionTab.search)) const Search(),
         ],
       ),
     );

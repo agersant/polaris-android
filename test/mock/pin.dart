@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/pin.dart';
 
 class Manager extends ChangeNotifier implements ManagerInterface {
@@ -8,20 +7,14 @@ class Manager extends ChangeNotifier implements ManagerInterface {
   }
 
   @override
-  Set<Host> get hosts => {};
+  List<String> get hosts => [];
 
   @override
-  Stream<Set<Host>> get hostsStream => Stream.value({});
+  Set<String>? getSongsInHost(String host) => {};
 
   @override
-  Set<dto.Song> getSongs(String host) => {};
+  List<Pin>? getPinsForHost(String host) => [];
 
   @override
-  Set<dto.Directory> getDirectories(String host) => {};
-
-  @override
-  Future<Set<dto.Song>> getAllSongs(String host) async => {};
-
-  @override
-  Future<Set<dto.Song>> getSongsInDirectory(String host, String path) async => {};
+  int countSongs() => 0;
 }

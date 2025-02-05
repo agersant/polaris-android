@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
-import 'package:polaris/core/dto.dart' as dto;
 import 'package:polaris/core/media_item.dart';
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/settings.dart' as settings;
@@ -29,9 +28,9 @@ class Manager {
   StreamAudioSource? _pinSongBeingFetched;
   late UniqueTimer _timer;
 
-  final _songsBeingFetchedSubject = BehaviorSubject<Set<dto.Song>>.seeded({});
-  Set<dto.Song> get songsBeingFetched => _songsBeingFetchedSubject.value;
-  Stream<Set<dto.Song>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
+  final _songsBeingFetchedSubject = BehaviorSubject<Set<String>>.seeded({});
+  Set<String> get songsBeingFetched => _songsBeingFetchedSubject.value;
+  Stream<Set<String>> get songsBeingFetchedStream => _songsBeingFetchedSubject.stream;
 
   Manager({
     required this.uuid,
@@ -118,8 +117,8 @@ class Manager {
 
       final audioSource = effectiveSequence[index];
       final MediaItem mediaItem = audioSource.tag;
-      final dto.Song song = mediaItem.toSong();
-      final bool hasAudio = await mediaCache.hasAudio(host, song.path);
+      final String path = mediaItem.getSongPath();
+      final bool hasAudio = await mediaCache.hasAudio(host, path);
       if (!hasAudio && audioSource is StreamAudioSource) {
         return audioSource;
       }
@@ -162,16 +161,16 @@ class Manager {
   }
 
   Future<StreamAudioSource?> _pickPinSongToFetch(String host) async {
-    final songs = await pinManager.getAllSongs(host);
+    final songs = pinManager.getSongsInHost(host);
     if (songs == null) {
-      throw "Could not list pinned songs";
+      return null;
     }
-    for (dto.Song song in songs) {
-      if (await mediaCache.hasAudio(host, song.path)) {
+    for (String path in songs) {
+      if (await mediaCache.hasAudio(host, path)) {
         continue;
       }
-      final mediaItem = song.toMediaItem(uuid.v4(), null);
-      final audioSource = await downloadManager.getAudio(host, song.path, mediaItem);
+      final mediaItem = makeMediaItem(uuid.v4(), path);
+      final audioSource = await downloadManager.getAudio(host, path, mediaItem);
       if (audioSource is StreamAudioSource) {
         return audioSource;
       }
@@ -182,7 +181,7 @@ class Manager {
   // TODO This can deadlock. See https://github.com/ryanheise/just_audio/issues/594
   Future<void> _prefetch(StreamAudioSource audioSource) async {
     final MediaItem mediaItem = audioSource.tag;
-    final String path = mediaItem.toSong().path;
+    final String path = mediaItem.getSongPath();
     try {
       developer.log("Beginning prefetch for song: $path");
       final response = await audioSource.request();
@@ -196,12 +195,12 @@ class Manager {
   }
 
   void _updateSongsBeingFetched() {
-    final songs = <dto.Song>{};
+    final songs = <String>{};
     if (_playlistSongBeingFetched != null) {
-      songs.add((_playlistSongBeingFetched!.tag as MediaItem).toSong());
+      songs.add((_playlistSongBeingFetched!.tag as MediaItem).getSongPath());
     }
     if (_pinSongBeingFetched != null) {
-      songs.add((_pinSongBeingFetched!.tag as MediaItem).toSong());
+      songs.add((_pinSongBeingFetched!.tag as MediaItem).getSongPath());
     }
     _songsBeingFetchedSubject.add(songs);
   }

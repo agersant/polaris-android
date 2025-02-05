@@ -5,20 +5,26 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/core/audio_handler.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/cleanup.dart' as cleanup;
+import 'package:polaris/core/client/api/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/pin.dart' as pin;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
+import 'package:polaris/core/songs.dart' as songs;
+import 'package:polaris/ui/collection/album_details.dart';
+import 'package:polaris/ui/collection/artist.dart';
 import 'package:polaris/ui/collection/browser_model.dart';
+import 'package:polaris/ui/collection/genre.dart';
 import 'package:polaris/ui/collection/page.dart';
 import 'package:polaris/ui/offline_music/page.dart';
 import 'package:polaris/ui/pages_model.dart';
@@ -48,47 +54,62 @@ final darkTheme = ThemeData(
 Future _registerSingletons() async {
   const uuid = Uuid();
   final settingsManager = settings.Manager();
+  final mediaCache = await MediaCache.create();
+  final collectionCache = await CollectionCache.create();
   final httpClient = http.Client();
   final connectionManager = connection.Manager(httpClient: httpClient);
   final authenticationManager = authentication.Manager(
     httpClient: httpClient,
     connectionManager: connectionManager,
   );
-  final polarisHttpClient = polaris.HttpClient(
+  final apiClient = APIClient(
     httpClient: httpClient,
     connectionManager: connectionManager,
     authenticationManager: authenticationManager,
+    collectionCache: collectionCache,
   );
-  final mediaCache = await MediaCache.create();
-  final collectionCache = await CollectionCache.create();
   final downloadManager = download.Manager(
     mediaCache: mediaCache,
-    httpClient: polarisHttpClient,
+    apiClient: apiClient,
   );
-  final polarisOfflineClient = polaris.OfflineClient(
+  final offlineClient = OfflineClient(
     mediaCache: mediaCache,
     collectionCache: collectionCache,
   );
-  final polarisClient = polaris.Client(
-    offlineClient: polarisOfflineClient,
-    httpClient: polarisHttpClient,
+  final songsManager = songs.Manager(
+    connectionManager: connectionManager,
+    collectionCache: collectionCache,
+    apiClient: apiClient,
+  );
+  final appClient = AppClient(
+    offlineClient: offlineClient,
+    apiClient: apiClient,
     downloadManager: downloadManager,
     connectionManager: connectionManager,
     collectionCache: collectionCache,
     mediaCache: mediaCache,
   );
-  final audioPlayer = AudioPlayer();
+  final audioHandler = await initAudioService(
+    connectionManager: connectionManager,
+    collectionCache: collectionCache,
+    appClient: appClient,
+  );
+  final audioPlayer = audioHandler.audioPlayer;
   final playlist = Playlist(
     uuid: uuid,
     connectionManager: connectionManager,
-    polarisClient: polarisClient,
+    appClient: appClient,
     audioPlayer: audioPlayer,
   );
-  final savestateManager =
-      savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
+  final savestateManager = savestate.Manager(
+    connectionManager: connectionManager,
+    collectionCache: collectionCache,
+    audioPlayer: audioPlayer,
+    playlist: playlist,
+  );
   final pinManager = await pin.Manager.create(
     connectionManager: connectionManager,
-    polarisClient: polarisClient,
+    appClient: appClient,
   );
   final prefetchManager = prefetch.Manager(
     uuid: uuid,
@@ -102,6 +123,7 @@ Future _registerSingletons() async {
   );
   final cleanupManager = cleanup.Manager(
     connectionManager: connectionManager,
+    collectionCache: collectionCache,
     mediaCache: mediaCache,
     pinManager: pinManager,
     audioPlayer: audioPlayer,
@@ -111,13 +133,14 @@ Future _registerSingletons() async {
 
   // TODO Needs some logic to recover from app restart while audio service is still running (?)
 
+  getIt.registerSingleton<PolarisAudioHandler>(audioHandler);
   getIt.registerSingleton<AudioPlayer>(audioPlayer);
   getIt.registerSingleton<Playlist>(playlist);
   getIt.registerSingleton<CollectionCache>(collectionCache);
   getIt.registerSingleton<MediaCacheInterface>(mediaCache);
   getIt.registerSingleton<connection.Manager>(connectionManager);
   getIt.registerSingleton<authentication.Manager>(authenticationManager);
-  getIt.registerSingleton<polaris.Client>(polarisClient);
+  getIt.registerSingleton<AppClient>(appClient);
   getIt.registerSingleton<savestate.Manager>(savestateManager);
   getIt.registerSingleton<pin.Manager>(pinManager);
   getIt.registerSingleton<prefetch.Manager>(prefetchManager);
@@ -125,6 +148,7 @@ Future _registerSingletons() async {
   getIt.registerSingleton<BrowserModel>(browserModel);
   getIt.registerSingleton<PagesModel>(PagesModel());
   getIt.registerSingleton<settings.Manager>(settingsManager);
+  getIt.registerSingleton<songs.Manager>(songsManager);
   getIt.registerSingleton<Uuid>(uuid);
 }
 
@@ -133,11 +157,6 @@ void main() async {
   await Settings.init();
   await _registerSingletons();
   await FlutterDisplayMode.setHighRefreshRate();
-  await JustAudioBackground.init(
-    androidNotificationIcon: "drawable/notification_icon",
-    androidNotificationChannelName: 'Polaris Audio Playback',
-    androidNotificationOngoing: true,
-  );
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
@@ -175,10 +194,67 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
           final authenticationComplete = authenticationManager.isAuthenticated();
           final isStartupComplete = isOfflineMode || (connectionComplete && authenticationComplete);
           final showPlayer = isStartupComplete && pagesModel.isPlayerOpen;
-          final collapseMiniPlayer = !isStartupComplete || (pagesModel.isPlayerOpen && !pagesModel.isQueueOpen);
           final showQueue = isStartupComplete && pagesModel.isQueueOpen;
           final showSettings = isStartupComplete && pagesModel.isSettingsOpen;
           final showOfflineMusic = isStartupComplete && pagesModel.isOfflineMusicOpen;
+          final showArtist = isStartupComplete && pagesModel.artist != null;
+          final showAlbum = isStartupComplete && pagesModel.album != null;
+          final showGenre = isStartupComplete && pagesModel.genre != null;
+
+          final collectionPages = [
+            if (showGenre)
+              MaterialPage<dynamic>(
+                  child: Genre(pagesModel.genre!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.handleGenrePageClosed();
+                    }
+                  }),
+            if (showArtist)
+              MaterialPage<dynamic>(
+                  child: Artist(pagesModel.artist!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.handleArtistPageClosed();
+                    }
+                  }),
+            if (showAlbum)
+              MaterialPage<dynamic>(
+                  child: AlbumDetails(pagesModel.album!),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.handleAlbumPageClosed();
+                    }
+                  }),
+          ];
+
+          final playbackPages = [
+            if (showPlayer)
+              MaterialPage<dynamic>(
+                  child: const PlayerPage(),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.handlePlayerClosed();
+                    }
+                  }),
+            if (showQueue)
+              MaterialPage<dynamic>(
+                  child: const QueuePage(),
+                  onPopInvoked: (didPop, dynamic result) {
+                    if (didPop) {
+                      pagesModel.handleQueueClosed();
+                    }
+                  }),
+          ];
+
+          final sortedPages = pagesModel.zones
+              .expand((z) => switch (z) {
+                    Zone.collection => collectionPages,
+                    Zone.playback => playbackPages,
+                  })
+              .toList();
+
+          final collapseMiniPlayer = sortedPages.lastOrNull?.child is PlayerPage;
 
           return Column(
             children: [
@@ -188,47 +264,24 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   onDidRemovePage: (page) {},
                   pages: [
                     if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
-
                     if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-
                     if (showSettings)
                       MaterialPage<dynamic>(
                           child: const SettingsPage(),
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
-                              pagesModel.closeSettings();
+                              pagesModel.handleSettingsClosed();
                             }
                           }),
-
                     if (showOfflineMusic)
                       MaterialPage<dynamic>(
                           child: const OfflineMusicPage(),
                           onPopInvoked: (didPop, dynamic result) {
                             if (didPop) {
-                              pagesModel.closeOfflineMusic();
+                              pagesModel.handleOfflineMusicClosed();
                             }
                           }),
-
-                    // Ideally album details would be here but OpenContainer() can't be used with the pages API.
-                    // TODO Consider transitions that aren't the default for player and queue pages
-
-                    if (showPlayer)
-                      MaterialPage<dynamic>(
-                          child: const PlayerPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closePlayer();
-                            }
-                          }),
-
-                    if (showQueue)
-                      MaterialPage<dynamic>(
-                          child: const QueuePage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.closeQueue();
-                            }
-                          }),
+                    ...sortedPages,
                   ],
                 ),
               ),

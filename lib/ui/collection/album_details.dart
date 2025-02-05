@@ -1,10 +1,14 @@
-import 'package:dartz/dartz.dart' as dartz;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/client/api/api_client.dart';
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
-import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/ui/collection/genre_badge.dart';
 import 'package:polaris/ui/strings.dart';
+import 'package:polaris/ui/utils/artist_links.dart';
 import 'package:polaris/ui/utils/context_menu.dart';
 import 'package:polaris/ui/utils/error_message.dart';
 import 'package:polaris/ui/utils/format.dart';
@@ -13,17 +17,17 @@ import 'package:polaris/ui/utils/thumbnail.dart';
 final getIt = GetIt.instance;
 
 class AlbumDetails extends StatefulWidget {
-  final dto.Directory album;
+  final dto.AlbumHeader albumHeader;
 
-  const AlbumDetails(this.album, {Key? key}) : super(key: key);
+  const AlbumDetails(this.albumHeader, {Key? key}) : super(key: key);
 
   @override
   State<AlbumDetails> createState() => _AlbumDetailsState();
 }
 
 class _AlbumDetailsState extends State<AlbumDetails> {
-  List<dto.Song>? _songs;
-  polaris.APIError? _error;
+  dto.Album? _album;
+  APIError? _error;
 
   @override
   initState() {
@@ -34,26 +38,23 @@ class _AlbumDetailsState extends State<AlbumDetails> {
   @override
   void didUpdateWidget(AlbumDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.album.path != widget.album.path) {
+    if (oldWidget.albumHeader.name != widget.albumHeader.name ||
+        !listEquals(oldWidget.albumHeader.mainArtists, widget.albumHeader.mainArtists)) {
       _fetchData();
     }
   }
 
   void _fetchData({bool useCache = true}) async {
     setState(() {
-      _songs = null;
+      _album = null;
       _error = null;
     });
     try {
-      final files = await getIt<polaris.Client>().browse(widget.album.path, useCache: useCache);
-      final songs = files.where((f) => f.isSong()).map((f) => f.asSong()).toList();
-      setState(() {
-        _songs = songs;
-      });
-    } on polaris.APIError catch (e) {
-      setState(() {
-        _error = e;
-      });
+      final client = getIt<AppClient>();
+      final album = await client.apiClient?.getAlbum(widget.albumHeader.name, widget.albumHeader.mainArtists);
+      setState(() => _album = album);
+    } on APIError catch (e) {
+      setState(() => _error = e);
     }
   }
 
@@ -67,8 +68,37 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     });
   }
 
+  List<String> _getGenres() {
+    final songs = _album?.songs;
+    if (songs == null) {
+      return [];
+    }
+    final Map<String, int> counts = {};
+    for (final song in songs) {
+      for (final genre in song.genres) {
+        counts.putIfAbsent(genre, () => 0);
+        counts[genre] = counts[genre]! + 1;
+      }
+    }
+    final names = counts.keys.toList();
+    names.sort((a, b) => -(counts[a] ?? 0).compareTo(counts[b] ?? 0));
+    return names;
+  }
+
+  Widget _getGenresWidget(List<String> genres) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        spacing: 8,
+        children: genres.map((g) => GenreBadge(g)).toList(),
+      ),
+    );
+  }
+
   List<Widget> _getMainContent() {
-    List<dto.Song>? songs = _songs;
+    List<dto.Song>? songs = _album?.songs;
     if (_error != null || songs == null) {
       return [
         Padding(
@@ -98,12 +128,13 @@ class _AlbumDetailsState extends State<AlbumDetails> {
         .map((discData) => Disc(
               discData,
               discCount: discs.length,
-              albumArtwork: widget.album.artwork,
+              albumArtwork: widget.albumHeader.artwork,
             ))
         .toList();
   }
 
   Widget _getPortraitLayout() {
+    final genres = _getGenres();
     var slivers = <Widget>[];
 
     slivers.add(SliverAppBar(
@@ -115,7 +146,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           StretchMode.zoomBackground,
           StretchMode.fadeTitle,
         ],
-        background: Thumbnail(widget.album.artwork),
+        background: Thumbnail(widget.albumHeader.artwork, ArtworkSize.small),
       ),
     ));
 
@@ -125,42 +156,47 @@ class _AlbumDetailsState extends State<AlbumDetails> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Text(
-                      widget.album.album ?? unknownAlbum,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      softWrap: true,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.albumHeader.name,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                            softWrap: true,
+                          ),
+                        ),
+                        AlbumContextMenuButton(
+                          name: widget.albumHeader.name,
+                          mainArtists: widget.albumHeader.mainArtists,
+                          actions: const [
+                            AlbumAction.queueLast,
+                            AlbumAction.queueNext,
+                            AlbumAction.togglePin,
+                          ],
+                          songs: _album?.songs,
+                          icon: Icons.menu,
+                        ),
+                      ],
                     ),
                   ),
-                  CollectionFileContextMenuButton(
-                    file: dto.CollectionFile(dartz.Right(widget.album)),
-                    actions: const [
-                      CollectionFileAction.queueLast,
-                      CollectionFileAction.queueNext,
-                      CollectionFileAction.togglePin,
-                      CollectionFileAction.refresh,
-                    ],
-                    onRefresh: () => _fetchData(useCache: false),
-                    children: _songs,
-                    icon: Icons.menu,
-                  ),
+                  if (genres.isNotEmpty) _getGenresWidget(genres),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ArtistLinks(widget.albumHeader.mainArtists),
                   Text(
-                    widget.album.artist ?? unknownArtist,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  Text(
-                    widget.album.year?.toString() ?? '',
+                    widget.albumHeader.year?.toString() ?? '',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -171,7 +207,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ),
     );
 
-    if (_songs == null && _error == null) {
+    if (_album == null && _error == null) {
       slivers.add(const SliverFillRemaining(
         child: Center(child: CircularProgressIndicator()),
       ));
@@ -193,7 +229,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: LargeThumbnail(widget.album.artwork),
+          child: LargeThumbnail(widget.albumHeader.artwork),
         ),
         Row(
           children: [
@@ -202,29 +238,27 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.album.formatAlbumName(),
+                    widget.albumHeader.name,
                     style: Theme.of(context).textTheme.bodyLarge,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(widget.album.formatArtist(), style: Theme.of(context).textTheme.bodySmall),
+                  ArtistLinks(widget.albumHeader.mainArtists),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8),
-              child: CollectionFileContextMenuButton(
-                file: dto.CollectionFile(dartz.Right(widget.album)),
+              child: AlbumContextMenuButton(
+                name: widget.albumHeader.name,
+                mainArtists: widget.albumHeader.mainArtists,
                 actions: const [
-                  CollectionFileAction.queueLast,
-                  CollectionFileAction.queueNext,
-                  CollectionFileAction.togglePin,
-                  CollectionFileAction.refresh,
+                  AlbumAction.queueLast,
+                  AlbumAction.queueNext,
+                  AlbumAction.togglePin,
                 ],
-                onRefresh: () => _fetchData(useCache: false),
-                children: _songs,
+                songs: _album?.songs,
                 icon: Icons.menu,
-                compact: true,
               ),
             ),
           ],
@@ -232,17 +266,19 @@ class _AlbumDetailsState extends State<AlbumDetails> {
       ],
     );
 
+    final genres = _getGenres();
     Widget rightColumn;
-    if (_songs == null && _error == null) {
+    if (_album == null && _error == null) {
       rightColumn = const Center(child: CircularProgressIndicator());
     } else {
       rightColumn = Padding(
         padding: const EdgeInsets.only(left: 24),
-        // Ideally this would line up with the artwork on the right,
-        // but the top padding built-in the ListTile makes it difficult
         child: ListView(
           physics: const BouncingScrollPhysics(),
-          children: _getMainContent(),
+          children: [
+            if (genres.isNotEmpty) _getGenresWidget(genres),
+            ..._getMainContent(),
+          ],
         ),
       );
     }
@@ -259,7 +295,7 @@ class _AlbumDetailsState extends State<AlbumDetails> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.album.formatAlbumName())),
+      appBar: AppBar(title: Text(widget.albumHeader.name)),
       body: body,
     );
   }
@@ -334,18 +370,19 @@ class Song extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () => getIt<Playlist>().queueLast([song]),
+        onTap: () => getIt<Playlist>().queueLast([song.path]),
         child: ListTile(
           leading: ListThumbnail(albumArtwork ?? song.artwork),
           title: Text(song.formatTrackNumberAndTitle(), overflow: TextOverflow.ellipsis),
-          subtitle: Text(song.formatArtistAndDuration(), overflow: TextOverflow.ellipsis),
-          trailing: CollectionFileContextMenuButton(
-            file: dto.CollectionFile(dartz.Left(song)),
+          subtitle: Text(song.formatArtistsAndDuration(), overflow: TextOverflow.ellipsis),
+          trailing: SongContextMenuButton(
+            path: song.path,
             actions: const [
-              CollectionFileAction.queueLast,
-              CollectionFileAction.queueNext,
-              CollectionFileAction.togglePin,
-              CollectionFileAction.songInfo,
+              SongAction.queueLast,
+              SongAction.queueNext,
+              SongAction.songInfo,
+              SongAction.viewFolder,
+              SongAction.togglePin,
             ],
           ),
           dense: true,

@@ -1,5 +1,6 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/media_item.dart';
@@ -9,6 +10,7 @@ import 'package:polaris/core/settings.dart' as settings;
 
 class Manager {
   final connection.Manager connectionManager;
+  final CollectionCache collectionCache;
   final MediaCacheInterface mediaCache;
   final pin.ManagerInterface pinManager;
   final AudioPlayer audioPlayer;
@@ -18,6 +20,7 @@ class Manager {
 
   Manager({
     required this.connectionManager,
+    required this.collectionCache,
     required this.mediaCache,
     required this.pinManager,
     required this.audioPlayer,
@@ -47,24 +50,30 @@ class Manager {
 
     audioPlayer.sequence?.forEach((audioSource) {
       final mediaItem = audioSource.tag as MediaItem;
-      final song = mediaItem.toSong();
-      songsToPreserve[host]!.add(song.path);
+      final path = mediaItem.getSongPath();
+      songsToPreserve[host]!.add(path);
+
+      final song = collectionCache.getSong(host, path);
+      if (song == null) {
+        return;
+      }
 
       final artwork = song.artwork;
       if (artwork != null) {
-        songsToPreserve[host]!.add(artwork);
+        imagesToPreserve[host]!.add(artwork);
       }
     });
 
-    for (String host in pinManager.hosts.map((host) => host.url)) {
-      final pinnedSongs = await pinManager.getAllSongs(host);
-      if (pinnedSongs == null) {
-        return;
+    for (String host in pinManager.hosts) {
+      for (String path in pinManager.getSongsInHost(host) ?? []) {
+        final hostSongs = songsToPreserve.putIfAbsent(host, () => {});
+        final hostImages = imagesToPreserve.putIfAbsent(host, () => {});
+        hostSongs.add(path);
+        final artwork = collectionCache.getSong(host, path)?.artwork;
+        if (artwork != null) {
+          hostImages.add(artwork);
+        }
       }
-      final hostSongs = songsToPreserve.putIfAbsent(host, () => {});
-      final hostImages = imagesToPreserve.putIfAbsent(host, () => {});
-      hostSongs.addAll(pinnedSongs.map((s) => s.path));
-      hostImages.addAll(pinnedSongs.map((s) => s.artwork).whereType<String>());
     }
 
     await mediaCache.purge(songsToPreserve, imagesToPreserve);

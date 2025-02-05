@@ -1,21 +1,23 @@
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-
-import 'mock/client.dart' as mock;
+import 'mock/http_client.dart' as mock;
 import 'mock/media_cache.dart' as mock;
 import 'mock/pin.dart' as pin;
 import 'package:just_audio/just_audio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/cache/media.dart';
+import 'package:polaris/core/client/api/api_client.dart';
+import 'package:polaris/core/client/app_client.dart';
+import 'package:polaris/core/client/offline_client.dart';
 import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/connection.dart' as connection;
 import 'package:polaris/core/cleanup.dart' as cleanup;
 import 'package:polaris/core/download.dart' as download;
 import 'package:polaris/core/playlist.dart';
-import 'package:polaris/core/polaris.dart' as polaris;
 import 'package:polaris/core/prefetch.dart' as prefetch;
 import 'package:polaris/core/savestate.dart' as savestate;
 import 'package:polaris/core/settings.dart' as settings;
+import 'package:polaris/core/songs.dart' as songs;
 import 'package:polaris/ui/collection/browser_model.dart';
 import 'package:polaris/ui/pages_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,29 +50,35 @@ class Harness {
 
     const uuid = Uuid();
     final settingsManager = settings.Manager();
+    final MediaCacheInterface mediaCache = await mock.MediaCache.create();
+    final collectionCache = CollectionCache(Collection());
     final mockHttpClient = mock.HttpClient();
     final connectionManager = connection.Manager(httpClient: mockHttpClient);
     final authenticationManager = authentication.Manager(
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
     );
-    final polarisHttpClient = polaris.HttpClient(
+    final apiClient = APIClient(
       httpClient: mockHttpClient,
       connectionManager: connectionManager,
       authenticationManager: authenticationManager,
+      collectionCache: collectionCache,
     );
-    final MediaCacheInterface mediaCache = await mock.MediaCache.create();
-    final collectionCache = CollectionCache(Collection());
     final downloadManager = download.Manager(
       mediaCache: mediaCache,
-      httpClient: polarisHttpClient,
+      apiClient: apiClient,
     );
-    final polarisClient = polaris.Client(
-      offlineClient: polaris.OfflineClient(
+    final songsManager = songs.Manager(
+      connectionManager: connectionManager,
+      collectionCache: collectionCache,
+      apiClient: apiClient,
+    );
+    final appClient = AppClient(
+      offlineClient: OfflineClient(
         mediaCache: mediaCache,
         collectionCache: collectionCache,
       ),
-      httpClient: polarisHttpClient,
+      apiClient: apiClient,
       downloadManager: downloadManager,
       connectionManager: connectionManager,
       collectionCache: collectionCache,
@@ -80,11 +88,15 @@ class Harness {
     final playlist = Playlist(
       uuid: uuid,
       connectionManager: connectionManager,
-      polarisClient: polarisClient,
+      appClient: appClient,
       audioPlayer: audioPlayer,
     );
-    final savestateManager =
-        savestate.Manager(connectionManager: connectionManager, audioPlayer: audioPlayer, playlist: playlist);
+    final savestateManager = savestate.Manager(
+      connectionManager: connectionManager,
+      collectionCache: collectionCache,
+      audioPlayer: audioPlayer,
+      playlist: playlist,
+    );
     final pinManager = await pin.Manager.create();
     final prefetchManager = prefetch.Manager(
       uuid: uuid,
@@ -98,6 +110,7 @@ class Harness {
     );
     final cleanupManager = cleanup.Manager(
       connectionManager: connectionManager,
+      collectionCache: collectionCache,
       mediaCache: mediaCache,
       pinManager: pinManager,
       audioPlayer: audioPlayer,
@@ -111,7 +124,7 @@ class Harness {
     getIt.registerSingleton<MediaCacheInterface>(mediaCache);
     getIt.registerSingleton<connection.Manager>(connectionManager);
     getIt.registerSingleton<authentication.Manager>(authenticationManager);
-    getIt.registerSingleton<polaris.Client>(polarisClient);
+    getIt.registerSingleton<AppClient>(appClient);
     getIt.registerSingleton<savestate.Manager>(savestateManager);
     getIt.registerSingleton<pin.Manager>(pinManager);
     getIt.registerSingleton<prefetch.Manager>(prefetchManager);
@@ -119,6 +132,7 @@ class Harness {
     getIt.registerSingleton<BrowserModel>(browserModel);
     getIt.registerSingleton<PagesModel>(PagesModel());
     getIt.registerSingleton<settings.Manager>(settingsManager);
+    getIt.registerSingleton<songs.Manager>(songsManager);
     getIt.registerSingleton<Uuid>(uuid);
 
     audioPlayer.setAudioSource(playlist.audioSource);

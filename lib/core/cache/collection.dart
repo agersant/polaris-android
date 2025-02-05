@@ -1,17 +1,23 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io' as io;
-import 'package:dartz/dartz.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:polaris/core/dto.dart' as dto;
+import 'package:polaris/core/client/api/v8_dto.dart' as dto;
 import 'package:polaris/utils.dart';
+import 'package:rxdart/rxdart.dart';
 
 const _firstVersion = 1;
-const _currentVersion = 1;
+const _currentVersion = 2;
 
 class CollectionCache {
   final Collection _collection;
+  final BehaviorSubject<()> _songIngestion = BehaviorSubject();
+  final BehaviorSubject<()> _songRequest = BehaviorSubject();
+  final BehaviorSubject<()> _playlists = BehaviorSubject();
+  Stream<()> get onSongsIngested => _songIngestion.stream;
+  Stream<()> get onSongsRequested => _songRequest.stream;
+  Stream<()> get onPlaylistsUpdated => _playlists.stream;
 
   CollectionCache(this._collection);
 
@@ -57,46 +63,162 @@ class CollectionCache {
     }
   }
 
-  List<dto.CollectionFile>? getDirectory(String host, String path) {
-    return _collection
-        .readDirectory(host, path)
-        ?.children
-        .map((name, file) {
-          if (file.isSong()) {
-            return MapEntry(name, dto.CollectionFile(Left(file.asSong().data)));
-          } else {
-            final directory = file.asDirectory().data ?? dto.Directory(path: p.join(path, name));
-            return MapEntry(name, dto.CollectionFile(Right(directory)));
-          }
-        })
-        .values
-        .toList()
-      ?..sort();
+  Future putDirectory(String host, String path, List<dto.BrowserEntry> entries) async {
+    final server = _collection.servers.putIfAbsent(host, () => Server());
+    server.directoryChildren[path] = {};
+    server.directorySongs[path] = {};
+    bool hasNewSongs = false;
+
+    for (dto.BrowserEntry entry in entries) {
+      if (entry.isDirectory) {
+        server.directoryChildren[path]!.add(entry.path);
+      } else {
+        server.directorySongs[path]!.add(entry.path);
+        hasNewSongs |= !server.songs.containsKey(entry.path);
+      }
+    }
+
+    server.populatedDirectories.add(path);
+    if (hasNewSongs) {
+      _songRequest.value = ();
+    }
+    await saveToDisk();
   }
 
-  bool hasPopulatedDirectory(String host, String path) {
-    final directory = _collection.readDirectory(host, path);
-    return directory?.populated == true;
-  }
+  Future putFiles(String host, List<String> files) async {
+    final server = _collection.servers.putIfAbsent(host, () => Server());
+    bool hasNewSongs = false;
 
-  Future putDirectory(String host, String path, List<dto.CollectionFile> content) async {
-    _collection.populateDirectory(host, path, content);
+    for (String path in files) {
+      final components = splitPath(path);
+      server.directorySongs.putIfAbsent(components.length > 1 ? dirname(path) : "", () => {}).add(path);
+      hasNewSongs |= !server.songs.containsKey(path);
+      String parent = components[0];
+      for (int i = 1; i < components.length - 1; i++) {
+        final child = '$parent/${components[i]}';
+        server.directoryChildren.putIfAbsent(parent, () => {}).add(child);
+        parent = child;
+      }
+    }
+
+    if (hasNewSongs) {
+      _songRequest.value = ();
+    }
     await saveToDisk();
   }
 
   Future putSongs(String host, List<dto.Song> songs) async {
-    _collection.addSongs(host, songs);
+    final server = _collection.servers.putIfAbsent(host, () => Server());
+    for (dto.Song song in songs) {
+      server.songs[song.path] = song;
+      final components = splitPath(song.path);
+      server.directorySongs.putIfAbsent(components.length > 1 ? dirname(song.path) : "", () => {}).add(song.path);
+      String parent = components[0];
+      for (int i = 1; i < components.length - 1; i++) {
+        final child = '$parent/${components[i]}';
+        server.directoryChildren.putIfAbsent(parent, () => {}).add(child);
+        parent = child;
+      }
+    }
+    _songIngestion.value = ();
     await saveToDisk();
   }
 
-  List<dto.Song>? flattenDirectory(String host, String path) {
-    return _collection.flattenDirectory(host, path)?.map((song) => song.data).toList()
-      ?..sort((a, b) => compareStrings(a.path, b.path));
+  void putPlaylists(String host, List<dto.PlaylistHeader> playlists) {
+    final server = _collection.servers.putIfAbsent(host, () => Server());
+    server.playlists = playlists;
+    _playlists.value = ();
+  }
+
+  Set<String> getMissingSongs(String host) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return {};
+    }
+
+    final Set<String> missing = {};
+    server.directorySongs.forEach((_, paths) {
+      for (final path in paths) {
+        if (!server.songs.containsKey(path)) {
+          missing.add(path);
+        }
+      }
+    });
+
+    return missing;
+  }
+
+  bool hasSong(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return false;
+    }
+    return server.songs.containsKey(path);
+  }
+
+  dto.Song? getSong(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return null;
+    }
+    return server.songs[path];
+  }
+
+  (Stream<dto.Song?>, dto.Song?) getSongStream(String host, String path) {
+    final song = getSong(host, path);
+    final stream =
+        song != null ? Stream.value(song) : onSongsIngested.map((_) => getSong(host, path)).whereNotNull().take(1);
+    return (stream, song);
+  }
+
+  List<dto.BrowserEntry>? getDirectory(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return null;
+    }
+
+    final subdirectories = (server.directoryChildren[path] ?? {}).toList(growable: false)..sort(compareStrings);
+    final songs = (server.directorySongs[path] ?? {}).toList(growable: false)..sort(compareStrings);
+
+    return subdirectories
+        .map((path) => dto.BrowserEntry(path: path, isDirectory: true))
+        .followedBy(songs.map((path) => dto.BrowserEntry(path: path, isDirectory: false)))
+        .toList(growable: false);
+  }
+
+  List<dto.PlaylistHeader>? getPlaylists(String host) {
+    return _collection.servers[host]?.playlists;
+  }
+
+  bool hasPopulatedDirectory(String host, String path) {
+    return _collection.servers[host]?.populatedDirectories.contains(path) ?? false;
+  }
+
+  List<String>? flattenDirectory(String host, String path) {
+    final server = _collection.servers[host];
+    if (server == null) {
+      return null;
+    }
+
+    final List<String> exploreList = [path];
+    final List<String> songs = [];
+    while (exploreList.isNotEmpty) {
+      final location = exploreList.removeLast();
+      for (String song in server.directorySongs[location] ?? []) {
+        songs.add(song);
+      }
+      for (String directory in server.directoryChildren[location] ?? []) {
+        exploreList.add(directory);
+      }
+    }
+
+    songs.sort(compareStrings);
+    return songs;
   }
 }
 
 class Collection {
-  final Map<String, Directory> servers = {};
+  final Map<String, Server> servers = {};
 
   Collection();
 
@@ -110,175 +232,43 @@ class Collection {
 
   Collection.fromJson(Map<String, dynamic> json) {
     json['servers'].forEach((String k, dynamic v) {
-      servers[k] = Directory.fromJson(v);
+      servers[k] = Server.fromJson(v);
     });
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'servers': servers.map((k, v) => MapEntry(k, v.toJson())),
       };
-
-  void populateDirectory(String host, String path, List<dto.CollectionFile> content) {
-    final parent = _findOrCreateDirectory(host, path);
-    final Set<String> childrenToKeep = {};
-    for (dto.CollectionFile file in content) {
-      final name = basename(file.path);
-      if (file.isSong()) {
-        parent._children[name] = File(Left(Song(file.asSong())));
-        childrenToKeep.add(name);
-      } else {
-        if (parent._children[name]?.isDirectory() != true) {
-          parent._children[name] = File(Right(Directory()));
-        }
-        parent._children[name]!.asDirectory().data = file.asDirectory();
-        childrenToKeep.add(name);
-      }
-    }
-    parent._children.removeWhere((key, value) => !childrenToKeep.contains(key));
-    parent.populated = true;
-  }
-
-  void addSongs(String host, List<dto.Song> songs) {
-    for (dto.Song song in songs) {
-      final directoryPath = dirname(song.path);
-      final name = basename(song.path);
-      final parent = _findOrCreateDirectory(host, directoryPath);
-      parent._children[name] = File(Left(Song(song)));
-    }
-  }
-
-  Directory? readDirectory(String host, String path) {
-    if (!_directoryExists(host, path)) {
-      return null;
-    }
-    return _findOrCreateDirectory(host, path);
-  }
-
-  List<Song>? flattenDirectory(String host, String path) {
-    if (!_directoryExists(host, path)) {
-      return null;
-    }
-    final Directory directory = _findOrCreateDirectory(host, path);
-    final List<File> exploreList = [];
-    final List<Song> songs = [];
-    exploreList.addAll(directory._children.values);
-    while (exploreList.isNotEmpty) {
-      final candidate = exploreList.removeLast();
-      if (candidate.isSong()) {
-        songs.add(candidate.asSong());
-      } else {
-        exploreList.addAll(candidate.asDirectory()._children.values);
-      }
-    }
-    return songs;
-  }
-
-  bool _directoryExists(String host, String path) {
-    final Directory? topLevelDirectory = servers[host];
-    if (topLevelDirectory == null) {
-      return false;
-    }
-    final components = splitPath(path);
-    File? file = File(Right(topLevelDirectory));
-    while (components.isNotEmpty) {
-      final component = components.removeAt(0);
-      final parent = file!.asDirectory();
-      file = parent._children[component];
-      if (file == null || file.isSong()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  Directory _findOrCreateDirectory(String host, String path) {
-    Directory? topLevelDirectory = servers[host];
-    if (topLevelDirectory == null) {
-      Directory newDirectory = Directory();
-      servers[host] = newDirectory;
-      topLevelDirectory = newDirectory;
-    }
-
-    final components = splitPath(path);
-    File? file = File(Right(topLevelDirectory));
-    while (components.isNotEmpty) {
-      final component = components.removeAt(0);
-      final parent = file!.asDirectory();
-      file = parent._children[component];
-      if (file == null || !file.isDirectory()) {
-        file = parent._children[component] = File(Right(Directory()));
-      }
-    }
-    return file!.asDirectory();
-  }
 }
 
-class File {
-  final Either<Song, Directory> content;
-  File(this.content);
+class Server {
+  Set<String> populatedDirectories = {};
+  Map<String, Set<String>> directoryChildren = {};
+  Map<String, Set<String>> directorySongs = {};
+  Map<String, dto.Song> songs = {};
+  List<dto.PlaylistHeader>? playlists; // not serialized
 
-  bool isSong() {
-    return content.isLeft();
-  }
+  Server();
 
-  bool isDirectory() {
-    return content.isRight();
-  }
+  Server.fromJson(Map<String, dynamic> json)
+      : populatedDirectories = (json['populatedDirectories'] as List<dynamic>).cast<String>().toSet() {
+    json['directoryChildren'].forEach((String k, dynamic v) {
+      directoryChildren[k] = (v as List<dynamic>).cast<String>().toSet();
+    });
 
-  Song asSong() {
-    return content.fold((song) => song, (directory) => throw "cache.File is not a song");
-  }
+    json['directorySongs'].forEach((String k, dynamic v) {
+      directorySongs[k] = (v as List<dynamic>).cast<String>().toSet();
+    });
 
-  Directory asDirectory() {
-    return content.fold((song) => throw "cache.File is not a directory", (directory) => directory);
-  }
-
-  factory File.fromJson(Map<String, dynamic> json) {
-    if (json['song'] != null) {
-      return File(Left(Song.fromJson(json['song'])));
-    }
-    if (json['directory'] != null) {
-      return File(Right(Directory.fromJson(json['directory'])));
-    }
-    throw ArgumentError("Malformed cache file Json");
-  }
-
-  Map<String, dynamic> toJson() => content.fold(
-        (song) => <String, dynamic>{'song': song.toJson()},
-        (directory) => <String, dynamic>{'directory': directory.toJson()},
-      );
-}
-
-class Directory {
-  dto.Directory? data;
-  final Map<String, File> _children;
-  bool populated = false;
-
-  Map<String, File> get children => {..._children};
-
-  Directory({this.data, Map<String, File>? children}) : _children = children ?? {};
-
-  Directory.fromJson(Map<String, dynamic> json) : _children = {} {
-    populated = json['populated'] as bool;
-    if (json['data'] != null) {
-      data = dto.Directory.fromJson(json['data']);
-    }
-    json['children'].forEach((String k, dynamic v) {
-      _children[k] = File.fromJson(v);
+    json['songs'].forEach((String k, dynamic v) {
+      songs[k] = dto.Song.fromJson(v);
     });
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'data': data?.toJson(),
-        'children': _children.map((key, value) => MapEntry(key, value.toJson())),
-        'populated': populated,
+        'populatedDirectories': populatedDirectories.toList(),
+        'directoryChildren': directoryChildren.map((key, value) => MapEntry(key, value.toList())),
+        'directorySongs': directorySongs.map((key, value) => MapEntry(key, value.toList())),
+        'songs': songs.map((key, value) => MapEntry(key, value.toJson())),
       };
-}
-
-class Song {
-  final dto.Song data;
-  Song(this.data);
-
-  Song.fromJson(Map<String, dynamic> json) : data = dto.Song.fromJson(json['data']);
-  Map<String, dynamic> toJson() => <String, dynamic>{'data': data.toJson()};
 }

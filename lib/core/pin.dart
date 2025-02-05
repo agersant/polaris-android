@@ -4,53 +4,162 @@ import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:polaris/core/client/app_client.dart';
 import 'package:polaris/core/connection.dart' as connection;
-import 'package:polaris/core/dto.dart' as dto;
-import 'package:polaris/core/polaris.dart' as polaris;
-import 'package:rxdart/rxdart.dart';
 
 const _firstVersion = 1;
-const _currentVersion = 1;
+const _currentVersion = 2;
 
 abstract class ManagerInterface extends ChangeNotifier {
-  Set<Host> get hosts;
-  Stream<Set<Host>> get hostsStream;
-  Set<dto.Song> getSongs(String host);
-  Set<dto.Directory> getDirectories(String host);
-  Future<Set<dto.Song>?> getAllSongs(String host);
-  Future<Set<dto.Song>?> getSongsInDirectory(String host, String path);
+  List<String> get hosts;
+  Set<String>? getSongsInHost(String host);
+  List<Pin>? getPinsForHost(String host);
+  int countSongs();
+}
+
+sealed class Pin {
+  Pin();
+
+  factory Pin.fromJson(Map<String, dynamic> json) {
+    final String type = json['type'];
+    return switch (type) {
+      'song' => SongPin.fromJson(json),
+      'directory' => DirectoryPin.fromJson(json),
+      'album' => AlbumPin.fromJson(json),
+      _ => throw 'Unexpected pin type: `$type`',
+    };
+  }
+
+  String get host;
+  String get key;
+  List<String> get songs;
+  Map<String, dynamic> toJson();
+}
+
+class SongPin extends Pin {
+  final String _host;
+  final String path;
+
+  SongPin(this._host, this.path);
+
+  @override
+  String get host => _host;
+
+  @override
+  String get key => path;
+
+  @override
+  List<String> get songs => [path];
+
+  factory SongPin.fromJson(Map<String, dynamic> json) => SongPin(
+        json['host'],
+        json['path'],
+      );
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'type': 'song',
+        'host': host,
+        'path': path,
+      };
+}
+
+class DirectoryPin extends Pin {
+  final String _host;
+  final String path;
+  final List<String> _songs;
+
+  DirectoryPin(this._host, this.path, this._songs);
+
+  @override
+  String get host => _host;
+
+  @override
+  String get key => path;
+
+  @override
+  List<String> get songs => _songs;
+
+  factory DirectoryPin.fromJson(Map<String, dynamic> json) => DirectoryPin(
+        json['host'],
+        json['path'],
+        (json['songs'] as List<dynamic>).cast<String>().toList(),
+      );
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'type': 'directory',
+        'host': host,
+        'path': path,
+        'songs': songs,
+      };
+}
+
+class AlbumPin extends Pin {
+  final String _host;
+  final String name;
+  final String? artwork;
+  final List<String> mainArtists;
+  final List<String> _songs;
+
+  AlbumPin(this._host, this.name, this.mainArtists, this._songs, this.artwork);
+
+  @override
+  String get host => _host;
+
+  @override
+  String get key => name + mainArtists.join('');
+
+  @override
+  List<String> get songs => _songs;
+
+  factory AlbumPin.fromJson(Map<String, dynamic> json) => AlbumPin(
+        json['host'],
+        json['name'],
+        (json['mainArtists'] as List<dynamic>).cast<String>().toList(),
+        (json['songs'] as List<dynamic>).cast<String>().toList(),
+        json['artwork'],
+      );
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'type': 'album',
+        'host': host,
+        'name': name,
+        'mainArtists': mainArtists,
+        'songs': songs,
+        'artwork': artwork,
+      };
+}
+
+class Pins {
+  final List<Pin> pins;
+
+  Pins(this.pins);
+
+  factory Pins.fromBytes(List<int> bytes) {
+    return Pins.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
+  }
+
+  List<int> toBytes() {
+    return io.gzip.encode(utf8.encode(jsonEncode(this)));
+  }
+
+  factory Pins.fromJson(Map<String, dynamic> json) {
+    return Pins((json['pins'] as List<dynamic>).map((p) => Pin.fromJson(p)).toList());
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{'pins': pins.map((p) => p.toJson()).toList()};
 }
 
 class Manager extends ChangeNotifier implements ManagerInterface {
-  final connection.Manager connectionManager;
-  final polaris.Client polarisClient;
-  final Map<String, Map<String, Set<dto.Song>>> _flattenCache = {};
-  final Storage _storage;
-
-  final _hostsSubject = BehaviorSubject<Set<Host>>.seeded({});
-
-  @override
-  Stream<Set<Host>> get hostsStream => _hostsSubject.stream;
-
-  @override
-  Set<Host> get hosts => _hostsSubject.value;
-
-  Manager(
-    this._storage, {
-    required this.connectionManager,
-    required this.polarisClient,
-  }) {
-    _updateHosts();
-  }
-
-  static Future<io.File> _getPinsFile(int version) async {
-    final temporaryDirectory = await getTemporaryDirectory();
-    return io.File(p.join(temporaryDirectory.path, 'pins-v$version.pins'));
-  }
+  final connection.ManagerInterface connectionManager;
+  final AppClientInterface appClient;
+  final Pins _pins;
 
   static Future<Manager> create({
     required connection.Manager connectionManager,
-    required polaris.Client polarisClient,
+    required AppClient appClient,
   }) async {
     for (int version = _firstVersion; version < _currentVersion; version++) {
       final oldCacheFile = await _getPinsFile(version);
@@ -61,12 +170,12 @@ class Manager extends ChangeNotifier implements ManagerInterface {
       });
     }
 
-    Storage pins = Storage();
+    Pins pins = Pins([]);
     final cachedFile = await _getPinsFile(_currentVersion);
     try {
       if (await cachedFile.exists()) {
         final cacheData = await cachedFile.readAsBytes();
-        pins = Storage.fromBytes(cacheData);
+        pins = Pins.fromBytes(cacheData);
         developer.log('Read pins list from: $cachedFile');
       }
     } catch (e) {
@@ -76,162 +185,186 @@ class Manager extends ChangeNotifier implements ManagerInterface {
     return Manager(
       pins,
       connectionManager: connectionManager,
-      polarisClient: polarisClient,
+      appClient: appClient,
     );
   }
 
-  @override
-  Set<dto.Directory> getDirectories(String host) {
-    final server = _storage._servers[host];
-    if (server == null) {
-      return {};
-    }
-    return server.values.where((file) => file.isDirectory()).map<dto.Directory>((file) => file.asDirectory()).toSet();
+  Manager(
+    this._pins, {
+    required this.connectionManager,
+    required this.appClient,
+  });
+
+  static Future<io.File> _getPinsFile(int version) async {
+    final temporaryDirectory = await getTemporaryDirectory();
+    return io.File(p.join(temporaryDirectory.path, 'pins-v$version.pins'));
   }
 
   @override
-  Set<dto.Song> getSongs(String host) {
-    final server = _storage._servers[host];
-    if (server == null) {
-      return {};
-    }
-    return server.values.where((file) => file.isSong()).map<dto.Song>((file) => file.asSong()).toSet();
+  List<String> get hosts {
+    final hosts = _pins.pins.map((p) => p.host).toSet().toList();
+    hosts.sort();
+    return hosts;
   }
 
   @override
-  Future<Set<dto.Song>?> getAllSongs(String host) async {
-    final allSongs = getSongs(host);
-    final directories = getDirectories(host);
-    for (dto.Directory directory in directories) {
-      Set<dto.Song>? songs = await _flatten(host, directory.path);
-      if (songs == null) {
-        return null;
-      }
-      allSongs.addAll(songs);
-    }
-    return allSongs;
+  Set<String> getSongsInHost(String host) {
+    return _pins.pins
+        .where((p) => p.host == host)
+        .map((p) => switch (p) {
+              final SongPin p => [p.path],
+              final DirectoryPin p => p.songs,
+              final AlbumPin p => p.songs,
+            })
+        .expand<String>((p) => p)
+        .toSet();
   }
 
   @override
-  Future<Set<dto.Song>?> getSongsInDirectory(String host, String path) async {
-    return await _flatten(host, path);
+  List<Pin> getPinsForHost(String host) {
+    final list = _pins.pins.where((p) => p.host == host).toList();
+    list.sort(
+      (a, b) => switch ((a, b)) {
+        (final DirectoryPin _, final AlbumPin _) => -1,
+        (final DirectoryPin a, final DirectoryPin b) => a.path.compareTo(b.path),
+        (final DirectoryPin _, final SongPin _) => -1,
+        (final AlbumPin a, final AlbumPin b) => a.name.compareTo(b.name),
+        (final AlbumPin _, final DirectoryPin _) => 1,
+        (final AlbumPin _, final SongPin _) => -1,
+        (final SongPin _, final AlbumPin _) => 1,
+        (final SongPin _, final DirectoryPin _) => 1,
+        (final SongPin a, final SongPin b) => a.path.compareTo(b.path),
+      },
+    );
+    return list;
   }
 
-  Future<Set<dto.Song>?> _flatten(String host, String path) async {
-    Set<dto.Song>? cachedSongs = _flattenCache[host]?[path];
-    if (cachedSongs != null) {
-      return cachedSongs;
+  @override
+  int countSongs() {
+    int count = 0;
+    for (Pin pin in _pins.pins) {
+      count += pin.songs.length;
     }
-
-    if (host != connectionManager.url || !connectionManager.isConnected()) {
-      try {
-        return (await polarisClient.offlineClient.flatten(host, path)).toSet();
-      } catch (e) {
-        return {};
-      }
-    }
-
-    try {
-      final songs = (await polarisClient.flatten(path)).toSet();
-      _flattenCache.putIfAbsent(host, () => {})[path] = songs;
-      return songs;
-    } catch (e) {
-      return null;
-    }
+    return count;
   }
 
-  void pin(String host, dto.CollectionFile file) async {
-    _storage.add(host, file);
-    _updateHosts();
+  Future<void> pinSong(String? explicitHost, String song) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    _pins.pins.add(SongPin(host, song));
     notifyListeners();
     await saveToDisk();
   }
 
-  void unpin(String host, dto.CollectionFile file) async {
-    _storage.remove(host, file);
-    _updateHosts();
+  Future<void> unpinSong(String? explicitHost, String song) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    _pins.pins.removeWhere((p) => switch (p) {
+          final SongPin p => p.path == song && p.host == host,
+          _ => false,
+        });
     notifyListeners();
     await saveToDisk();
   }
 
-  bool isPinned(String host, dto.CollectionFile file) {
-    return _storage.contains(host, file);
+  bool isSongPinned(String? explicitHost, String song) {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return false;
+    }
+    return _pins.pins.any((p) => switch (p) {
+          final SongPin p => p.path == song && p.host == host,
+          _ => false,
+        });
+  }
+
+  Future<void> pinDirectory(String? explicitHost, String path) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    final songList = await appClient.flatten(path);
+    _pins.pins.add(DirectoryPin(host, path, songList.paths));
+    notifyListeners();
+    await saveToDisk();
+  }
+
+  Future<void> unpinDirectory(String? explicitHost, String path) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    _pins.pins.removeWhere((p) => switch (p) {
+          final DirectoryPin p => p.path == path && p.host == host,
+          _ => false,
+        });
+    notifyListeners();
+    await saveToDisk();
+  }
+
+  bool isDirectoryPinned(String? explicitHost, String path) {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return false;
+    }
+    return _pins.pins.any((p) => switch (p) {
+          final DirectoryPin p => p.path == path && p.host == host,
+          _ => false,
+        });
+  }
+
+  Future<void> pinAlbum(String? explicitHost, String name, List<String> mainArtists) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    final album = await appClient.apiClient?.getAlbum(name, mainArtists);
+    if (album == null) {
+      return;
+    }
+    final songs = album.songs.map((s) => s.path).toList();
+    _pins.pins.add(AlbumPin(host, name, mainArtists, songs, album.artwork));
+    notifyListeners();
+    await saveToDisk();
+  }
+
+  Future<void> unpinAlbum(String? explicitHost, String name, List<String> mainArtists) async {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return;
+    }
+    _pins.pins.removeWhere((p) => switch (p) {
+          final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists) && p.host == host,
+          _ => false,
+        });
+    notifyListeners();
+    await saveToDisk();
+  }
+
+  bool isAlbumPinned(String? explicitHost, String name, List<String> mainArtists) {
+    final host = explicitHost ?? connectionManager.url;
+    if (host == null) {
+      return false;
+    }
+    return _pins.pins.any((p) => switch (p) {
+          final AlbumPin p => p.name == name && listEquals(p.mainArtists, mainArtists) && p.host == host,
+          _ => false,
+        });
   }
 
   Future saveToDisk() async {
     try {
       final cacheFile = await _getPinsFile(_currentVersion);
       await cacheFile.create(recursive: true);
-      final serializedData = _storage.toBytes();
+      final serializedData = _pins.toBytes();
       await cacheFile.writeAsBytes(serializedData, flush: true);
       developer.log('Wrote pins list to: $cacheFile');
     } catch (e) {
       developer.log('Error while writing pins list to disk: ', error: e);
     }
-  }
-
-  void _updateHosts() {
-    _hostsSubject.add(_storage._servers.keys
-        .where((host) => _storage._servers[host]?.isNotEmpty ?? false)
-        .map((host) => Host(_storage, url: host))
-        .toSet());
-  }
-}
-
-class Host {
-  final String url;
-  late Set<dto.CollectionFile> content;
-
-  Host(Storage storage, {required this.url}) {
-    content = storage._servers[url]?.values.toSet() ?? {};
-  }
-}
-
-class Storage {
-  final Map<String, Map<String, dto.CollectionFile>> _servers = {};
-
-  Storage();
-
-  factory Storage.fromBytes(List<int> bytes) {
-    return Storage.fromJson(jsonDecode(utf8.decode(io.gzip.decode(bytes))));
-  }
-
-  List<int> toBytes() {
-    return io.gzip.encode(utf8.encode(jsonEncode(this)));
-  }
-
-  Storage.fromJson(Map<String, dynamic> json) {
-    json['servers'].forEach((String host, dynamic files) {
-      _servers[host] = <String, dto.CollectionFile>{};
-      files.forEach((String path, dynamic file) {
-        _servers[host]![path] = dto.CollectionFile.fromJson(file);
-      });
-    });
-  }
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'servers': _servers.map(
-          (host, files) => MapEntry(
-            host,
-            files.map((path, file) => MapEntry(path, file.toJson())),
-          ),
-        )
-      };
-
-  void add(String host, dto.CollectionFile file) {
-    final hostContent = _servers.putIfAbsent(host, () => <String, dto.CollectionFile>{});
-    hostContent[file.path] = file;
-  }
-
-  bool contains(String host, dto.CollectionFile file) {
-    final hostContent = _servers[host];
-    if (hostContent == null) {
-      return false;
-    }
-    return hostContent[file.path] != null;
-  }
-
-  void remove(String host, dto.CollectionFile file) {
-    _servers[host]?.remove(file.path);
   }
 }
