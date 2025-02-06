@@ -157,7 +157,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
   await _registerSingletons();
-  await FlutterDisplayMode.setHighRefreshRate();
+  FlutterDisplayMode.setHighRefreshRate();
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
