@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'package:async/async.dart';
+import 'package:polaris/core/authentication.dart' as authentication;
 import 'package:polaris/core/cache/collection.dart';
 import 'package:polaris/core/client/api/api_client.dart';
 import 'package:polaris/core/client/api/v8_dto.dart' as dto;
@@ -7,36 +8,52 @@ import 'package:polaris/core/connection.dart' as connection;
 
 class Manager {
   final connection.Manager connectionManager;
+  final authentication.Manager authenticationManager;
   final CollectionCache collectionCache;
   final APIClient apiClient;
 
   final Set<String> _failed = {};
   final List<CancelableOperation<dto.SongBatch?>> _activeFetches = [];
+  bool _cancelling = false;
 
   Manager({
     required this.connectionManager,
+    required this.authenticationManager,
     required this.collectionCache,
     required this.apiClient,
   }) {
-    connectionManager.addListener(reset);
+    connectionManager.addListener(handleConnectionChange);
+    authenticationManager.addListener(handleConnectionChange);
     collectionCache.onSongsRequested.listen((_) => _fetch());
   }
 
-  void reset() {
+  void handleConnectionChange() {
     _failed.clear();
-    for (CancelableOperation<dto.SongBatch?> activeFetch in _activeFetches) {
+    _cancelling = true;
+    final activeFetches = List.from(_activeFetches);
+    for (CancelableOperation<dto.SongBatch?> activeFetch in activeFetches) {
       activeFetch.cancel();
     }
+    _cancelling = false;
     _activeFetches.clear();
+    _fetch();
   }
 
   void _fetch() async {
-    if (_activeFetches.isNotEmpty) {
+    if (!connectionManager.isConnected() || !authenticationManager.isAuthenticated()) {
+      return;
+    }
+
+    if ((connectionManager.apiVersion ?? 0) < 8) {
       return;
     }
 
     final String? host = connectionManager.url;
     if (host == null) {
+      return;
+    }
+
+    if (_cancelling || _activeFetches.isNotEmpty) {
       return;
     }
 
@@ -86,6 +103,8 @@ class Manager {
       return;
     }
     collectionCache.putSongs(host, batch.songs);
+    final found = batch.songs.map((s) => s.path).toSet();
+    _failed.addAll(paths.where((s) => !found.contains(s)));
     _failed.addAll(batch.notFound);
   }
 }

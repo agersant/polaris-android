@@ -78,6 +78,7 @@ Future _registerSingletons() async {
   );
   final songsManager = songs.Manager(
     connectionManager: connectionManager,
+    authenticationManager: authenticationManager,
     collectionCache: collectionCache,
     apiClient: apiClient,
   );
@@ -156,7 +157,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Settings.init();
   await _registerSingletons();
-  await FlutterDisplayMode.setHighRefreshRate();
+  FlutterDisplayMode.setHighRefreshRate();
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
   await getIt<AudioPlayer>().setAudioSource(getIt<Playlist>().audioSource);
@@ -254,7 +255,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   })
               .toList();
 
-          final collapseMiniPlayer = sortedPages.lastOrNull?.child is PlayerPage;
+          final collapseMiniPlayer = !isStartupComplete || sortedPages.lastOrNull?.child is PlayerPage;
 
           return Column(
             children: [

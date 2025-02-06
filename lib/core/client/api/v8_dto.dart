@@ -64,9 +64,16 @@ class SongList {
 class SongBatchRequest {
   List<String> paths;
   SongBatchRequest({required this.paths});
+
   Map<String, dynamic> toJson() => <String, dynamic>{
         'paths': paths,
       };
+
+  factory SongBatchRequest.fromJson(Map<String, dynamic> json) {
+    return SongBatchRequest(
+      paths: (json['paths'] as List<dynamic>).cast<String>(),
+    );
+  }
 }
 
 class SongBatch {
