@@ -14,6 +14,7 @@ class Manager {
 
   final Set<String> _failed = {};
   final List<CancelableOperation<dto.SongBatch?>> _activeFetches = [];
+  bool _cancelling = false;
 
   Manager({
     required this.connectionManager,
@@ -28,9 +29,12 @@ class Manager {
 
   void handleConnectionChange() {
     _failed.clear();
-    for (CancelableOperation<dto.SongBatch?> activeFetch in _activeFetches) {
+    _cancelling = true;
+    final activeFetches = List.from(_activeFetches);
+    for (CancelableOperation<dto.SongBatch?> activeFetch in activeFetches) {
       activeFetch.cancel();
     }
+    _cancelling = false;
     _activeFetches.clear();
     _fetch();
   }
@@ -49,7 +53,7 @@ class Manager {
       return;
     }
 
-    if (_activeFetches.isNotEmpty) {
+    if (_cancelling || _activeFetches.isNotEmpty) {
       return;
     }
 
