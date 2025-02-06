@@ -70,6 +70,7 @@ class Harness {
     );
     final songsManager = songs.Manager(
       connectionManager: connectionManager,
+      authenticationManager: authenticationManager,
       collectionCache: collectionCache,
       apiClient: apiClient,
     );

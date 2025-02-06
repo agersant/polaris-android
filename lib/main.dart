@@ -78,6 +78,7 @@ Future _registerSingletons() async {
   );
   final songsManager = songs.Manager(
     connectionManager: connectionManager,
+    authenticationManager: authenticationManager,
     collectionCache: collectionCache,
     apiClient: apiClient,
   );
