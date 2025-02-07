@@ -1,1 +1,3 @@
-- 🐛 Fixed a bug where the app would sometimes fail to launch (tentative)
+- 🆕 Added seeking controls in system notifications
+- 🐛 Fixed a bug where on some devices, it was not possible to resume playback from system notifications
+
