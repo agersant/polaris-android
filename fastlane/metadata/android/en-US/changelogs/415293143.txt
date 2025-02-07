@@ -1,0 +1,1 @@
+- 🐛 Fixed a bug where the app would sometimes fail to launch (tentative)
