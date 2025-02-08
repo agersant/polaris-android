@@ -87,7 +87,9 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaAction.seek,
           MediaAction.seekForward,
           MediaAction.seekBackward,
-          if (playing) MediaAction.pause else MediaAction.play,
+          MediaAction.play,
+          MediaAction.pause,
+          MediaAction.playPause,
         },
         processingState: switch (audioPlayer.processingState) {
           ProcessingState.idle => AudioProcessingState.idle,
