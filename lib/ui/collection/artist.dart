@@ -168,7 +168,7 @@ class _ArtistState extends State<Artist> with TickerProviderStateMixin {
     return OrientationBuilder(builder: (context, orientation) {
       return SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        padding: const EdgeInsets.all(24),
         child: Column(
           spacing: 24,
           children: [
