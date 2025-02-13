@@ -12,6 +12,7 @@ jobs:
     name: Release
     runs-on: ubuntu-24.04
     steps:
+      # Merge
       - name: Merge to beta branch
         uses: devmasx/merge-branch@v1.3.1
         with:
@@ -22,30 +23,53 @@ jobs:
         uses: actions/checkout@master
         with:
           ref: beta
+      
+      # Version management
+      - name: Update version name and increment version code in pubspec.yaml
+        run: gawk -i inplace -F'[ +]' '/^[[:space:]]*version/ { $1 = $1; $2 = "${{ github.event.inputs.versionName }}+"1+$3; $3 = ""} 1' pubspec.yaml
+      - name: Read version code from pubspec.yaml
+        run: gawk -F'[ +]' '/^[[:space:]]*version/ { print "VERSION_CODE="$3 }' pubspec.yaml >> $GITHUB_ENV
+      - run: echo "${{ env.VERSION_CODE }}"
+      - name: Copy release notes
+        run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
+
+      # Build
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "3.27.1"
       - name: Retrieve encryption keys
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.2
         with:
           fileName: "android-signing-keystore.jks"
           encodedString: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-      - uses: subosito/flutter-action@v1
-        with:
-          flutter-version: "3.27.1"
-      - name: Update version name and increment version code in pubspec.yaml
-        run: gawk -i inplace -F'[ +]' '/^[[:space:]]*version/ { $1 = $1; $2 = "${{ github.event.inputs.versionName }}+"1+$3; $3 = ""} 1' pubspec.yaml
-      - name: Read version code from pubspec.yaml
-        run: gawk -F'[ +]' '/^[[:space:]]*version/ { print "VERSION_CODE="$3 }' pubspec.yaml >> $GITHUB_ENV
-      - run: echo "${{ env.VERSION_CODE }}"
-      - name: Build Flutter app
+      - name: Build apk
+        run: flutter build apk
+        env:
+          SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
+          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+      - name: Build appbundle
         run: flutter build appbundle
         env:
           SIGNING_KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
           SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
-      - name: Copy release notes
-        run: cp ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt "./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt"
-      - name: Upload release
+      
+      # Release
+      - name: Rename apk
+        run: cp build/app/outputs/apk/release/app-release.apk polaris.apk
+      - name: Make Github release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt
+          tag_name: ${{ github.event.inputs.versionName }}
+          prerelease: true
+          fail_on_unmatched_files: true
+          files: polaris.apk
+      - name: Upload to Google Play
         uses: maierj/fastlane-action@v1.4.0
         with:
           lane: "publish_to_beta"
@@ -53,6 +77,8 @@ jobs:
           options: '{ "aab_path": "build/app/outputs/bundle/release/app-release.aab" }'
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_API_KEY_JSON }}
+
+      # Bookkeeping
       - name: Commit and tag changes to beta branch
         uses: EndBug/add-and-commit@v5
         with:

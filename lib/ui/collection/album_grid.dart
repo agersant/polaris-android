@@ -50,7 +50,7 @@ class AlbumGrid extends StatelessWidget {
             final childAspectRatio = childWidth / childHeight;
 
             final gridView = GridView.builder(
-              padding: padding,
+              padding: padding ?? EdgeInsets.zero,
               physics: shrinkWrap
                   ? const NeverScrollableScrollPhysics()
                   : const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
