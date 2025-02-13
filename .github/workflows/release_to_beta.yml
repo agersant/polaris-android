@@ -59,14 +59,16 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
       
       # Release
+      - name: Rename apk
+        run: cp build/app/outputs/apk/release/app-release.apk polaris.apk
       - name: Make Github release
         uses: softprops/action-gh-release@v2
         with:
-          body-path: ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt
+          body_path: ./fastlane/metadata/android/en-US/changelogs/CURRENT_VERSION.txt
           tag_name: ${{ github.event.inputs.versionName }}
           prerelease: true
           fail_on_unmatched_files: true
-          files: build/app/outputs/apk/release/app-release.apk
+          files: polaris.apk
       - name: Upload to Google Play
         uses: maierj/fastlane-action@v1.4.0
         with:
