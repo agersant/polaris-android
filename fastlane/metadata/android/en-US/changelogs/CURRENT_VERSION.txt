@@ -1,2 +1,3 @@
-- 🐛 Fixed a bug where the app would sometimes fail to launch (tentative)
+- 🆕 Added seeking controls in system notifications
 - ✨ Adjusted whitespace on Artist/Releases and Artist/FeaturedOn pages
+- 🐛 Improved compatibility with playback controls in system notifications

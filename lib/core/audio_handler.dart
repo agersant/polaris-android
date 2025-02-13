@@ -83,6 +83,14 @@ class PolarisAudioHandler extends BaseAudioHandler with SeekHandler {
           MediaControl.skipToNext,
         ],
         androidCompactActionIndices: const [1, 3],
+        systemActions: {
+          MediaAction.pause,
+          MediaAction.play,
+          MediaAction.playPause,
+          MediaAction.seek,
+          MediaAction.seekBackward,
+          MediaAction.seekForward,
+        },
         processingState: switch (audioPlayer.processingState) {
           ProcessingState.idle => AudioProcessingState.idle,
           ProcessingState.loading => AudioProcessingState.loading,
