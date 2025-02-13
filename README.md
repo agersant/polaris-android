@@ -5,7 +5,7 @@
 
 # Polaris Android
 
-Android client for [Polaris](https://github.com/agersant/polaris). Available for download on the [Google Play Store](https://play.google.com/store/apps/details?id=agersant.polaris) or on [F-Droid](https://f-droid.org/packages/agersant.polaris/).
+Android client for [Polaris](https://github.com/agersant/polaris). Available for download on [Google Play Store](https://play.google.com/store/apps/details?id=agersant.polaris), [F-Droid](https://f-droid.org/packages/agersant.polaris/), or [Github Releases](https://github.com/agersant/polaris-android/releases).
 
 <img width="360" src="res/screenshot_album_view.png?raw=true"/>
 <img width="360" src="res/screenshot_player.png?raw=true"/>
