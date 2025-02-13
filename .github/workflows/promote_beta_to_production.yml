@@ -21,7 +21,12 @@ jobs:
       - name: Read version name
         run: gawk -F'[ +]' '/^[[:space:]]*version/ { print "VERSION_NAME="$2 }' pubspec.yaml >> $GITHUB_ENV
       - run: echo "${{ env.VERSION_NAME }}"
-      - name: Promote release
+      - name: Promote release on Github
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION_NAME }}
+          prerelease: false
+      - name: Promote release on Google Play
         uses: maierj/fastlane-action@v1.4.0
         with:
           lane: "promote_beta_to_production"
