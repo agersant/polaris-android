@@ -1,3 +1,2 @@
-- 🆕 Added seeking controls in system notifications
-- ✨ Adjusted whitespace on Artist/Releases and Artist/FeaturedOn pages
-- 🐛 Improved compatibility with playback controls in system notifications
+- 🆕 When opening the playback queue, the list of songs will now scroll to the current song
+- 🆕 Tapping a song in the queue now unpauses playback
