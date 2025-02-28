@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart' hide Placeholder;
 import 'package:get_it/get_it.dart';
@@ -19,16 +22,16 @@ import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
 
+const songHeight = 64.0;
+
 class QueuePage extends StatelessWidget {
   const QueuePage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final connection.Manager connectionManager = getIt<connection.Manager>();
     final AudioPlayer audioPlayer = getIt<AudioPlayer>();
     final Playlist playlist = getIt<Playlist>();
 
-    // TODO autoscroll to current song
     // TODO display number of songs and total duration
 
     // TODO there is a visual bug when re-ordering songs in a way that shifts the currently playing song.
@@ -42,20 +45,30 @@ class QueuePage extends StatelessWidget {
         if (isEmpty) {
           body = const ErrorMessage(queueEmpty);
         } else {
-          body = ReorderableListView.builder(
-            itemBuilder: (context, index) {
-              final SequenceState sequenceState = snapshot.data!;
-              final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
-              final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
-              onTap() => audioPlayer.seek(null, index: index);
-              return _songWidget(context, index, mediaItem, isCurrent, onTap);
-            },
-            itemCount: snapshot.data?.sequence.length ?? 0,
-            onReorder: (int oldIndex, int newIndex) {
-              playlist.moveSong(oldIndex, newIndex);
-            },
-            physics: const BouncingScrollPhysics(),
-          );
+          body = LayoutBuilder(builder: (context, constraints) {
+            final currentIndex = audioPlayer.sequenceState?.currentIndex ?? 0;
+            final numSongs = audioPlayer.sequenceState?.sequence.length ?? 0;
+            final double offset =
+                clampDouble((currentIndex - 5) * songHeight, 0, max(0, numSongs * songHeight - constraints.maxHeight));
+            final scrollController = ScrollController(initialScrollOffset: offset);
+
+            return ReorderableListView.builder(
+              itemBuilder: (context, index) {
+                final SequenceState sequenceState = snapshot.data!;
+                final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
+                final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
+                onTap() => audioPlayer.seek(null, index: index);
+                return _songWidget(context, index, mediaItem, isCurrent, onTap);
+              },
+              itemCount: snapshot.data?.sequence.length ?? 0,
+              itemExtent: songHeight,
+              onReorder: (int oldIndex, int newIndex) {
+                playlist.moveSong(oldIndex, newIndex);
+              },
+              scrollController: scrollController,
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            );
+          });
         }
 
         final clearAction = isEmpty ? null : _clearQueue;
