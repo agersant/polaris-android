@@ -57,7 +57,11 @@ class QueuePage extends StatelessWidget {
                 final SequenceState sequenceState = snapshot.data!;
                 final MediaItem mediaItem = sequenceState.sequence[index].tag as MediaItem;
                 final bool isCurrent = mediaItem.id == (sequenceState.currentSource?.tag as MediaItem).id;
-                onTap() => audioPlayer.seek(null, index: index);
+                onTap() async {
+                  await audioPlayer.seek(null, index: index);
+                  await audioPlayer.play();
+                }
+
                 return _songWidget(context, index, mediaItem, isCurrent, onTap);
               },
               itemCount: snapshot.data?.sequence.length ?? 0,
