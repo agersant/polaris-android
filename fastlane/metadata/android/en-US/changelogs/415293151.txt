@@ -1,0 +1,2 @@
+- 🆕 When opening the playback queue, the list of songs will now scroll to the current song
+- 🆕 Tapping a song in the queue now unpauses playback
