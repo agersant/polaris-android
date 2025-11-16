@@ -255,8 +255,7 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   })
               .toList();
 
-          final topPage = sortedPages.lastOrNull?.child;
-          final collapseMiniPlayer = !isStartupComplete || topPage is PlayerPage || topPage is QueuePage;
+          final collapseMiniPlayer = !isStartupComplete || sortedPages.lastOrNull?.child is PlayerPage;
 
           return Column(
             children: [
