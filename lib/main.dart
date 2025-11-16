@@ -255,40 +255,41 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
                   })
               .toList();
 
-          final topPage = sortedPages.lastOrNull?.child;
-          final collapseMiniPlayer = !isStartupComplete || topPage is PlayerPage || topPage is QueuePage;
+          final collapseMiniPlayer = !isStartupComplete || sortedPages.lastOrNull?.child is PlayerPage;
 
-          return Column(
-            children: [
-              Expanded(
-                child: Navigator(
-                  key: navigatorKey,
-                  onDidRemovePage: (page) {},
-                  pages: [
-                    if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
-                    if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-                    if (showSettings)
-                      MaterialPage<dynamic>(
-                          child: const SettingsPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.handleSettingsClosed();
-                            }
-                          }),
-                    if (showOfflineMusic)
-                      MaterialPage<dynamic>(
-                          child: const OfflineMusicPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.handleOfflineMusicClosed();
-                            }
-                          }),
-                    ...sortedPages,
-                  ],
+          return SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Navigator(
+                    key: navigatorKey,
+                    onDidRemovePage: (page) {},
+                    pages: [
+                      if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
+                      if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
+                      if (showSettings)
+                        MaterialPage<dynamic>(
+                            child: const SettingsPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.handleSettingsClosed();
+                              }
+                            }),
+                      if (showOfflineMusic)
+                        MaterialPage<dynamic>(
+                            child: const OfflineMusicPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.handleOfflineMusicClosed();
+                              }
+                            }),
+                      ...sortedPages,
+                    ],
+                  ),
                 ),
-              ),
-              MiniPlayer(collapse: collapseMiniPlayer),
-            ],
+                MiniPlayer(collapse: collapseMiniPlayer),
+              ],
+            ),
           );
         },
       ),
