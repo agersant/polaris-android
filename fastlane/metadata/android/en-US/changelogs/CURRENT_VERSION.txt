@@ -1,3 +1,4 @@
 - 🆕 When opening the playback queue, the list of songs will now scroll to the current song
 - 🆕 Tapping a song in the queue now unpauses playback
+- ✨ Adjusted whitespace on Albums page
 - 🐛 App UI no longer overlaps device safe-area (ie. nav buttons)
