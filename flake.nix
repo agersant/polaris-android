@@ -14,8 +14,11 @@ outputs = { self, nixpkgs, flake-utils }:
         };
       };
       sdk-args = {
-        buildToolsVersions = [ "34.0.0" ];
-        platformVersions = [ "33" "34" "35" ];
+        buildToolsVersions = [ "35.0.0" ];
+        platformVersions = [ "33" "34" "35" "36" ];
+        includeNDK = true;
+        ndkVersions = [ "28.2.13676358" ];
+        cmakeVersions = [ "3.22.1" ];
       };
       android-comp = pkgs.androidenv.composeAndroidPackages sdk-args;
       android-sdk = android-comp.androidsdk;
@@ -40,7 +43,7 @@ outputs = { self, nixpkgs, flake-utils }:
       devShell =
         with pkgs; mkShell rec {
           ANDROID_SDK_ROOT = "${android-sdk-root}";
-          GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_SDK_ROOT}/build-tools/34.0.0/aapt2";
+          GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_SDK_ROOT}/build-tools/35.0.0/aapt2";
           buildInputs = [
             android-emulator
             flutter
