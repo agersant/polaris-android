@@ -48,7 +48,7 @@ final darkTheme = ThemeData(
   useMaterial3: false,
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
-  indicatorColor: Colors.blue, // TabBar current tab highlight
+  tabBarTheme: const TabBarThemeData(indicatorColor: Colors.blue), // TabBar current tab highlight
 );
 
 Future _registerSingletons() async {
