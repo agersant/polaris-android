@@ -105,6 +105,7 @@ class _ConnectFormState extends State<ConnectForm> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(errorText),
       action: action,
+      persist: false,
     ));
   }
 
