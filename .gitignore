@@ -36,6 +36,7 @@
 coverage
 devtools_options.yaml
 temporaryPath
+android/build/reports
 
 # Web related
 lib/generated_plugin_registrant.dart

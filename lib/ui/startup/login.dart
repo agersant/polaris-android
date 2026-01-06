@@ -76,23 +76,30 @@ class _LoginFormState extends State<LoginForm> {
 
   void _handleError(authentication.Error error) {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
+
+    String errorText;
     switch (error) {
       case authentication.Error.authenticationAlreadyInProgress:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorAlreadyAuthenticating)));
+        errorText = errorAlreadyAuthenticating;
         break;
       case authentication.Error.incorrectCredentials:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorIncorrectCredentials)));
+        errorText = errorIncorrectCredentials;
         break;
       case authentication.Error.requestFailed:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorRequestFailed)));
+        errorText = errorRequestFailed;
         break;
       case authentication.Error.requestTimeout:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorTimeout)));
+        errorText = errorTimeout;
         break;
       case authentication.Error.unknownError:
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(errorUnknown)));
+        errorText = errorUnknown;
         break;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(errorText),
+      persist: false,
+    ));
   }
 
   @override

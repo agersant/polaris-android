@@ -2,4 +2,3 @@
 - 🆕 Tapping a song in the queue now unpauses playback
 - ✨ Adjusted whitespace on Albums page
 - 🐛 App UI no longer overlaps device safe-area (ie. nav buttons)
-- ⚒️ Updated Flutter to version 3.38

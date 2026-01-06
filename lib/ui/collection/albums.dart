@@ -72,7 +72,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
     super.build(context);
 
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       child: Column(
         spacing: 24,
         children: [
@@ -115,6 +115,7 @@ class _AlbumsState extends State<Albums> with AutomaticKeepAliveClientMixin {
       albums,
       _scrollController,
       shrinkWrap: false,
+      padding: const EdgeInsets.only(bottom: 24),
     );
   }
 

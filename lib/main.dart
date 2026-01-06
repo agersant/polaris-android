@@ -48,7 +48,7 @@ final darkTheme = ThemeData(
   useMaterial3: false,
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
-  indicatorColor: Colors.blue, // TabBar current tab highlight
+  tabBarTheme: const TabBarThemeData(indicatorColor: Colors.blue), // TabBar current tab highlight
 );
 
 Future _registerSingletons() async {
@@ -257,37 +257,39 @@ class PolarisRouterDelegate extends RouterDelegate<PolarisPath>
 
           final collapseMiniPlayer = !isStartupComplete || sortedPages.lastOrNull?.child is PlayerPage;
 
-          return Column(
-            children: [
-              Expanded(
-                child: Navigator(
-                  key: navigatorKey,
-                  onDidRemovePage: (page) {},
-                  pages: [
-                    if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
-                    if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
-                    if (showSettings)
-                      MaterialPage<dynamic>(
-                          child: const SettingsPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.handleSettingsClosed();
-                            }
-                          }),
-                    if (showOfflineMusic)
-                      MaterialPage<dynamic>(
-                          child: const OfflineMusicPage(),
-                          onPopInvoked: (didPop, dynamic result) {
-                            if (didPop) {
-                              pagesModel.handleOfflineMusicClosed();
-                            }
-                          }),
-                    ...sortedPages,
-                  ],
+          return SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Navigator(
+                    key: navigatorKey,
+                    onDidRemovePage: (page) {},
+                    pages: [
+                      if (!isStartupComplete) MaterialPage<dynamic>(child: StartupPage()),
+                      if (isStartupComplete) const MaterialPage<dynamic>(child: CollectionPage()),
+                      if (showSettings)
+                        MaterialPage<dynamic>(
+                            child: const SettingsPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.handleSettingsClosed();
+                              }
+                            }),
+                      if (showOfflineMusic)
+                        MaterialPage<dynamic>(
+                            child: const OfflineMusicPage(),
+                            onPopInvoked: (didPop, dynamic result) {
+                              if (didPop) {
+                                pagesModel.handleOfflineMusicClosed();
+                              }
+                            }),
+                      ...sortedPages,
+                    ],
+                  ),
                 ),
-              ),
-              MiniPlayer(collapse: collapseMiniPlayer),
-            ],
+                MiniPlayer(collapse: collapseMiniPlayer),
+              ],
+            ),
           );
         },
       ),
