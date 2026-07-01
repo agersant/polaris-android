@@ -1,0 +1,1 @@
+- 🐛 Fixed a bug where the mini-player would sometimes disappear during navigation
