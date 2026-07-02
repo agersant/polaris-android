@@ -104,6 +104,7 @@ class PagesModel extends ChangeNotifier {
 
   void handlePlayerClosed() {
     _isPlayerOpen = false;
+    notifyListeners();
   }
 
   void openQueue() {
