@@ -1,1 +1,1 @@
-- 🐛 Fixed a bug where the mini-player would sometimes disappear during navigation
+- ⚙️ The `Playlist lookahead` setting can now be set as high as 20 or 50 songs.
