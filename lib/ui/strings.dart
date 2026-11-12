@@ -5,7 +5,7 @@ const errorAPIVersion = 'The Polaris server responded but uses an incompatible A
 const errorNetwork = 'The Polaris server could not be reached.';
 const errorRequestFailed = 'The Polaris server sent an unexpected response.';
 const errorTimeout = 'The Polaris server is taking too long to respond.';
-const errorUnknown = 'An unknown error occured.';
+const errorUnknown = 'An unknown error occurred.';
 const errorAlreadyConnecting = 'Please wait while the connection is being established.';
 const errorAlreadyAuthenticating = 'Please wait while the authentication is in progress.';
 const errorIncorrectCredentials = 'Incorrect username or password.';
@@ -74,6 +74,7 @@ const unknownSong = 'Unknown Song';
 String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu
+const contextMenuPlayNow = 'Play Now';
 const contextMenuQueueLast = 'Play Last';
 const contextMenuQueueNext = 'Play Next';
 const contextMenuRefresh = 'Refresh';

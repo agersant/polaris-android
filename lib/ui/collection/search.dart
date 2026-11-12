@@ -111,7 +111,11 @@ class _SearchState extends State<Search> {
                   SongsContextMenuButton(
                     paths: _results,
                     icon: Icons.menu,
-                    actions: const [SongsAction.queueLast, SongsAction.queueNext],
+                    actions: const [
+                      SongsAction.playNow,
+                      SongsAction.queueNext,
+                      SongsAction.queueLast,
+                    ],
                   )
                 ],
               ),
@@ -165,8 +169,9 @@ Widget _songWidget(BuildContext context, String path) {
                     trailing: SongContextMenuButton(
                       path: path,
                       actions: const [
-                        SongAction.queueLast,
+                        SongAction.playNow,
                         SongAction.queueNext,
+                        SongAction.queueLast,
                         SongAction.songInfo,
                         SongAction.viewAlbum,
                         SongAction.viewFolder,
