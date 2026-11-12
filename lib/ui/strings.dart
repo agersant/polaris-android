@@ -74,6 +74,7 @@ const unknownSong = 'Unknown Song';
 String numSearchResults(int? n) => '${n ?? "?"} ${(n ?? 2) > 1 ? "results" : "result"}';
 
 // Context menu
+const contextMenuPlayNow = 'Play Now';
 const contextMenuQueueLast = 'Play Last';
 const contextMenuQueueNext = 'Play Next';
 const contextMenuRefresh = 'Refresh';

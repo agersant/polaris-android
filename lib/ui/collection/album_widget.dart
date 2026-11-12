@@ -61,8 +61,9 @@ class AlbumWidget extends StatelessWidget {
       name: album.name,
       mainArtists: album.mainArtists,
       actions: const [
-        AlbumAction.queueLast,
+        AlbumAction.playNow,
         AlbumAction.queueNext,
+        AlbumAction.queueLast,
         AlbumAction.togglePin,
       ],
       compact: true,

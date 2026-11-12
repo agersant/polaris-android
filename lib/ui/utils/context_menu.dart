@@ -82,8 +82,9 @@ abstract class ContextMenuButton<T> extends StatelessWidget {
 }
 
 enum DirectoryAction {
-  queueLast,
+  playNow,
   queueNext,
+  queueLast,
   refresh,
   togglePin,
 }
@@ -104,8 +105,9 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   @override
   (IconData, String) getActionVisuals(DirectoryAction action) {
     return switch (action) {
-      DirectoryAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
-      DirectoryAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      DirectoryAction.playNow => (Icons.playlist_play, contextMenuPlayNow),
+      DirectoryAction.queueNext => (Icons.playlist_add, contextMenuQueueNext),
+      DirectoryAction.queueLast => (Icons.low_priority, contextMenuQueueLast),
       DirectoryAction.refresh => (Icons.refresh, contextMenuRefresh),
       DirectoryAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
     };
@@ -114,11 +116,16 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
   @override
   void executeAction(BuildContext context, DirectoryAction action) async {
     switch (action) {
-      case DirectoryAction.queueLast:
-        getIt<Playlist>().queueLast(await _listSongs());
+      case DirectoryAction.playNow:
+        final songs = await _listSongs();
+        await getIt<Playlist>().clear();
+        getIt<Playlist>().queueLast(songs);
         break;
       case DirectoryAction.queueNext:
         getIt<Playlist>().queueNext(await _listSongs());
+        break;
+      case DirectoryAction.queueLast:
+        getIt<Playlist>().queueLast(await _listSongs());
         break;
       case DirectoryAction.refresh:
         onRefresh();
@@ -147,6 +154,7 @@ class DirectoryContextMenuButton extends ContextMenuButton<DirectoryAction> {
 }
 
 enum SongAction {
+  playNow,
   queueLast,
   queueNext,
   removeFromQueue,
@@ -177,8 +185,9 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   @override
   bool isActionPossible(SongAction action) {
     return switch (action) {
-      SongAction.queueLast => true,
+      SongAction.playNow => true,
       SongAction.queueNext => true,
+      SongAction.queueLast => true,
       SongAction.removeFromQueue => true,
       SongAction.togglePin => true,
       SongAction.songInfo => song != null,
@@ -190,8 +199,9 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   @override
   (IconData, String) getActionVisuals(SongAction action) {
     return switch (action) {
-      SongAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
-      SongAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      SongAction.playNow => (Icons.playlist_play, contextMenuPlayNow),
+      SongAction.queueNext => (Icons.playlist_add, contextMenuQueueNext),
+      SongAction.queueLast => (Icons.low_priority, contextMenuQueueLast),
       SongAction.removeFromQueue => (Icons.clear, contextMenuRemoveFromQueue),
       SongAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
       SongAction.songInfo => (Icons.info_outline, contextMenuSongInfo),
@@ -203,11 +213,15 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
   @override
   void executeAction(BuildContext context, SongAction action) async {
     switch (action) {
-      case SongAction.queueLast:
+      case SongAction.playNow:
+        await getIt<Playlist>().clear();
         getIt<Playlist>().queueLast([path]);
         break;
       case SongAction.queueNext:
         getIt<Playlist>().queueNext([path]);
+        break;
+      case SongAction.queueLast:
+        getIt<Playlist>().queueLast([path]);
         break;
       case SongAction.removeFromQueue:
         onRemoveFromQueue();
@@ -249,8 +263,9 @@ class SongContextMenuButton extends ContextMenuButton<SongAction> {
 }
 
 enum SongsAction {
-  queueLast,
+  playNow,
   queueNext,
+  queueLast,
 }
 
 class SongsContextMenuButton extends ContextMenuButton<SongsAction> {
@@ -267,27 +282,33 @@ class SongsContextMenuButton extends ContextMenuButton<SongsAction> {
   @override
   (IconData, String) getActionVisuals(SongsAction action) {
     return switch (action) {
-      SongsAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
-      SongsAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      SongsAction.playNow => (Icons.playlist_play, contextMenuPlayNow),
+      SongsAction.queueNext => (Icons.playlist_add, contextMenuQueueNext),
+      SongsAction.queueLast => (Icons.low_priority, contextMenuQueueLast),
     };
   }
 
   @override
   void executeAction(BuildContext context, SongsAction action) async {
     switch (action) {
-      case SongsAction.queueLast:
+      case SongsAction.playNow:
+        await getIt<Playlist>().clear();
         getIt<Playlist>().queueLast(paths);
         break;
       case SongsAction.queueNext:
         getIt<Playlist>().queueNext(paths);
+        break;
+      case SongsAction.queueLast:
+        getIt<Playlist>().queueLast(paths);
         break;
     }
   }
 }
 
 enum AlbumAction {
-  queueLast,
+  playNow,
   queueNext,
+  queueLast,
   togglePin,
 }
 
@@ -309,8 +330,9 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   @override
   (IconData, String) getActionVisuals(AlbumAction action) {
     return switch (action) {
-      AlbumAction.queueLast => (Icons.playlist_add, contextMenuQueueLast),
-      AlbumAction.queueNext => (Icons.playlist_play, contextMenuQueueNext),
+      AlbumAction.playNow => (Icons.playlist_play, contextMenuPlayNow),
+      AlbumAction.queueNext => (Icons.playlist_add, contextMenuQueueNext),
+      AlbumAction.queueLast => (Icons.low_priority, contextMenuQueueLast),
       AlbumAction.togglePin => (Icons.offline_pin, _isPinned() ? contextMenuUnpin : contextMenuPin),
     };
   }
@@ -318,11 +340,16 @@ class AlbumContextMenuButton extends ContextMenuButton<AlbumAction> {
   @override
   void executeAction(BuildContext context, AlbumAction action) async {
     switch (action) {
-      case AlbumAction.queueLast:
-        getIt<Playlist>().queueLast(await _listSongs());
+      case AlbumAction.playNow:
+        final songs = await _listSongs();
+        await getIt<Playlist>().clear();
+        getIt<Playlist>().queueLast(songs);
         break;
       case AlbumAction.queueNext:
         getIt<Playlist>().queueNext(await _listSongs());
+        break;
+      case AlbumAction.queueLast:
+        getIt<Playlist>().queueLast(await _listSongs());
         break;
       case AlbumAction.togglePin:
         final pinManager = getIt<pin.Manager>();
