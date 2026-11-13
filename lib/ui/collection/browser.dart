@@ -82,8 +82,9 @@ class _BrowserState extends State<Browser> with AutomaticKeepAliveClientMixin {
                                 path: browserModel.browserStack.last,
                                 icon: Icons.menu,
                                 actions: const [
-                                  DirectoryAction.queueLast,
+                                  DirectoryAction.playNow,
                                   DirectoryAction.queueNext,
+                                  DirectoryAction.queueLast,
                                   DirectoryAction.togglePin,
                                 ],
                               ),
@@ -230,8 +231,9 @@ class Directory extends StatelessWidget {
         trailing: DirectoryContextMenuButton(
           path: entry.path,
           actions: const [
-            DirectoryAction.queueLast,
+            DirectoryAction.playNow,
             DirectoryAction.queueNext,
+            DirectoryAction.queueLast,
             DirectoryAction.togglePin,
           ],
         ),
@@ -257,8 +259,9 @@ class Song extends StatelessWidget {
         trailing: SongContextMenuButton(
           path: entry.path,
           actions: const [
-            SongAction.queueLast,
+            SongAction.playNow,
             SongAction.queueNext,
+            SongAction.queueLast,
             SongAction.songInfo,
             SongAction.viewAlbum,
             SongAction.togglePin,

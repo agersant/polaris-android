@@ -175,8 +175,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                           name: widget.albumHeader.name,
                           mainArtists: widget.albumHeader.mainArtists,
                           actions: const [
-                            AlbumAction.queueLast,
+                            AlbumAction.playNow,
                             AlbumAction.queueNext,
+                            AlbumAction.queueLast,
                             AlbumAction.togglePin,
                           ],
                           songs: _album?.songs,
@@ -253,8 +254,9 @@ class _AlbumDetailsState extends State<AlbumDetails> {
                 name: widget.albumHeader.name,
                 mainArtists: widget.albumHeader.mainArtists,
                 actions: const [
-                  AlbumAction.queueLast,
+                  AlbumAction.playNow,
                   AlbumAction.queueNext,
+                  AlbumAction.queueLast,
                   AlbumAction.togglePin,
                 ],
                 songs: _album?.songs,
@@ -378,8 +380,9 @@ class Song extends StatelessWidget {
           trailing: SongContextMenuButton(
             path: song.path,
             actions: const [
-              SongAction.queueLast,
+              SongAction.playNow,
               SongAction.queueNext,
+              SongAction.queueLast,
               SongAction.songInfo,
               SongAction.viewFolder,
               SongAction.togglePin,
